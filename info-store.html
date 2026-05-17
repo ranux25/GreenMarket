@@ -557,6 +557,232 @@
     border-top: 1px solid var(--border);
   }
 
+  /* ========== MODAL DE COMMANDE ========== */
+  .order-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+  }
+  .order-modal-overlay.open { display: flex; }
+  .order-modal {
+    background: var(--white);
+    border-radius: 16px;
+    max-width: 550px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
+  }
+  @keyframes modalSlideIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .order-modal-header {
+    background: var(--wine);
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 16px 16px 0 0;
+  }
+  .order-modal-header h3 {
+    color: white;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+  .order-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: white;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  .order-modal-close:hover { opacity: 1; }
+  .order-modal-body { padding: 1.5rem; }
+  .order-product-list {
+    background: var(--cream);
+    border-radius: 12px;
+    padding: 0.5rem;
+    margin-bottom: 1.5rem;
+    max-height: 250px;
+    overflow-y: auto;
+  }
+  .order-product-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .order-product-item:last-child { border-bottom: none; }
+  .order-product-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: var(--sage-light);
+  }
+  .order-product-info { flex: 1; }
+  .order-product-name {
+    font-weight: 600;
+    color: var(--wine);
+    font-size: 0.9rem;
+  }
+  .order-product-price {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  .order-product-quantity {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .order-qty-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--sage-light);
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .order-qty-btn:hover {
+    background: var(--sage);
+    color: white;
+  }
+  .order-qty-value {
+    min-width: 30px;
+    text-align: center;
+    font-weight: 600;
+  }
+  .order-product-total {
+    font-weight: 700;
+    color: var(--wine);
+    min-width: 70px;
+    text-align: right;
+  }
+  .order-summary {
+    background: var(--cream);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .order-summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .order-summary-row:last-child {
+    border-bottom: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--wine);
+    padding-top: 0.8rem;
+    margin-top: 0.3rem;
+  }
+  .order-summary-label { color: var(--text-muted); }
+  .order-summary-value { font-weight: 600; }
+  .order-form-group { margin-bottom: 1rem; }
+  .order-form-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+  }
+  .order-form-group select,
+  .order-form-group input,
+  .order-form-group textarea {
+    width: 100%;
+    padding: 0.7rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Jost', sans-serif;
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .order-form-group select:focus,
+  .order-form-group input:focus,
+  .order-form-group textarea:focus { border-color: var(--wine); }
+  .order-radio-group {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    padding: 0.5rem 0;
+  }
+  .order-radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: normal;
+  }
+  .order-modal-footer {
+    padding: 1rem 1.5rem 1.5rem;
+    display: flex;
+    gap: 1rem;
+  }
+  .btn-confirm {
+    flex: 2;
+    background: var(--wine);
+    color: white;
+    border: none;
+    padding: 0.8rem;
+    border-radius: 40px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-confirm:hover { background: var(--wine-dark); }
+  .btn-cancel-order {
+    flex: 1;
+    background: var(--border);
+    color: var(--text-muted);
+    border: none;
+    padding: 0.8rem;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-cancel-order:hover { background: var(--sage-light); }
+  .order-success {
+    text-align: center;
+    padding: 2rem;
+  }
+  .order-success-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+  .order-success h4 {
+    color: var(--wine);
+    margin-bottom: 0.5rem;
+  }
+  .order-success p {
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+
   @media (max-width: 700px) {
     nav { padding: 0 1rem; }
     .nav-links { display: none; }
@@ -567,263 +793,6 @@
     .products-grid { grid-template-columns: 1fr; }
     .shop-name { font-size: 1.6rem; }
   }
-  <!-- Añade este CSS al final de la sección <style> de info-store.html -->
-
-/* ========== MODAL DE COMMANDE ========== */
-.order-modal-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  backdrop-filter: blur(4px);
-}
-.order-modal-overlay.open {
-  display: flex;
-}
-.order-modal {
-  background: var(--white);
-  border-radius: 16px;
-  max-width: 550px;
-  width: 90%;
-  max-height: 85vh;
-  overflow-y: auto;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-  animation: modalSlideIn 0.3s ease;
-}
-@keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.order-modal-header {
-  background: var(--wine);
-  padding: 1.2rem 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-radius: 16px 16px 0 0;
-}
-.order-modal-header h3 {
-  color: white;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.3rem;
-  font-weight: 600;
-}
-.order-modal-close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: white;
-  opacity: 0.7;
-  transition: opacity 0.2s;
-}
-.order-modal-close:hover {
-  opacity: 1;
-}
-.order-modal-body {
-  padding: 1.5rem;
-}
-.order-product-list {
-  background: var(--cream);
-  border-radius: 12px;
-  padding: 0.5rem;
-  margin-bottom: 1.5rem;
-  max-height: 250px;
-  overflow-y: auto;
-}
-.order-product-item {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  padding: 0.8rem;
-  border-bottom: 1px solid var(--border);
-}
-.order-product-item:last-child {
-  border-bottom: none;
-}
-.order-product-img {
-  width: 50px;
-  height: 50px;
-  border-radius: 8px;
-  object-fit: cover;
-  background: var(--sage-light);
-}
-.order-product-info {
-  flex: 1;
-}
-.order-product-name {
-  font-weight: 600;
-  color: var(--wine);
-  font-size: 0.9rem;
-}
-.order-product-price {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-.order-product-quantity {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.order-qty-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--sage-light);
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.order-qty-btn:hover {
-  background: var(--sage);
-  color: white;
-}
-.order-qty-value {
-  min-width: 30px;
-  text-align: center;
-  font-weight: 600;
-}
-.order-product-total {
-  font-weight: 700;
-  color: var(--wine);
-  min-width: 70px;
-  text-align: right;
-}
-
-.order-summary {
-  background: var(--cream);
-  border-radius: 12px;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-}
-.order-summary-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid var(--border);
-}
-.order-summary-row:last-child {
-  border-bottom: none;
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--wine);
-  padding-top: 0.8rem;
-  margin-top: 0.3rem;
-}
-.order-summary-label {
-  color: var(--text-muted);
-}
-.order-summary-value {
-  font-weight: 600;
-}
-
-.order-form-group {
-  margin-bottom: 1rem;
-}
-.order-form-group label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
-  margin-bottom: 0.3rem;
-}
-.order-form-group select,
-.order-form-group input,
-.order-form-group textarea {
-  width: 100%;
-  padding: 0.7rem;
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  font-family: 'Jost', sans-serif;
-  background: var(--cream);
-  outline: none;
-  transition: border-color 0.2s;
-}
-.order-form-group select:focus,
-.order-form-group input:focus,
-.order-form-group textarea:focus {
-  border-color: var(--wine);
-}
-.order-radio-group {
-  display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  padding: 0.5rem 0;
-}
-.order-radio-group label {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.85rem;
-  text-transform: none;
-  letter-spacing: normal;
-  font-weight: normal;
-}
-.order-modal-footer {
-  padding: 1rem 1.5rem 1.5rem;
-  display: flex;
-  gap: 1rem;
-}
-.btn-confirm {
-  flex: 2;
-  background: var(--wine);
-  color: white;
-  border: none;
-  padding: 0.8rem;
-  border-radius: 40px;
-  font-weight: 700;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.btn-confirm:hover {
-  background: var(--wine-dark);
-}
-.btn-cancel-order {
-  flex: 1;
-  background: var(--border);
-  color: var(--text-muted);
-  border: none;
-  padding: 0.8rem;
-  border-radius: 40px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.btn-cancel-order:hover {
-  background: var(--sage-light);
-}
-.order-success {
-  text-align: center;
-  padding: 2rem;
-}
-.order-success-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-}
-.order-success h4 {
-  color: var(--wine);
-  margin-bottom: 0.5rem;
-}
-.order-success p {
-  color: var(--text-muted);
-  margin-bottom: 1rem;
-}
 </style>
 </head>
 <body>
@@ -857,6 +826,51 @@
 
 <div class="footer-note">
   🌿 GreenMarket – Mettre en valeur les producteurs locaux
+</div>
+
+<!-- MODAL DE COMMANDE -->
+<div class="order-modal-overlay" id="orderModal">
+  <div class="order-modal">
+    <div class="order-modal-header">
+      <h3>🛍️ Validation de la commande</h3>
+      <button class="order-modal-close" onclick="closeOrderModal()">✕</button>
+    </div>
+    <div class="order-modal-body" id="orderModalBody">
+      <div id="orderProductsList" class="order-product-list"></div>
+      <div class="order-summary">
+        <div class="order-summary-row"><span class="order-summary-label">Sous-total</span><span id="orderSubtotal">0.00 €</span></div>
+        <div class="order-summary-row"><span class="order-summary-label">Livraison</span><span id="orderDelivery">5.00 €</span></div>
+        <div class="order-summary-row"><span class="order-summary-label">Total</span><span id="orderTotal">0.00 €</span></div>
+      </div>
+      <div class="order-form-group">
+        <label>Mode de livraison</label>
+        <div class="order-radio-group">
+          <label><input type="radio" name="delivery" value="delivery" checked> 📦 Livraison à domicile</label>
+          <label><input type="radio" name="delivery" value="pickup"> 🏪 Retrait en boutique</label>
+        </div>
+      </div>
+      <div class="order-form-group" id="addressGroup">
+        <label>Adresse de livraison</label>
+        <input type="text" id="orderAddress" placeholder="Votre adresse complète">
+      </div>
+      <div class="order-form-group">
+        <label>Mode de paiement</label>
+        <div class="order-radio-group">
+          <label><input type="radio" name="payment" value="card" checked> 💳 Carte bancaire</label>
+          <label><input type="radio" name="payment" value="paypal"> 📱 PayPal</label>
+          <label><input type="radio" name="payment" value="cash"> 💶 Espèce à la livraison</label>
+        </div>
+      </div>
+      <div class="order-form-group">
+        <label>Notes (optionnel)</label>
+        <textarea id="orderNotes" rows="2" placeholder="Instructions particulières..."></textarea>
+      </div>
+    </div>
+    <div class="order-modal-footer">
+      <button class="btn-cancel-order" onclick="closeOrderModal()">Annuler</button>
+      <button class="btn-confirm" onclick="confirmOrder()">Confirmer la commande</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -894,7 +908,7 @@
   }
 
   function showToast(msg, bg = 'var(--wine)') {
-    const toast = document.getElementById('toast');
+    let toast = document.getElementById('toast');
     if (!toast) {
       const t = document.createElement('div');
       t.id = 'toast';
@@ -1008,7 +1022,6 @@
     document.getElementById('productImageFile').value = '';
     document.getElementById('imagePreview').innerHTML = product?.image ? `<img src="${product.image}" alt="Aperçu">` : '<div class="preview-placeholder">Aucune image</div>';
     
-    // Resetear selección de tipo de imagen
     document.querySelector('input[name="productImageType"][value="url"]').checked = true;
     document.getElementById('productUrlContainer').style.display = 'block';
     document.getElementById('productFileContainer').style.display = 'none';
@@ -1061,7 +1074,7 @@
         showToast("✅ Produit ajouté");
       }
       closeProductModal();
-      loadShop(); // Recargar la página
+      loadShop();
     });
   }
 
@@ -1100,13 +1113,176 @@
     }
   }
 
-  // ========== ELIMINAR PRODUCTO ==========
   function deleteProductConfirm(shopId, productId) {
     if (confirm("Supprimer ce produit ?")) {
       deleteProduct(shopId, productId);
       loadShop();
       showToast("✅ Produit supprimé");
     }
+  }
+
+  // ========== MODAL DE COMMANDE ==========
+  let orderProducts = [];
+  let orderTotal = 0;
+
+  function openOrderModal(shopId, shopName, productsList) {
+    orderProducts = productsList.map(p => ({
+      id: p.id,
+      name: p.name,
+      price: parseFloat(p.price.replace('€', '').replace('/kg', '').replace('/barquette', '').replace('/botte', '').replace('/pot', '').replace('/L', '').trim()) || 5,
+      priceDisplay: p.price,
+      image: p.image,
+      stock: p.stock,
+      quantity: 1
+    }));
+    
+    updateOrderModal();
+    document.getElementById('orderModal').classList.add('open');
+  }
+
+  function updateOrderModal() {
+    const productListHtml = orderProducts.map(p => `
+      <div class="order-product-item">
+        <img src="${p.image}" class="order-product-img" onerror="this.src='https://picsum.photos/id/20/100/100'">
+        <div class="order-product-info">
+          <div class="order-product-name">${escapeHtml(p.name)}</div>
+          <div class="order-product-price">${p.priceDisplay}</div>
+        </div>
+        <div class="order-product-quantity">
+          <button class="order-qty-btn" onclick="updateProductQuantity(${p.id}, -1)">-</button>
+          <span class="order-qty-value">${p.quantity}</span>
+          <button class="order-qty-btn" onclick="updateProductQuantity(${p.id}, 1)">+</button>
+        </div>
+        <div class="order-product-total">${(p.price * p.quantity).toFixed(2)} €</div>
+      </div>
+    `).join('');
+    
+    const subtotal = orderProducts.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+    const delivery = 5;
+    orderTotal = subtotal + delivery;
+    
+    document.getElementById('orderProductsList').innerHTML = productListHtml || '<div style="text-align:center; padding:1rem;">Aucun produit</div>';
+    document.getElementById('orderSubtotal').textContent = subtotal.toFixed(2) + ' €';
+    document.getElementById('orderDelivery').textContent = delivery.toFixed(2) + ' €';
+    document.getElementById('orderTotal').textContent = orderTotal.toFixed(2) + ' €';
+  }
+
+  function updateProductQuantity(productId, delta) {
+    const product = orderProducts.find(p => p.id === productId);
+    if (product) {
+      const newQty = product.quantity + delta;
+      if (newQty >= 1 && newQty <= (product.stock || 99)) {
+        product.quantity = newQty;
+        updateOrderModal();
+      }
+    }
+  }
+
+  function confirmOrder() {
+    const deliveryMethod = document.querySelector('input[name="delivery"]:checked')?.value;
+    const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value;
+    const address = document.getElementById('orderAddress').value.trim();
+    const notes = document.getElementById('orderNotes').value.trim();
+    
+    if (!deliveryMethod) {
+      showToast("⚠️ Veuillez choisir un mode de livraison", '#9a4a00');
+      return;
+    }
+    if (!address && deliveryMethod !== 'pickup') {
+      showToast("⚠️ Veuillez saisir votre adresse", '#9a4a00');
+      return;
+    }
+    
+    const order = {
+      id: Date.now(),
+      date: new Date().toLocaleString('fr-FR'),
+      products: orderProducts.map(p => ({ ...p })),
+      subtotal: orderProducts.reduce((sum, p) => sum + (p.price * p.quantity), 0),
+      delivery: 5,
+      total: orderTotal,
+      deliveryMethod: deliveryMethod,
+      paymentMethod: paymentMethod,
+      address: address,
+      notes: notes,
+      status: 'confirmée'
+    };
+    
+    const existingOrders = JSON.parse(localStorage.getItem('greenmarket_orders') || '[]');
+    existingOrders.push(order);
+    localStorage.setItem('greenmarket_orders', JSON.stringify(existingOrders));
+    
+    showOrderSuccess();
+  }
+
+  function showOrderSuccess() {
+    const modalBody = document.getElementById('orderModalBody');
+    modalBody.innerHTML = `
+      <div class="order-success">
+        <div class="order-success-icon">✅</div>
+        <h4>Commande confirmée !</h4>
+        <p>Merci pour votre commande. Vous recevrez un email de confirmation.</p>
+        <p><strong>N° de commande :</strong> #${Date.now().toString().slice(-8)}</p>
+        <button class="btn-filled" onclick="closeOrderModalAndRefresh()" style="margin-top:1rem;">Fermer</button>
+      </div>
+    `;
+    setTimeout(() => {
+      closeOrderModalAndRefresh();
+    }, 4000);
+  }
+
+  function closeOrderModalAndRefresh() {
+    document.getElementById('orderModal').classList.remove('open');
+    resetOrderModal();
+    showToast("✅ Commande confirmée !");
+  }
+
+  function resetOrderModal() {
+    const modalBody = document.getElementById('orderModalBody');
+    modalBody.innerHTML = `
+      <div id="orderProductsList" class="order-product-list"></div>
+      <div class="order-summary">
+        <div class="order-summary-row"><span class="order-summary-label">Sous-total</span><span id="orderSubtotal">0.00 €</span></div>
+        <div class="order-summary-row"><span class="order-summary-label">Livraison</span><span id="orderDelivery">5.00 €</span></div>
+        <div class="order-summary-row"><span class="order-summary-label">Total</span><span id="orderTotal">0.00 €</span></div>
+      </div>
+      <div class="order-form-group">
+        <label>Mode de livraison</label>
+        <div class="order-radio-group">
+          <label><input type="radio" name="delivery" value="delivery" checked> 📦 Livraison à domicile</label>
+          <label><input type="radio" name="delivery" value="pickup"> 🏪 Retrait en boutique</label>
+        </div>
+      </div>
+      <div class="order-form-group" id="addressGroup">
+        <label>Adresse de livraison</label>
+        <input type="text" id="orderAddress" placeholder="Votre adresse complète">
+      </div>
+      <div class="order-form-group">
+        <label>Mode de paiement</label>
+        <div class="order-radio-group">
+          <label><input type="radio" name="payment" value="card" checked> 💳 Carte bancaire</label>
+          <label><input type="radio" name="payment" value="paypal"> 📱 PayPal</label>
+          <label><input type="radio" name="payment" value="cash"> 💶 Espèce à la livraison</label>
+        </div>
+      </div>
+      <div class="order-form-group">
+        <label>Notes (optionnel)</label>
+        <textarea id="orderNotes" rows="2" placeholder="Instructions particulières..."></textarea>
+      </div>
+    `;
+    
+    const deliveryRadios = document.querySelectorAll('input[name="delivery"]');
+    deliveryRadios.forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        const addressGroup = document.getElementById('addressGroup');
+        if (addressGroup) {
+          addressGroup.style.display = e.target.value === 'pickup' ? 'none' : 'block';
+        }
+      });
+    });
+  }
+
+  function closeOrderModal() {
+    document.getElementById('orderModal').classList.remove('open');
   }
 
   // ========== PÁGINA PRINCIPAL ==========
@@ -1221,9 +1397,9 @@
             </div>
           </div>
 
-          <button class="btn-order" onclick="openOrderModal(${shop.id}, '${escapeHtml(shop.name)}', ${JSON.stringify(shopProducts)})">
+          <button class="btn-order" onclick="openOrderModal(${shop.id}, '${escapeHtml(shop.name)}', ${JSON.stringify(shopProducts).replace(/</g, '\\u003c')})">
             🛍️ Commander maintenant
-        </button>
+          </button>
         </div>
       </div>
 
@@ -1257,7 +1433,6 @@
 
     document.getElementById('content').innerHTML = html;
 
-    // Configurar eventos del modal
     setupProductModalEvents();
     
     if (isOwner) {
@@ -1278,245 +1453,12 @@
   window.openProductModal = openProductModal;
   window.deleteProductConfirm = deleteProductConfirm;
   window.closeProductModal = closeProductModal;
+  window.openOrderModal = openOrderModal;
+  window.closeOrderModal = closeOrderModal;
+  window.confirmOrder = confirmOrder;
+  window.updateProductQuantity = updateProductQuantity;
 
   loadShop();
-  // Añade este JavaScript al final de info-store.html, antes de 
-
-// ========== MODAL DE COMMANDE ==========
-let orderProducts = [];
-let orderTotal = 0;
-
-function openOrderModal(shopId, shopName, productsList) {
-  // Inicializar productos del pedido
-  orderProducts = productsList.map(p => ({
-    id: p.id,
-    name: p.name,
-    price: parseFloat(p.price.replace('€', '').replace('/kg', '').replace('/barquette', '').replace('/botte', '').replace('/pot', '').replace('/L', '').trim()) || 5,
-    priceDisplay: p.price,
-    image: p.image,
-    stock: p.stock,
-    quantity: 1
-  }));
-  
-  updateOrderModal();
-  
-  const modal = document.getElementById('orderModal');
-  modal.classList.add('open');
-}
-
-function updateOrderModal() {
-  const productListHtml = orderProducts.map(p => `
-    <div class="order-product-item">
-      <img src="${p.image}" class="order-product-img" onerror="this.src='https://picsum.photos/id/20/100/100'">
-      <div class="order-product-info">
-        <div class="order-product-name">${escapeHtml(p.name)}</div>
-        <div class="order-product-price">${p.priceDisplay}</div>
-      </div>
-      <div class="order-product-quantity">
-        <button class="order-qty-btn" onclick="updateProductQuantity(${p.id}, -1)">-</button>
-        <span class="order-qty-value">${p.quantity}</span>
-        <button class="order-qty-btn" onclick="updateProductQuantity(${p.id}, 1)">+</button>
-      </div>
-      <div class="order-product-total">${(p.price * p.quantity).toFixed(2)} €</div>
-    </div>
-  `).join('');
-  
-  const subtotal = orderProducts.reduce((sum, p) => sum + (p.price * p.quantity), 0);
-  const delivery = 5;
-  orderTotal = subtotal + delivery;
-  
-  document.getElementById('orderProductsList').innerHTML = productListHtml || '<div style="text-align:center; padding:1rem;">Aucun produit</div>';
-  document.getElementById('orderSubtotal').textContent = subtotal.toFixed(2) + ' €';
-  document.getElementById('orderDelivery').textContent = delivery.toFixed(2) + ' €';
-  document.getElementById('orderTotal').textContent = orderTotal.toFixed(2) + ' €';
-}
-
-function updateProductQuantity(productId, delta) {
-  const product = orderProducts.find(p => p.id === productId);
-  if (product) {
-    const newQty = product.quantity + delta;
-    if (newQty >= 1 && newQty <= (product.stock || 99)) {
-      product.quantity = newQty;
-      updateOrderModal();
-    }
-  }
-}
-
-function confirmOrder() {
-  const deliveryMethod = document.querySelector('input[name="delivery"]:checked')?.value;
-  const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value;
-  const address = document.getElementById('orderAddress').value.trim();
-  const notes = document.getElementById('orderNotes').value.trim();
-  
-  if (!deliveryMethod) {
-    showToast("⚠️ Veuillez choisir un mode de livraison", '#9a4a00');
-    return;
-  }
-  if (!address && deliveryMethod !== 'pickup') {
-    showToast("⚠️ Veuillez saisir votre adresse", '#9a4a00');
-    return;
-  }
-  
-  // Créer la commande
-  const order = {
-    id: Date.now(),
-    date: new Date().toLocaleString('fr-FR'),
-    products: orderProducts.map(p => ({ ...p })),
-    subtotal: orderProducts.reduce((sum, p) => sum + (p.price * p.quantity), 0),
-    delivery: 5,
-    total: orderTotal,
-    deliveryMethod: deliveryMethod,
-    paymentMethod: paymentMethod,
-    address: address,
-    notes: notes,
-    status: 'confirmée'
-  };
-  
-  // Sauvegarder dans localStorage
-  const existingOrders = JSON.parse(localStorage.getItem('greenmarket_orders') || '[]');
-  existingOrders.push(order);
-  localStorage.setItem('greenmarket_orders', JSON.stringify(existingOrders));
-  
-  // Afficher le message de succès
-  showOrderSuccess();
-}
-
-function showOrderSuccess() {
-  const modalBody = document.getElementById('orderModalBody');
-  modalBody.innerHTML = `
-    <div class="order-success">
-      <div class="order-success-icon">✅</div>
-      <h4>Commande confirmée !</h4>
-      <p>Merci pour votre commande. Vous recevrez un email de confirmation.</p>
-      <p><strong>N° de commande :</strong> #${Date.now().toString().slice(-8)}</p>
-      <button class="btn-filled" onclick="closeOrderModalAndRefresh()" style="margin-top:1rem;">Fermer</button>
-    </div>
-  `;
-  setTimeout(() => {
-    closeOrderModalAndRefresh();
-  }, 4000);
-}
-
-function closeOrderModalAndRefresh() {
-  document.getElementById('orderModal').classList.remove('open');
-  // Réinitialiser le modal pour la prochaine fois
-  const modalBody = document.getElementById('orderModalBody');
-  modalBody.innerHTML = `
-    <div id="orderProductsList" class="order-product-list"></div>
-    <div class="order-summary">
-      <div class="order-summary-row"><span class="order-summary-label">Sous-total</span><span id="orderSubtotal">0.00 €</span></div>
-      <div class="order-summary-row"><span class="order-summary-label">Livraison</span><span id="orderDelivery">5.00 €</span></div>
-      <div class="order-summary-row"><span class="order-summary-label">Total</span><span id="orderTotal">0.00 €</span></div>
-    </div>
-    <div class="order-form-group">
-      <label>Mode de livraison</label>
-      <div class="order-radio-group">
-        <label><input type="radio" name="delivery" value="delivery" checked> 📦 Livraison à domicile</label>
-        <label><input type="radio" name="delivery" value="pickup"> 🏪 Retrait en boutique</label>
-      </div>
-    </div>
-    <div class="order-form-group" id="addressGroup">
-      <label>Adresse de livraison</label>
-      <input type="text" id="orderAddress" placeholder="Votre adresse complète">
-    </div>
-    <div class="order-form-group">
-      <label>Mode de paiement</label>
-      <div class="order-radio-group">
-        <label><input type="radio" name="payment" value="card" checked> 💳 Carte bancaire</label>
-        <label><input type="radio" name="payment" value="paypal"> 📱 PayPal</label>
-        <label><input type="radio" name="payment" value="cash"> 💶 Espèce à la livraison</label>
-      </div>
-    </div>
-    <div class="order-form-group">
-      <label>Notes (optionnel)</label>
-      <textarea id="orderNotes" rows="2" placeholder="Instructions particulières..."></textarea>
-    </div>
-  `;
-  
-  // Réattacher les événements
-  const deliveryRadios = document.querySelectorAll('input[name="delivery"]');
-  deliveryRadios.forEach(radio => {
-    radio.addEventListener('change', (e) => {
-      const addressGroup = document.getElementById('addressGroup');
-      if (addressGroup) {
-        addressGroup.style.display = e.target.value === 'pickup' ? 'none' : 'block';
-      }
-    });
-  });
-  
-  const initialPickup = document.querySelector('input[name="delivery"]:checked')?.value === 'pickup';
-  const addressGroup = document.getElementById('addressGroup');
-  if (addressGroup) {
-    addressGroup.style.display = initialPickup ? 'none' : 'block';
-  }
-  
-  showToast("✅ Commande confirmée !");
-}
-
-function closeOrderModal() {
-  document.getElementById('orderModal').classList.remove('open');
-}
-
-// Modifier le bouton "Commander maintenant" pour ouvrir le modal
-// Dans la fonction loadShop(), remplacer le bouton par :
-// <button class="btn-order" onclick="openOrderModal(${shop.id}, '${escapeHtml(shop.name)}', ${JSON.stringify(shopProducts)})">
-//   🛍️ Commander maintenant
-// </button>
 </script>
-<!-- Añade este HTML al final de info-store.html, antes de </body> -->
-
-<!-- MODAL DE COMMANDE -->
-<div class="order-modal-overlay" id="orderModal">
-  <div class="order-modal">
-    <div class="order-modal-header">
-      <h3>🛍️ Validation de la commande</h3>
-      <button class="order-modal-close" onclick="closeOrderModal()">✕</button>
-    </div>
-    <div class="order-modal-body" id="orderModalBody">
-      <div id="orderProductsList" class="order-product-list"></div>
-      <div class="order-summary">
-        <div class="order-summary-row">
-          <span class="order-summary-label">Sous-total</span>
-          <span id="orderSubtotal">0.00 €</span>
-        </div>
-        <div class="order-summary-row">
-          <span class="order-summary-label">Livraison</span>
-          <span id="orderDelivery">5.00 €</span>
-        </div>
-        <div class="order-summary-row">
-          <span class="order-summary-label">Total</span>
-          <span id="orderTotal">0.00 €</span>
-        </div>
-      </div>
-      <div class="order-form-group">
-        <label>Mode de livraison</label>
-        <div class="order-radio-group">
-          <label><input type="radio" name="delivery" value="delivery" checked> 📦 Livraison à domicile</label>
-          <label><input type="radio" name="delivery" value="pickup"> 🏪 Retrait en boutique</label>
-        </div>
-      </div>
-      <div class="order-form-group" id="addressGroup">
-        <label>Adresse de livraison</label>
-        <input type="text" id="orderAddress" placeholder="Votre adresse complète">
-      </div>
-      <div class="order-form-group">
-        <label>Mode de paiement</label>
-        <div class="order-radio-group">
-          <label><input type="radio" name="payment" value="card" checked> 💳 Carte bancaire</label>
-          <label><input type="radio" name="payment" value="paypal"> 📱 PayPal</label>
-          <label><input type="radio" name="payment" value="cash"> 💶 Espèce à la livraison</label>
-        </div>
-      </div>
-      <div class="order-form-group">
-        <label>Notes (optionnel)</label>
-        <textarea id="orderNotes" rows="2" placeholder="Instructions particulières..."></textarea>
-      </div>
-    </div>
-    <div class="order-modal-footer">
-      <button class="btn-cancel-order" onclick="closeOrderModal()">Annuler</button>
-      <button class="btn-confirm" onclick="confirmOrder()">Confirmer la commande</button>
-    </div>
-  </div>
-</div>
 </body>
 </html>
