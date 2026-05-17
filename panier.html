@@ -3,701 +3,374 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GreenMarket – Mon panier</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>GreenMarket – Mon Panier</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --cream:      #fff9eb;
-    --sage:       #9fb2ac;
-    --sage-dark:  #7a9490;
-    --sage-light: #c8d8d4;
-    --wine:       #5d0d18;
-    --wine-dark:  #3e0910;
-    --wine-light: #8c2030;
-    --wine-pale:  #f5e6e8;
-    --text:       #2a1a1c;
-    --text-muted: #6b5055;
-    --border:     #e8ddd0;
-    --white:      #fffdf7;
-    --shadow:     rgba(93,13,24,.10);
-    --shadow-md:  rgba(93,13,24,.18);
-  }
+:root{
+  --cream:#fff9eb;
+  --sage:#9fb2ac;
+  --sage-dark:#7a9490;
+  --wine:#5d0d18;
+  --wine-dark:#3e0910;
+  --border:#e8ddd0;
+  --white:#fffdf7;
+  --text:#2a1a1c;
+  --text-muted:#6b5055;
+  --shadow:rgba(93,13,24,.12);
+}
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
 
-  body {
-    font-family: 'Jost', sans-serif;
-    background: var(--cream);
-    color: var(--text);
-    min-height: 100vh;
-  }
+body{
+  font-family:'Jost',sans-serif;
+  background:var(--cream);
+  color:var(--text);
+}
 
-  nav {
-    background: var(--white);
-    border-bottom: 1.5px solid var(--border);
-    padding: 0 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 68px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .nav-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.7rem;
-    font-weight: 700;
-    color: var(--wine);
-    display: flex;
-    align-items: center;
-    gap: .4rem;
-  }
-  .nav-logo span { color: var(--sage-dark); font-weight: 400; font-style: italic; }
-  .nav-links { display: flex; gap: 2rem; }
-  .nav-links a {
-    text-decoration: none;
-    color: var(--text-muted);
-    font-size: .82rem;
-    font-weight: 500;
-    letter-spacing: .09em;
-    text-transform: uppercase;
-    transition: color .2s;
-  }
-  .nav-links a:hover, .nav-links a.active { color: var(--wine); }
-  .nav-actions { display: flex; gap: .8rem; align-items: center; }
+nav{
+  background:var(--white);
+  height:70px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 2rem;
+  border-bottom:1px solid var(--border);
+}
 
-  .btn-outline {
-    border: 1.5px solid var(--wine);
-    background: transparent;
-    color: var(--wine);
-    padding: .45rem 1.2rem;
-    border-radius: 3px;
-    font-family: 'Jost', sans-serif;
-    font-size: .78rem;
-    font-weight: 600;
-    letter-spacing: .07em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all .2s;
-  }
-  .btn-outline:hover { background: var(--wine); color: var(--cream); }
-  .btn-filled {
-    background: var(--wine);
-    color: var(--cream);
-    border: none;
-    padding: .5rem 1.3rem;
-    border-radius: 3px;
-    font-family: 'Jost', sans-serif;
-    font-size: .78rem;
-    font-weight: 600;
-    letter-spacing: .07em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background .2s;
-  }
-  .btn-filled:hover { background: var(--wine-dark); }
+.nav-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.8rem;
+  font-weight:700;
+  color:var(--wine);
+}
 
-  .user-badge {
-    background: var(--wine-pale);
-    padding: 0.4rem 1rem;
-    border-radius: 30px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--wine);
-    font-weight: 600;
-    font-size: 0.85rem;
-  }
+.nav-logo span{
+  color:var(--sage-dark);
+  font-style:italic;
+}
 
-  .cart-icon {
-    position: relative;
-    cursor: pointer;
-    font-size: 1.3rem;
-    color: var(--text-muted);
-    transition: color 0.2s;
-  }
-  .cart-icon:hover { color: var(--wine); }
-  .cart-count {
-    position: absolute;
-    top: -8px;
-    right: -12px;
-    background: var(--wine);
-    color: white;
-    font-size: 0.65rem;
-    font-weight: 600;
-    padding: 0.1rem 0.4rem;
-    border-radius: 50%;
-    min-width: 18px;
-    text-align: center;
-  }
+.btn-back{
+  background:var(--wine);
+  color:white;
+  padding:.6rem 1rem;
+  border-radius:4px;
+  text-decoration:none;
+  font-size:.8rem;
+  font-weight:600;
+}
 
-  .page-header {
-    background: var(--wine);
-    padding: 2rem 2.5rem;
-    position: relative;
-    overflow: hidden;
-  }
-  .page-header::before {
-    content: '';
-    position: absolute;
-    right: -80px;
-    top: -80px;
-    width: 420px;
-    height: 420px;
-    border: 55px solid rgba(255,249,235,.05);
-    border-radius: 50%;
-  }
-  .page-header::after {
-    content: '';
-    position: absolute;
-    left: 4%;
-    bottom: -70px;
-    width: 240px;
-    height: 240px;
-    border: 40px solid rgba(159,178,172,.10);
-    border-radius: 50%;
-  }
-  .header-inner {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-  .header-left .header-eyebrow {
-    font-size: .72rem;
-    font-weight: 600;
-    letter-spacing: .2em;
-    text-transform: uppercase;
-    color: var(--sage-light);
-    margin-bottom: .9rem;
-  }
-  .header-left h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: var(--cream);
-  }
-  .header-left p {
-    color: rgba(255,249,235,.62);
-    font-size: .9rem;
-  }
+.page-header{
+  background:var(--wine);
+  color:white;
+  padding:3rem 2rem;
+}
 
-  .container {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1.5rem;
-  }
+.page-header h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:3rem;
+}
 
-  .cart-grid {
-    display: grid;
-    grid-template-columns: 1fr 350px;
-    gap: 2rem;
-  }
+.container{
+  max-width:1100px;
+  margin:2rem auto;
+  padding:0 1rem;
+}
 
-  .cart-items {
-    background: var(--white);
-    border-radius: 12px;
-    border: 1.5px solid var(--border);
-    overflow: hidden;
-  }
-  .cart-header {
-    display: grid;
-    grid-template-columns: 3fr 1fr 1fr 0.5fr;
-    padding: 1rem 1.2rem;
-    background: var(--cream);
-    border-bottom: 1px solid var(--border);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text-muted);
-  }
-  .cart-item {
-    display: grid;
-    grid-template-columns: 3fr 1fr 1fr 0.5fr;
-    align-items: center;
-    padding: 1rem 1.2rem;
-    border-bottom: 1px solid var(--border);
-    transition: background 0.2s;
-  }
-  .cart-item:hover {
-    background: rgba(159,178,172,0.05);
-  }
-  .cart-item-product {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-  }
-  .cart-item-img {
-    width: 60px;
-    height: 60px;
-    border-radius: 8px;
-    object-fit: cover;
-    background: var(--sage-light);
-  }
-  .cart-item-info h4 {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--wine);
-    margin-bottom: 0.2rem;
-  }
-  .cart-item-info p {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-  }
-  .cart-item-price {
-    font-weight: 600;
-    color: var(--text);
-    font-size: 0.9rem;
-  }
-  .cart-item-quantity {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .qty-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--sage-light);
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
-    font-size: 1rem;
-  }
-  .qty-btn:hover {
-    background: var(--sage);
-    color: white;
-  }
-  .qty-value {
-    min-width: 30px;
-    text-align: center;
-    font-weight: 600;
-  }
-  .cart-item-total {
-    font-weight: 700;
-    color: var(--wine);
-    font-size: 0.95rem;
-  }
-  .cart-item-remove {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: var(--text-muted);
-    transition: color 0.2s;
-    padding: 0.3rem;
-  }
-  .cart-item-remove:hover {
-    color: var(--wine);
-  }
+.cart-layout{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:2rem;
+}
 
-  .cart-summary {
-    background: var(--white);
-    border-radius: 12px;
-    border: 1.5px solid var(--border);
-    padding: 1.2rem;
-    position: sticky;
-    top: 90px;
-  }
-  .cart-summary h3 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border);
-  }
-  .summary-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.6rem 0;
-    font-size: 0.9rem;
-  }
-  .summary-row.total {
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--wine);
-    padding-top: 0.8rem;
-    margin-top: 0.5rem;
-    border-top: 1px solid var(--border);
-  }
-  .btn-checkout {
-    width: 100%;
-    background: var(--wine);
-    color: white;
-    border: none;
-    padding: 0.9rem;
-    border-radius: 40px;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.2s;
-    margin-top: 1rem;
-  }
-  .btn-checkout:hover {
-    background: var(--wine-dark);
-  }
-  .btn-checkout:disabled {
-    background: var(--sage);
-    cursor: not-allowed;
-  }
+.cart-items{
+  background:var(--white);
+  border-radius:10px;
+  padding:1.5rem;
+  box-shadow:0 10px 30px var(--shadow);
+}
 
-  .empty-cart {
-    text-align: center;
-    padding: 4rem 2rem;
-    background: var(--white);
-    border-radius: 12px;
-    border: 1.5px solid var(--border);
-  }
-  .empty-cart-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-  }
-  .empty-cart h3 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.5rem;
-    color: var(--text);
-    margin-bottom: 0.5rem;
-  }
-  .empty-cart p {
-    color: var(--text-muted);
-    margin-bottom: 1.5rem;
-  }
+.cart-item{
+  display:flex;
+  gap:1rem;
+  padding:1rem 0;
+  border-bottom:1px solid var(--border);
+}
 
-  .toast {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    background: var(--wine);
-    color: var(--cream);
-    padding: .85rem 1.5rem;
-    border-radius: 5px;
-    font-size: .86rem;
-    font-weight: 500;
-    box-shadow: 0 8px 28px var(--shadow-md);
-    z-index: 500;
-    transform: translateY(80px);
-    opacity: 0;
-    transition: all .35s cubic-bezier(.34,1.4,.64,1);
-  }
-  .toast.show { transform: translateY(0); opacity: 1; }
+.cart-item img{
+  width:110px;
+  height:110px;
+  object-fit:cover;
+  border-radius:8px;
+}
 
-  .footer-note {
-    text-align: center;
-    margin-top: 3rem;
-    padding: 1.5rem;
-    color: var(--text-muted);
-    border-top: 1px solid var(--border);
-  }
+.item-info{
+  flex:1;
+}
 
-  @media (max-width: 800px) {
-    .cart-grid { grid-template-columns: 1fr; }
-    .cart-header { display: none; }
-    .cart-item {
-      grid-template-columns: 1fr;
-      gap: 0.8rem;
-    }
-    .cart-item-product { grid-row: 1; }
-    .cart-item-price, .cart-item-quantity, .cart-item-total {
-      display: flex;
-      justify-content: space-between;
-      padding-left: 70px;
-    }
-    nav { padding: 0 1rem; }
-    .nav-links { display: none; }
-    .container { padding: 0 1rem; }
+.item-name{
+  font-weight:700;
+  color:var(--wine);
+  font-size:1rem;
+}
+
+.item-shop{
+  font-size:.8rem;
+  color:var(--text-muted);
+  margin:.3rem 0;
+}
+
+.item-price{
+  font-size:1rem;
+  font-weight:700;
+  color:var(--sage-dark);
+}
+
+.quantity-controls{
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  margin-top:.7rem;
+}
+
+.quantity-controls button{
+  width:30px;
+  height:30px;
+  border:none;
+  background:var(--wine);
+  color:white;
+  border-radius:4px;
+  cursor:pointer;
+}
+
+.btn-delete{
+  background:#eee;
+  color:var(--wine);
+  border:none;
+  padding:.5rem .8rem;
+  border-radius:4px;
+  cursor:pointer;
+  margin-top:.8rem;
+}
+
+.summary{
+  background:var(--white);
+  border-radius:10px;
+  padding:1.5rem;
+  height:fit-content;
+  box-shadow:0 10px 30px var(--shadow);
+}
+
+.summary h2{
+  font-family:'Cormorant Garamond',serif;
+  margin-bottom:1rem;
+}
+
+.summary-line{
+  display:flex;
+  justify-content:space-between;
+  margin:.8rem 0;
+}
+
+.total{
+  font-size:1.3rem;
+  font-weight:700;
+  color:var(--wine);
+  border-top:1px solid var(--border);
+  padding-top:1rem;
+}
+
+.btn-checkout{
+  width:100%;
+  margin-top:1.5rem;
+  background:var(--wine);
+  color:white;
+  border:none;
+  padding:1rem;
+  border-radius:6px;
+  font-weight:700;
+  cursor:pointer;
+  font-size:1rem;
+}
+
+.btn-checkout:hover{
+  background:var(--wine-dark);
+}
+
+.btn-clear{
+  width:100%;
+  margin-top:1rem;
+  background:var(--sage);
+  color:white;
+  border:none;
+  padding:.8rem;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.empty{
+  text-align:center;
+  padding:4rem;
+  background:var(--white);
+  border-radius:10px;
+}
+
+@media(max-width:850px){
+  .cart-layout{
+    grid-template-columns:1fr;
   }
+  .cart-item{
+    flex-direction:column;
+  }
+  .cart-item img{
+    width:100%;
+    height:220px;
+  }
+}
 </style>
 </head>
+
 <body>
 
 <nav>
   <div class="nav-logo">🌿 Green<span>Market</span></div>
-  <div class="nav-links">
-    <a href="store.html">Accueil</a>
-    <a href="store.html">Boutiques</a>
-    <a href="#">Produits</a>
-    <a href="#">À propos</a>
-  </div>
-  <div class="nav-actions" id="authWidget"></div>
+  <a href="store.html" class="btn-back">← Continuer les achats</a>
 </nav>
 
 <div class="page-header">
-  <div class="header-inner">
-    <div class="header-left">
-      <div class="header-eyebrow">🛒 PRÉPAREZ VOTRE COMMANDE</div>
-      <h1>Mon panier</h1>
-      <p>Vérifiez vos articles et procédez au paiement</p>
-    </div>
-  </div>
+  <h1>🛒 Mon Panier</h1>
+  <p>Retrouvez tous vos produits sélectionnés</p>
 </div>
 
 <div class="container">
-  <div id="cartContent">
-    <div class="loading" style="text-align:center; padding:3rem;">Chargement de votre panier...</div>
-  </div>
-</div>
-
-<div class="footer-note">
-  🌿 GreenMarket – Mettre en valeur les producteurs locaux
+  <div id="cartContent"></div>
 </div>
 
 <script>
-  // ========== GESTION DU PANIER ==========
-  let panier = [];
 
-  function sauvegarderPanier() {
-    localStorage.setItem('greenmarket_panier', JSON.stringify(panier));
-  }
+function getPanier(){
+  const saved = localStorage.getItem('greenmarket_panier');
+  return saved ? JSON.parse(saved) : [];
+}
 
-  function chargerPanier() {
-    const saved = localStorage.getItem('greenmarket_panier');
-    if (saved) {
-      panier = JSON.parse(saved);
-    } else {
-      panier = [];
-    }
-    return panier;
-  }
+function savePanier(panier){
+  localStorage.setItem('greenmarket_panier', JSON.stringify(panier));
+  renderCart();
+}
 
-  function ajouterAuPanier(produit) {
-    const existing = panier.find(p => p.id === produit.id);
-    if (existing) {
-      existing.quantite += 1;
-    } else {
-      panier.push({
-        id: produit.id,
-        nom: produit.name,
-        prix: produit.price,
-        prixNumerique: extrairePrixNumerique(produit.price),
-        image: produit.image,
-        boutiqueId: produit.boutiqueId,
-        boutiqueNom: produit.boutiqueNom,
-        quantite: 1
-      });
-    }
-    sauvegarderPanier();
-    mettreAJourAffichagePanier();
-    showToast(`✅ ${produit.name} ajouté au panier`);
-  }
+function removeItem(id){
+  let panier = getPanier();
+  panier = panier.filter(item => item.id !== id);
+  savePanier(panier);
+}
 
-  function modifierQuantite(produitId, delta) {
-    const index = panier.findIndex(p => p.id === produitId);
-    if (index !== -1) {
-      const nouvelleQuantite = panier[index].quantite + delta;
-      if (nouvelleQuantite <= 0) {
-        panier.splice(index, 1);
-      } else {
-        panier[index].quantite = nouvelleQuantite;
+function changeQuantity(id, delta){
+  let panier = getPanier();
+  panier = panier.map(item => {
+    if(item.id === id){
+      item.quantite += delta;
+      if(item.quantite < 1){
+        item.quantite = 1;
       }
-      sauvegarderPanier();
-      mettreAJourAffichagePanier();
     }
+    return item;
+  });
+  savePanier(panier);
+}
+
+function clearCart(){
+  if(confirm("Vider le panier ?")){
+    localStorage.removeItem('greenmarket_panier');
+    renderCart();
   }
+}
 
-  function supprimerDuPanier(produitId) {
-    panier = panier.filter(p => p.id !== produitId);
-    sauvegarderPanier();
-    mettreAJourAffichagePanier();
-    showToast("🗑️ Produit retiré du panier");
+function getTotal(panier){
+  return panier.reduce((sum,item)=>{
+    return sum + (item.prixNumerique * item.quantite);
+  },0);
+}
+
+function goCheckout(){
+  const panier = getPanier();
+  if(panier.length === 0){
+    alert("Panier vide");
+    return;
   }
+  
+  // Convertir los productos al formato esperado por checkout.html
+  const productosParaCheckout = panier.map(item => ({
+    id: item.id,
+    name: item.nom,
+    price: item.prix,
+    image: item.image,
+    quantity: item.quantite,
+    boutiqueId: item.boutiqueId,
+    boutiqueNom: item.boutiqueNom
+  }));
+  
+  const encoded = encodeURIComponent(JSON.stringify(productosParaCheckout));
+  window.location.href = `checkout.html?products=${encoded}`;
+}
 
-  function viderPanier() {
-    if (panier.length > 0 && confirm("Vider tout votre panier ?")) {
-      panier = [];
-      sauvegarderPanier();
-      mettreAJourAffichagePanier();
-      showToast("🛒 Panier vidé");
-    }
-  }
+function renderCart(){
+  const panier = getPanier();
+  const container = document.getElementById('cartContent');
 
-  function extrairePrixNumerique(prixStr) {
-    if (typeof prixStr === 'number') return prixStr;
-    if (!prixStr) return 5;
-    const match = String(prixStr).match(/(\d+(?:[.,]\d+)?)/);
-    return match ? parseFloat(match[1].replace(',', '.')) : 5;
-  }
-
-  function calculerTotaux() {
-    let sousTotal = 0;
-    for (let i = 0; i < panier.length; i++) {
-      const p = panier[i];
-      const prixNum = p.prixNumerique || extrairePrixNumerique(p.prix);
-      sousTotal += prixNum * p.quantite;
-    }
-    const livraison = sousTotal > 0 ? 5 : 0;
-    const total = sousTotal + livraison;
-    return { sousTotal, livraison, total };
-  }
-
-  function procederAuPaiement() {
-    if (panier.length === 0) {
-      showToast("⚠️ Votre panier est vide", '#9a4a00');
-      return;
-    }
-
-    // Vérifier que tous les produits sont de la même boutique
-    const premiereBoutique = panier[0].boutiqueId;
-    const memeBoutique = panier.every(p => p.boutiqueId === premiereBoutique);
-
-    if (!memeBoutique) {
-      showToast("⚠️ Veuillez sélectionner des produits d'une seule boutique", '#9a4a00');
-      return;
-    }
-
-    const produitsPourCheckout = panier.map(p => ({
-      id: p.id,
-      name: p.nom,
-      price: p.prix,
-      image: p.image,
-      quantity: p.quantite,
-      boutiqueId: p.boutiqueId,
-      boutiqueNom: p.boutiqueNom
-    }));
-
-    const encodedProducts = encodeURIComponent(JSON.stringify(produitsPourCheckout));
-    window.location.href = `checkout.html?shopId=${panier[0].boutiqueId}&shopName=${encodeURIComponent(panier[0].boutiqueNom)}&products=${encodedProducts}`;
-  }
-
-  function mettreAJourAffichagePanier() {
-    const container = document.getElementById('cartContent');
-
-    if (panier.length === 0) {
-      container.innerHTML = `
-        <div class="empty-cart">
-          <div class="empty-cart-icon">🛒</div>
-          <h3>Votre panier est vide</h3>
-          <p>Découvrez nos boutiques et ajoutez des produits à votre panier</p>
-          <a href="store.html" class="btn-filled">🛍️ Découvrir les boutiques</a>
-        </div>
-      `;
-      return;
-    }
-
-    const { sousTotal, livraison, total } = calculerTotaux();
-
-    const itemsHtml = panier.map(p => {
-      const prixNum = p.prixNumerique || extrairePrixNumerique(p.prix);
-      const totalItem = prixNum * p.quantite;
-      return `
-        <div class="cart-item">
-          <div class="cart-item-product">
-            <img src="${escapeHtml(p.image)}" class="cart-item-img" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=80&h=80&fit=crop'">
-            <div class="cart-item-info">
-              <h4>${escapeHtml(p.nom)}</h4>
-              <p>${escapeHtml(p.boutiqueNom)}</p>
-            </div>
-          </div>
-          <div class="cart-item-price">${escapeHtml(p.prix)}</div>
-          <div class="cart-item-quantity">
-            <button class="qty-btn" onclick="modifierQuantite(${p.id}, -1)">-</button>
-            <span class="qty-value">${p.quantite}</span>
-            <button class="qty-btn" onclick="modifierQuantite(${p.id}, 1)">+</button>
-          </div>
-          <div class="cart-item-total">${totalItem.toFixed(2)} €</div>
-          <button class="cart-item-remove" onclick="supprimerDuPanier(${p.id})" title="Supprimer">🗑️</button>
-        </div>
-      `;
-    }).join('');
-
-    const html = `
-      <div class="cart-grid">
-        <div class="cart-items">
-          <div class="cart-header">
-            <span>Produit</span>
-            <span>Prix unitaire</span>
-            <span>Quantité</span>
-            <span>Total</span>
-          </div>
-          ${itemsHtml}
-        </div>
-
-        <div class="cart-summary">
-          <h3>📋 Récapitulatif</h3>
-          <div class="summary-row">
-            <span>Sous-total</span>
-            <span>${sousTotal.toFixed(2)} €</span>
-          </div>
-          <div class="summary-row">
-            <span>Livraison</span>
-            <span>${livraison.toFixed(2)} €</span>
-          </div>
-          <div class="summary-row total">
-            <span>Total</span>
-            <span>${total.toFixed(2)} €</span>
-          </div>
-          <button class="btn-checkout" onclick="procederAuPaiement()">✅ Procéder au paiement</button>
-          <button class="btn-outline" onclick="viderPanier()" style="width:100%; margin-top:0.8rem;">🗑️ Vider le panier</button>
-        </div>
+  if(panier.length === 0){
+    container.innerHTML = `
+      <div class="empty">
+        <h2>🛒 Votre panier est vide</h2>
+        <p style="margin-top:1rem;">Ajoutez des produits depuis les boutiques.</p>
       </div>
     `;
-
-    container.innerHTML = html;
+    return;
   }
 
-  // ========== UTILITAIRES ==========
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-      if (m === '&') return '&amp;';
-      if (m === '<') return '&lt;';
-      if (m === '>') return '&gt;';
-      return m;
-    });
-  }
+  const total = getTotal(panier);
 
-  function showToast(msg, bg) {
-    let t = document.getElementById('toast');
-    if (!t) {
-      t = document.createElement('div');
-      t.id = 'toast';
-      t.className = 'toast';
-      document.body.appendChild(t);
-    }
-    const toastEl = document.getElementById('toast');
-    toastEl.innerHTML = msg;
-    if (bg) toastEl.style.background = bg;
-    toastEl.classList.add('show');
-    setTimeout(() => toastEl.classList.remove('show'), 3200);
-  }
+  container.innerHTML = `
+    <div class="cart-layout">
+      <div class="cart-items">
+        ${panier.map(item => `
+          <div class="cart-item">
+            <img src="${item.image}" alt="${item.nom}">
+            <div class="item-info">
+              <div class="item-name">${item.nom}</div>
+              <div class="item-shop">Boutique : ${item.boutiqueNom}</div>
+              <div class="item-price">${item.prix}</div>
+              <div class="quantity-controls">
+                <button onclick="changeQuantity(${item.id}, -1)">-</button>
+                <span>${item.quantite}</span>
+                <button onclick="changeQuantity(${item.id}, 1)">+</button>
+              </div>
+              <button class="btn-delete" onclick="removeItem(${item.id})">🗑️ Supprimer</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="summary">
+        <h2>Résumé</h2>
+        <div class="summary-line">
+          <span>Produits</span>
+          <span>${panier.length}</span>
+        </div>
+        <div class="summary-line total">
+          <span>Total</span>
+          <span>${total.toFixed(2)} €</span>
+        </div>
+        <button class="btn-checkout" onclick="goCheckout()">✅ Passer la commande</button>
+        <button class="btn-clear" onclick="clearCart()">🗑️ Vider le panier</button>
+      </div>
+    </div>
+  `;
+}
 
-  // ========== AUTH ==========
-  let currentUser = null;
+renderCart();
 
-  function getCurrentUser() {
-    const userJson = sessionStorage.getItem('greenmarket_current_user');
-    return userJson ? JSON.parse(userJson) : null;
-  }
-
-  function updateAuthUI() {
-    const widget = document.getElementById('authWidget');
-    const user = getCurrentUser();
-    if (user) {
-      let roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Producteur' : 'Client');
-      widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<a href="logout.html" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;text-decoration:none;">🚪</a></div>`;
-    } else {
-      widget.innerHTML = `<a href="store.html" class="btn-outline" style="text-decoration:none;">Accueil</a>`;
-    }
-  }
-
-  // ========== INIT ==========
-  chargerPanier();
-  mettreAJourAffichagePanier();
-  updateAuthUI();
-
-  // Exponer funciones globales
-  window.modifierQuantite = modifierQuantite;
-  window.supprimerDuPanier = supprimerDuPanier;
-  window.viderPanier = viderPanier;
-  window.procederAuPaiement = procederAuPaiement;
-  window.ajouterAuPanier = ajouterAuPanier;
 </script>
 </body>
 </html>

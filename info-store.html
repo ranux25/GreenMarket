@@ -617,7 +617,7 @@
   <div class="nav-links">
     <a href="store.html">Accueil</a>
     <a href="store.html">Boutiques</a>
-    <a href="#" class="cart-link">🛒 Panier <span id="cartCount" class="cart-count">0</span></a>
+    <a href="panier.html" class="cart-link">🛒 Panier <span id="cartCount" class="cart-count">0</span></a>
     <a href="#">À propos</a>
   </div>
   <a href="store.html" class="btn-back">← Retour</a>
@@ -740,9 +740,23 @@
 
   // ========== FUNCIONES EXISTENTES ==========
   function getCurrentUser() {
-    const userJson = sessionStorage.getItem('greenmarket_current_user');
-    return userJson ? JSON.parse(userJson) : null;
-  }
+const userJson = sessionStorage.getItem("greenmarket_current_user");
+
+if (!userJson) return null;
+
+const user = JSON.parse(userJson);
+
+// compatibilidad de roles
+if (user.role === "Producer") {
+user.role = "productor";
+}
+
+if (user.role === "Customer") {
+user.role = "client";
+}
+
+return user;
+}
 
   function escapeHtml(str) {
     if (!str) return '';
@@ -1003,7 +1017,20 @@
 
     const category = categories.find(c => c.id === shop.categoryId);
     const shopProducts = loadProductsFromStorage(shopId);
-    const isOwner = (currentUser && currentUser.role === 'productor' && currentUser.producerId === shop.producerId) || (currentUser && currentUser.role === 'admin');
+    const isOwner =
+(
+currentUser &&
+(
+currentUser.role === 'productor' ||
+currentUser.role === 'Producer'
+) &&
+currentUser.producerId == shop.producerId
+)
+||
+(
+currentUser &&
+currentUser.role === 'admin'
+);
 
     const bannerImage = shop.banner || 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1000&q=80';
 
