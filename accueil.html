@@ -26,7 +26,6 @@
  
     h1, h2, h3, .playfair { font-family: 'Playfair Display', serif; }
  
-    /* ---- HEADER ---- */
     header {
       background: #9FB2AC;
       border-bottom: 2px solid #f0e8d5;
@@ -35,26 +34,6 @@
       z-index: 100;
       box-shadow: 0 2px 16px rgba(93,13,24,0.07);
     }
- 
-    .logo-container {
-  width: 70px;
-  height: 70px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-.logo-container img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  transform: scale(1.21);
-}
  
     .search-bar input {
       border: 1.5px solid #e8dfc8;
@@ -139,33 +118,15 @@
       box-shadow: 0 4px 14px rgba(93,13,24,0.25);
     }
  
-    /* ---- HERO ---- */
     .hero-section {
       background: linear-gradient(135deg, #fdf5e0 60%, #f5ede6 100%);
       overflow: hidden;
       position: relative;
+      min-height: 75vh;
+      display: flex;
+      align-items: center;
     }
  
-    .hero-pattern {
-      position: absolute;
-      right: 0; top: 0;
-      width: 45%;
-      height: 100%;
-      opacity: 0.13;
-      pointer-events: none;
-    }
- 
-    .hero-geo {
-      position: absolute;
-      right: 4%; top: 50%;
-      transform: translateY(-50%);
-      width: 340px;
-      height: 340px;
-      pointer-events: none;
-      opacity: 0.18;
-    }
- 
-    /* ---- CATEGORIES ---- */
     .category-card {
       background: #fff;
       border-radius: 16px;
@@ -182,21 +143,9 @@
       background: #fff8f0;
       border-color: var(--secondary);
     }
-    .category-icon {
-      font-size: 36px;
-      margin-bottom: 10px;
-      display: block;
-      line-height: 1;
-    }
-    .category-name {
-      font-family: 'Lato', sans-serif;
-      font-weight: 700;
-      font-size: 13px;
-      color: var(--text-dark);
-      letter-spacing: 0.2px;
-    }
+    .category-icon { font-size: 36px; margin-bottom: 10px; display: block; line-height: 1; }
+    .category-name { font-family: 'Lato', sans-serif; font-weight: 700; font-size: 13px; color: var(--text-dark); letter-spacing: 0.2px; }
  
-    /* ---- PRODUCT CARDS ---- */
     .product-card {
       background: #fff;
       border-radius: 18px;
@@ -217,11 +166,6 @@
       height: 190px;
       object-fit: cover;
       background: linear-gradient(135deg, #f5ede0, #e8d8c4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 56px;
-      color: #c5a88a;
     }
  
     .badge {
@@ -258,7 +202,6 @@
       transform: translateY(-1px);
     }
  
-    /* ---- COOPERATIVES ---- */
     .coop-card {
       background: #fff;
       border-radius: 18px;
@@ -280,17 +223,10 @@
       font-size: 32px;
     }
  
-    /* ---- PROMO BANNER ---- */
     .promo-banner {
       background: var(--primary);
       position: relative;
       overflow: hidden;
-    }
-    .promo-banner::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23fff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
     }
  
     .btn-sage {
@@ -311,7 +247,6 @@
       box-shadow: 0 4px 14px rgba(159,178,172,0.4);
     }
  
-    /* ---- WHY SECTION ---- */
     .why-feature {
       display: flex;
       align-items: flex-start;
@@ -332,7 +267,6 @@
       margin-top: 1px;
     }
  
-    /* ---- FOOTER ---- */
     footer {
       background: var(--footer-bg);
       color: #d4b8a0;
@@ -354,7 +288,6 @@
       margin-bottom: 16px;
     }
  
-    /* ---- SECTION TITLE ---- */
     .section-title {
       font-family: 'Playfair Display', serif;
       font-size: clamp(22px, 3vw, 32px);
@@ -373,7 +306,6 @@
       width: 60%;
     }
  
-    /* Toast */
     #toast {
       position: fixed;
       bottom: 28px;
@@ -394,88 +326,115 @@
     }
     #toast.show { transform: translateY(0); opacity: 1; }
  
-    /* Responsive helpers */
+    .store-card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(93,13,24,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 1px solid #f0e8d5;
+      cursor: pointer;
+    }
+    .store-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(93,13,24,0.12);
+    }
+    .store-banner {
+      height: 150px;
+      width: 100%;
+      object-fit: cover;
+    }
+    .store-info { padding: 1rem; }
+    .store-name { font-weight: 700; font-size: 1.1rem; color: var(--primary); margin-bottom: 0.25rem; }
+    .store-category { font-size: 0.7rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    .store-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; }
+ 
     @media (max-width: 640px) {
-      .hero-geo { display: none; }
       .desktop-nav { display: none; }
     }
   </style>
 </head>
 <body>
  
-<!-- TOAST -->
 <div id="toast">✓ Produit ajouté au panier !</div>
  
-<!-- ===================== HEADER ===================== -->
+<!-- ===================== HEADER (shared with store.html) ===================== -->
 <header>
   <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4 flex-wrap">
-    <!-- Logo + Nom -->
-<div class="flex items-center gap-3">
-  <div class="logo-container overflow-hidden bg-white">
-  <img 
-    src="images/logom.png" 
-    alt="GreenMarket Logo"
-    class="w-full h-full object-contain p-1"
-  />
-</div>   
-  
-  <span
-    style="
-      font-family: 'Playfair Display', serif;
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--primary);
-      letter-spacing: 1px;
-    ">GreenMarket</span>
-</div>
- 
-    <!-- Search -->
-    <div class="search-bar flex-1 flex justify-center min-w-[180px]">
-      <input type="text" placeholder="Rechercher un produit traditionnel..." />
+    <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='accueil.html'">
+      <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl">
+        🌿
+      </div>
+      <span style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: 1px;">
+        GreenMarket
+      </span>
     </div>
- 
-    <!-- Nav -->
+
+    <div class="search-bar flex-1 flex justify-center min-w-[180px]">
+      <input type="text" id="searchInput" placeholder="Rechercher un produit traditionnel..." />
+    </div>
+
     <nav class="desktop-nav hidden md:flex items-center gap-6">
-      <a href="store.html" class="nav-link">Catalogue</a>
-      <a href="#" class="nav-link">Coopératives</a>
-      <a href="#" class="nav-link">Dashboard</a>
-      <a href="#" class="nav-link">Contact</a>
+      <a href="accueil.html" class="nav-link" id="navAccueil">Accueil</a>
+      <a href="store.html" class="nav-link" id="navBoutiques">Boutiques</a>
+      <a href="#" class="nav-link" onclick="scrollToSection('products')">Produits</a>
+      <a href="#" class="nav-link" onclick="scrollToSection('coops')">Coopératives</a>
     </nav>
- 
-    <!-- Cart + Login -->
+
     <div class="flex items-center gap-3 ml-auto md:ml-0">
-      <button class="cart-btn" title="Panier">
+      <button class="cart-btn" title="Panier" onclick="goToCart()">
         <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#5D0D18" stroke-width="1.8">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 6h14M9 21a1 1 0 1 0 2 0M15 21a1 1 0 1 0 2 0" />
         </svg>
-        <span class="cart-badge" id="cart-count">3</span>
+        <span class="cart-badge" id="cart-count">0</span>
       </button>
-      <button class="btn-primary">Connexion</button>
+      <div id="authWidget"></div>
     </div>
   </div>
 </header>
  
 <!-- ===================== HERO MODIFIÉE ===================== -->
-<section class="hero-section" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem; padding: 0;"> <!-- <<< MODIFIÉ : py-20 supprimé, padding réduit à 40px 20px, ajout flex -->
-  
-  <!-- TEXTE À GAUCHE -->
-  <div class="max-w-5xl mx-auto relative z-10" style="flex: 1; min-width: 250px; padding-left: 20px;"> <!-- <<< MODIFIÉ : ajout padding-left -->
-    <p class="text-sm font-bold tracking-widest uppercase mb-3" style="color:var(--secondary); font-family:'Lato',sans-serif;">
+<section class="hero-section" style="position: relative; min-height: 75vh; display: flex; align-items: center; overflow: hidden; padding: 0;">
+
+  <!-- FONDO (IMAGEN) -->
+  <div style="position: absolute; inset: 0;">
+    <img 
+      src="IMAGES/hero2.PNG" 
+      alt="Hero image"
+      style="width: 100%; height: 100%; object-fit: cover;"
+    />
+  </div>
+
+  <!-- DEGRADADO ABAJO (TRANSPARENTE HACIA ARRIBA) -->
+  <div style="
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top,  var(--bg), rgba(0,0,0,0));
+  "></div>
+
+  <!-- CONTENIDO -->
+  <div style="position: relative; z-index: 2; flex: 1; min-width: 250px; padding-left: 20px; max-width: 700px;">
+
+    <p class="text-sm font-bold tracking-widest uppercase mb-3"
+       style="color:var(--secondary); font-family:'Lato',sans-serif;">
       🌿 Commerce équitable & authentique
     </p>
-    <h1 class="playfair font-bold leading-tight mb-5" style="font-size:clamp(30px,5vw,58px); color:var(--primary); max-width:680px;">
+
+    <h1 class="playfair font-bold leading-tight mb-5"
+        style="font-size:clamp(30px,5vw,58px); color:var(--primary);">
       Les trésors de nos coopératives, directement chez vous
     </h1>
-    <p class="mb-8 text-lg" style="color:var(--text-light); max-width:500px; font-family:'Lato',sans-serif; line-height:1.7;">
+
+    <p class="mb-8 text-lg"
+       style="color:var(--text-light); max-width:500px; font-family:'Lato',sans-serif; line-height:1.7;">
       Produits authentiques, savoir-faire traditionnel, commerce équitable
     </p>
+
     <button class="btn-sage text-base px-8 py-3" style="font-size:15px;">
       Découvrir nos coopératives
     </button>
-  </div>
 
-  <!-- IMAGE À DROITE - AJOUTÉE -->
-  <img src="images/hero.PNG" alt="Hero image" style="flex: 1; max-width: 900px; height: 590px; object-fit: cover; border-radius: 24px; padding-right: 20px;"> <!-- <<< AJOUTÉ : l'image qui était avant en dehors de la section -->
+  </div>
 
 </section>
  
@@ -485,357 +444,56 @@
     <h2 class="section-title">Nos catégories de produits traditionnels</h2>
   </div>
   <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 gap-4">
-    <div class="category-card"><span class="category-icon">🧥</span><span class="category-name">Vêtements traditionnels</span></div>
-    <div class="category-card"><span class="category-icon">🫒</span><span class="category-name">Huiles & Condiments</span></div>
-    <div class="category-card"><span class="category-icon">🌿</span><span class="category-name">Plantes & Herbes</span></div>
-    <div class="category-card"><span class="category-icon">🍯</span><span class="category-name">Miel & Douceurs</span></div>
-    <div class="category-card"><span class="category-icon">🧺</span><span class="category-name">Artisanat & Poterie</span></div>
-    <div class="category-card"><span class="category-icon">🧴</span><span class="category-name">Produits de beauté</span></div>
-    <div class="category-card"><span class="category-icon">🌾</span><span class="category-name">Épicerie fine</span></div>
-    <div class="category-card"><span class="category-icon">🪑</span><span class="category-name">Décoration & Mobilier</span></div>
+    <div class="category-card" onclick="window.location.href='store.html?cat=Fruits%20et%20l%C3%A9gumes'"><span class="category-icon">🥦</span><span class="category-name">Fruits & légumes</span></div>
+    <div class="category-card" onclick="window.location.href='store.html?cat=Produits%20laitiers'"><span class="category-icon">🧀</span><span class="category-name">Produits laitiers</span></div>
+    <div class="category-card" onclick="window.location.href='store.html?cat=Boulangerie%20artisanale'"><span class="category-icon">🍞</span><span class="category-name">Boulangerie</span></div>
+    <div class="category-card" onclick="window.location.href='store.html?cat=Miel%20et%20apiculture'"><span class="category-icon">🍯</span><span class="category-name">Miel</span></div>
+    <div class="category-card" onclick="window.location.href='store.html?cat=Huiles%20et%20conserveries'"><span class="category-icon">🫒</span><span class="category-name">Huiles</span></div>
+    <div class="category-card" onclick="window.location.href='store.html?cat=Plantes%20m%C3%A9dicinales'"><span class="category-icon">🌿</span><span class="category-name">Plantes</span></div>
   </div>
 </section>
  
-<!-- ===================== FEATURED PRODUCTS ===================== -->
-<section
-      class="py-10 px-4"
-      style="background: linear-gradient(180deg, #fdf8ee 0%, #fff9eb 100%)"
-    >
-      <div class="max-w-7xl mx-auto">
-        <div class="mb-10">
-          <h2 class="section-title">Produits populaires des coopératives</h2>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          <!-- Card 1 -->
-          <div class="product-card">
-            <img
-              src="images/caftan.jfif"
-              class="product-img"
-              alt="Caftan traditionnel"
-            />
-            <div class="p-4 flex flex-col flex-1 gap-2">
-              <span class="badge badge-secondary">Artisanal</span>
-              <h3
-                class="font-bold text-base mt-1"
-                style="
-                  font-family: &quot;Playfair Display&quot;, serif;
-                  color: var(--text-dark);
-                "
-              >
-                Caftan traditionnel
-              </h3>
-              <p
-                class="text-xs flex items-center gap-1"
-                style="color: var(--text-light)"
-              >
-                👩‍🌾 Coopérative Fès Artisanat
-              </p>
-              <div class="flex items-center gap-1">
-                <span class="stars">★★★★½</span>
-                <span class="text-xs" style="color: var(--text-light)"
-                  >(156 avis)</span
-                >
-              </div>
-              <p
-                class="font-bold text-lg mt-auto"
-                style="
-                  color: var(--primary);
-                  font-family: &quot;Playfair Display&quot;, serif;
-                "
-              >
-                450 DH
-              </p>
-              <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">
-                Ajouter au panier
-              </button>
-            </div>
-          </div>
-
-          <!-- Card 2 -->
-          <div class="product-card">
-            <img
-              src="images/olive.jfif"
-              class="product-img"
-              alt="Huile Olive"
-            />
-            <div class="p-4 flex flex-col flex-1 gap-2">
-              <span class="badge badge-bio">Bio - Terroir</span>
-              <h3
-                class="font-bold text-base mt-1"
-                style="
-                  font-family: &quot;Playfair Display&quot;, serif;
-                  color: var(--text-dark);
-                "
-              >
-                Huile d'olive extra vierge
-              </h3>
-              <p
-                class="text-xs flex items-center gap-1"
-                style="color: var(--text-light)"
-              >
-                👩‍🌾 Coopérative Atlas
-              </p>
-              <div class="flex items-center gap-1">
-                <span class="stars">★★★★★</span>
-                <span class="text-xs" style="color: var(--text-light)"
-                  >(234 avis)</span
-                >
-              </div>
-              <p
-                class="font-bold text-lg mt-auto"
-                style="
-                  color: var(--primary);
-                  font-family: &quot;Playfair Display&quot;, serif;
-                "
-              >
-                120 DH / litre
-              </p>
-              <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">
-                Ajouter au panier
-              </button>
-            </div>
-          </div>
-
-          <!-- Card 3 -->
-          <div class="product-card">
-            <img
-              src="images/plante.jfif"
-              class="product-img"
-              alt="Plante médicinales"
-            />
-            <div class="p-4 flex flex-col flex-1 gap-2">
-              <span class="badge badge-rare">Rare</span>
-              <h3
-                class="font-bold text-base mt-1"
-                style="
-                  font-family: &quot;Playfair Display&quot;, serif;
-                  color: var(--text-dark);
-                "
-              >
-                Mélange plantes médicinales
-              </h3>
-              <p
-                class="text-xs flex items-center gap-1"
-                style="color: var(--text-light)"
-              >
-                👩‍🌾 Coopérative Ourika
-              </p>
-              <div class="flex items-center gap-1">
-                <span class="stars">★★★★½</span>
-                <span class="text-xs" style="color: var(--text-light)"
-                  >(89 avis)</span
-                >
-              </div>
-              <p
-                class="font-bold text-lg mt-auto"
-                style="
-                  color: var(--primary);
-                  font-family: &quot;Playfair Display&quot;, serif;
-                "
-              >
-                45 DH
-              </p>
-              <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">
-                Ajouter au panier
-              </button>
-            </div>
-          </div>
-
-          <!-- Card 4 -->
-          <div class="product-card">
-            <img
-              src="images/tapis.jfif"
-              class="product-img"
-              alt="Tapis traditionnel"
-            />
-            <div class="p-4 flex flex-col flex-1 gap-2">
-              <span class="badge badge-fait">Fait main</span>
-              <h3
-                class="font-bold text-base mt-1"
-                style="
-                  font-family: &quot;Playfair Display&quot;, serif;
-                  color: var(--text-dark);
-                "
-              >
-                Tapis berbère
-              </h3>
-              <p
-                class="text-xs flex items-center gap-1"
-                style="color: var(--text-light)"
-              >
-                👩‍🌾 Coopérative Haut-Atlas
-              </p>
-              <div class="flex items-center gap-1">
-                <span class="stars">★★★★★</span>
-                <span class="text-xs" style="color: var(--text-light)"
-                  >(67 avis)</span
-                >
-              </div>
-              <p
-                class="font-bold text-lg mt-auto"
-                style="
-                  color: var(--primary);
-                  font-family: &quot;Playfair Display&quot;, serif;
-                "
-              >
-                1 200 DH
-              </p>
-              <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">
-                Ajouter au panier
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+<!-- ===================== STORES SECTION (from store.html) ===================== -->
+<section class="py-10 px-4" style="background: linear-gradient(180deg, #fdf8ee 0%, #fff9eb 100%)">
+  <div class="max-w-7xl mx-auto">
+    <div class="mb-10">
+      <h2 class="section-title">Nos boutiques partenaires</h2>
+      <p class="mt-2 text-sm text-gray-500">Découvrez nos producteurs locaux et artisans</p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="storesGrid"></div>
+    <div class="text-center mt-8">
+      <button class="btn-outline" onclick="window.location.href='store.html'">Voir toutes les boutiques →</button>
+    </div>
+  </div>
+</section>
  
 <!-- ===================== COOPERATIVES ===================== -->
-<section class="py-16 px-4 max-w-7xl mx-auto">
+<section id="coops" class="py-16 px-4 max-w-7xl mx-auto">
   <div class="text-center mb-3">
     <h2 class="section-title" style="display:block; text-align:center;">Nos coopératives partenaires</h2>
     <p class="mt-4 text-base" style="color:var(--text-light); font-family:'Lato',sans-serif;">Soutenez l'artisanat et l'agriculture traditionnelle</p>
   </div>
-  <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6">
- 
-    <div class="coop-card">
-      <div class="coop-header">🏔️</div>
-      <div class="p-5">
-        <h3 class="font-bold text-base mb-1" style="font-family:'Playfair Display',serif;">Coopérative Atlas</h3>
-        <p class="text-xs mb-4 flex items-center gap-1" style="color:var(--text-light);">📍 Marrakech</p>
-        <p class="text-sm mb-4" style="color:var(--text-light);">Huiles, produits du terroir et artisanat de la région Atlas.</p>
-        <button class="btn-outline w-full">Voir la boutique</button>
-      </div>
-    </div>
- 
-    <div class="coop-card">
-      <div class="coop-header">🏺</div>
-      <div class="p-5">
-        <h3 class="font-bold text-base mb-1" style="font-family:'Playfair Display',serif;">Coopérative Fès Artisanat</h3>
-        <p class="text-xs mb-4 flex items-center gap-1" style="color:var(--text-light);">📍 Fès</p>
-        <p class="text-sm mb-4" style="color:var(--text-light);">Artisanat authentique, poterie et vêtements traditionnels.</p>
-        <button class="btn-outline w-full">Voir la boutique</button>
-      </div>
-    </div>
- 
-    <div class="coop-card">
-      <div class="coop-header">🌿</div>
-      <div class="p-5">
-        <h3 class="font-bold text-base mb-1" style="font-family:'Playfair Display',serif;">Coopérative Ourika</h3>
-        <p class="text-xs mb-4 flex items-center gap-1" style="color:var(--text-light);">📍 Ourika Valley</p>
-        <p class="text-sm mb-4" style="color:var(--text-light);">Plantes médicinales rares et produits naturels de la vallée.</p>
-        <button class="btn-outline w-full">Voir la boutique</button>
-      </div>
-    </div>
- 
-  </div>
+  <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6" id="coopsGrid"></div>
 </section>
  
 <!-- ===================== PROMO BANNER ===================== -->
 <section class="promo-banner py-12 px-4">
   <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
     <div>
-      <p class="text-xl font-bold text-white" style="font-family:'Playfair Display',serif;">
-        Livraison offerte dès 250 DH
-      </p>
+      <p class="text-xl font-bold text-white" style="font-family:'Playfair Display',serif;">Livraison offerte dès 250 DH</p>
       <p class="text-sm mt-1" style="color:#f0c8b0; font-family:'Lato',sans-serif;">Soutenez les coopératives locales et les artisans marocains</p>
     </div>
-    <button class="btn-sage px-8 py-3 whitespace-nowrap">Devenir partenaire</button>
+    <button class="btn-sage px-8 py-3 whitespace-nowrap" id="becomePartnerBtn">Devenir partenaire</button>
   </div>
 </section>
  
-<!-- ===================== SECOND PRODUCT ROW ===================== -->
-<section class="py-14 px-4" style="background:#fff;">
+<!-- ===================== PRODUCTS ===================== -->
+<section id="products" class="py-14 px-4" style="background:#fff;">
   <div class="max-w-7xl mx-auto">
     <div class="mb-10">
-      <h2 class="section-title">Nouveautés des coopératives</h2>
+      <h2 class="section-title">Produits populaires</h2>
     </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
- 
-      <div class="product-card">
-        <div class="product-img">
-            <img
-              src="images/savon.jfif"
-              class="product-img"
-              alt="Savon Noir"
-            />
-        </div>
-        <div class="p-4 flex flex-col flex-1 gap-2">
-          <span class="badge badge-secondary">Produits de beauté</span>
-          <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display',serif; color:var(--text-dark);">Savon noir</h3>
-          <p class="text-xs" style="color:var(--text-light);">👩‍🌾 Coopérative Atlas</p>
-          <div class="flex items-center gap-1">
-            <span class="stars">★★★★★</span>
-            <span class="text-xs" style="color:var(--text-light);">(112 avis)</span>
-          </div>
-          <p class="font-bold text-lg mt-auto" style="color:var(--primary); font-family:'Playfair Display',serif;">25 DH</p>
-          <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">Ajouter au panier</button>
-        </div>
-      </div>
- 
-      <div class="product-card">
-        <div class="product-img">
-            <img
-              src="images/amlou.jfif"
-              class="product-img"
-              alt="Amlou"
-            />
-        </div>
-        <div class="p-4 flex flex-col flex-1 gap-2">
-          <span class="badge badge-bio">Huiles & Condiments</span>
-          <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display',serif; color:var(--text-dark);">Amlou</h3>
-          <p class="text-xs" style="color:var(--text-light);">👩‍🌾 Coopérative Haut-Atlas</p>
-          <div class="flex items-center gap-1">
-            <span class="stars">★★★★½</span>
-            <span class="text-xs" style="color:var(--text-light);">(78 avis)</span>
-          </div>
-          <p class="font-bold text-lg mt-auto" style="color:var(--primary); font-family:'Playfair Display',serif;">35 DH</p>
-          <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">Ajouter au panier</button>
-        </div>
-      </div>
- 
-      <div class="product-card">
-        <div class="product-img">
-            <img
-              src="images/tagine.jfif"
-              class="product-img"
-              alt="Tagine"
-            />
-        </div>
-        <div class="p-4 flex flex-col flex-1 gap-2">
-          <span class="badge badge-fait">Artisanat</span>
-          <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display',serif; color:var(--text-dark);">Tajine en terre cuite</h3>
-          <p class="text-xs" style="color:var(--text-light);">👩‍🌾 Coopérative Fès Artisanat</p>
-          <div class="flex items-center gap-1">
-            <span class="stars">★★★★★</span>
-            <span class="text-xs" style="color:var(--text-light);">(203 avis)</span>
-          </div>
-          <p class="font-bold text-lg mt-auto" style="color:var(--primary); font-family:'Playfair Display',serif;">180 DH</p>
-          <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">Ajouter au panier</button>
-        </div>
-      </div>
- 
-      <div class="product-card">
-        <div class="product-img">
-            <img
-              src="images/raselhanout.jfif"
-              class="product-img"
-              alt="Savon Noir"
-            />
-        </div>
-        <div class="p-4 flex flex-col flex-1 gap-2">
-          <span class="badge" style="background:#7d5a3c; color:#fff;">Épicerie fine</span>
-          <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display',serif; color:var(--text-dark);">Ras el Hanout</h3>
-          <p class="text-xs" style="color:var(--text-light);">👩‍🌾 Coopérative Ourika</p>
-          <div class="flex items-center gap-1">
-            <span class="stars">★★★★★</span>
-            <span class="text-xs" style="color:var(--text-light);">(341 avis)</span>
-          </div>
-          <p class="font-bold text-lg mt-auto" style="color:var(--primary); font-family:'Playfair Display',serif;">30 DH</p>
-          <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">Ajouter au panier</button>
-        </div>
-      </div>
- 
-    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6" id="productsGrid"></div>
   </div>
 </section>
  
@@ -845,118 +503,278 @@
     <div>
       <h2 class="section-title mb-8">Pourquoi acheter en coopérative ?</h2>
       <div>
-        <div class="why-feature">
-          <div class="why-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div>
-            <p class="font-bold text-base" style="color:var(--text-dark); font-family:'Playfair Display',serif;">Produits authentiques et de qualité</p>
-            <p class="text-sm mt-1" style="color:var(--text-light);">Chaque produit est sélectionné avec soin, issu du savoir-faire local.</p>
-          </div>
-        </div>
-        <div class="why-feature">
-          <div class="why-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div>
-            <p class="font-bold text-base" style="color:var(--text-dark); font-family:'Playfair Display',serif;">Prix équitable pour les artisans</p>
-            <p class="text-sm mt-1" style="color:var(--text-light);">Vos achats soutiennent directement les producteurs et artisans locaux.</p>
-          </div>
-        </div>
-        <div class="why-feature">
-          <div class="why-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div>
-            <p class="font-bold text-base" style="color:var(--text-dark); font-family:'Playfair Display',serif;">Traçabilité garantie</p>
-            <p class="text-sm mt-1" style="color:var(--text-light);">Connaissez l'origine exacte de chaque produit, de la coopérative à vous.</p>
-          </div>
-        </div>
-        <div class="why-feature">
-          <div class="why-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div>
-            <p class="font-bold text-base" style="color:var(--text-dark); font-family:'Playfair Display',serif;">Préservation du savoir-faire traditionnel</p>
-            <p class="text-sm mt-1" style="color:var(--text-light);">Contribuez à la transmission des techniques ancestrales marocaines.</p>
-          </div>
-        </div>
+        <div class="why-feature"><div class="why-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><p class="font-bold text-base">Produits authentiques et de qualité</p><p class="text-sm mt-1 text-gray-500">Chaque produit est sélectionné avec soin, issu du savoir-faire local.</p></div></div>
+        <div class="why-feature"><div class="why-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><p class="font-bold text-base">Prix équitable pour les artisans</p><p class="text-sm mt-1 text-gray-500">Vos achats soutiennent directement les producteurs et artisans locaux.</p></div></div>
+        <div class="why-feature"><div class="why-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><p class="font-bold text-base">Traçabilité garantie</p><p class="text-sm mt-1 text-gray-500">Connaissez l'origine exacte de chaque produit, de la coopérative à vous.</p></div></div>
+        <div class="why-feature"><div class="why-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><p class="font-bold text-base">Préservation du savoir-faire traditionnel</p><p class="text-sm mt-1 text-gray-500">Contribuez à la transmission des techniques ancestrales marocaines.</p></div></div>
       </div>
     </div>
- 
-    <!-- Authentic image side -->
-<div class="flex items-center justify-center">
-  <img 
-    src="images/pic.jfif" 
-    alt="Produits traditionnels marocains"
-    class="rounded-2xl shadow-xl w-full max-w-sm object-cover"
-    style="aspect-ratio: 1/1;"
-  >
-</div>
+    <div class="flex items-center justify-center">
+      <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&h=500&fit=crop" alt="Produits traditionnels marocains" class="rounded-2xl shadow-xl w-full max-w-sm object-cover" style="aspect-ratio: 1/1;">
+    </div>
   </div>
 </section>
  
 <!-- ===================== FOOTER ===================== -->
 <footer class="pt-14 pb-8 px-4">
   <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 mb-10">
- 
-    <div>
-      <p class="footer-heading">CoopMarket</p>
-      <a href="#">À propos</a>
-      <a href="#">Nos coopératives</a>
-      <a href="#">Devenir partenaire</a>
-    </div>
- 
-    <div>
-      <p class="footer-heading">Aide</p>
-      <a href="#">FAQ</a>
-      <a href="#">Livraison</a>
-      <a href="#">Paiement sécurisé</a>
-    </div>
- 
-    <div>
-      <p class="footer-heading">Légal</p>
-      <a href="#">CGU</a>
-      <a href="#">Confidentialité</a>
-    </div>
- 
-    <div>
-      <p class="footer-heading">Suivez-nous</p>
-      <a href="#" class="flex items-center gap-2">
-        <svg width="16" height="16" fill="#c4a890" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-        Facebook
-      </a>
-      <a href="#" class="flex items-center gap-2 mt-1">
-        <svg width="16" height="16" fill="none" stroke="#c4a890" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#c4a890" stroke="none"/></svg>
-        Instagram
-      </a>
-    </div>
- 
+    <div><p class="footer-heading">GreenMarket</p><a href="#">À propos</a><a href="#">Nos coopératives</a><a href="#">Devenir partenaire</a></div>
+    <div><p class="footer-heading">Aide</p><a href="#">FAQ</a><a href="#">Livraison</a><a href="#">Paiement sécurisé</a></div>
+    <div><p class="footer-heading">Légal</p><a href="#">CGU</a><a href="#">Confidentialité</a></div>
+    <div><p class="footer-heading">Suivez-nous</p><a href="#" class="flex items-center gap-2">📘 Facebook</a><a href="#" class="flex items-center gap-2 mt-1">📷 Instagram</a></div>
   </div>
- 
   <div class="max-w-7xl mx-auto border-t border-opacity-20 pt-6 flex flex-col md:flex-row items-center justify-between gap-2" style="border-color:#6a2030;">
-    <p class="text-xs" style="color:#9a7060; font-family:'Lato',sans-serif;">© 2026 CoopMarket – Soutenir nos coopératives</p>
-    <p class="text-xs" style="color:#9a7060; font-family:'Lato',sans-serif;">🇲🇦 Fait avec ❤️ pour les artisans marocains</p>
+    <p class="text-xs" style="color:#9a7060;">© 2026 GreenMarket – Soutenir nos coopératives</p>
+    <p class="text-xs" style="color:#9a7060;">🇲🇦 Fait avec ❤️ pour les artisans marocains</p>
   </div>
 </footer>
- 
-<!-- ===================== JS ===================== -->
+
 <script>
-  let cartCount = 3;
-  let toastTimer = null;
- 
-  const cartBadge = document.getElementById('cart-count');
-  const toast = document.getElementById('toast');
- 
-  document.querySelectorAll('.add-to-cart').forEach(btn => {
-    btn.addEventListener('click', () => {
-      cartCount++;
-      cartBadge.textContent = cartCount;
- 
-      // Animate badge
-      cartBadge.style.transform = 'scale(1.5)';
-      setTimeout(() => { cartBadge.style.transform = 'scale(1)'; }, 200);
-      cartBadge.style.transition = 'transform 0.2s';
- 
-      // Show toast
-      if (toastTimer) clearTimeout(toastTimer);
-      toast.classList.add('show');
-      toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
-    });
+// ========== DONNÉES PRODUITS ==========
+const products = [
+  { id: 1, name: "Caftan traditionnel", price: "450 DH", image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=300&h=200&fit=crop", coop: "Coopérative Fès Artisanat", rating: 4.5, reviews: 156, badge: "Artisanal", badgeClass: "secondary" },
+  { id: 2, name: "Huile d'olive extra vierge", price: "120 DH / litre", image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&h=200&fit=crop", coop: "Coopérative Atlas", rating: 5, reviews: 234, badge: "Bio", badgeClass: "bio" },
+  { id: 3, name: "Mélange plantes médicinales", price: "45 DH", image: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=300&h=200&fit=crop", coop: "Coopérative Ourika", rating: 4.5, reviews: 89, badge: "Rare", badgeClass: "rare" },
+  { id: 4, name: "Tapis berbère", price: "1 200 DH", image: "https://images.unsplash.com/photo-1526721940322-10fb6e3ae94a?w=300&h=200&fit=crop", coop: "Coopérative Haut-Atlas", rating: 5, reviews: 67, badge: "Fait main", badgeClass: "fait" }
+];
+
+const cooperatives = [
+  { name: "Coopérative Atlas", location: "Marrakech", description: "Huiles, produits du terroir et artisanat.", icon: "🏔️" },
+  { name: "Coopérative Fès Artisanat", location: "Fès", description: "Artisanat authentique, poterie et vêtements.", icon: "🏺" },
+  { name: "Coopérative Ourika", location: "Ourika Valley", description: "Plantes médicinales rares et produits naturels.", icon: "🌿" }
+];
+
+// ========== STORES DATA ==========
+let storesData = [];
+
+function loadStoresFromStorage() {
+  const saved = localStorage.getItem('greenmarket_stores');
+  if (saved) {
+    storesData = JSON.parse(saved);
+  } else {
+    // Default stores
+    storesData = [
+      { id: 1, name: "Le Verger Céleste", category: "Fruits et légumes", banner: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=400&h=200&fit=crop", desc: "Fruits et légumes bio de Provence", rating: 4.9 },
+      { id: 2, name: "La Crèmerie des Sommets", category: "Produits laitiers", banner: "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=400&h=200&fit=crop", desc: "Fromages artisanaux de montagne", rating: 4.7 },
+      { id: 3, name: "Le Pétrin d'Antan", category: "Boulangerie", banner: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=200&fit=crop", desc: "Pain au levain et viennoiseries", rating: 4.9 }
+    ];
+    localStorage.setItem('greenmarket_stores', JSON.stringify(storesData));
+  }
+}
+
+function renderStoresOnAccueil() {
+  const grid = document.getElementById('storesGrid');
+  if (!grid) return;
+  
+  const storesToShow = storesData.slice(0, 3);
+  grid.innerHTML = storesToShow.map(store => `
+    <div class="store-card" onclick="window.location.href='store.html'">
+      <img src="${store.banner}" class="store-banner" alt="${store.name}" onerror="this.src='https://placehold.co/400x200?text=Boutique'">
+      <div class="store-info">
+        <div class="store-name">${escapeHtml(store.name)}</div>
+        <div class="store-category">${escapeHtml(store.category)}</div>
+        <div class="store-desc">${escapeHtml(store.desc.substring(0, 80))}${store.desc.length > 80 ? '…' : ''}</div>
+        <div class="flex items-center gap-1 mt-2"><span class="stars">${'★'.repeat(Math.floor(store.rating))}${'☆'.repeat(5 - Math.floor(store.rating))}</span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ========== PANIER ==========
+let cart = [];
+
+function loadCart() {
+  const saved = localStorage.getItem('greenmarket_cart');
+  cart = saved ? JSON.parse(saved) : [];
+  updateCartCount();
+}
+
+function saveCart() { localStorage.setItem('greenmarket_cart', JSON.stringify(cart)); updateCartCount(); }
+
+function updateCartCount() {
+  const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  const badge = document.getElementById('cart-count');
+  if (badge) badge.textContent = total;
+}
+
+function addToCart(product) {
+  const existing = cart.find(item => item.id === product.id);
+  if (existing) existing.quantity = (existing.quantity || 1) + 1;
+  else cart.push({ ...product, quantity: 1 });
+  saveCart();
+  showToast(`✓ ${product.name} ajouté au panier !`);
+}
+
+function goToCart() {
+  if (cart.length === 0) { showToast("🛒 Votre panier est vide", "#9a4a00"); return; }
+  let summary = "🛒 Votre panier:\n";
+  let total = 0;
+  cart.forEach(item => {
+    const priceNum = parseFloat(item.price.toString().replace(/[^0-9.,]/g, '').replace(',', '.'));
+    const qty = item.quantity || 1;
+    const itemTotal = priceNum * qty;
+    total += itemTotal;
+    summary += `- ${item.name} x${qty} = ${itemTotal.toFixed(2)} DH\n`;
   });
+  summary += `\nTotal: ${total.toFixed(2)} DH\n\nValider la commande ?`;
+  if (confirm(summary)) {
+    alert("✅ Commande confirmée ! Merci pour votre achat.");
+    cart = [];
+    saveCart();
+  }
+}
+
+function showToast(msg, bg = 'var(--primary)') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.style.background = bg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+function renderProducts() {
+  const grid = document.getElementById('productsGrid');
+  if (!grid) return;
+  
+  function createCard(p) {
+    const badgeClass = p.badgeClass === 'secondary' ? 'badge-secondary' : p.badgeClass === 'bio' ? 'badge-bio' : p.badgeClass === 'rare' ? 'badge-rare' : 'badge-fait';
+    return `
+      <div class="product-card">
+        <img src="${p.image}" class="product-img" alt="${p.name}" onerror="this.src='https://placehold.co/300x200?text=Produit'">
+        <div class="p-4 flex flex-col flex-1 gap-2">
+          <span class="badge ${badgeClass}">${p.badge}</span>
+          <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display', serif;">${p.name}</h3>
+          <p class="text-xs flex items-center gap-1 text-gray-500">👩‍🌾 ${p.coop}</p>
+          <div class="flex items-center gap-1"><span class="stars">${'★'.repeat(Math.floor(p.rating))}${p.rating % 1 ? '½' : ''}${'☆'.repeat(5 - Math.ceil(p.rating))}</span><span class="text-xs text-gray-500">(${p.reviews} avis)</span></div>
+          <p class="font-bold text-lg mt-auto" style="color: var(--primary);">${p.price}</p>
+          <button class="btn-primary w-full mt-1 py-2 text-sm" onclick='addToCart(${JSON.stringify(p).replace(/'/g, "\\'")})'>Ajouter au panier</button>
+        </div>
+      </div>
+    `;
+  }
+  grid.innerHTML = products.map(createCard).join('');
+}
+
+function renderCooperatives() {
+  const coopsGrid = document.getElementById('coopsGrid');
+  if (!coopsGrid) return;
+  coopsGrid.innerHTML = cooperatives.map(coop => `
+    <div class="coop-card">
+      <div class="coop-header">${coop.icon}</div>
+      <div class="p-5">
+        <h3 class="font-bold text-base mb-1" style="font-family:'Playfair Display',serif;">${coop.name}</h3>
+        <p class="text-xs mb-4 flex items-center gap-1 text-gray-500">📍 ${coop.location}</p>
+        <p class="text-sm mb-4 text-gray-500">${coop.description}</p>
+        <button class="btn-outline w-full" onclick="window.location.href='store.html'">Voir la boutique</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ========== AUTH ==========
+let currentUser = null;
+
+function initUsers() {
+  if (!localStorage.getItem('greenmarket_users')) {
+    const defaultUsers = [
+      { id: 1, name: "Jean Dupont", email: "client@test.com", password: "client123", role: "client", producerId: null },
+      { id: 2, name: "Producteur Local", email: "producteur@test.com", password: "prod123", role: "productor", producerId: 101 }
+    ];
+    localStorage.setItem('greenmarket_users', JSON.stringify(defaultUsers));
+  }
+}
+
+function getCurrentUser() {
+  const u = sessionStorage.getItem('greenmarket_current_user');
+  return u ? JSON.parse(u) : null;
+}
+
+function setCurrentUser(user) {
+  sessionStorage.setItem('greenmarket_current_user', JSON.stringify(user));
+  currentUser = user;
+  updateAuthUI();
+}
+
+function logout() {
+  sessionStorage.removeItem('greenmarket_current_user');
+  currentUser = null;
+  updateAuthUI();
+  showToast("👋 Déconnexion réussie");
+}
+
+function login(email, password) {
+  const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
+  const user = users.find(u => u.email === email && u.password === password);
+  if (user) {
+    const { password, ...safeUser } = user;
+    setCurrentUser(safeUser);
+    return { success: true, user: safeUser };
+  }
+  return { success: false, error: "Email ou mot de passe incorrect" };
+}
+
+function updateAuthUI() {
+  const widget = document.getElementById('authWidget');
+  const user = getCurrentUser();
+  if (user) {
+    const roleText = user.role === 'productor' ? 'Producteur' : 'Client';
+    widget.innerHTML = `<div class="flex items-center gap-2 bg-white rounded-full px-3 py-1"><span>👋 ${user.name}</span><button onclick="logout()" class="text-red-600 ml-2">🚪</button></div>`;
+  } else {
+    widget.innerHTML = `<button class="btn-primary" onclick="showLoginModal()">Connexion</button>`;
+  }
+}
+
+function showLoginModal() {
+  const email = prompt("Email (client@test.com pour tester):");
+  const password = prompt("Mot de passe (client123):");
+  if (email && password) {
+    const result = login(email, password);
+    if (result.success) showToast(`👋 Bonjour ${result.user.name} !`);
+    else alert(result.error);
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
+}
+
+function scrollToSection(id) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ========== INIT ==========
+function init() {
+  loadCart();
+  renderProducts();
+  renderCooperatives();
+  loadStoresFromStorage();
+  renderStoresOnAccueil();
+  initUsers();
+  updateAuthUI();
+  
+  document.getElementById('becomePartnerBtn')?.addEventListener('click', () => {
+    const user = getCurrentUser();
+    if (user && user.role === 'productor') alert("Vous êtes déjà producteur !");
+    else if (user) alert("Pour devenir partenaire, créez un compte producteur.");
+    else showLoginModal();
+  });
+  
+  // Search functionality
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      document.querySelectorAll('.product-card').forEach(card => {
+        const title = card.querySelector('h3')?.textContent.toLowerCase() || '';
+        const coop = card.querySelector('p.text-xs')?.textContent.toLowerCase() || '';
+        card.style.display = title.includes(query) || coop.includes(query) ? '' : 'none';
+      });
+    });
+  }
+}
+
+init();
 </script>
- 
 </body>
 </html>
