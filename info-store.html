@@ -36,30 +36,22 @@
     background: var(--white);
     border-bottom: 1.5px solid var(--border);
     padding: 0 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: flex; align-items: center; justify-content: space-between;
     height: 68px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    position: sticky; top: 0; z-index: 100;
   }
   .nav-logo {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.7rem;
-    font-weight: 700;
+    font-size: 1.7rem; font-weight: 700;
     color: var(--wine);
-    display: flex;
-    align-items: center;
-    gap: .4rem;
+    display: flex; align-items: center; gap: .4rem;
   }
   .nav-logo span { color: var(--sage-dark); font-weight: 400; font-style: italic; }
   .nav-links { display: flex; gap: 2rem; }
   .nav-links a {
     text-decoration: none;
     color: var(--text-muted);
-    font-size: .82rem;
-    font-weight: 500;
+    font-size: .82rem; font-weight: 500;
     letter-spacing: .09em;
     text-transform: uppercase;
     transition: color .2s;
@@ -1126,15 +1118,30 @@
   let orderTotal = 0;
 
   function openOrderModal(shopId, shopName, productsList) {
-    orderProducts = productsList.map(p => ({
-      id: p.id,
-      name: p.name,
-      price: parseFloat(p.price.replace('€', '').replace('/kg', '').replace('/barquette', '').replace('/botte', '').replace('/pot', '').replace('/L', '').trim()) || 5,
-      priceDisplay: p.price,
-      image: p.image,
-      stock: p.stock,
-      quantity: 1
-    }));
+    console.log("openOrderModal called", productsList);
+    if (!productsList || productsList.length === 0) {
+      showToast("⚠️ Aucun produit disponible dans cette boutique", '#9a4a00');
+      return;
+    }
+    
+    orderProducts = productsList.map(p => {
+      let priceValue = 5;
+      if (p.price) {
+        const priceMatch = p.price.match(/(\d+(?:[.,]\d+)?)/);
+        if (priceMatch) {
+          priceValue = parseFloat(priceMatch[1].replace(',', '.'));
+        }
+      }
+      return {
+        id: p.id,
+        name: p.name,
+        price: priceValue,
+        priceDisplay: p.price,
+        image: p.image,
+        stock: p.stock || 99,
+        quantity: 1
+      };
+    });
     
     updateOrderModal();
     document.getElementById('orderModal').classList.add('open');
@@ -1161,10 +1168,16 @@
     const delivery = 5;
     orderTotal = subtotal + delivery;
     
-    document.getElementById('orderProductsList').innerHTML = productListHtml || '<div style="text-align:center; padding:1rem;">Aucun produit</div>';
-    document.getElementById('orderSubtotal').textContent = subtotal.toFixed(2) + ' €';
-    document.getElementById('orderDelivery').textContent = delivery.toFixed(2) + ' €';
-    document.getElementById('orderTotal').textContent = orderTotal.toFixed(2) + ' €';
+    const productsContainer = document.getElementById('orderProductsList');
+    if (productsContainer) {
+      productsContainer.innerHTML = productListHtml || '<div style="text-align:center; padding:1rem;">Aucun produit</div>';
+    }
+    const subtotalElem = document.getElementById('orderSubtotal');
+    const deliveryElem = document.getElementById('orderDelivery');
+    const totalElem = document.getElementById('orderTotal');
+    if (subtotalElem) subtotalElem.textContent = subtotal.toFixed(2) + ' €';
+    if (deliveryElem) deliveryElem.textContent = delivery.toFixed(2) + ' €';
+    if (totalElem) totalElem.textContent = orderTotal.toFixed(2) + ' €';
   }
 
   function updateProductQuantity(productId, delta) {
@@ -1181,8 +1194,8 @@
   function confirmOrder() {
     const deliveryMethod = document.querySelector('input[name="delivery"]:checked')?.value;
     const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value;
-    const address = document.getElementById('orderAddress').value.trim();
-    const notes = document.getElementById('orderNotes').value.trim();
+    const address = document.getElementById('orderAddress')?.value.trim() || '';
+    const notes = document.getElementById('orderNotes')?.value.trim() || '';
     
     if (!deliveryMethod) {
       showToast("⚠️ Veuillez choisir un mode de livraison", '#9a4a00');
@@ -1211,20 +1224,19 @@
     existingOrders.push(order);
     localStorage.setItem('greenmarket_orders', JSON.stringify(existingOrders));
     
-    showOrderSuccess();
-  }
-
-  function showOrderSuccess() {
     const modalBody = document.getElementById('orderModalBody');
-    modalBody.innerHTML = `
-      <div class="order-success">
-        <div class="order-success-icon">✅</div>
-        <h4>Commande confirmée !</h4>
-        <p>Merci pour votre commande. Vous recevrez un email de confirmation.</p>
-        <p><strong>N° de commande :</strong> #${Date.now().toString().slice(-8)}</p>
-        <button class="btn-filled" onclick="closeOrderModalAndRefresh()" style="margin-top:1rem;">Fermer</button>
-      </div>
-    `;
+    if (modalBody) {
+      modalBody.innerHTML = `
+        <div class="order-success">
+          <div class="order-success-icon">✅</div>
+          <h4>Commande confirmée !</h4>
+          <p>Merci pour votre commande. Vous recevrez un email de confirmation.</p>
+          <p><strong>N° de commande :</strong> #${order.id.toString().slice(-8)}</p>
+          <button class="btn-filled" onclick="closeOrderModalAndRefresh()" style="margin-top:1rem;">Fermer</button>
+        </div>
+      `;
+    }
+    
     setTimeout(() => {
       closeOrderModalAndRefresh();
     }, 4000);
@@ -1238,47 +1250,52 @@
 
   function resetOrderModal() {
     const modalBody = document.getElementById('orderModalBody');
-    modalBody.innerHTML = `
-      <div id="orderProductsList" class="order-product-list"></div>
-      <div class="order-summary">
-        <div class="order-summary-row"><span class="order-summary-label">Sous-total</span><span id="orderSubtotal">0.00 €</span></div>
-        <div class="order-summary-row"><span class="order-summary-label">Livraison</span><span id="orderDelivery">5.00 €</span></div>
-        <div class="order-summary-row"><span class="order-summary-label">Total</span><span id="orderTotal">0.00 €</span></div>
-      </div>
-      <div class="order-form-group">
-        <label>Mode de livraison</label>
-        <div class="order-radio-group">
-          <label><input type="radio" name="delivery" value="delivery" checked> 📦 Livraison à domicile</label>
-          <label><input type="radio" name="delivery" value="pickup"> 🏪 Retrait en boutique</label>
+    if (modalBody) {
+      modalBody.innerHTML = `
+        <div id="orderProductsList" class="order-product-list"></div>
+        <div class="order-summary">
+          <div class="order-summary-row"><span class="order-summary-label">Sous-total</span><span id="orderSubtotal">0.00 €</span></div>
+          <div class="order-summary-row"><span class="order-summary-label">Livraison</span><span id="orderDelivery">5.00 €</span></div>
+          <div class="order-summary-row"><span class="order-summary-label">Total</span><span id="orderTotal">0.00 €</span></div>
         </div>
-      </div>
-      <div class="order-form-group" id="addressGroup">
-        <label>Adresse de livraison</label>
-        <input type="text" id="orderAddress" placeholder="Votre adresse complète">
-      </div>
-      <div class="order-form-group">
-        <label>Mode de paiement</label>
-        <div class="order-radio-group">
-          <label><input type="radio" name="payment" value="card" checked> 💳 Carte bancaire</label>
-          <label><input type="radio" name="payment" value="paypal"> 📱 PayPal</label>
-          <label><input type="radio" name="payment" value="cash"> 💶 Espèce à la livraison</label>
+        <div class="order-form-group">
+          <label>Mode de livraison</label>
+          <div class="order-radio-group">
+            <label><input type="radio" name="delivery" value="delivery" checked> 📦 Livraison à domicile</label>
+            <label><input type="radio" name="delivery" value="pickup"> 🏪 Retrait en boutique</label>
+          </div>
         </div>
-      </div>
-      <div class="order-form-group">
-        <label>Notes (optionnel)</label>
-        <textarea id="orderNotes" rows="2" placeholder="Instructions particulières..."></textarea>
-      </div>
-    `;
+        <div class="order-form-group" id="addressGroup">
+          <label>Adresse de livraison</label>
+          <input type="text" id="orderAddress" placeholder="Votre adresse complète">
+        </div>
+        <div class="order-form-group">
+          <label>Mode de paiement</label>
+          <div class="order-radio-group">
+            <label><input type="radio" name="payment" value="card" checked> 💳 Carte bancaire</label>
+            <label><input type="radio" name="payment" value="paypal"> 📱 PayPal</label>
+            <label><input type="radio" name="payment" value="cash"> 💶 Espèce à la livraison</label>
+          </div>
+        </div>
+        <div class="order-form-group">
+          <label>Notes (optionnel)</label>
+          <textarea id="orderNotes" rows="2" placeholder="Instructions particulières..."></textarea>
+        </div>
+      `;
+    }
     
     const deliveryRadios = document.querySelectorAll('input[name="delivery"]');
     deliveryRadios.forEach(radio => {
-      radio.addEventListener('change', (e) => {
-        const addressGroup = document.getElementById('addressGroup');
-        if (addressGroup) {
-          addressGroup.style.display = e.target.value === 'pickup' ? 'none' : 'block';
-        }
-      });
+      radio.removeEventListener('change', handleDeliveryChange);
+      radio.addEventListener('change', handleDeliveryChange);
     });
+  }
+  
+  function handleDeliveryChange(e) {
+    const addressGroup = document.getElementById('addressGroup');
+    if (addressGroup) {
+      addressGroup.style.display = e.target.value === 'pickup' ? 'none' : 'block';
+    }
   }
 
   function closeOrderModal() {
@@ -1334,6 +1351,8 @@
         </div>
       `).join('') + `</div>`;
     }
+
+    const productsJson = JSON.stringify(shopProducts).replace(/</g, '\\u003c').replace(/>/g, '\\u003e');
 
     const html = `
       <div class="shop-detail-card">
@@ -1397,7 +1416,7 @@
             </div>
           </div>
 
-          <button class="btn-order" onclick="openOrderModal(${shop.id}, '${escapeHtml(shop.name)}', ${JSON.stringify(shopProducts).replace(/</g, '\\u003c')})">
+          <button class="btn-order" onclick="openOrderModal(${shop.id}, '${escapeHtml(shop.name)}', ${productsJson})">
             🛍️ Commander maintenant
           </button>
         </div>
@@ -1442,10 +1461,13 @@
       }
     }
     
-    document.getElementById('saveProductBtn').onclick = saveProduct;
-    document.getElementById('cancelProductBtn').onclick = closeProductModal;
-    document.getElementById('productModal').onclick = (e) => {
-      if (e.target === document.getElementById('productModal')) closeProductModal();
+    const saveBtn = document.getElementById('saveProductBtn');
+    const cancelBtn = document.getElementById('cancelProductBtn');
+    const productModal = document.getElementById('productModal');
+    if (saveBtn) saveBtn.onclick = saveProduct;
+    if (cancelBtn) cancelBtn.onclick = closeProductModal;
+    if (productModal) productModal.onclick = (e) => {
+      if (e.target === productModal) closeProductModal();
     };
   }
 
@@ -1457,6 +1479,7 @@
   window.closeOrderModal = closeOrderModal;
   window.confirmOrder = confirmOrder;
   window.updateProductQuantity = updateProductQuantity;
+  window.closeOrderModalAndRefresh = closeOrderModalAndRefresh;
 
   loadShop();
 </script>
