@@ -71,40 +71,6 @@
       
     </div>
   </div>
-  <script>
-document.querySelector("form").addEventListener("submit", function(e) {
-  e.preventDefault();
-
-  const email = document.getElementById("Email").value.trim();
-  const password = document.getElementById("Password").value.trim();
-
-  let users = JSON.parse(localStorage.getItem("greenmarket_users")) || [];
-
-  const user = users.find(
-    u => u.email === email && u.password === password
-  );
-
-  if (!user) {
-    alert("Email ou mot de passe incorrect");
-    return;
-  }
-
-  // guardar sesión
-  sessionStorage.setItem(
-    "greenmarket_current_user",
-    JSON.stringify(user)
-  );
-
-  alert("Connexion réussie ✅");
-
-  // redirigir según rol
-  if (user.role === "productor") {
-    window.location.href = "dashboard-producteur.html";
-  } else {
-    window.location.href = "store.html";
-  }
-});
-</script>
-
+  
 </body>
 </html>
