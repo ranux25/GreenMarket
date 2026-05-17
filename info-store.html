@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GreenMarket – Détail boutique</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:      #fff9eb;
+    --sage:       #9fb2ac;
+    --sage-dark:  #7a9490;
+    --sage-light: #c8d8d4;
+    --wine:       #5d0d18;
+    --wine-dark:  #3e0910;
+    --wine-light: #8c2030;
+    --wine-pale:  #f5e6e8;
+    --text:       #2a1a1c;
+    --text-muted: #6b5055;
+    --border:     #e8ddd0;
+    --white:      #fffdf7;
+    --shadow:     rgba(93,13,24,.10);
+    --shadow-md:  rgba(93,13,24,.18);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  nav {
+    background: var(--white);
+    border-bottom: 1.5px solid var(--border);
+    padding: 0 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--wine);
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+  }
+  .nav-logo span { color: var(--sage-dark); font-weight: 400; font-style: italic; }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: .82rem;
+    font-weight: 500;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--wine); }
+  .btn-back {
+    background: var(--wine-pale);
+    color: var(--wine);
+    padding: 0.5rem 1.3rem;
+    border-radius: 3px;
+    text-decoration: none;
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    transition: all .2s;
+  }
+  .btn-back:hover {
+    background: var(--wine);
+    color: var(--cream);
+  }
+
+  .page-header {
+    background: var(--wine);
+    padding: 2rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-header::before {
+    content: '';
+    position: absolute;
+    right: -80px;
+    top: -80px;
+    width: 420px;
+    height: 420px;
+    border: 55px solid rgba(255,249,235,.05);
+    border-radius: 50%;
+  }
+  .page-header::after {
+    content: '';
+    position: absolute;
+    left: 4%;
+    bottom: -70px;
+    width: 240px;
+    height: 240px;
+    border: 40px solid rgba(159,178,172,.10);
+    border-radius: 50%;
+  }
+  .header-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .header-left .header-eyebrow {
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--sage-light);
+    margin-bottom: .9rem;
+  }
+  .header-left h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--cream);
+  }
+  .header-left p {
+    color: rgba(255,249,235,.62);
+    font-size: .9rem;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+  }
+
+  .shop-detail-card {
+    background: var(--white);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px var(--shadow);
+    border: 1.5px solid var(--border);
+  }
+
+  .shop-banner {
+    height: 320px;
+    position: relative;
+    overflow: hidden;
+  }
+  .shop-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .shop-banner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 60%, rgba(42,26,28,.4));
+  }
+
+  .shop-body {
+    padding: 1.8rem 2rem 2rem;
+  }
+
+  .shop-title {
+    margin-bottom: 1.5rem;
+  }
+  .shop-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+  .shop-category {
+    display: inline-block;
+    background: var(--sage-light);
+    color: var(--sage-dark);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.8rem;
+    border-radius: 3px;
+  }
+  .shop-tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.8rem;
+  }
+  .tag {
+    background: var(--border);
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 0.18rem 0.6rem;
+    border-radius: 2px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    background: var(--cream);
+    padding: 1rem;
+    border-radius: 6px;
+    border: 1.5px solid var(--border);
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    text-align: center;
+  }
+  .stat-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--wine);
+    display: block;
+  }
+  .stat-label {
+    font-size: .7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .07em;
+  }
+  .stars {
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+    margin-top: 4px;
+  }
+  .star { color: var(--wine); font-size: .8rem; }
+  .star.empty { color: var(--border); }
+
+  .section {
+    margin-bottom: 2rem;
+  }
+  .section h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid var(--border);
+    display: inline-block;
+  }
+  .section-desc {
+    font-size: .95rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.2rem;
+    margin-top: 1rem;
+  }
+  .product-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.25s ease;
+  }
+  .product-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--sage);
+    box-shadow: 0 8px 20px var(--shadow);
+  }
+  .product-image {
+    height: 150px;
+    overflow: hidden;
+  }
+  .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  .product-card:hover .product-image img {
+    transform: scale(1.05);
+  }
+  .product-info {
+    padding: 0.8rem;
+  }
+  .product-name {
+    font-weight: 700;
+    color: var(--wine);
+    font-size: 0.9rem;
+  }
+  .product-price {
+    font-weight: 700;
+    color: var(--sage-dark);
+    margin: 0.3rem 0;
+    font-size: 1rem;
+  }
+  .product-stock {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+  .product-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .btn-buy {
+    flex: 1;
+    background: var(--wine);
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-buy:hover { background: var(--wine-dark); }
+  .btn-delete {
+    background: var(--border);
+    color: var(--wine);
+    border: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+  .btn-delete:hover {
+    background: var(--wine);
+    color: white;
+  }
+  .btn-edit {
+    background: var(--sage-light);
+    color: var(--sage-dark);
+    border: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+  .btn-edit:hover {
+    background: var(--sage);
+    color: white;
+  }
+  .empty-products {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    background: var(--cream);
+    border-radius: 8px;
+  }
+
+  .producer-card {
+    display: flex;
+    gap: 1.2rem;
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem;
+    flex-wrap: wrap;
+  }
+  .producer-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--sage-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .producer-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .producer-info {
+    flex: 1;
+  }
+  .producer-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .producer-meta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 0.3rem 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .producer-bio {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+  }
+  .badge-list {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .badge {
+    background: var(--wine-pale);
+    color: var(--wine);
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+  .btn-profil {
+    margin-top: 1rem;
+    background: var(--sage);
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 3px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 0.8rem;
+    transition: background 0.2s;
+  }
+  .btn-profil:hover { background: var(--wine); }
+  .btn-dashboard {
+    background: var(--wine);
+    color: white;
+    margin-top: 0.5rem;
+  }
+  .btn-dashboard:hover { background: var(--wine-dark); }
+
+  .btn-order {
+    width: 100%;
+    background: var(--wine);
+    color: white;
+    border: none;
+    padding: 0.8rem;
+    border-radius: 3px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 1rem;
+  }
+  .btn-order:hover { background: var(--wine-dark); }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-content {
+    background: var(--white);
+    border-radius: 8px;
+    padding: 1.5rem;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  }
+  .modal-content h3 {
+    color: var(--wine);
+    margin-bottom: 1rem;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .modal-content input, .modal-content textarea, .modal-content select {
+    width: 100%;
+    padding: 0.7rem;
+    margin-bottom: 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-family: inherit;
+    background: var(--cream);
+  }
+  .image-option-group {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .image-option-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+  .image-preview {
+    margin-top: 0.5rem;
+    width: 100%;
+    height: 100px;
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .image-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .modal-actions {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+  }
+  .modal-actions button {
+    flex: 1;
+    padding: 0.6rem;
+    border-radius: 3px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-save { background: var(--wine); color: white; }
+  .btn-cancel { background: var(--border); color: var(--text-muted); }
+
+  .loading, .error {
+    text-align: center;
+    padding: 3rem;
+  }
+  .error {
+    background: var(--wine-pale);
+    border-radius: 8px;
+    color: var(--wine);
+  }
+  .footer-note {
+    text-align: center;
+    margin-top: 3rem;
+    padding: 1.5rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 700px) {
+    nav { padding: 0 1rem; }
+    .nav-links { display: none; }
+    .container { padding: 0 1rem; }
+    .shop-body { padding: 1rem; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .shop-banner { height: 220px; }
+    .products-grid { grid-template-columns: 1fr; }
+    .shop-name { font-size: 1.6rem; }
+  }
+  <!-- Añade este CSS al final de la sección <style> de info-store.html -->
+
+/* ========== MODAL DE COMMANDE ========== */
+.order-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+.order-modal-overlay.open {
+  display: flex;
+}
+.order-modal {
+  background: var(--white);
+  border-radius: 16px;
+  max-width: 550px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease;
+}
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.order-modal-header {
+  background: var(--wine);
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 16px 16px 0 0;
+}
+.order-modal-header h3 {
+  color: white;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+.order-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: white;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.order-modal-close:hover {
+  opacity: 1;
+}
+.order-modal-body {
+  padding: 1.5rem;
+}
+.order-product-list {
+  background: var(--cream);
+  border-radius: 12px;
+  padding: 0.5rem;
+  margin-bottom: 1.5rem;
+  max-height: 250px;
+  overflow-y: auto;
+}
+.order-product-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+.order-product-item:last-child {
+  border-bottom: none;
+}
+.order-product-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--sage-light);
+}
+.order-product-info {
+  flex: 1;
+}
+.order-product-name {
+  font-weight: 600;
+  color: var(--wine);
+  font-size: 0.9rem;
+}
+.order-product-price {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.order-product-quantity {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.order-qty-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--sage-light);
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.order-qty-btn:hover {
+  background: var(--sage);
+  color: white;
+}
+.order-qty-value {
+  min-width: 30px;
+  text-align: center;
+  font-weight: 600;
+}
+.order-product-total {
+  font-weight: 700;
+  color: var(--wine);
+  min-width: 70px;
+  text-align: right;
+}
+
+.order-summary {
+  background: var(--cream);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+.order-summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.order-summary-row:last-child {
+  border-bottom: none;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--wine);
+  padding-top: 0.8rem;
+  margin-top: 0.3rem;
+}
+.order-summary-label {
+  color: var(--text-muted);
+}
+.order-summary-value {
+  font-weight: 600;
+}
+
+.order-form-group {
+  margin-bottom: 1rem;
+}
+.order-form-group label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.3rem;
+}
+.order-form-group select,
+.order-form-group input,
+.order-form-group textarea {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Jost', sans-serif;
+  background: var(--cream);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.order-form-group select:focus,
+.order-form-group input:focus,
+.order-form-group textarea:focus {
+  border-color: var(--wine);
+}
+.order-radio-group {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 0;
+}
+.order-radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: normal;
+}
+.order-modal-footer {
+  padding: 1rem 1.5rem 1.5rem;
+  display: flex;
+  gap: 1rem;
+}
+.btn-confirm {
+  flex: 2;
+  background: var(--wine);
+  color: white;
+  border: none;
+  padding: 0.8rem;
+  border-radius: 40px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-confirm:hover {
+  background: var(--wine-dark);
+}
+.btn-cancel-order {
+  flex: 1;
+  background: var(--border);
+  color: var(--text-muted);
+  border: none;
+  padding: 0.8rem;
+  border-radius: 40px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-cancel-order:hover {
+  background: var(--sage-light);
+}
+.order-success {
+  text-align: center;
+  padding: 2rem;
+}
+.order-success-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+.order-success h4 {
+  color: var(--wine);
+  margin-bottom: 0.5rem;
+}
+.order-success p {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">🌿 Green<span>Market</span></div>
+  <div class="nav-links">
+    <a href="store.html">Accueil</a>
+    <a href="store.html">Boutiques</a>
+    <a href="#">Produits</a>
+    <a href="#">À propos</a>
+  </div>
+  <a href="store.html" class="btn-back">← Retour</a>
+</nav>
+
+<div class="page-header">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-eyebrow">🌱 DÉCOUVREZ CETTE BOUTIQUE</div>
+      <h1>Détail de la<br>boutique</h1>
+      <p>Tous les produits et informations du producteur</p>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div id="content">
+    <div class="loading">Chargement des informations...</div>
+  </div>
+</div>
+
+<div class="footer-note">
+  🌿 GreenMarket – Mettre en valeur les producteurs locaux
+</div>
+
+<script>
+  let currentUser = null;
+  let productsData = {};
+
+  function getCurrentUser() {
+    const userJson = sessionStorage.getItem('greenmarket_current_user');
+    return userJson ? JSON.parse(userJson) : null;
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  function getShopIdFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('id');
+  }
+
+  function starsHtml(rating) {
+    let full = Math.floor(rating);
+    let stars = '';
+    for (let i = 0; i < 5; i++) {
+      if (i < full) stars += '<span class="star">★</span>';
+      else stars += '<span class="star empty">★</span>';
+    }
+    return stars;
+  }
+
+  function showToast(msg, bg = 'var(--wine)') {
+    const toast = document.getElementById('toast');
+    if (!toast) {
+      const t = document.createElement('div');
+      t.id = 'toast';
+      t.className = 'toast';
+      t.style.cssText = 'position:fixed;bottom:2rem;right:2rem;background:var(--wine);color:var(--cream);padding:.85rem 1.5rem;border-radius:5px;z-index:500;transform:translateY(80px);opacity:0;transition:all .35s';
+      document.body.appendChild(t);
+    }
+    const t = document.getElementById('toast');
+    t.innerHTML = msg;
+    t.style.background = bg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3200);
+  }
+
+  // ========== GESTIÓN DE PRODUCTOS ==========
+  function loadProductsFromStorage(shopId) {
+    const saved = localStorage.getItem(`products_${shopId}`);
+    if (saved) {
+      productsData[shopId] = JSON.parse(saved);
+    } else if (!productsData[shopId]) {
+      productsData[shopId] = [];
+    }
+    return productsData[shopId] || [];
+  }
+
+  function saveProductsToStorage(shopId) {
+    localStorage.setItem(`products_${shopId}`, JSON.stringify(productsData[shopId] || []));
+  }
+
+  function addProduct(shopId, product) {
+    if (!productsData[shopId]) productsData[shopId] = [];
+    const newId = Date.now();
+    productsData[shopId].push({
+      id: newId,
+      name: product.name,
+      price: product.price,
+      stock: product.stock || 0,
+      image: product.image || 'https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop',
+      description: product.description || ''
+    });
+    saveProductsToStorage(shopId);
+    updateShopProductCount(shopId);
+    return newId;
+  }
+
+  function updateProduct(shopId, productId, productData) {
+    if (productsData[shopId]) {
+      const index = productsData[shopId].findIndex(p => p.id == productId);
+      if (index !== -1) {
+        productsData[shopId][index] = { ...productsData[shopId][index], ...productData };
+        saveProductsToStorage(shopId);
+      }
+    }
+  }
+
+  function deleteProduct(shopId, productId) {
+    if (productsData[shopId]) {
+      productsData[shopId] = productsData[shopId].filter(p => p.id != productId);
+      saveProductsToStorage(shopId);
+      updateShopProductCount(shopId);
+    }
+  }
+
+  function updateShopProductCount(shopId) {
+    const savedShops = localStorage.getItem('greenmarket_stores');
+    if (savedShops) {
+      let shops = JSON.parse(savedShops);
+      const shopIndex = shops.findIndex(s => s.id == shopId);
+      if (shopIndex !== -1) {
+        shops[shopIndex].products = productsData[shopId]?.length || 0;
+        localStorage.setItem('greenmarket_stores', JSON.stringify(shops));
+      }
+    }
+  }
+
+  // ========== CARGAR DATOS ==========
+  function loadStores() {
+    const saved = localStorage.getItem('greenmarket_stores');
+    if (saved) return JSON.parse(saved);
+    return [];
+  }
+
+  function loadCategories() {
+    const saved = localStorage.getItem('greenmarket_categories');
+    if (saved) return JSON.parse(saved);
+    return [
+      { id: 1, name: 'Fruits et légumes' },
+      { id: 2, name: 'Produits laitiers' },
+      { id: 3, name: 'Boulangerie artisanale' },
+      { id: 4, name: 'Miel et apiculture' },
+      { id: 5, name: 'Huiles et conserves' },
+      { id: 6, name: 'Plantes médicinales' }
+    ];
+  }
+
+  // ========== MODAL DE PRODUCTO ==========
+  let currentShopId = null;
+  let editingProductId = null;
+
+  function openProductModal(shopId, productId = null) {
+    currentShopId = shopId;
+    editingProductId = productId;
+    const product = productId ? productsData[shopId]?.find(p => p.id == productId) : null;
+    
+    document.getElementById('productModalTitle').innerText = product ? '✏️ Modifier le produit' : '➕ Ajouter un produit';
+    document.getElementById('productName').value = product?.name || '';
+    document.getElementById('productPrice').value = product?.price || '';
+    document.getElementById('productStock').value = product?.stock || 0;
+    document.getElementById('productImageUrl').value = product?.image || '';
+    document.getElementById('productDesc').value = product?.description || '';
+    document.getElementById('productImageFile').value = '';
+    document.getElementById('imagePreview').innerHTML = product?.image ? `<img src="${product.image}" alt="Aperçu">` : '<div class="preview-placeholder">Aucune image</div>';
+    
+    // Resetear selección de tipo de imagen
+    document.querySelector('input[name="productImageType"][value="url"]').checked = true;
+    document.getElementById('productUrlContainer').style.display = 'block';
+    document.getElementById('productFileContainer').style.display = 'none';
+    
+    document.getElementById('productModal').classList.add('open');
+  }
+
+  function closeProductModal() {
+    document.getElementById('productModal').classList.remove('open');
+    editingProductId = null;
+    currentShopId = null;
+  }
+
+  function getProductImage(callback) {
+    const imageType = document.querySelector('input[name="productImageType"]:checked').value;
+    if (imageType === 'url') {
+      const url = document.getElementById('productImageUrl').value.trim();
+      callback(url || 'https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop');
+    } else {
+      const file = document.getElementById('productImageFile').files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          callback(event.target.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        callback('https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop');
+      }
+    }
+  }
+
+  function saveProduct() {
+    const name = document.getElementById('productName').value.trim();
+    const price = document.getElementById('productPrice').value.trim();
+    const stock = parseInt(document.getElementById('productStock').value) || 0;
+    const description = document.getElementById('productDesc').value.trim();
+    
+    if (!name || !price) {
+      showToast("⚠️ Veuillez remplir le nom et le prix", '#9a4a00');
+      return;
+    }
+    
+    getProductImage((image) => {
+      if (editingProductId) {
+        updateProduct(currentShopId, editingProductId, { name, price, stock, image, description });
+        showToast("✅ Produit modifié");
+      } else {
+        addProduct(currentShopId, { name, price, stock, image, description });
+        showToast("✅ Produit ajouté");
+      }
+      closeProductModal();
+      loadShop(); // Recargar la página
+    });
+  }
+
+  function setupProductModalEvents() {
+    const radioUrl = document.querySelector('input[name="productImageType"][value="url"]');
+    const radioFile = document.querySelector('input[name="productImageType"][value="file"]');
+    const urlContainer = document.getElementById('productUrlContainer');
+    const fileContainer = document.getElementById('productFileContainer');
+    const fileInput = document.getElementById('productImageFile');
+    const preview = document.getElementById('imagePreview');
+    
+    if (radioUrl && radioFile) {
+      radioUrl.addEventListener('change', () => {
+        urlContainer.style.display = 'block';
+        fileContainer.style.display = 'none';
+      });
+      radioFile.addEventListener('change', () => {
+        urlContainer.style.display = 'none';
+        fileContainer.style.display = 'block';
+      });
+    }
+    
+    if (fileInput) {
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            preview.innerHTML = `<img src="${event.target.result}" alt="Aperçu">`;
+          };
+          reader.readAsDataURL(file);
+        } else {
+          preview.innerHTML = '<div class="preview-placeholder">Aucune image</div>';
+        }
+      });
+    }
+  }
+
+  // ========== ELIMINAR PRODUCTO ==========
+  function deleteProductConfirm(shopId, productId) {
+    if (confirm("Supprimer ce produit ?")) {
+      deleteProduct(shopId, productId);
+      loadShop();
+      showToast("✅ Produit supprimé");
+    }
+  }
+
+  // ========== PÁGINA PRINCIPAL ==========
+  function loadShop() {
+    currentUser = getCurrentUser();
+    const shopId = getShopIdFromURL();
+
+    if (!shopId) {
+      document.getElementById('content').innerHTML = `<div class="error"><h2>❌ Boutique non spécifiée</h2><a href="store.html" class="btn-back">Retour</a></div>`;
+      return;
+    }
+
+    let shops = loadStores();
+    let categories = loadCategories();
+    const shop = shops.find(s => s.id == shopId);
+
+    if (!shop) {
+      document.getElementById('content').innerHTML = `<div class="error"><h2>❌ Boutique introuvable</h2><a href="store.html" class="btn-back">Retour</a></div>`;
+      return;
+    }
+
+    const category = categories.find(c => c.id === shop.categoryId);
+    const shopProducts = loadProductsFromStorage(shopId);
+    const isOwner = (currentUser && currentUser.role === 'productor' && currentUser.producerId === shop.producerId) || (currentUser && currentUser.role === 'admin');
+
+    const bannerImage = shop.banner || 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1000&q=80';
+
+    let productsHtml = '';
+    if (shopProducts.length === 0) {
+      productsHtml = `<div class="empty-products">📦 Aucun produit dans cette boutique pour le moment.</div>`;
+    } else {
+      productsHtml = `<div class="products-grid">` + shopProducts.map(p => `
+        <div class="product-card">
+          <div class="product-image">
+            <img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop'">
+          </div>
+          <div class="product-info">
+            <div class="product-name">${escapeHtml(p.name)}</div>
+            <div class="product-price">${escapeHtml(p.price)}</div>
+            <div class="product-stock">📦 Stock: ${p.stock || 0}</div>
+            <div class="product-actions">
+              <button class="btn-buy" onclick="alert('🛒 ${escapeHtml(p.name)} ajouté au panier !')">Acheter</button>
+              ${isOwner ? `
+                <button class="btn-edit" onclick="openProductModal(${shopId}, ${p.id})">✏️</button>
+                <button class="btn-delete" onclick="deleteProductConfirm(${shopId}, ${p.id})">🗑️</button>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+      `).join('') + `</div>`;
+    }
+
+    const html = `
+      <div class="shop-detail-card">
+        <div class="shop-banner"><img src="${bannerImage}" alt="${escapeHtml(shop.name)}"></div>
+        <div class="shop-body">
+          <div class="shop-title">
+            <h1 class="shop-name">${escapeHtml(shop.name)}</h1>
+            <div class="shop-category">${category ? escapeHtml(category.name) : shop.category || 'Boutique'}</div>
+            <div class="shop-tags">
+              ${(shop.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-value">${shop.rating || '4.8'}</span>
+              <div class="stars">${starsHtml(shop.rating || 4.8)}</div>
+              <span class="stat-label">${shop.reviews || 0} avis</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value">${shopProducts.length}</span>
+              <span class="stat-label">Produits</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value">${shop.sales || '0'}</span>
+              <span class="stat-label">Ventes</span>
+            </div>
+          </div>
+
+          <div class="section">
+            <h3>📖 À propos de la boutique</h3>
+            <p class="section-desc">${escapeHtml(shop.desc) || 'Aucune description disponible.'}</p>
+          </div>
+
+          <div class="section">
+            <h3>🛍️ Nos produits</h3>
+            ${isOwner ? `<button class="btn-profil" id="openAddProductBtn" style="margin-bottom:1rem; background:var(--wine);">➕ Ajouter un produit</button>` : ''}
+            ${productsHtml}
+          </div>
+
+          <div class="section">
+            <h3>👨‍🌾 Le producteur</h3>
+            <div class="producer-card">
+              <div class="producer-avatar">
+                <div style="width:60px;height:60px;border-radius:50%;background:var(--sage-light);display:flex;align-items:center;justify-content:center;font-size:2rem;">👨‍🌾</div>
+              </div>
+              <div class="producer-info">
+                <div class="producer-name">${escapeHtml(shop.producerName || 'Producteur local')}</div>
+                <div class="producer-meta">
+                  <span>📍 ${escapeHtml(shop.location || 'France')}</span>
+                  <span>📅 Producteur depuis ${shop.since || '2022'}</span>
+                </div>
+                <div class="producer-bio">Producteur passionné par les produits du terroir et la qualité artisanale.</div>
+                <div class="badge-list">
+                  <span class="badge">✓ Vérifié</span>
+                  <span class="badge">🏆 Artisan</span>
+                </div>
+                <a href="profil-producteur.html?id=${shop.producerId}" class="btn-profil">👤 Voir le profil complet →</a>
+                ${isOwner ? `<a href="dashboard-producteur.html" class="btn-profil btn-dashboard">📊 Accéder à mon tableau de bord</a>` : ''}
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-order" onclick="openOrderModal(${shop.id}, '${escapeHtml(shop.name)}', ${JSON.stringify(shopProducts)})">
+            🛍️ Commander maintenant
+        </button>
+        </div>
+      </div>
+
+      <div class="modal-overlay" id="productModal">
+        <div class="modal-content">
+          <h3 id="productModalTitle">➕ Ajouter un produit</h3>
+          <input type="text" id="productName" placeholder="Nom du produit">
+          <input type="text" id="productPrice" placeholder="Prix (ex: 5.50 €)">
+          <input type="number" id="productStock" placeholder="Stock">
+          
+          <div class="image-option-group">
+            <label><input type="radio" name="productImageType" value="url" checked> 🌐 URL d'image</label>
+            <label><input type="radio" name="productImageType" value="file"> 📁 Télécharger un fichier</label>
+          </div>
+          <div id="productUrlContainer">
+            <input type="text" id="productImageUrl" placeholder="https://images.unsplash.com/...">
+          </div>
+          <div id="productFileContainer" style="display: none;">
+            <input type="file" id="productImageFile" accept="image/*">
+            <div id="imagePreview" class="image-preview"><div class="preview-placeholder">Aucune image</div></div>
+          </div>
+          
+          <textarea id="productDesc" placeholder="Description" rows="2"></textarea>
+          <div class="modal-actions">
+            <button class="btn-save" id="saveProductBtn">Enregistrer</button>
+            <button class="btn-cancel" id="cancelProductBtn">Annuler</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('content').innerHTML = html;
+
+    // Configurar eventos del modal
+    setupProductModalEvents();
+    
+    if (isOwner) {
+      const openBtn = document.getElementById('openAddProductBtn');
+      if (openBtn) {
+        openBtn.onclick = () => openProductModal(shopId, null);
+      }
+    }
+    
+    document.getElementById('saveProductBtn').onclick = saveProduct;
+    document.getElementById('cancelProductBtn').onclick = closeProductModal;
+    document.getElementById('productModal').onclick = (e) => {
+      if (e.target === document.getElementById('productModal')) closeProductModal();
+    };
+  }
+
+  // Exponer funciones globales
+  window.openProductModal = openProductModal;
+  window.deleteProductConfirm = deleteProductConfirm;
+  window.closeProductModal = closeProductModal;
+
+  loadShop();
+  // Añade este JavaScript al final de info-store.html, antes de 
+
+// ========== MODAL DE COMMANDE ==========
+let orderProducts = [];
+let orderTotal = 0;
+
+function openOrderModal(shopId, shopName, productsList) {
+  // Inicializar productos del pedido
+  orderProducts = productsList.map(p => ({
+    id: p.id,
+    name: p.name,
+    price: parseFloat(p.price.replace('€', '').replace('/kg', '').replace('/barquette', '').replace('/botte', '').replace('/pot', '').replace('/L', '').trim()) || 5,
+    priceDisplay: p.price,
+    image: p.image,
+    stock: p.stock,
+    quantity: 1
+  }));
+  
+  updateOrderModal();
+  
+  const modal = document.getElementById('orderModal');
+  modal.classList.add('open');
+}
+
+function updateOrderModal() {
+  const productListHtml = orderProducts.map(p => `
+    <div class="order-product-item">
+      <img src="${p.image}" class="order-product-img" onerror="this.src='https://picsum.photos/id/20/100/100'">
+      <div class="order-product-info">
+        <div class="order-product-name">${escapeHtml(p.name)}</div>
+        <div class="order-product-price">${p.priceDisplay}</div>
+      </div>
+      <div class="order-product-quantity">
+        <button class="order-qty-btn" onclick="updateProductQuantity(${p.id}, -1)">-</button>
+        <span class="order-qty-value">${p.quantity}</span>
+        <button class="order-qty-btn" onclick="updateProductQuantity(${p.id}, 1)">+</button>
+      </div>
+      <div class="order-product-total">${(p.price * p.quantity).toFixed(2)} €</div>
+    </div>
+  `).join('');
+  
+  const subtotal = orderProducts.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+  const delivery = 5;
+  orderTotal = subtotal + delivery;
+  
+  document.getElementById('orderProductsList').innerHTML = productListHtml || '<div style="text-align:center; padding:1rem;">Aucun produit</div>';
+  document.getElementById('orderSubtotal').textContent = subtotal.toFixed(2) + ' €';
+  document.getElementById('orderDelivery').textContent = delivery.toFixed(2) + ' €';
+  document.getElementById('orderTotal').textContent = orderTotal.toFixed(2) + ' €';
+}
+
+function updateProductQuantity(productId, delta) {
+  const product = orderProducts.find(p => p.id === productId);
+  if (product) {
+    const newQty = product.quantity + delta;
+    if (newQty >= 1 && newQty <= (product.stock || 99)) {
+      product.quantity = newQty;
+      updateOrderModal();
+    }
+  }
+}
+
+function confirmOrder() {
+  const deliveryMethod = document.querySelector('input[name="delivery"]:checked')?.value;
+  const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value;
+  const address = document.getElementById('orderAddress').value.trim();
+  const notes = document.getElementById('orderNotes').value.trim();
+  
+  if (!deliveryMethod) {
+    showToast("⚠️ Veuillez choisir un mode de livraison", '#9a4a00');
+    return;
+  }
+  if (!address && deliveryMethod !== 'pickup') {
+    showToast("⚠️ Veuillez saisir votre adresse", '#9a4a00');
+    return;
+  }
+  
+  // Créer la commande
+  const order = {
+    id: Date.now(),
+    date: new Date().toLocaleString('fr-FR'),
+    products: orderProducts.map(p => ({ ...p })),
+    subtotal: orderProducts.reduce((sum, p) => sum + (p.price * p.quantity), 0),
+    delivery: 5,
+    total: orderTotal,
+    deliveryMethod: deliveryMethod,
+    paymentMethod: paymentMethod,
+    address: address,
+    notes: notes,
+    status: 'confirmée'
+  };
+  
+  // Sauvegarder dans localStorage
+  const existingOrders = JSON.parse(localStorage.getItem('greenmarket_orders') || '[]');
+  existingOrders.push(order);
+  localStorage.setItem('greenmarket_orders', JSON.stringify(existingOrders));
+  
+  // Afficher le message de succès
+  showOrderSuccess();
+}
+
+function showOrderSuccess() {
+  const modalBody = document.getElementById('orderModalBody');
+  modalBody.innerHTML = `
+    <div class="order-success">
+      <div class="order-success-icon">✅</div>
+      <h4>Commande confirmée !</h4>
+      <p>Merci pour votre commande. Vous recevrez un email de confirmation.</p>
+      <p><strong>N° de commande :</strong> #${Date.now().toString().slice(-8)}</p>
+      <button class="btn-filled" onclick="closeOrderModalAndRefresh()" style="margin-top:1rem;">Fermer</button>
+    </div>
+  `;
+  setTimeout(() => {
+    closeOrderModalAndRefresh();
+  }, 4000);
+}
+
+function closeOrderModalAndRefresh() {
+  document.getElementById('orderModal').classList.remove('open');
+  // Réinitialiser le modal pour la prochaine fois
+  const modalBody = document.getElementById('orderModalBody');
+  modalBody.innerHTML = `
+    <div id="orderProductsList" class="order-product-list"></div>
+    <div class="order-summary">
+      <div class="order-summary-row"><span class="order-summary-label">Sous-total</span><span id="orderSubtotal">0.00 €</span></div>
+      <div class="order-summary-row"><span class="order-summary-label">Livraison</span><span id="orderDelivery">5.00 €</span></div>
+      <div class="order-summary-row"><span class="order-summary-label">Total</span><span id="orderTotal">0.00 €</span></div>
+    </div>
+    <div class="order-form-group">
+      <label>Mode de livraison</label>
+      <div class="order-radio-group">
+        <label><input type="radio" name="delivery" value="delivery" checked> 📦 Livraison à domicile</label>
+        <label><input type="radio" name="delivery" value="pickup"> 🏪 Retrait en boutique</label>
+      </div>
+    </div>
+    <div class="order-form-group" id="addressGroup">
+      <label>Adresse de livraison</label>
+      <input type="text" id="orderAddress" placeholder="Votre adresse complète">
+    </div>
+    <div class="order-form-group">
+      <label>Mode de paiement</label>
+      <div class="order-radio-group">
+        <label><input type="radio" name="payment" value="card" checked> 💳 Carte bancaire</label>
+        <label><input type="radio" name="payment" value="paypal"> 📱 PayPal</label>
+        <label><input type="radio" name="payment" value="cash"> 💶 Espèce à la livraison</label>
+      </div>
+    </div>
+    <div class="order-form-group">
+      <label>Notes (optionnel)</label>
+      <textarea id="orderNotes" rows="2" placeholder="Instructions particulières..."></textarea>
+    </div>
+  `;
+  
+  // Réattacher les événements
+  const deliveryRadios = document.querySelectorAll('input[name="delivery"]');
+  deliveryRadios.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      const addressGroup = document.getElementById('addressGroup');
+      if (addressGroup) {
+        addressGroup.style.display = e.target.value === 'pickup' ? 'none' : 'block';
+      }
+    });
+  });
+  
+  const initialPickup = document.querySelector('input[name="delivery"]:checked')?.value === 'pickup';
+  const addressGroup = document.getElementById('addressGroup');
+  if (addressGroup) {
+    addressGroup.style.display = initialPickup ? 'none' : 'block';
+  }
+  
+  showToast("✅ Commande confirmée !");
+}
+
+function closeOrderModal() {
+  document.getElementById('orderModal').classList.remove('open');
+}
+
+// Modifier le bouton "Commander maintenant" pour ouvrir le modal
+// Dans la fonction loadShop(), remplacer le bouton par :
+// <button class="btn-order" onclick="openOrderModal(${shop.id}, '${escapeHtml(shop.name)}', ${JSON.stringify(shopProducts)})">
+//   🛍️ Commander maintenant
+// </button>
+</script>
+<!-- Añade este HTML al final de info-store.html, antes de </body> -->
+
+<!-- MODAL DE COMMANDE -->
+<div class="order-modal-overlay" id="orderModal">
+  <div class="order-modal">
+    <div class="order-modal-header">
+      <h3>🛍️ Validation de la commande</h3>
+      <button class="order-modal-close" onclick="closeOrderModal()">✕</button>
+    </div>
+    <div class="order-modal-body" id="orderModalBody">
+      <div id="orderProductsList" class="order-product-list"></div>
+      <div class="order-summary">
+        <div class="order-summary-row">
+          <span class="order-summary-label">Sous-total</span>
+          <span id="orderSubtotal">0.00 €</span>
+        </div>
+        <div class="order-summary-row">
+          <span class="order-summary-label">Livraison</span>
+          <span id="orderDelivery">5.00 €</span>
+        </div>
+        <div class="order-summary-row">
+          <span class="order-summary-label">Total</span>
+          <span id="orderTotal">0.00 €</span>
+        </div>
+      </div>
+      <div class="order-form-group">
+        <label>Mode de livraison</label>
+        <div class="order-radio-group">
+          <label><input type="radio" name="delivery" value="delivery" checked> 📦 Livraison à domicile</label>
+          <label><input type="radio" name="delivery" value="pickup"> 🏪 Retrait en boutique</label>
+        </div>
+      </div>
+      <div class="order-form-group" id="addressGroup">
+        <label>Adresse de livraison</label>
+        <input type="text" id="orderAddress" placeholder="Votre adresse complète">
+      </div>
+      <div class="order-form-group">
+        <label>Mode de paiement</label>
+        <div class="order-radio-group">
+          <label><input type="radio" name="payment" value="card" checked> 💳 Carte bancaire</label>
+          <label><input type="radio" name="payment" value="paypal"> 📱 PayPal</label>
+          <label><input type="radio" name="payment" value="cash"> 💶 Espèce à la livraison</label>
+        </div>
+      </div>
+      <div class="order-form-group">
+        <label>Notes (optionnel)</label>
+        <textarea id="orderNotes" rows="2" placeholder="Instructions particulières..."></textarea>
+      </div>
+    </div>
+    <div class="order-modal-footer">
+      <button class="btn-cancel-order" onclick="closeOrderModal()">Annuler</button>
+      <button class="btn-confirm" onclick="confirmOrder()">Confirmer la commande</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GreenMarket – Dashboard Producteur</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --cream:      #fff9eb;
+    --sage:       #9fb2ac;
+    --sage-dark:  #7a9490;
+    --sage-light: #c8d8d4;
+    --wine:       #5d0d18;
+    --wine-dark:  #3e0910;
+    --wine-light: #8c2030;
+    --wine-pale:  #f5e6e8;
+    --text:       #2a1a1c;
+    --text-muted: #6b5055;
+    --border:     #e8ddd0;
+    --white:      #fffdf7;
+    --shadow:     rgba(93,13,24,.10);
+    --shadow-md:  rgba(93,13,24,.18);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  nav {
+    background: var(--white);
+    border-bottom: 1.5px solid var(--border);
+    padding: 0 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--wine);
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+  }
+  .nav-logo span { color: var(--sage-dark); font-weight: 400; font-style: italic; }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: .82rem;
+    font-weight: 500;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    transition: color .2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--wine); }
+  .nav-actions { display: flex; gap: .8rem; align-items: center; }
+
+  .btn-outline {
+    border: 1.5px solid var(--wine);
+    background: transparent;
+    color: var(--wine);
+    padding: .45rem 1.2rem;
+    border-radius: 3px;
+    font-family: 'Jost', sans-serif;
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-outline:hover { background: var(--wine); color: var(--cream); }
+  .btn-filled {
+    background: var(--wine);
+    color: var(--cream);
+    border: none;
+    padding: .5rem 1.3rem;
+    border-radius: 3px;
+    font-family: 'Jost', sans-serif;
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .btn-filled:hover { background: var(--wine-dark); }
+
+  .user-badge {
+    background: var(--wine-pale);
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--wine);
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .page-header {
+    background: var(--wine);
+    padding: 2rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-header::before {
+    content: '';
+    position: absolute;
+    right: -80px;
+    top: -80px;
+    width: 420px;
+    height: 420px;
+    border: 55px solid rgba(255,249,235,.05);
+    border-radius: 50%;
+  }
+  .page-header::after {
+    content: '';
+    position: absolute;
+    left: 4%;
+    bottom: -70px;
+    width: 240px;
+    height: 240px;
+    border: 40px solid rgba(159,178,172,.10);
+    border-radius: 50%;
+  }
+  .header-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .header-left .header-eyebrow {
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--sage-light);
+    margin-bottom: .9rem;
+  }
+  .header-left h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--cream);
+  }
+  .header-left p {
+    color: rgba(255,249,235,.62);
+    font-size: .9rem;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+  }
+
+  .stats-dashboard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card-dash {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1.2rem;
+    border: 1.5px solid var(--border);
+    box-shadow: 0 2px 12px var(--shadow);
+    transition: transform 0.2s;
+  }
+  .stat-card-dash:hover { transform: translateY(-3px); }
+  .stat-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+  .stat-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--wine);
+  }
+  .stat-unit { font-size: 0.8rem; color: var(--text-muted); margin-left: 0.2rem; }
+  .stat-icon { float: right; font-size: 2rem; opacity: 0.3; }
+
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .chart-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1.2rem;
+    border: 1.5px solid var(--border);
+  }
+  .chart-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border);
+  }
+  canvas { max-height: 250px; width: 100%; }
+
+  .stores-section {
+    background: var(--white);
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    overflow: hidden;
+  }
+  .stores-section-header {
+    background: var(--wine);
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .stores-section-header h3 {
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--cream);
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  .btn-add-store {
+    background: var(--sage);
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-add-store:hover { background: var(--sage-dark); }
+  .stores-table { width: 100%; border-collapse: collapse; }
+  .stores-table th, .stores-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .stores-table th {
+    background: var(--cream);
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .stores-table tr:hover { background: rgba(159,178,172,0.1); }
+  .shop-banner-mini {
+    width: 50px;
+    height: 50px;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+  .btn-action {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  .btn-action.delete:hover { background: var(--wine-pale); color: var(--wine); }
+  .btn-action.edit:hover { background: var(--sage-light); color: var(--sage-dark); }
+  .btn-view {
+    background: var(--sage-light);
+    color: var(--sage-dark);
+    border: none;
+    padding: 0.3rem 0.8rem;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-view:hover { background: var(--sage); color: white; }
+
+  .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
+
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--wine);
+    color: var(--cream);
+    padding: .85rem 1.5rem;
+    border-radius: 5px;
+    font-size: .86rem;
+    font-weight: 500;
+    box-shadow: 0 8px 28px var(--shadow-md);
+    z-index: 500;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all .35s cubic-bezier(.34,1.4,.64,1);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-content {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    max-width: 500px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .modal-content h3 { color: var(--wine); margin-bottom: 1rem; }
+  .modal-content input, .modal-content select, .modal-content textarea {
+    width: 100%;
+    padding: 0.7rem;
+    margin-bottom: 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    background: var(--cream);
+  }
+  .modal-actions { display: flex; gap: 1rem; margin-top: 1rem; }
+  .modal-actions button { flex: 1; padding: 0.6rem; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; }
+  .btn-save { background: var(--wine); color: white; }
+  .btn-cancel { background: var(--border); color: var(--text-muted); }
+
+  @media (max-width: 1000px) {
+    .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
+    .charts-row { grid-template-columns: 1fr; }
+    .container { padding: 0 1rem; }
+    nav { padding: 0 1rem; }
+    .nav-links { display: none; }
+  }
+  @media (max-width: 700px) {
+    .stats-dashboard { grid-template-columns: 1fr; }
+    .stores-table { font-size: 0.8rem; }
+    .stores-table th, .stores-table td { padding: 0.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">🌿 Green<span>Market</span></div>
+  <div class="nav-links">
+    <a href="store.html">Boutiques</a>
+    <a href="#" class="active">Dashboard</a>
+    <a href="#">Produits</a>
+    <a href="#">À propos</a>
+  </div>
+  <div class="nav-actions" id="authWidget"></div>
+</nav>
+
+<div class="page-header">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-eyebrow">📊 ESPACE PRODUCTEUR</div>
+      <h1>Tableau de bord</h1>
+      <p>Gérez vos boutiques, suivez vos ventes et analysez vos performances</p>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div id="dashboardContent">
+    <div class="loading" style="text-align:center; padding:3rem;">Chargement de votre tableau de bord...</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="productModal">
+  <div class="modal-content">
+    <h3 id="productModalTitle">➕ Ajouter un produit</h3>
+    <input type="text" id="productName" placeholder="Nom du produit">
+    <input type="text" id="productPrice" placeholder="Prix (ex: 5.50 €)">
+    <input type="number" id="productStock" placeholder="Stock">
+    <input type="text" id="productImage" placeholder="URL de l'image">
+    <textarea id="productDesc" placeholder="Description" rows="2"></textarea>
+    <input type="hidden" id="productShopId">
+    <input type="hidden" id="productId">
+    <div class="modal-actions">
+      <button class="btn-save" id="saveProductBtn">Enregistrer</button>
+      <button class="btn-cancel" id="closeProductModal">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentUser = null;
+let currentProducerId = null;
+
+function getCurrentUser() {
+  const u = sessionStorage.getItem('greenmarket_current_user');
+  return u ? JSON.parse(u) : null;
+}
+
+function logout() {
+  sessionStorage.removeItem('greenmarket_current_user');
+  window.location.href = 'store.html';
+}
+
+function updateAuthUI() {
+  const widget = document.getElementById('authWidget');
+  const user = getCurrentUser();
+  if (user) {
+    let roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Producteur' : 'Client');
+    widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;">🚪</button></div>`;
+    document.getElementById('logoutBtn')?.addEventListener('click', logout);
+  } else {
+    widget.innerHTML = `<a href="store.html" class="btn-outline" style="text-decoration:none;">Accueil</a>`;
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
+}
+
+function showToast(msg, bg='var(--wine)') {
+  const t = document.getElementById('toast');
+  t.innerHTML = msg;
+  t.style.background = bg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+let stores = [];
+let categories = [];
+let products = {};
+
+function loadStores() {
+  const saved = localStorage.getItem('greenmarket_stores');
+  if (saved) stores = JSON.parse(saved);
+  else stores = [];
+}
+
+function saveStores() { localStorage.setItem('greenmarket_stores', JSON.stringify(stores)); }
+
+function loadCategories() {
+  const saved = localStorage.getItem('greenmarket_categories');
+  if (saved) categories = JSON.parse(saved);
+  else categories = [{ id: 1, name: 'Fruits et légumes' }, { id: 2, name: 'Produits laitiers' }, { id: 3, name: 'Boulangerie' }];
+}
+
+function loadProducts() {
+  for (let i = 0; i < stores.length; i++) {
+    const saved = localStorage.getItem(`products_${stores[i].id}`);
+    if (saved) products[stores[i].id] = JSON.parse(saved);
+    else products[stores[i].id] = [];
+  }
+}
+
+function saveProducts(shopId) {
+  localStorage.setItem(`products_${shopId}`, JSON.stringify(products[shopId] || []));
+}
+
+function addProduct(shopId, product) {
+  if (!products[shopId]) products[shopId] = [];
+  const newId = Date.now();
+  products[shopId].push({
+    id: newId,
+    name: product.name,
+    price: product.price,
+    stock: product.stock || 0,
+    image: product.image || 'https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop',
+    description: product.description || ''
+  });
+  saveProducts(shopId);
+  updateShopProductCount(shopId);
+}
+
+function updateProduct(shopId, productId, productData) {
+  if (products[shopId]) {
+    const index = products[shopId].findIndex(p => p.id == productId);
+    if (index !== -1) {
+      products[shopId][index] = { ...products[shopId][index], ...productData };
+      saveProducts(shopId);
+    }
+  }
+}
+
+function deleteProduct(shopId, productId) {
+  if (products[shopId]) {
+    products[shopId] = products[shopId].filter(p => p.id != productId);
+    saveProducts(shopId);
+    updateShopProductCount(shopId);
+  }
+}
+
+function updateShopProductCount(shopId) {
+  const shop = stores.find(s => s.id == shopId);
+  if (shop) {
+    shop.products = products[shopId]?.length || 0;
+    saveStores();
+  }
+}
+
+function deleteShop(shopId) {
+  if (confirm("⚠️ Supprimer cette boutique supprimera aussi tous ses produits. Êtes-vous sûr ?")) {
+    stores = stores.filter(s => s.id != shopId);
+    delete products[shopId];
+    localStorage.removeItem(`products_${shopId}`);
+    saveStores();
+    loadDashboard();
+    showToast("✅ Boutique supprimée");
+  }
+}
+
+function loadDashboard() {
+  const user = getCurrentUser();
+  if (!user || (user.role !== 'productor' && user.role !== 'admin')) {
+    document.getElementById('dashboardContent').innerHTML = `
+      <div style="text-align:center; padding:3rem; background:var(--white); border-radius:12px;">
+        <div style="font-size:3rem; margin-bottom:1rem;">🔒</div>
+        <h2>Accès restreint</h2>
+        <p>Vous devez être connecté en tant que producteur pour accéder à ce tableau de bord.</p>
+        <a href="store.html" class="btn-filled" style="display:inline-block; margin-top:1rem;">Retour à l'accueil</a>
+      </div>
+    `;
+    return;
+  }
+
+  currentProducerId = user.producerId || user.id;
+  
+  loadStores();
+  loadCategories();
+  loadProducts();
+  
+  const myStores = stores.filter(s => s.producerId == currentProducerId);
+  
+  const totalShops = myStores.length;
+  const totalProducts = myStores.reduce((sum, s) => sum + (products[s.id]?.length || 0), 0);
+  const totalSales = myStores.reduce((sum, s) => sum + (parseInt(String(s.sales).replace(/\s/g, '')) || 0), 0);
+  const totalRevenue = totalSales * 15;
+  const avgRating = myStores.length > 0 ? (myStores.reduce((sum, s) => sum + s.rating, 0) / myStores.length).toFixed(1) : 0;
+
+  const storeNames = myStores.map(s => s.name);
+  const storeProducts = myStores.map(s => products[s.id]?.length || 0);
+  const storeSales = myStores.map(s => parseInt(String(s.sales).replace(/\s/g, '')) || 0);
+
+  const html = `
+    <div class="stats-dashboard">
+      <div class="stat-card-dash"><div class="stat-icon">🏪</div><div class="stat-title">Mes boutiques</div><div class="stat-number">${totalShops}</div></div>
+      <div class="stat-card-dash"><div class="stat-icon">🛍️</div><div class="stat-title">Total produits</div><div class="stat-number">${totalProducts}</div></div>
+      <div class="stat-card-dash"><div class="stat-icon">💰</div><div class="stat-title">Chiffre d'affaires</div><div class="stat-number">${totalRevenue.toLocaleString()} <span class="stat-unit">€</span></div></div>
+      <div class="stat-card-dash"><div class="stat-icon">⭐</div><div class="stat-title">Note moyenne</div><div class="stat-number">${avgRating}</div></div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card"><h3>📊 Produits par boutique</h3><canvas id="productsChart"></canvas></div>
+      <div class="chart-card"><h3>📈 Ventes par boutique</h3><canvas id="salesChart"></canvas></div>
+    </div>
+    <div class="stores-section">
+      <div class="stores-section-header"><h3>🏪 Mes boutiques</h3><button class="btn-add-store" onclick="window.location.href='store.html'">➕ Nouvelle boutique</button></div>
+      <div class="stores-table-container">
+        <table class="stores-table">
+          <thead><tr><th>Boutique</th><th>Catégorie</th><th>Produits</th><th>Ventes</th><th>Note</th><th>Actions</th></tr></thead>
+          <tbody>
+            ${myStores.length === 0 ? '<tr><td colspan="6" class="empty-state">Vous n\'avez pas encore de boutique. <a href="store.html">Créez votre première boutique</a></td></tr>' : 
+              myStores.map(s => `
+                <tr>
+                  <td><img src="${s.banner}" class="shop-banner-mini" onerror="this.src='https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=100&q=80'"> ${escapeHtml(s.name)}</td>
+                  <td>${escapeHtml(s.category)}</td>
+                  <td>${products[s.id]?.length || 0}</td>
+                  <td>${s.sales || 0}</td>
+                  <td>${s.rating} ★</td>
+                  <td>
+                    <button class="btn-action edit" onclick="manageProducts(${s.id}, '${escapeHtml(s.name)}')" title="Gérer les produits">📦</button>
+                    <button class="btn-action delete" onclick="deleteShop(${s.id})" title="Supprimer">🗑️</button>
+                    <a href="info-store.html?id=${s.id}" class="btn-view" target="_blank">👁️ Voir</a>
+                  </td>
+                </tr>
+              `).join('')
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('dashboardContent').innerHTML = html;
+
+  setTimeout(() => {
+    if (typeof Chart !== 'undefined') {
+      const productsCtx = document.getElementById('productsChart')?.getContext('2d');
+      const salesCtx = document.getElementById('salesChart')?.getContext('2d');
+      if (productsCtx) {
+        new Chart(productsCtx, {
+          type: 'bar',
+          data: { labels: storeNames, datasets: [{ label: 'Nombre de produits', data: storeProducts, backgroundColor: '#9fb2ac', borderRadius: 6 }] },
+          options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
+        });
+      }
+      if (salesCtx) {
+        new Chart(salesCtx, {
+          type: 'line',
+          data: { labels: storeNames, datasets: [{ label: 'Ventes (€)', data: storeSales.map(v => v * 15), borderColor: '#5d0d18', backgroundColor: 'rgba(93,13,24,0.1)', fill: true, tension: 0.3 }] },
+          options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
+        });
+      }
+    }
+  }, 100);
+}
+
+let currentShopId = null;
+
+function manageProducts(shopId, shopName) {
+  currentShopId = shopId;
+  const shopProducts = products[shopId] || [];
+  
+  const modalHtml = `
+    <div class="modal-overlay open" id="productsModal" style="display:flex;">
+      <div class="modal-content" style="max-width: 800px;">
+        <h3>📦 Gestion des produits - ${escapeHtml(shopName)}</h3>
+        <button class="btn-add-store" id="addProductToShopBtn" style="margin-bottom:1rem;">➕ Ajouter un produit</button>
+        <div style="max-height: 400px; overflow-y: auto;">
+          <table style="width:100%; border-collapse: collapse;">
+            <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left; padding:0.5rem;">Image</th><th style="text-align:left; padding:0.5rem;">Nom</th><th style="text-align:left; padding:0.5rem;">Prix</th><th style="text-align:left; padding:0.5rem;">Stock</th><th style="text-align:left; padding:0.5rem;">Actions</th></tr></thead>
+            <tbody>
+              ${shopProducts.length === 0 ? '<tr><td colspan="5" style="text-align:center; padding:2rem;">Aucun produit dans cette boutique</td></tr>' :
+                shopProducts.map(p => `
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:0.5rem;"><img src="${p.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=100&h=100&fit=crop'"></td>
+                    <td style="padding:0.5rem;">${escapeHtml(p.name)}</td>
+                    <td style="padding:0.5rem;">${escapeHtml(p.price)}</td>
+                    <td style="padding:0.5rem;">${p.stock || 0}</td>
+                    <td style="padding:0.5rem;">
+                      <button class="btn-action edit" onclick="editProduct(${shopId}, ${p.id})">✏️</button>
+                      <button class="btn-action delete" onclick="deleteProductConfirm(${shopId}, ${p.id})">🗑️</button>
+                    </td>
+                  </tr>
+                `).join('')
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-actions" style="margin-top:1rem;"><button class="btn-cancel" id="closeProductsModal">Fermer</button></div>
+      </div>
+    </div>
+  `;
+  
+  const existingModal = document.getElementById('productsModal');
+  if (existingModal) existingModal.remove();
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  
+  document.getElementById('addProductToShopBtn').onclick = () => openProductModal(shopId, null);
+  document.getElementById('closeProductsModal').onclick = () => {
+    document.getElementById('productsModal').remove();
+    loadDashboard();
+  };
+}
+
+function openProductModal(shopId, productId = null) {
+  const product = productId ? products[shopId]?.find(p => p.id == productId) : null;
+  document.getElementById('productModalTitle').innerText = product ? '✏️ Modifier le produit' : '➕ Ajouter un produit';
+  document.getElementById('productName').value = product?.name || '';
+  document.getElementById('productPrice').value = product?.price || '';
+  document.getElementById('productStock').value = product?.stock || 0;
+  document.getElementById('productImage').value = product?.image || '';
+  document.getElementById('productDesc').value = product?.description || '';
+  document.getElementById('productShopId').value = shopId;
+  document.getElementById('productId').value = productId || '';
+  document.getElementById('productModal').classList.add('open');
+}
+
+function closeProductModal() { document.getElementById('productModal').classList.remove('open'); }
+
+function saveProduct() {
+  const shopId = parseInt(document.getElementById('productShopId').value);
+  const productId = document.getElementById('productId').value;
+  const name = document.getElementById('productName').value.trim();
+  const price = document.getElementById('productPrice').value.trim();
+  const stock = parseInt(document.getElementById('productStock').value) || 0;
+  const image = document.getElementById('productImage').value.trim();
+  const description = document.getElementById('productDesc').value.trim();
+  
+  if (!name || !price) { showToast("⚠️ Veuillez remplir le nom et le prix", '#9a4a00'); return; }
+  
+  if (productId) {
+    updateProduct(shopId, productId, { name, price, stock, image, description });
+    showToast("✅ Produit modifié");
+  } else {
+    addProduct(shopId, { name, price, stock, image, description });
+    showToast("✅ Produit ajouté");
+  }
+  
+  closeProductModal();
+  const productsModal = document.getElementById('productsModal');
+  if (productsModal) productsModal.remove();
+  manageProducts(shopId, stores.find(s => s.id == shopId)?.name || 'Boutique');
+}
+
+function editProduct(shopId, productId) {
+  closeProductModal();
+  openProductModal(shopId, productId);
+}
+
+function deleteProductConfirm(shopId, productId) {
+  if (confirm("Supprimer ce produit ?")) {
+    deleteProduct(shopId, productId);
+    const productsModal = document.getElementById('productsModal');
+    if (productsModal) productsModal.remove();
+    manageProducts(shopId, stores.find(s => s.id == shopId)?.name || 'Boutique');
+    showToast("✅ Produit supprimé");
+  }
+}
+
+function init() {
+  updateAuthUI();
+  loadDashboard();
+  document.getElementById('saveProductBtn').onclick = saveProduct;
+  document.getElementById('closeProductModal').onclick = closeProductModal;
+  document.getElementById('productModal').onclick = (e) => { if (e.target === document.getElementById('productModal')) closeProductModal(); };
+}
+
+window.deleteShop = deleteShop;
+window.manageProducts = manageProducts;
+window.editProduct = editProduct;
+window.deleteProductConfirm = deleteProductConfirm;
+window.openProductModal = openProductModal;
+window.closeProductModal = closeProductModal;
+
+init();
+</script>
+</body>
+</html>

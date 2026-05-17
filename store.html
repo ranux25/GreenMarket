@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GreenMarket – Boutiques</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:      #fff9eb;
+    --sage:       #9fb2ac;
+    --sage-dark:  #7a9490;
+    --sage-light: #c8d8d4;
+    --wine:       #5d0d18;
+    --wine-dark:  #3e0910;
+    --wine-light: #8c2030;
+    --wine-pale:  #f5e6e8;
+    --text:       #2a1a1c;
+    --text-muted: #6b5055;
+    --border:     #e8ddd0;
+    --white:      #fffdf7;
+    --shadow:     rgba(93,13,24,.10);
+    --shadow-md:  rgba(93,13,24,.18);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  nav {
+    background: var(--white);
+    border-bottom: 1.5px solid var(--border);
+    padding: 0 2.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.7rem; font-weight: 700;
+    color: var(--wine);
+    display: flex; align-items: center; gap: .4rem;
+  }
+  .nav-logo span { color: var(--sage-dark); font-weight: 400; font-style: italic; }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    text-decoration: none; color: var(--text-muted);
+    font-size: .82rem; font-weight: 500; letter-spacing: .09em;
+    text-transform: uppercase; transition: color .2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--wine); }
+  .nav-actions { display: flex; gap: .8rem; align-items: center; }
+
+  .btn-outline {
+    border: 1.5px solid var(--wine); background: transparent; color: var(--wine);
+    padding: .45rem 1.2rem; border-radius: 3px;
+    font-family: 'Jost', sans-serif; font-size: .78rem; font-weight: 600;
+    letter-spacing: .07em; text-transform: uppercase;
+    cursor: pointer; transition: all .2s;
+  }
+  .btn-outline:hover { background: var(--wine); color: var(--cream); }
+  .btn-filled {
+    background: var(--wine); color: var(--cream);
+    border: none; padding: .5rem 1.3rem; border-radius: 3px;
+    font-family: 'Jost', sans-serif; font-size: .78rem; font-weight: 600;
+    letter-spacing: .07em; text-transform: uppercase;
+    cursor: pointer; transition: background .2s;
+  }
+  .btn-filled:hover { background: var(--wine-dark); }
+
+  .user-badge {
+    background: var(--wine-pale);
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--wine);
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .page-header {
+    background: var(--wine);
+    padding: 4rem 2.5rem 3rem;
+    position: relative; overflow: hidden;
+  }
+  .page-header::before {
+    content: '';
+    position: absolute; right: -80px; top: -80px;
+    width: 420px; height: 420px;
+    border: 55px solid rgba(255,249,235,.05);
+    border-radius: 50%;
+  }
+  .page-header::after {
+    content: '';
+    position: absolute; left: 4%; bottom: -70px;
+    width: 240px; height: 240px;
+    border: 40px solid rgba(159,178,172,.10);
+    border-radius: 50%;
+  }
+  .header-inner { position: relative; z-index: 1; }
+  .header-eyebrow {
+    font-size: .72rem; font-weight: 600; letter-spacing: .2em;
+    text-transform: uppercase; color: var(--sage-light);
+    margin-bottom: .9rem;
+  }
+  .page-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.6rem; font-weight: 700; line-height: 1.05;
+    color: var(--cream); margin-bottom: .7rem;
+  }
+  .page-header h1 em { font-weight: 400; color: rgba(255,249,235,.6); font-size: 2.6rem; }
+  .page-header p {
+    color: rgba(255,249,235,.62); font-size: .93rem; font-weight: 300; max-width: 500px;
+  }
+  .header-stats {
+    display: flex; gap: 2.5rem; margin-top: 2rem;
+    padding-top: 1.8rem;
+    border-top: 1px solid rgba(255,249,235,.14);
+  }
+  .h-stat-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem; font-weight: 700; color: var(--cream);
+    display: block; line-height: 1;
+  }
+  .h-stat-label {
+    font-size: .7rem; color: var(--sage-light);
+    letter-spacing: .1em; text-transform: uppercase;
+  }
+
+  .search-bar-wrap {
+    background: var(--white);
+    padding: 1.1rem 2.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex; gap: 1rem; align-items: center;
+    flex-wrap: wrap;
+  }
+  .search-input-wrapper { flex: 1; position: relative; min-width: 200px; }
+  .search-input-wrapper svg {
+    position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);
+    color: var(--sage-dark);
+  }
+  .search-input {
+    width: 100%; padding: .68rem 1rem .68rem 2.8rem;
+    border: 1.5px solid var(--border); border-radius: 3px;
+    background: var(--cream);
+    font-family: 'Jost', sans-serif; font-size: .88rem;
+    color: var(--text); outline: none; transition: border-color .2s;
+  }
+  .search-input:focus { border-color: var(--wine); }
+  .filter-select {
+    padding: .68rem 2.1rem .68rem 1rem;
+    border: 1.5px solid var(--border); border-radius: 3px;
+    background: var(--cream);
+    font-family: 'Jost', sans-serif; font-size: .85rem;
+    color: var(--text); outline: none; cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 12 12'%3E%3Cpath fill='%235d0d18' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right .8rem center;
+  }
+
+  .main-layout {
+    display: grid; grid-template-columns: 300px 1fr;
+    max-width: 1400px; margin: 0 auto;
+    padding: 2rem 2.5rem; gap: 2rem;
+  }
+
+  .sidebar { position: sticky; top: 88px; align-self: start; }
+  .sidebar-section {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 6px; overflow: hidden;
+    box-shadow: 0 2px 18px var(--shadow);
+    margin-bottom: 1.2rem;
+  }
+  .sidebar-header {
+    background: var(--wine);
+    padding: 1rem 1.3rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .sidebar-header h3 {
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--cream); font-size: 1.12rem; font-weight: 600; letter-spacing: .03em;
+  }
+  .add-btn {
+    background: rgba(255,249,235,.15); color: var(--cream);
+    border: 1px solid rgba(255,249,235,.28);
+    border-radius: 3px; padding: .28rem .8rem;
+    font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    cursor: pointer; display: flex; align-items: center; gap: .3rem;
+    transition: background .2s;
+  }
+  .add-btn:hover { background: rgba(255,249,235,.28); }
+
+  .category-list { padding: .4rem 0; }
+  .category-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .65rem 1.3rem;
+    cursor: pointer; transition: background .15s;
+    border-left: 3px solid transparent;
+  }
+  .category-item:hover { background: var(--cream); border-left-color: var(--sage); }
+  .category-item.active { background: var(--wine-pale); border-left-color: var(--wine); }
+  .cat-left { display: flex; align-items: center; gap: .7rem; }
+  .cat-icon { font-size: 1.05rem; }
+  .cat-name { font-size: .87rem; font-weight: 500; color: var(--text); }
+  .cat-count {
+    background: var(--border); color: var(--text-muted);
+    padding: .14rem .55rem; border-radius: 50px;
+    font-size: .7rem; font-weight: 600;
+  }
+  .category-item.active .cat-count { background: var(--wine); color: var(--cream); }
+
+  .add-cat-form {
+    padding: 1.2rem; border-top: 1px solid var(--border); display: none;
+  }
+  .add-cat-form.open { display: block; }
+  .add-cat-form label {
+    font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--text-muted); display: block; margin-bottom: .35rem;
+  }
+  .add-cat-form input {
+    width: 100%; padding: .55rem .8rem;
+    border: 1.5px solid var(--border); border-radius: 3px;
+    font-family: 'Jost', sans-serif; font-size: .85rem;
+    background: var(--cream); color: var(--text); outline: none;
+    transition: border-color .2s; margin-bottom: .75rem;
+  }
+  .add-cat-form input:focus { border-color: var(--wine); }
+  .form-actions { display: flex; gap: .5rem; }
+  .btn-sm-wine {
+    flex: 1; background: var(--wine); color: var(--cream);
+    border: none; padding: .52rem; border-radius: 3px;
+    font-family: 'Jost', sans-serif; font-size: .78rem; font-weight: 600;
+    letter-spacing: .06em; text-transform: uppercase;
+    cursor: pointer; transition: background .2s;
+  }
+  .btn-sm-wine:hover { background: var(--wine-dark); }
+  .btn-sm-cancel {
+    flex: 1; background: var(--border); color: var(--text-muted);
+    border: none; padding: .52rem; border-radius: 3px;
+    font-family: 'Jost', sans-serif; font-size: .78rem; font-weight: 500;
+    cursor: pointer; transition: background .2s;
+  }
+  .btn-sm-cancel:hover { background: #d9cfc0; }
+  .role-notice {
+    padding: .8rem 1.3rem; background: #fdf5e4;
+    border-top: 1px solid var(--border);
+    font-size: .77rem; color: var(--text-muted);
+    display: flex; align-items: center; gap: .4rem; min-height: 42px;
+  }
+
+  .create-shop-section {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 1.2rem;
+  }
+  .create-shop-header {
+    background: var(--sage);
+    padding: 1rem 1.3rem;
+  }
+  .create-shop-header h3 {
+    font-family: 'Cormorant Garamond', serif;
+    color: white;
+    font-size: 1.12rem;
+    font-weight: 600;
+    letter-spacing: .03em;
+  }
+  .create-shop-form {
+    padding: 1.2rem;
+  }
+  .create-shop-form label {
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: .35rem;
+    margin-top: .8rem;
+  }
+  .create-shop-form label:first-of-type { margin-top: 0; }
+  .create-shop-form input, .create-shop-form select, .create-shop-form textarea {
+    width: 100%;
+    padding: .55rem .8rem;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    font-family: 'Jost', sans-serif;
+    font-size: .85rem;
+    background: var(--cream);
+    color: var(--text);
+    outline: none;
+    transition: border-color .2s;
+  }
+  .create-shop-form textarea { resize: vertical; min-height: 60px; }
+  .image-option-group { display: flex; gap: 1rem; margin: 0.5rem 0; }
+  .image-option-group label { display: flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; text-transform: none; letter-spacing: normal; margin-top: 0; }
+  .image-preview { margin-top: 0.5rem; width: 100%; height: 100px; background: var(--cream); border: 1.5px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .image-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .image-preview .preview-placeholder { color: var(--text-muted); font-size: 0.7rem; }
+  .new-category-row { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+  .new-category-row input { flex: 1; margin-top: 0; }
+  .new-category-row button {
+    background: var(--sage); color: white; border: none; padding: 0.55rem 1rem; border-radius: 3px;
+    font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+  }
+  .new-category-row button:hover { background: var(--wine); }
+  .helper-text { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem; }
+  .btn-create-shop {
+    width: 100%; background: var(--wine); color: var(--cream); border: none; padding: .7rem;
+    border-radius: 3px; font-size: .8rem; font-weight: 600; letter-spacing: .07em;
+    text-transform: uppercase; cursor: pointer; margin-top: 1rem;
+  }
+  .btn-create-shop:hover { background: var(--wine-dark); }
+
+  .filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .filter-btn {
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn.active {
+    background: var(--wine);
+    border-color: var(--wine);
+    color: white;
+  }
+  .filter-btn:hover:not(.active) {
+    border-color: var(--sage);
+  }
+
+  .stores-title-row {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 1.2rem;
+  }
+  .stores-area h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.75rem; font-weight: 700; color: var(--text);
+  }
+  .stores-count { font-size: .8rem; color: var(--text-muted); }
+  .stores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .store-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform .25s, box-shadow .25s, border-color .25s;
+    box-shadow: 0 2px 12px var(--shadow);
+    position: relative;
+  }
+  .store-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px var(--shadow-md);
+    border-color: var(--sage);
+  }
+  .store-banner {
+    height: 180px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .store-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .4s ease;
+  }
+  .store-card:hover .store-banner img { transform: scale(1.05); }
+  .store-badge {
+    position: absolute;
+    top: 0.8rem;
+    right: 0.8rem;
+    background: var(--wine);
+    color: var(--cream);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.7rem;
+    border-radius: 3px;
+    z-index: 2;
+  }
+  .store-badge.organic { background: var(--sage-dark); }
+  .store-badge.artisan { background: #6b5240; }
+
+  .store-body {
+    padding: 1.2rem;
+  }
+  .store-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 0.3rem;
+  }
+  .store-category-tag {
+    display: inline-block;
+    background: var(--sage-light);
+    color: var(--sage-dark);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.6rem;
+    border-radius: 3px;
+    margin-bottom: 0.6rem;
+  }
+  .store-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    font-weight: 300;
+  }
+  .store-stats {
+    display: flex;
+    border-top: 1px solid var(--border);
+    padding-top: 0.8rem;
+  }
+  .store-stat {
+    text-align: center;
+    flex: 1;
+    border-right: 1px solid var(--border);
+  }
+  .store-stat:last-child { border-right: none; }
+  .store-stat-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--wine);
+    display: block;
+  }
+  .store-stat-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .store-stars {
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+    margin-top: 0.15rem;
+  }
+  .star { color: var(--wine); font-size: 0.7rem; }
+  .star.empty { color: var(--border); }
+
+  .favorite-btn {
+    position: absolute;
+    top: 0.8rem;
+    left: 0.8rem;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.2s;
+    z-index: 10;
+  }
+  .favorite-btn:hover { transform: scale(1.1); }
+  .favorite-btn .heart-empty { color: var(--text-muted); }
+  .favorite-btn .heart-filled { color: var(--wine); }
+  .favorite-btn .heart-filled { display: none; }
+  .favorite-btn.favorited .heart-empty { display: none; }
+  .favorite-btn.favorited .heart-filled { display: inline; }
+
+  .delete-shop-btn {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    background: var(--wine);
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .store-card:hover .delete-shop-btn { opacity: 1; }
+  .delete-shop-btn:hover { background: var(--wine-dark); }
+
+  .toast {
+    position: fixed; bottom: 2rem; right: 2rem;
+    background: var(--wine); color: var(--cream);
+    padding: .85rem 1.5rem; border-radius: 5px;
+    font-size: .86rem; font-weight: 500;
+    box-shadow: 0 8px 28px var(--shadow-md);
+    z-index: 500; transform: translateY(80px); opacity: 0;
+    transition: all .35s cubic-bezier(.34,1.4,.64,1);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
+  .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+
+  .auth-modal-overlay {
+    display: none; position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    align-items: center; justify-content: center;
+    z-index: 1000;
+  }
+  .auth-modal-overlay.open { display: flex; }
+  .auth-modal {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 450px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  }
+  .auth-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .auth-tab {
+    background: none;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .auth-tab.active { color: var(--wine); border-bottom: 2px solid var(--wine); }
+  .auth-form { display: none; }
+  .auth-form.active { display: block; }
+  .auth-form h3 { color: var(--wine); margin-bottom: 1rem; font-family: 'Cormorant Garamond', serif; }
+  .auth-form input, .auth-form textarea {
+    width: 100%;
+    padding: 0.7rem;
+    margin-bottom: 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Jost', sans-serif;
+    background: var(--cream);
+  }
+  .auth-form textarea { border-radius: 8px; resize: vertical; }
+  .auth-error { color: #d9534f; font-size: 0.8rem; margin-top: 0.5rem; text-align: center; }
+  .role-selector { display: flex; gap: 1rem; margin-bottom: 1rem; }
+  .role-selector label { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; }
+  .auth-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--text-muted);
+  }
+
+  @media(max-width:900px){ .main-layout { grid-template-columns: 1fr; } .sidebar { position: static; } }
+  @media(max-width:600px){
+    nav { padding: 0 1rem; }
+    .nav-links { display: none; }
+    .page-header { padding: 2.5rem 1.2rem 2rem; }
+    .page-header h1 { font-size: 2.4rem; }
+    .header-stats { gap: 1.5rem; }
+    .search-bar-wrap { flex-wrap: wrap; padding: 1rem; }
+    .main-layout { padding: 1.2rem 1rem; }
+    .store-banner { height: 160px; }
+    .new-category-row { flex-wrap: wrap; }
+    .new-category-row button { width: 100%; }
+    .image-option-group { flex-direction: column; gap: 0.3rem; }
+    .filter-buttons { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">🌿 Green<span>Market</span></div>
+  <div class="nav-links">
+    <a href="#">Accueil</a>
+    <a href="#" class="active">Boutiques</a>
+    <a href="#">Produits</a>
+    <a href="#">À propos</a>
+    <a href="dashboard-producteur.html" id="dashboardLink" style="display: none;">📊 Dashboard</a>
+  </div>
+  <div class="nav-actions" id="authWidget"></div>
+</nav>
+
+<div class="page-header">
+  <div class="header-inner">
+    <div class="header-eyebrow">🌱 Circuits courts &amp; produits du terroir</div>
+    <h1>Nos Boutiques<br><em>Locales</em></h1>
+    <p>Découvrez des producteurs vérifiés, engagés pour l'environnement et la qualité de leur terroir.</p>
+    <div class="header-stats">
+      <div><span class="h-stat-val" id="statStores">6</span><span class="h-stat-label">Boutiques actives</span></div>
+      <div><span class="h-stat-val" id="statProducts">0</span><span class="h-stat-label">Produits locaux</span></div>
+      <div><span class="h-stat-val" id="statRating">0,0 ★</span><span class="h-stat-label">Note moyenne</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="search-bar-wrap">
+  <div class="search-input-wrapper">
+    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input class="search-input" id="searchInput" type="text" placeholder="Rechercher une boutique, un producteur…">
+  </div>
+  <select class="filter-select" id="catFilter"><option value="">Toutes les catégories</option></select>
+  <select class="filter-select" id="sortFilter">
+    <option value="">Trier par</option>
+    <option value="rating">Mieux notées</option>
+    <option value="products">Plus de produits</option>
+    <option value="name">Nom A–Z</option>
+  </select>
+</div>
+
+<div class="main-layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-header"><h3>Catégories</h3><button class="add-btn" id="toggleAddCat"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>Ajouter</button></div>
+      <div class="category-list" id="categoryList"></div>
+      <div class="add-cat-form" id="addCatForm">
+        <label for="catNameInput">Nom de la catégorie</label>
+        <input type="text" id="catNameInput" placeholder="Ex : Épices et condiments">
+        <label for="catIconInput">Icône (emoji)</label>
+        <input type="text" id="catIconInput" placeholder="🌶️" maxlength="4">
+        <div class="form-actions"><button class="btn-sm-cancel" id="cancelCat">Annuler</button><button class="btn-sm-wine" id="saveCat">Enregistrer</button></div>
+      </div>
+      <div class="role-notice" id="roleNotice"></div>
+    </div>
+
+    <div id="createShopSection" class="create-shop-section" style="display: none;">
+      <div class="create-shop-header"><h3>🏪 Créer ma boutique</h3></div>
+      <div class="create-shop-form">
+        <label>Nom de la boutique *</label>
+        <input type="text" id="shopName" placeholder="Ex: Les Délices du Terroir">
+        <label>Catégorie *</label>
+        <select id="shopCategory"></select>
+        <div class="new-category-row">
+          <input type="text" id="newCategoryName" placeholder="Nouvelle catégorie...">
+          <button id="addNewCategoryBtn">➕ Ajouter</button>
+        </div>
+        <div class="helper-text">💡 Si votre catégorie n'existe pas, ajoutez-la ci-dessus</div>
+        <label>Image de la boutique *</label>
+        <div class="image-option-group">
+          <label><input type="radio" name="imageType" value="url" checked> 🌐 URL d'image</label>
+          <label><input type="radio" name="imageType" value="file"> 📁 Télécharger un fichier</label>
+        </div>
+        <div id="urlImageContainer">
+          <input type="text" id="shopBannerUrl" placeholder="https://images.unsplash.com/...">
+          <div class="helper-text">📷 Entrez une URL d'image pour la bannière</div>
+        </div>
+        <div id="fileImageContainer" style="display: none;">
+          <input type="file" id="shopBannerFile" accept="image/*">
+          <div id="imagePreview" class="image-preview"><div class="preview-placeholder">Aucune image sélectionnée</div></div>
+          <div class="helper-text">📁 Choisissez une image depuis votre ordinateur</div>
+        </div>
+        <label>Description</label>
+        <textarea id="shopDesc" placeholder="Décrivez votre boutique..."></textarea>
+        <label>Badge (optionnel)</label>
+        <select id="shopBadge"><option value="">Aucun badge</option><option value="Bio">Bio</option><option value="Artisanal">Artisanal</option><option value="Local">Local</option></select>
+        <button class="btn-create-shop" id="createShopBtn">✨ Créer ma boutique</button>
+      </div>
+    </div>
+  </aside>
+
+  <section class="stores-area">
+    <div class="stores-title-row">
+      <h2 id="storesTitle">Toutes les boutiques</h2>
+      <span class="stores-count" id="storesCount"></span>
+    </div>
+    <div class="filter-buttons">
+      <button class="filter-btn active" data-filter="all">🏪 Toutes</button>
+      <button class="filter-btn" data-filter="favorites">❤️ Favoris</button>
+    </div>
+    <div class="stores-grid" id="storesGrid"></div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="auth-modal-overlay" id="authModal">
+  <div class="auth-modal">
+    <div class="auth-tabs"><button class="auth-tab active" data-tab="login">Connexion</button><button class="auth-tab" data-tab="register">Inscription</button></div>
+    <div id="loginForm" class="auth-form active">
+      <h3>🔐 Se connecter</h3>
+      <input type="email" id="loginEmail" placeholder="Email"><input type="password" id="loginPassword" placeholder="Mot de passe">
+      <button class="btn-filled" id="doLoginBtn" style="width:100%">Se connecter</button>
+      <p class="auth-error" id="loginError"></p>
+    </div>
+    <div id="registerForm" class="auth-form">
+      <h3>📝 Créer un compte</h3>
+      <div class="role-selector"><label><input type="radio" name="registerRole" value="client" checked> 👤 Client</label><label><input type="radio" name="registerRole" value="productor"> 🌾 Producteur</label></div>
+      <input type="text" id="registerName" placeholder="Nom complet"><input type="email" id="registerEmail" placeholder="Email"><input type="password" id="registerPassword" placeholder="Mot de passe">
+      <div id="producerFields" style="display: none;">
+        <input type="text" id="producerShopName" placeholder="Nom de votre boutique"><input type="text" id="producerLocation" placeholder="Localisation"><textarea id="producerBio" placeholder="Décrivez votre activité..." rows="2"></textarea>
+      </div>
+      <button class="btn-filled" id="doRegisterBtn" style="width:100%">S'inscrire</button>
+      <p class="auth-error" id="registerError"></p>
+    </div>
+    <button class="auth-close" id="closeAuthModal">✕</button>
+  </div>
+</div>
+
+<script>
+// ========== CATÉGORIES ==========
+let categories = [
+  { id:1, icon:'🥦', name:'Fruits et légumes' },
+  { id:2, icon:'🧀', name:'Produits laitiers' },
+  { id:3, icon:'🍞', name:'Boulangerie artisanale' },
+  { id:4, icon:'🍯', name:'Miel et apiculture' },
+  { id:5, icon:'🫒', name:'Huiles et conserves' },
+  { id:6, icon:'🌿', name:'Plantes médicinales' }
+];
+
+// ========== BOUTIQUES AVEC PRODUITS PAR DÉFAUT ==========
+let stores = [
+  { 
+    id:1, name:"Le Verger Céleste", category:'Fruits et légumes', categoryId:1, 
+    badge:'Bio', badgeClass:'organic', 
+    banner:'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=700&q=80', 
+    desc:'Des fruits et légumes cultivés avec amour sous le ciel étoilé, récoltés à maturité parfaite.', 
+    rating:4.9, reviews:156, products:4, sales:'1 450', 
+    tags:['Bio','Local','Saison'], 
+    producerId:101, producerName:'Élodie Moreau', location:'Provence', since:'2018' 
+  },
+  { 
+    id:2, name:"La Crèmerie des Sommets", category:'Produits laitiers', categoryId:2, 
+    badge:'Artisanal', badgeClass:'artisan', 
+    banner:'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=700&q=80', 
+    desc:'Fromages de chèvre et brebis fabriqués en altitude, affinés en cave naturelle.', 
+    rating:4.7, reviews:94, products:4, sales:'620', 
+    tags:['Artisanal','Lait cru','Montagne'], 
+    producerId:102, producerName:'Benoît Girard', location:'Savoie', since:'2015' 
+  },
+  { 
+    id:3, name:"Le Pétrin d'Antan", category:'Boulangerie artisanale', categoryId:3, 
+    badge:'Local', badgeClass:'', 
+    banner:'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=700&q=80', 
+    desc:'Pain cuit au feu de bois, viennoiseries et pâtisseries selon les recettes de nos grands-mères.', 
+    rating:4.9, reviews:228, products:3, sales:'2 350', 
+    tags:['Feu de bois','Levain','Tradition'], 
+    producerId:103, producerName:'Marguerite Dufour', location:'Bretagne', since:'2010' 
+  },
+  { 
+    id:4, name:"Ruchers d'Albion", category:'Miel et apiculture', categoryId:4, 
+    badge:'Bio', badgeClass:'organic', 
+    banner:'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=700&q=80', 
+    desc:'Miels monofloraux et polyfloraux issus de ruches respectueuses des abeilles.', 
+    rating:4.8, reviews:72, products:3, sales:'430', 
+    tags:['Miel cru','Sans chauffage','Biodiversité'], 
+    producerId:104, producerName:'Luc Verdier', location:'Ardèche', since:'2019' 
+  },
+  { 
+    id:5, name:"L'Olivier Enchanté", category:'Huiles et conserves', categoryId:5, 
+    badge:'Artisanal', badgeClass:'artisan', 
+    banner:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=700&q=80', 
+    desc:'Huiles d’olive vierge extra, tapenades et conserves du soleil méditerranéen.', 
+    rating:4.6, reviews:108, products:3, sales:'890', 
+    tags:['Première pression','Sans conservateurs','Méditerranée'], 
+    producerId:105, producerName:'Rosa Vivaldi', location:'Nice', since:'2016' 
+  },
+  { 
+    id:6, name:"L'Herboristerie Vagabonde", category:'Plantes médicinales', categoryId:6, 
+    badge:'Local', badgeClass:'', 
+    banner:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=700&q=80', 
+    desc:'Plantes sauvages séchées, tisanes bio et huiles essentielles de cueillette raisonnée.', 
+    rating:4.5, reviews:51, products:3, sales:'340', 
+    tags:['Cueillette sauvage','Bio','Tradition'], 
+    producerId:106, producerName:'Clémence Sauvage', location:'Massif Central', since:'2020' 
+  }
+];
+
+// ========== PRODUITS PAR DÉFAUT AVEC IMAGES ==========
+const defaultProducts = {
+  1: [
+    { id: 101, name: "Fraises Gariguette", price: "6.50 €/barquette", stock: 45, image: "https://images.pexels.com/photos/46174/strawberries-berries-fruit-freshness-46174.jpeg?w=300&h=200&fit=crop", description: "Fraises parfumées de Provence" },
+    { id: 102, name: "Tomates Anciennes", price: "4.50 €/kg", stock: 60, image: "https://images.pexels.com/photos/533280/close-up-red-tomatoes-tomato-533280.jpeg?w=300&h=200&fit=crop", description: "Tomates coeur de boeuf" },
+    { id: 103, name: "Asperges Vertes", price: "5.00 €/botte", stock: 30, image: "https://images.pexels.com/photos/143133/asperges-vegetables-green-healthy-143133.jpeg?w=300&h=200&fit=crop", description: "Asperges fraîches du printemps" },
+    { id: 104, name: "Pêches Juteuses", price: "4.80 €/kg", stock: 35, image: "https://images.pexels.com/photos/104570/peaches-fruit-sweet-delicious-104570.jpeg?w=300&h=200&fit=crop", description: "Pêches bio du verger" }
+  ],
+  2: [
+    { id: 201, name: "Camembert au Lait Cru", price: "6.50 €", stock: 25, image: "https://images.pexels.com/photos/821365/pexels-photo-821365.jpeg?w=300&h=200&fit=crop", description: "Camembert affiné 3 semaines" },
+    { id: 202, name: "Chèvre Frais", price: "4.50 €", stock: 30, image: "https://images.pexels.com/photos/839443/pexels-photo-839443.jpeg?w=300&h=200&fit=crop", description: "Fromage de chèvre frais" },
+    { id: 203, name: "Brebis Pyrénées", price: "8.50 €", stock: 15, image: "https://images.pexels.com/photos/586568/pexels-photo-586568.jpeg?w=300&h=200&fit=crop", description: "Fromage de brebis" },
+    { id: 204, name: "Yaourt Fermier", price: "2.50 €/pot", stock: 50, image: "https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?w=300&h=200&fit=crop", description: "Yaourt nature bio" }
+  ],
+  3: [
+    { id: 301, name: "Pain au Levain", price: "4.50 €", stock: 40, image: "https://images.pexels.com/photos/236887/pexels-photo-236887.jpeg?w=300&h=200&fit=crop", description: "Pain bio cuit au feu de bois" },
+    { id: 302, name: "Croissant Pur Beurre", price: "1.20 €", stock: 60, image: "https://images.pexels.com/photos/163957/baking-croissant-pastry-bakery-163957.jpeg?w=300&h=200&fit=crop", description: "Viennoiserie croustillante" },
+    { id: 303, name: "Baguette Tradition", price: "1.10 €", stock: 80, image: "https://images.pexels.com/photos/2474658/pexels-photo-2474658.jpeg?w=300&h=200&fit=crop", description: "Baguette farine bio" }
+  ],
+  4: [
+    { id: 401, name: "Miel de Lavande", price: "18.00 €/pot", stock: 25, image: "https://images.pexels.com/photos/95979/honey-jar-drop-of-honey-comb-95979.jpeg?w=300&h=200&fit=crop", description: "Miel monofloral de Provence" },
+    { id: 402, name: "Miel de Forêt", price: "15.00 €/pot", stock: 20, image: "https://images.pexels.com/photos/129341/pexels-photo-129341.jpeg?w=300&h=200&fit=crop", description: "Miel corsé des montagnes" },
+    { id: 403, name: "Propolis", price: "12.00 €/flacon", stock: 15, image: "https://images.pexels.com/photos/95978/honey-drops-sweet-flow-95978.jpeg?w=300&h=200&fit=crop", description: "Propolis pure" }
+  ],
+  5: [
+    { id: 501, name: "Huile d'Olive AOP", price: "15.00 €/500ml", stock: 40, image: "https://images.pexels.com/photos/139535/olive-oil-bottle-olives-olive-oil-139535.jpeg?w=300&h=200&fit=crop", description: "Première pression à froid" },
+    { id: 502, name: "Tapenade Noire", price: "6.00 €/pot", stock: 35, image: "https://images.pexels.com/photos/4962613/pexels-photo-4962613.jpeg?w=300&h=200&fit=crop", description: "Tapenade d'olives noires" },
+    { id: 503, name: "Confiture de Figue", price: "5.50 €/pot", stock: 25, image: "https://images.pexels.com/photos/1028702/figs-honey-fruit-sweet-1028702.jpeg?w=300&h=200&fit=crop", description: "Confiture artisanale" }
+  ],
+  6: [
+    { id: 601, name: "Tisane Digestive", price: "7.00 €/boîte", stock: 45, image: "https://images.pexels.com/photos/1640145/pexels-photo-1640145.jpeg?w=300&h=200&fit=crop", description: "Mélange de plantes bio" },
+    { id: 602, name: "Romarin Sauvage", price: "5.00 €/sachet", stock: 60, image: "https://images.pexels.com/photos/52824/rosemary-herb-bouquet-pile-52824.jpeg?w=300&h=200&fit=crop", description: "Romarin cueilli à la main" },
+    { id: 603, name: "Menthe Poivrée", price: "4.50 €/sachet", stock: 50, image: "https://images.pexels.com/photos/135173/pexels-photo-135173.jpeg?w=300&h=200&fit=crop", description: "Menthe bio séchée" }
+  ]
+};
+
+// ========== SAUVEGARDE DES PRODUITS PAR DÉFAUT ==========
+function saveDefaultProducts() {
+  let productsSaved = false;
+  for (const shopId in defaultProducts) {
+    const existing = localStorage.getItem(`products_${shopId}`);
+    if (!existing) {
+      localStorage.setItem(`products_${shopId}`, JSON.stringify(defaultProducts[shopId]));
+      productsSaved = true;
+    }
+  }
+  if (productsSaved) {
+    console.log("✅ Produits par défaut sauvegardés");
+  }
+}
+
+// ========== PRODUITS PAR DÉFAUT POUR LES NOUVELLES BOUTIQUES ==========
+function getDefaultProductsForCategory(categoryId) {
+  const defaultProductLists = {
+    1: defaultProducts[1] || defaultProducts[1],
+    2: defaultProducts[2] || defaultProducts[2],
+    3: defaultProducts[3] || defaultProducts[3],
+    4: defaultProducts[4] || defaultProducts[4],
+    5: defaultProducts[5] || defaultProducts[5],
+    6: defaultProducts[6] || defaultProducts[6]
+  };
+  return defaultProductLists[categoryId] || defaultProducts[1];
+}
+
+// ========== FAVORIS ==========
+let favorites = [];
+
+function loadFavorites() {
+  const saved = localStorage.getItem('greenmarket_favorites');
+  if (saved) favorites = JSON.parse(saved);
+  else favorites = [];
+}
+
+function saveFavorites() {
+  localStorage.setItem('greenmarket_favorites', JSON.stringify(favorites));
+}
+
+function isFavorite(shopId) {
+  return favorites.includes(shopId);
+}
+
+function addFavorite(shopId) {
+  if (!favorites.includes(shopId)) {
+    favorites.push(shopId);
+    saveFavorites();
+    showToast("❤️ Boutique ajoutée aux favoris");
+    renderStores();
+  }
+}
+
+function removeFavorite(shopId) {
+  favorites = favorites.filter(id => id !== shopId);
+  saveFavorites();
+  showToast("💔 Boutique retirée des favoris");
+  renderStores();
+}
+
+function toggleFavorite(shopId, event) {
+  event.stopPropagation();
+  if (isFavorite(shopId)) {
+    removeFavorite(shopId);
+  } else {
+    addFavorite(shopId);
+  }
+}
+
+// ========== FILTRE FAVORIS ==========
+let currentFilter = 'all';
+
+function setFilter(filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    if (btn.dataset.filter === filter) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+  renderStores();
+}
+
+// ========== AUTH ==========
+let currentUser = null;
+
+function initUsers() {
+  const defaultUsers = [
+    { id: 1, name: "Administrateur", email: "admin@greenmarket.com", password: "admin123", role: "admin", producerId: null, producerName: null },
+    { id: 2, name: "Élodie Moreau", email: "elodie@verger.fr", password: "elodie123", role: "productor", producerId: 101, producerName: "Élodie Moreau" },
+    { id: 3, name: "Benoît Girard", email: "benoit@cremerie.fr", password: "benoit123", role: "productor", producerId: 102, producerName: "Benoît Girard" },
+    { id: 4, name: "Marguerite Dufour", email: "marguerite@fournil.fr", password: "marguerite123", role: "productor", producerId: 103, producerName: "Marguerite Dufour" },
+    { id: 5, name: "Luc Verdier", email: "luc@ruchers.fr", password: "luc123", role: "productor", producerId: 104, producerName: "Luc Verdier" },
+    { id: 6, name: "Rosa Vivaldi", email: "rosa@olivier.fr", password: "rosa123", role: "productor", producerId: 105, producerName: "Rosa Vivaldi" },
+    { id: 7, name: "Clémence Sauvage", email: "clemence@herboristerie.fr", password: "clemence123", role: "productor", producerId: 106, producerName: "Clémence Sauvage" },
+    { id: 8, name: "Client Test", email: "client@test.com", password: "client123", role: "client", producerId: null, producerName: null }
+  ];
+  if (!localStorage.getItem('greenmarket_users')) {
+    localStorage.setItem('greenmarket_users', JSON.stringify(defaultUsers));
+  }
+}
+
+function getCurrentUser() {
+  const userJson = sessionStorage.getItem('greenmarket_current_user');
+  return userJson ? JSON.parse(userJson) : null;
+}
+
+function setCurrentUser(user) {
+  sessionStorage.setItem('greenmarket_current_user', JSON.stringify(user));
+  currentUser = user;
+  updateCreateShopVisibility();
+  updateDashboardLink();
+}
+
+function logout() {
+  sessionStorage.removeItem('greenmarket_current_user');
+  currentUser = null;
+  updateAuthUI();
+  updateCreateShopVisibility();
+  updateDashboardLink();
+  showToast("👋 Déconnexion réussie");
+}
+
+function login(email, password) {
+  const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
+  const user = users.find(u => u.email === email && u.password === password);
+  if (user) {
+    const { password, ...safeUser } = user;
+    setCurrentUser(safeUser);
+    return { success: true, user: safeUser };
+  }
+  return { success: false, error: "Email ou mot de passe incorrect" };
+}
+
+function registerClient(name, email, password) {
+  const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
+  if (users.find(u => u.email === email)) {
+    return { success: false, error: "Email déjà utilisé" };
+  }
+  const newUser = { id: Date.now(), name, email, password, role: "client", producerId: null, producerName: null };
+  users.push(newUser);
+  localStorage.setItem('greenmarket_users', JSON.stringify(users));
+  const { password: _, ...safeUser } = newUser;
+  setCurrentUser(safeUser);
+  return { success: true, user: safeUser };
+}
+
+function registerProducer(name, email, password) {
+  const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
+  if (users.find(u => u.email === email)) {
+    return { success: false, error: "Email déjà utilisé" };
+  }
+  const newProducerId = Date.now();
+  const newUser = { id: Date.now(), name, email, password, role: "productor", producerId: newProducerId, producerName: name };
+  users.push(newUser);
+  localStorage.setItem('greenmarket_users', JSON.stringify(users));
+  const { password: _, ...safeUser } = newUser;
+  setCurrentUser(safeUser);
+  return { success: true, user: safeUser };
+}
+
+function updateAuthUI() {
+  const widget = document.getElementById('authWidget');
+  const user = getCurrentUser();
+  if (user) {
+    let roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Producteur' : 'Client');
+    widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;">🚪</button></div>`;
+    document.getElementById('logoutBtn')?.addEventListener('click', logout);
+  } else {
+    widget.innerHTML = `<button class="btn-outline" id="showLoginBtn">Connexion</button><button class="btn-filled" id="showRegisterBtn">S'inscrire</button>`;
+    document.getElementById('showLoginBtn')?.addEventListener('click', () => showAuthModal('login'));
+    document.getElementById('showRegisterBtn')?.addEventListener('click', () => showAuthModal('register'));
+  }
+  updateCategoriesPermissions();
+}
+
+function updateDashboardLink() {
+  const user = getCurrentUser();
+  const dashboardLink = document.getElementById('dashboardLink');
+  if (dashboardLink) {
+    if (user && (user.role === 'productor' || user.role === 'admin')) {
+      dashboardLink.style.display = 'inline-block';
+    } else {
+      dashboardLink.style.display = 'none';
+    }
+  }
+}
+
+function updateCreateShopVisibility() {
+  const user = getCurrentUser();
+  const createShopSection = document.getElementById('createShopSection');
+  if (createShopSection) {
+    if (user && (user.role === 'productor' || user.role === 'admin')) {
+      createShopSection.style.display = 'block';
+      updateCategorySelect();
+      setupImageOptions();
+    } else {
+      createShopSection.style.display = 'none';
+    }
+  }
+}
+
+function updateCategorySelect() {
+  const sel = document.getElementById('shopCategory');
+  if (sel) {
+    sel.innerHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  }
+}
+
+function setupImageOptions() {
+  const radioUrl = document.querySelector('input[name="imageType"][value="url"]');
+  const radioFile = document.querySelector('input[name="imageType"][value="file"]');
+  const urlContainer = document.getElementById('urlImageContainer');
+  const fileContainer = document.getElementById('fileImageContainer');
+  const fileInput = document.getElementById('shopBannerFile');
+  const preview = document.getElementById('imagePreview');
+  
+  if (!radioUrl || !radioFile) return;
+  
+  radioUrl.addEventListener('change', () => {
+    urlContainer.style.display = 'block';
+    fileContainer.style.display = 'none';
+  });
+  radioFile.addEventListener('change', () => {
+    urlContainer.style.display = 'none';
+    fileContainer.style.display = 'block';
+  });
+  
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          preview.innerHTML = `<img src="${event.target.result}" alt="Aperçu">`;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.innerHTML = '<div class="preview-placeholder">Aucune image sélectionnée</div>';
+      }
+    });
+  }
+}
+
+function showAuthModal(tab = 'login') {
+  const modal = document.getElementById('authModal');
+  const loginTab = document.querySelector('.auth-tab[data-tab="login"]');
+  const registerTab = document.querySelector('.auth-tab[data-tab="register"]');
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+  if (tab === 'login') {
+    loginTab.classList.add('active');
+    registerTab.classList.remove('active');
+    loginForm.classList.add('active');
+    registerForm.classList.remove('active');
+  } else {
+    loginTab.classList.remove('active');
+    registerTab.classList.add('active');
+    loginForm.classList.remove('active');
+    registerForm.classList.add('active');
+  }
+  modal.classList.add('open');
+}
+
+function closeAuthModal() {
+  document.getElementById('authModal').classList.remove('open');
+}
+
+function setupAuthModal() {
+  const tabs = document.querySelectorAll('.auth-tab');
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+  const roleRadios = document.querySelectorAll('input[name="registerRole"]');
+  const producerFields = document.getElementById('producerFields');
+  
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      if (tab.dataset.tab === 'login') {
+        loginForm.classList.add('active');
+        registerForm.classList.remove('active');
+      } else {
+        loginForm.classList.remove('active');
+        registerForm.classList.add('active');
+      }
+    });
+  });
+  
+  roleRadios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      producerFields.style.display = radio.value === 'productor' ? 'block' : 'none';
+    });
+  });
+  
+  document.getElementById('doLoginBtn').addEventListener('click', () => {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const result = login(email, password);
+    if (result.success) {
+      closeAuthModal();
+      updateAuthUI();
+      updateCreateShopVisibility();
+      renderStores();
+      showToast(`👋 Bonjour ${result.user.name} !`);
+    } else {
+      document.getElementById('loginError').textContent = result.error;
+    }
+  });
+  
+  document.getElementById('doRegisterBtn').addEventListener('click', () => {
+    const role = document.querySelector('input[name="registerRole"]:checked').value;
+    const name = document.getElementById('registerName').value;
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    if (!name || !email || !password) {
+      document.getElementById('registerError').textContent = "Veuillez remplir tous les champs";
+      return;
+    }
+    let result;
+    if (role === 'productor') {
+      result = registerProducer(name, email, password);
+    } else {
+      result = registerClient(name, email, password);
+    }
+    if (result.success) {
+      closeAuthModal();
+      updateAuthUI();
+      updateCreateShopVisibility();
+      renderStores();
+      showToast(`✅ Bienvenue ${result.user.name} !`);
+    } else {
+      document.getElementById('registerError').textContent = result.error;
+    }
+  });
+  
+  document.getElementById('closeAuthModal').addEventListener('click', closeAuthModal);
+  document.getElementById('authModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('authModal')) closeAuthModal();
+  });
+}
+
+function addNewCategory() {
+  const newName = document.getElementById('newCategoryName').value.trim();
+  if (!newName) {
+    showToast("⚠️ Veuillez saisir un nom", '#9a4a00');
+    return;
+  }
+  if (categories.find(c => c.name.toLowerCase() === newName.toLowerCase())) {
+    showToast("⚠️ Catégorie existe déjà", '#9a4a00');
+    return;
+  }
+  const newId = Math.max(...categories.map(c => c.id), 0) + 1;
+  categories.push({ id: newId, icon: '📦', name: newName });
+  saveCategories();
+  updateCategorySelect();
+  document.getElementById('newCategoryName').value = '';
+  showToast(`✅ Catégorie "${newName}" ajoutée !`);
+}
+
+function getImageData(callback) {
+  const imageType = document.querySelector('input[name="imageType"]:checked').value;
+  if (imageType === 'url') {
+    const url = document.getElementById('shopBannerUrl').value.trim();
+    callback(url || 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=700&q=80');
+  } else {
+    const file = document.getElementById('shopBannerFile').files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        callback(event.target.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      callback('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=700&q=80');
+    }
+  }
+}
+
+function createShop() {
+  const user = getCurrentUser();
+  if (!user || (user.role !== 'productor' && user.role !== 'admin')) {
+    showToast("🔒 Vous devez être connecté en tant que producteur", '#9a4a00');
+    return;
+  }
+  
+  const name = document.getElementById('shopName').value.trim();
+  const catId = parseInt(document.getElementById('shopCategory').value);
+  const desc = document.getElementById('shopDesc').value.trim();
+  const badge = document.getElementById('shopBadge').value;
+  
+  if (!name) {
+    showToast("⚠️ Veuillez saisir un nom", '#9a4a00');
+    return;
+  }
+  if (!catId) {
+    showToast("⚠️ Veuillez sélectionner une catégorie", '#9a4a00');
+    return;
+  }
+  
+  const cat = categories.find(c => c.id === catId);
+  const newId = Math.max(...stores.map(s => s.id), 0) + 1;
+  let badgeClass = '';
+  if (badge === 'Bio') badgeClass = 'organic';
+  if (badge === 'Artisanal') badgeClass = 'artisan';
+  
+  getImageData((bannerImage) => {
+    const newShop = {
+      id: newId,
+      name: name,
+      category: cat ? cat.name : 'Non catégorisé',
+      categoryId: catId,
+      badge: badge,
+      badgeClass: badgeClass,
+      banner: bannerImage,
+      desc: desc || "Nouvelle boutique artisanale",
+      rating: 0,
+      reviews: 0,
+      products: 0,
+      sales: '0',
+      tags: ['Nouveau'],
+      producerId: user.producerId || user.id,
+      producerName: user.name,
+      location: 'France',
+      since: new Date().getFullYear().toString()
+    };
+    
+    stores.push(newShop);
+    saveStores();
+    
+    // Ajouter des produits par défaut selon la catégorie
+    const defaultProds = getDefaultProductsForCategory(catId);
+    if (defaultProds && defaultProds.length > 0) {
+      const productsToSave = defaultProds.map(p => ({
+        ...p,
+        id: Date.now() + Math.random() * 1000
+      }));
+      localStorage.setItem(`products_${newId}`, JSON.stringify(productsToSave));
+      newShop.products = productsToSave.length;
+    }
+    
+    document.getElementById('shopName').value = '';
+    document.getElementById('shopDesc').value = '';
+    document.getElementById('shopBannerUrl').value = '';
+    document.getElementById('shopBannerFile').value = '';
+    document.getElementById('imagePreview').innerHTML = '<div class="preview-placeholder">Aucune image sélectionnée</div>';
+    
+    renderStores();
+    renderCategories();
+    showToast(`✅ Boutique "${name}" créée avec ${newShop.products} produits par défaut !`);
+  });
+}
+
+function saveStores() {
+  localStorage.setItem('greenmarket_stores', JSON.stringify(stores));
+}
+
+function loadStores() {
+  const saved = localStorage.getItem('greenmarket_stores');
+  if (saved) {
+    stores = JSON.parse(saved);
+  }
+}
+
+function saveCategories() {
+  localStorage.setItem('greenmarket_categories', JSON.stringify(categories));
+}
+
+function loadCategories() {
+  const saved = localStorage.getItem('greenmarket_categories');
+  if (saved) {
+    categories = JSON.parse(saved);
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
+
+function showToast(msg, bg = 'var(--wine)') {
+  const t = document.getElementById('toast');
+  t.innerHTML = msg;
+  t.style.background = bg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+function stars(r) {
+  return Array.from({ length: 5 }, (_, i) => `<span class="star${i < Math.round(r) ? '' : ' empty'}">★</span>`).join('');
+}
+
+let activeCategory = null;
+
+function renderCategories() {
+  const list = document.getElementById('categoryList');
+  list.innerHTML = `
+    <div class="category-item${activeCategory === null ? ' active' : ''}" data-name="">
+      <div class="cat-left"><span class="cat-icon">🏪</span><span class="cat-name">Toutes les boutiques</span></div>
+      <span class="cat-count">${stores.length}</span>
+    </div>
+    ${categories.map(c => `
+      <div class="category-item${activeCategory === c.name ? ' active' : ''}" data-name="${c.name}">
+        <div class="cat-left"><span class="cat-icon">${c.icon}</span><span class="cat-name">${c.name}</span></div>
+        <span class="cat-count">${stores.filter(s => s.category === c.name).length}</span>
+      </div>
+    `).join('')}
+  `;
+  list.querySelectorAll('.category-item').forEach(el => {
+    el.addEventListener('click', () => {
+      activeCategory = el.dataset.name || null;
+      document.getElementById('catFilter').value = activeCategory || '';
+      renderCategories();
+      renderStores();
+    });
+  });
+}
+
+function updateCategoriesPermissions() {
+  const btn = document.getElementById('toggleAddCat');
+  const notice = document.getElementById('roleNotice');
+  const user = getCurrentUser();
+  if (user && user.role === 'admin') {
+    btn.style.display = 'flex';
+    notice.innerHTML = '';
+  } else {
+    btn.style.display = 'none';
+    notice.innerHTML = '🔒 Seuls les administrateurs peuvent gérer les catégories.';
+  }
+}
+
+function deleteShop(shopId, event) {
+  event.stopPropagation();
+  if (confirm("⚠️ Êtes-vous sûr de vouloir supprimer cette boutique ?")) {
+    stores = stores.filter(s => s.id !== shopId);
+    favorites = favorites.filter(id => id !== shopId);
+    saveStores();
+    saveFavorites();
+    renderStores();
+    renderCategories();
+    showToast("✅ Boutique supprimée");
+  }
+}
+
+function updateStats() {
+  const totalProducts = stores.reduce((sum, s) => sum + (s.products || 0), 0);
+  const avgRating = stores.length ? (stores.reduce((sum, s) => sum + s.rating, 0) / stores.length).toFixed(1) : 0;
+  document.getElementById('statStores').textContent = stores.length;
+  document.getElementById('statProducts').textContent = totalProducts;
+  document.getElementById('statRating').textContent = avgRating + ' ★';
+}
+
+function renderStores() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const sort = document.getElementById('sortFilter').value;
+  let list = stores.filter(s => {
+    const ms = !q || s.name.toLowerCase().includes(q) || s.producerName.toLowerCase().includes(q);
+    const mc = !activeCategory || s.category === activeCategory;
+    return ms && mc;
+  });
+  
+  if (currentFilter === 'favorites') {
+    list = list.filter(s => isFavorite(s.id));
+  }
+  
+  if (sort === 'rating') list.sort((a, b) => b.rating - a.rating);
+  if (sort === 'products') list.sort((a, b) => b.products - a.products);
+  if (sort === 'name') list.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+  
+  document.getElementById('storesTitle').textContent = currentFilter === 'favorites' ? 'Mes boutiques favorites' : (activeCategory || 'Toutes les boutiques');
+  document.getElementById('storesCount').textContent = `${list.length} boutique${list.length > 1 ? 's' : ''}`;
+  
+  updateStats();
+  
+  const grid = document.getElementById('storesGrid');
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">${currentFilter === 'favorites' ? '❤️' : '🔍'}</div><p>${currentFilter === 'favorites' ? 'Aucune boutique dans vos favoris' : 'Aucune boutique trouvée.'}</p></div>`;
+    return;
+  }
+  
+  const user = getCurrentUser();
+  grid.innerHTML = list.map(s => {
+    const canDelete = user && (user.role === 'admin' || (user.role === 'productor' && user.producerId === s.producerId));
+    const favorited = isFavorite(s.id);
+    return `
+      <div class="store-card">
+        <div class="store-banner" onclick="window.location.href='info-store.html?id=${s.id}'">
+          <img src="${s.banner}" alt="${s.name}" loading="lazy" onerror="this.src='https://picsum.photos/id/20/700/400'">
+          <span class="store-badge ${s.badgeClass}">${s.badge || ''}</span>
+        </div>
+        <button class="favorite-btn ${favorited ? 'favorited' : ''}" onclick="toggleFavorite(${s.id}, event)">
+          <span class="heart-empty">🤍</span>
+          <span class="heart-filled">❤️</span>
+        </button>
+        <div class="store-body">
+          <div class="store-name">${escapeHtml(s.name)}</div>
+          <span class="store-category-tag">${escapeHtml(s.category)}</span>
+          <p class="store-desc">${s.desc.length > 100 ? s.desc.slice(0, 100) + '…' : s.desc}</p>
+          <div class="store-stats">
+            <div class="store-stat"><span class="store-stat-val">${s.rating}</span><div class="store-stars">${stars(s.rating)}</div><span class="store-stat-label">${s.reviews} avis</span></div>
+            <div class="store-stat"><span class="store-stat-val">${s.products}</span><span class="store-stat-label">Produits</span></div>
+            <div class="store-stat"><span class="store-stat-val">${s.sales}</span><span class="store-stat-label">Ventes</span></div>
+          </div>
+        </div>
+        ${canDelete ? `<button class="delete-shop-btn" onclick="deleteShop(${s.id}, event)">🗑️ Supprimer</button>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+document.getElementById('toggleAddCat')?.addEventListener('click', () => document.getElementById('addCatForm')?.classList.toggle('open'));
+document.getElementById('cancelCat')?.addEventListener('click', () => {
+  document.getElementById('addCatForm')?.classList.remove('open');
+  document.getElementById('catNameInput').value = '';
+  document.getElementById('catIconInput').value = '';
+});
+document.getElementById('saveCat')?.addEventListener('click', () => {
+  const name = document.getElementById('catNameInput').value.trim();
+  const icon = document.getElementById('catIconInput').value.trim() || '📦';
+  if (!name) {
+    showToast('⚠️ Veuillez saisir un nom', '#9a4a00');
+    return;
+  }
+  if (categories.find(c => c.name.toLowerCase() === name.toLowerCase())) {
+    showToast('⚠️ Catégorie existe déjà', '#9a4a00');
+    return;
+  }
+  const newId = Math.max(...categories.map(c => c.id), 0) + 1;
+  categories.push({ id: newId, icon, name });
+  saveCategories();
+  updateCategorySelect();
+  document.getElementById('addCatForm')?.classList.remove('open');
+  document.getElementById('catNameInput').value = '';
+  document.getElementById('catIconInput').value = '';
+  renderCategories();
+  showToast(`✅ Catégorie « ${name} » ajoutée`);
+});
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => setFilter(btn.dataset.filter));
+});
+
+document.getElementById('addNewCategoryBtn')?.addEventListener('click', addNewCategory);
+document.getElementById('createShopBtn')?.addEventListener('click', createShop);
+document.getElementById('searchInput')?.addEventListener('input', renderStores);
+document.getElementById('sortFilter')?.addEventListener('change', renderStores);
+document.getElementById('catFilter')?.addEventListener('change', e => {
+  activeCategory = e.target.value || null;
+  renderCategories();
+  renderStores();
+});
+
+// Inicializar select de categorías
+categories.forEach(c => {
+  const opt = document.createElement('option');
+  opt.value = c.name;
+  opt.textContent = c.name;
+  document.getElementById('catFilter')?.appendChild(opt);
+});
+
+// Inicializar productos por defecto
+saveDefaultProducts();
+
+// Cargar datos y arrancar
+loadStores();
+loadCategories();
+loadFavorites();
+initUsers();
+updateAuthUI();
+setupAuthModal();
+renderCategories();
+renderStores();
+updateCreateShopVisibility();
+updateDashboardLink();
+
+// Exponer funciones globales
+window.deleteShop = deleteShop;
+window.toggleFavorite = toggleFavorite;
+</script>
+</body>
+</html>
