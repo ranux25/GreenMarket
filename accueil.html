@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GreenMarket – Les trésors de nos coopératives</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #5D0D18;
+      --secondary: #9FB2AC;
+      --bg: #FFF9EB;
+      --text-dark: #2C2C2C;
+      --text-light: #6B6B6B;
+      --footer-bg: #3A0A10;
+    }
+ 
+    * { box-sizing: border-box; }
+ 
+    body {
+      background-color: var(--bg);
+      color: var(--text-dark);
+      font-family: 'Lato', sans-serif;
+    }
+ 
+    h1, h2, h3, .playfair { font-family: 'Playfair Display', serif; }
+ 
+    /* ---- HEADER ---- */
+    header {
+      background: #9FB2AC;
+      border-bottom: 2px solid #f0e8d5;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 16px rgba(93,13,24,0.07);
+    }
+ 
+    .logo-container {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.logo-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: scale(1.21);
+}
+ 
+    .search-bar input {
+      border: 1.5px solid #e8dfc8;
+      background: #fdf8ee;
+      border-radius: 999px;
+      padding: 10px 20px;
+      width: 100%;
+      max-width: 420px;
+      font-family: 'Lato', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      color: var(--text-dark);
+    }
+    .search-bar input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(93,13,24,0.08);
+    }
+ 
+    .nav-link {
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text-dark);
+      text-decoration: none;
+      letter-spacing: 0.5px;
+      transition: color 0.2s;
+      padding: 4px 0;
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      display: block;
+      height: 2px;
+      background: var(--primary);
+      transform: scaleX(0);
+      transition: transform 0.25s;
+      border-radius: 2px;
+    }
+    .nav-link:hover { color: var(--primary); }
+    .nav-link:hover::after { transform: scaleX(1); }
+ 
+    .cart-btn {
+      position: relative;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .cart-badge {
+      position: absolute;
+      top: -5px; right: -7px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 999px;
+      min-width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Lato', sans-serif;
+    }
+ 
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 22px;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      letter-spacing: 0.3px;
+    }
+    .btn-primary:hover {
+      background: #7a1020;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(93,13,24,0.25);
+    }
+ 
+    /* ---- HERO ---- */
+    .hero-section {
+      background: linear-gradient(135deg, #fdf5e0 60%, #f5ede6 100%);
+      overflow: hidden;
+      position: relative;
+    }
+ 
+    .hero-pattern {
+      position: absolute;
+      right: 0; top: 0;
+      width: 45%;
+      height: 100%;
+      opacity: 0.13;
+      pointer-events: none;
+    }
+ 
+    .hero-geo {
+      position: absolute;
+      right: 4%; top: 50%;
+      transform: translateY(-50%);
+      width: 340px;
+      height: 340px;
+      pointer-events: none;
+      opacity: 0.18;
+    }
+ 
+    /* ---- CATEGORIES ---- */
+    .category-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 28px 16px 22px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.22s, box-shadow 0.22s, background 0.22s;
+      box-shadow: 0 2px 10px rgba(93,13,24,0.06);
+      border: 1.5px solid #f0e8d5;
+    }
+    .category-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 28px rgba(93,13,24,0.13);
+      background: #fff8f0;
+      border-color: var(--secondary);
+    }
+    .category-icon {
+      font-size: 36px;
+      margin-bottom: 10px;
+      display: block;
+      line-height: 1;
+    }
+    .category-name {
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text-dark);
+      letter-spacing: 0.2px;
+    }
+ 
+    /* ---- PRODUCT CARDS ---- */
+    .product-card {
+      background: #fff;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 3px 14px rgba(93,13,24,0.07);
+      transition: transform 0.22s, box-shadow 0.22s;
+      border: 1.5px solid #f0e8d5;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-card:hover {
+      transform: scale(1.025);
+      box-shadow: 0 12px 32px rgba(93,13,24,0.14);
+    }
+ 
+    .product-img {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      background: linear-gradient(135deg, #f5ede0, #e8d8c4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+      color: #c5a88a;
+    }
+ 
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Lato', sans-serif;
+      letter-spacing: 0.5px;
+      padding: 3px 11px;
+    }
+    .badge-secondary { background: var(--secondary); color: #fff; }
+    .badge-rare { background: #c0392b; color: #fff; }
+    .badge-bio { background: #6aaf6a; color: #fff; }
+    .badge-fait { background: #c07a1a; color: #fff; }
+ 
+    .stars { color: #e0a82e; font-size: 14px; }
+ 
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.15s;
+    }
+    .btn-outline:hover {
+      background: var(--primary);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+ 
+    /* ---- COOPERATIVES ---- */
+    .coop-card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 3px 14px rgba(93,13,24,0.07);
+      border: 1.5px solid #f0e8d5;
+      transition: transform 0.2s, box-shadow 0.2s;
+      overflow: hidden;
+    }
+    .coop-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 28px rgba(93,13,24,0.12);
+    }
+    .coop-header {
+      height: 80px;
+      background: linear-gradient(135deg, var(--primary) 0%, #a01a28 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+ 
+    /* ---- PROMO BANNER ---- */
+    .promo-banner {
+      background: var(--primary);
+      position: relative;
+      overflow: hidden;
+    }
+    .promo-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23fff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+    }
+ 
+    .btn-sage {
+      background: var(--secondary);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 24px;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    }
+    .btn-sage:hover {
+      background: #8aa09a;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(159,178,172,0.4);
+    }
+ 
+    /* ---- WHY SECTION ---- */
+    .why-feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 18px 0;
+      border-bottom: 1px solid #f0e8d5;
+    }
+    .why-feature:last-child { border-bottom: none; }
+    .why-check {
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+ 
+    /* ---- FOOTER ---- */
+    footer {
+      background: var(--footer-bg);
+      color: #d4b8a0;
+    }
+    footer a {
+      color: #c4a890;
+      text-decoration: none;
+      transition: color 0.2s;
+      font-size: 14px;
+      display: block;
+      margin-bottom: 8px;
+    }
+    footer a:hover { color: #fff; }
+    .footer-heading {
+      font-family: 'Playfair Display', serif;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+ 
+    /* ---- SECTION TITLE ---- */
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(22px, 3vw, 32px);
+      font-weight: 700;
+      color: var(--text-dark);
+      position: relative;
+      display: inline-block;
+    }
+    .section-title::after {
+      content: '';
+      display: block;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 2px;
+      margin-top: 8px;
+      width: 60%;
+    }
+ 
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--primary);
+      color: #fff;
+      padding: 14px 22px;
+      border-radius: 12px;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 8px 24px rgba(93,13,24,0.3);
+      z-index: 9999;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(.22,1,.36,1), opacity 0.3s;
+      pointer-events: none;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+ 
+    /* Responsive helpers */
+    @media (max-width: 640px) {
+      .hero-geo { display: none; }
+      .desktop-nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+ 
+<!-- TOAST -->
+<div id="toast">✓ Produit ajouté au panier !</div>
+ 
+<!-- ===================== HEADER ===================== -->
+<header>
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4 flex-wrap">
+    <!-- Logo + Nom -->
+<div class="flex items-center gap-3">
+  <div class="logo-container overflow-hidden bg-white">
+  <img 
+    src="images/logom.png" 
+    alt="GreenMarket Logo"
+    class="w-full h-full object-contain p-1"
+  />
+</div>   
+  
+  <span
+    style="
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 1px;
+    ">GreenMarket</span>
+</div>
+ 
+    <!-- Search -->
+    <div class="search-bar flex-1 flex justify-center min-w-[180px]">
+      <input type="text" placeholder="Rechercher un produit traditionnel..." />
+    </div>
+ 
+    <!-- Nav -->
+    <nav class="desktop-nav hidden md:flex items-center gap-6">
+      <a href="#" class="nav-link">Catalogue</a>
+      <a href="#" class="nav-link">Coopératives</a>
+      <a href="#" class="nav-link">Dashboard</a>
+      <a href="#" class="nav-link">Contact</a>
+    </nav>
+ 
+    <!-- Cart + Login -->
+    <div class="flex items-center gap-3 ml-auto md:ml-0">
+      <button class="cart-btn" title="Panier">
+        <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#5D0D18" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 6h14M9 21a1 1 0 1 0 2 0M15 21a1 1 0 1 0 2 0" />
+        </svg>
+        <span class="cart-badge" id="cart-count">3</span>
+      </button>
+      <button class="btn-primary">Connexion</button>
+    </div>
+  </div>
+</header>
+ 
+<!-- ===================== HERO MODIFIÉE ===================== -->
+<section class="hero-section" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem; padding: 0;"> <!-- <<< MODIFIÉ : py-20 supprimé, padding réduit à 40px 20px, ajout flex -->
+  
+  <!-- TEXTE À GAUCHE -->
+  <div class="max-w-5xl mx-auto relative z-10" style="flex: 1; min-width: 250px; padding-left: 20px;"> <!-- <<< MODIFIÉ : ajout padding-left -->
+    <p class="text-sm font-bold tracking-widest uppercase mb-3" style="color:var(--secondary); font-family:'Lato',sans-serif;">
+      🌿 Commerce équitable & authentique
+    </p>
+    <h1 class="playfair font-bold leading-tight mb-5" style="font-size:clamp(30px,5vw,58px); color:var(--primary); max-width:680px;">
+      Les trésors de nos coopératives, directement chez vous
+    </h1>
+    <p class="mb-8 text-lg" style="color:var(--text-light); max-width:500px; font-family:'Lato',sans-serif; line-height:1.7;">
+      Produits authentiques, savoir-faire traditionnel, commerce équitable
+    </p>
+    <button class="btn-sage text-base px-8 py-3" style="font-size:15px;">
+      Découvrir nos coopératives
+    </button>
+  </div>
+
+  <!-- IMAGE À DROITE - AJOUTÉE -->
+  <img src="images/hero.PNG" alt="Hero image" style="flex: 1; max-width: 900px; height: 590px; object-fit: cover; border-radius: 24px; padding-right: 20px;"> <!-- <<< AJOUTÉ : l'image qui était avant en dehors de la section -->
+
+</section>
+ 
+<!-- ===================== CATEGORIES ===================== -->
+<section class="py-16 px-4 max-w-7xl mx-auto">
+  <div class="mb-10">
+    <h2 class="section-title">Nos catégories de produits traditionnels</h2>
+  </div>
+  <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 gap-4">
+    <div class="category-card"><span class="category-icon">🧥</span><span class="category-name">Vêtements traditionnels</span></div>
+    <div class="category-card"><span class="category-icon">🫒</span><span class="category-name">Huiles & Condiments</span></div>
+    <div class="category-card"><span class="category-icon">🌿</span><span class="category-name">Plantes & Herbes</span></div>
+    <div class="category-card"><span class="category-icon">🍯</span><span class="category-name">Miel & Douceurs</span></div>
+    <div class="category-card"><span class="category-icon">🧺</span><span class="category-name">Artisanat & Poterie</span></div>
+    <div class="category-card"><span class="category-icon">🧴</span><span class="category-name">Produits de beauté</span></div>
+    <div class="category-card"><span class="category-icon">🌾</span><span class="category-name">Épicerie fine</span></div>
+    <div class="category-card"><span class="category-icon">🪑</span><span class="category-name">Décoration & Mobilier</span></div>
+  </div>
+</section>
+ 
+<!-- ===================== FEATURED PRODUCTS ===================== -->
+<section
+      class="py-10 px-4"
+      style="background: linear-gradient(180deg, #fdf8ee 0%, #fff9eb 100%)"
+    >
+      <div class="max-w-7xl mx-auto">
+        <div class="mb-10">
+          <h2 class="section-title">Produits populaires des coopératives</h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          <!-- Card 1 -->
+          <div class="product-card">
+            <img
+              src="images/caftan.jfif"
+              class="product-img"
+              alt="Caftan traditionnel"
+            />
+            <div class="p-4 flex flex-col flex-1 gap-2">
+              <span class="badge badge-secondary">Artisanal</span>
+              <h3
+                class="font-bold text-base mt-1"
+                style="
+                  font-family: &quot;Playfair Display&quot;, serif;
+                  color: var(--text-dark);
+                "
+              >
+                Caftan traditionnel
+              </h3>
+              <p
+                class="text-xs flex items-center gap-1"
+                style="color: var(--text-light)"
+              >
+                👩‍🌾 Coopérative Fès Artisanat
+              </p>
+              <div class="flex items-center gap-1">
+                <span class="stars">★★★★½</span>
+                <span class="text-xs" style="color: var(--text-light)"
+                  >(156 avis)</span
+                >
+              </div>
+              <p
+                class="font-bold text-lg mt-auto"
+                style="
+                  color: var(--primary);
+                  font-family: &quot;Playfair Display&quot;, serif;
+                "
+              >
+                450 DH
+              </p>
+              <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">
+                Ajouter au panier
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="product-card">
+            <img
+              src="images/olive.jfif"
+              class="product-img"
+              alt="Huile Olive"
+            />
+            <div class="p-4 flex flex-col flex-1 gap-2">
+              <span class="badge badge-bio">Bio - Terroir</span>
+              <h3
+                class="font-bold text-base mt-1"
+                style="
+                  font-family: &quot;Playfair Display&quot;, serif;
+                  color: var(--text-dark);
+                "
+              >
+                Huile d'olive extra vierge
+              </h3>
+              <p
+                class="text-xs flex items-center gap-1"
+                style="color: var(--text-light)"
+              >
+                👩‍🌾 Coopérative Atlas
+              </p>
+              <div class="flex items-center gap-1">
+                <span class="stars">★★★★★</span>
+                <span class="text-xs" style="color: var(--text-light)"
+                  >(234 avis)</span
+                >
+              </div>
+              <p
+                class="font-bold text-lg mt-auto"
+                style="
+                  color: var(--primary);
+                  font-family: &quot;Playfair Display&quot;, serif;
+                "
+              >
+                120 DH / litre
+              </p>
+              <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">
+                Ajouter au panier
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="product-card">
+            <img
+              src="images/plante.jfif"
+              class="product-img"
+              alt="Plante médicinales"
+            />
+            <div class="p-4 flex flex-col flex-1 gap-2">
+              <span class="badge badge-rare">Rare</span>
+              <h3
+                class="font-bold text-base mt-1"
+                style="
+                  font-family: &quot;Playfair Display&quot;, serif;
+                  color: var(--text-dark);
+                "
+              >
+                Mélange plantes médicinales
+              </h3>
+              <p
+                class="text-xs flex items-center gap-1"
+                style="color: var(--text-light)"
+              >
+                👩‍🌾 Coopérative Ourika
+              </p>
+              <div class="flex items-center gap-1">
+                <span class="stars">★★★★½</span>
+                <span class="text-xs" style="color: var(--text-light)"
+                  >(89 avis)</span
+                >
+              </div>
+              <p
+                class="font-bold text-lg mt-auto"
+                style="
+                  color: var(--primary);
+                  font-family: &quot;Playfair Display&quot;, serif;
+                "
+              >
+                45 DH
+              </p>
+              <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">
+                Ajouter au panier
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="product-card">
+            <img
+              src="images/tapis.jfif"
+              class="product-img"
+              alt="Tapis traditionnel"
+            />
+            <div class="p-4 flex flex-col flex-1 gap-2">
+              <span class="badge badge-fait">Fait main</span>
+              <h3
+                class="font-bold text-base mt-1"
+                style="
+                  font-family: &quot;Playfair Display&quot;, serif;
+                  color: var(--text-dark);
+                "
+              >
+                Tapis berbère
+              </h3>
+              <p
+                class="text-xs flex items-center gap-1"
+                style="color: var(--text-light)"
+              >
+                👩‍🌾 Coopérative Haut-Atlas
+              </p>
+              <div class="flex items-center gap-1">
+                <span class="stars">★★★★★</span>
+                <span class="text-xs" style="color: var(--text-light)"
+                  >(67 avis)</span
+                >
+              </div>
+              <p
+                class="font-bold text-lg mt-auto"
+                style="
+                  color: var(--primary);
+                  font-family: &quot;Playfair Display&quot;, serif;
+                "
+              >
+                1 200 DH
+              </p>
+              <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">
+                Ajouter au panier
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+ 
+<!-- ===================== COOPERATIVES ===================== -->
+<section class="py-16 px-4 max-w-7xl mx-auto">
+  <div class="text-center mb-3">
+    <h2 class="section-title" style="display:block; text-align:center;">Nos coopératives partenaires</h2>
+    <p class="mt-4 text-base" style="color:var(--text-light); font-family:'Lato',sans-serif;">Soutenez l'artisanat et l'agriculture traditionnelle</p>
+  </div>
+  <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6">
+ 
+    <div class="coop-card">
+      <div class="coop-header">🏔️</div>
+      <div class="p-5">
+        <h3 class="font-bold text-base mb-1" style="font-family:'Playfair Display',serif;">Coopérative Atlas</h3>
+        <p class="text-xs mb-4 flex items-center gap-1" style="color:var(--text-light);">📍 Marrakech</p>
+        <p class="text-sm mb-4" style="color:var(--text-light);">Huiles, produits du terroir et artisanat de la région Atlas.</p>
+        <button class="btn-outline w-full">Voir la boutique</button>
+      </div>
+    </div>
+ 
+    <div class="coop-card">
+      <div class="coop-header">🏺</div>
+      <div class="p-5">
+        <h3 class="font-bold text-base mb-1" style="font-family:'Playfair Display',serif;">Coopérative Fès Artisanat</h3>
+        <p class="text-xs mb-4 flex items-center gap-1" style="color:var(--text-light);">📍 Fès</p>
+        <p class="text-sm mb-4" style="color:var(--text-light);">Artisanat authentique, poterie et vêtements traditionnels.</p>
+        <button class="btn-outline w-full">Voir la boutique</button>
+      </div>
+    </div>
+ 
+    <div class="coop-card">
+      <div class="coop-header">🌿</div>
+      <div class="p-5">
+        <h3 class="font-bold text-base mb-1" style="font-family:'Playfair Display',serif;">Coopérative Ourika</h3>
+        <p class="text-xs mb-4 flex items-center gap-1" style="color:var(--text-light);">📍 Ourika Valley</p>
+        <p class="text-sm mb-4" style="color:var(--text-light);">Plantes médicinales rares et produits naturels de la vallée.</p>
+        <button class="btn-outline w-full">Voir la boutique</button>
+      </div>
+    </div>
+ 
+  </div>
+</section>
+ 
+<!-- ===================== PROMO BANNER ===================== -->
+<section class="promo-banner py-12 px-4">
+  <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+    <div>
+      <p class="text-xl font-bold text-white" style="font-family:'Playfair Display',serif;">
+        Livraison offerte dès 250 DH
+      </p>
+      <p class="text-sm mt-1" style="color:#f0c8b0; font-family:'Lato',sans-serif;">Soutenez les coopératives locales et les artisans marocains</p>
+    </div>
+    <button class="btn-sage px-8 py-3 whitespace-nowrap">Devenir partenaire</button>
+  </div>
+</section>
+ 
+<!-- ===================== SECOND PRODUCT ROW ===================== -->
+<section class="py-14 px-4" style="background:#fff;">
+  <div class="max-w-7xl mx-auto">
+    <div class="mb-10">
+      <h2 class="section-title">Nouveautés des coopératives</h2>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+ 
+      <div class="product-card">
+        <div class="product-img">
+            <img
+              src="images/savon.jfif"
+              class="product-img"
+              alt="Savon Noir"
+            />
+        </div>
+        <div class="p-4 flex flex-col flex-1 gap-2">
+          <span class="badge badge-secondary">Produits de beauté</span>
+          <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display',serif; color:var(--text-dark);">Savon noir</h3>
+          <p class="text-xs" style="color:var(--text-light);">👩‍🌾 Coopérative Atlas</p>
+          <div class="flex items-center gap-1">
+            <span class="stars">★★★★★</span>
+            <span class="text-xs" style="color:var(--text-light);">(112 avis)</span>
+          </div>
+          <p class="font-bold text-lg mt-auto" style="color:var(--primary); font-family:'Playfair Display',serif;">25 DH</p>
+          <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">Ajouter au panier</button>
+        </div>
+      </div>
+ 
+      <div class="product-card">
+        <div class="product-img">
+            <img
+              src="images/amlou.jfif"
+              class="product-img"
+              alt="Amlou"
+            />
+        </div>
+        <div class="p-4 flex flex-col flex-1 gap-2">
+          <span class="badge badge-bio">Huiles & Condiments</span>
+          <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display',serif; color:var(--text-dark);">Amlou</h3>
+          <p class="text-xs" style="color:var(--text-light);">👩‍🌾 Coopérative Haut-Atlas</p>
+          <div class="flex items-center gap-1">
+            <span class="stars">★★★★½</span>
+            <span class="text-xs" style="color:var(--text-light);">(78 avis)</span>
+          </div>
+          <p class="font-bold text-lg mt-auto" style="color:var(--primary); font-family:'Playfair Display',serif;">35 DH</p>
+          <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">Ajouter au panier</button>
+        </div>
+      </div>
+ 
+      <div class="product-card">
+        <div class="product-img">
+            <img
+              src="images/tagine.jfif"
+              class="product-img"
+              alt="Tagine"
+            />
+        </div>
+        <div class="p-4 flex flex-col flex-1 gap-2">
+          <span class="badge badge-fait">Artisanat</span>
+          <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display',serif; color:var(--text-dark);">Tajine en terre cuite</h3>
+          <p class="text-xs" style="color:var(--text-light);">👩‍🌾 Coopérative Fès Artisanat</p>
+          <div class="flex items-center gap-1">
+            <span class="stars">★★★★★</span>
+            <span class="text-xs" style="color:var(--text-light);">(203 avis)</span>
+          </div>
+          <p class="font-bold text-lg mt-auto" style="color:var(--primary); font-family:'Playfair Display',serif;">180 DH</p>
+          <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">Ajouter au panier</button>
+        </div>
+      </div>
+ 
+      <div class="product-card">
+        <div class="product-img">
+            <img
+              src="images/raselhanout.jfif"
+              class="product-img"
+              alt="Savon Noir"
+            />
+        </div>
+        <div class="p-4 flex flex-col flex-1 gap-2">
+          <span class="badge" style="background:#7d5a3c; color:#fff;">Épicerie fine</span>
+          <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display',serif; color:var(--text-dark);">Ras el Hanout</h3>
+          <p class="text-xs" style="color:var(--text-light);">👩‍🌾 Coopérative Ourika</p>
+          <div class="flex items-center gap-1">
+            <span class="stars">★★★★★</span>
+            <span class="text-xs" style="color:var(--text-light);">(341 avis)</span>
+          </div>
+          <p class="font-bold text-lg mt-auto" style="color:var(--primary); font-family:'Playfair Display',serif;">30 DH</p>
+          <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">Ajouter au panier</button>
+        </div>
+      </div>
+ 
+    </div>
+  </div>
+</section>
+ 
+<!-- ===================== WHY SECTION ===================== -->
+<section class="py-16 px-4" style="background:linear-gradient(135deg,#fdf5e0 0%,#f5ede0 100%);">
+  <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+    <div>
+      <h2 class="section-title mb-8">Pourquoi acheter en coopérative ?</h2>
+      <div>
+        <div class="why-feature">
+          <div class="why-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div>
+            <p class="font-bold text-base" style="color:var(--text-dark); font-family:'Playfair Display',serif;">Produits authentiques et de qualité</p>
+            <p class="text-sm mt-1" style="color:var(--text-light);">Chaque produit est sélectionné avec soin, issu du savoir-faire local.</p>
+          </div>
+        </div>
+        <div class="why-feature">
+          <div class="why-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div>
+            <p class="font-bold text-base" style="color:var(--text-dark); font-family:'Playfair Display',serif;">Prix équitable pour les artisans</p>
+            <p class="text-sm mt-1" style="color:var(--text-light);">Vos achats soutiennent directement les producteurs et artisans locaux.</p>
+          </div>
+        </div>
+        <div class="why-feature">
+          <div class="why-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div>
+            <p class="font-bold text-base" style="color:var(--text-dark); font-family:'Playfair Display',serif;">Traçabilité garantie</p>
+            <p class="text-sm mt-1" style="color:var(--text-light);">Connaissez l'origine exacte de chaque produit, de la coopérative à vous.</p>
+          </div>
+        </div>
+        <div class="why-feature">
+          <div class="why-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div>
+            <p class="font-bold text-base" style="color:var(--text-dark); font-family:'Playfair Display',serif;">Préservation du savoir-faire traditionnel</p>
+            <p class="text-sm mt-1" style="color:var(--text-light);">Contribuez à la transmission des techniques ancestrales marocaines.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- Authentic image side -->
+<div class="flex items-center justify-center">
+  <img 
+    src="images/pic.jfif" 
+    alt="Produits traditionnels marocains"
+    class="rounded-2xl shadow-xl w-full max-w-sm object-cover"
+    style="aspect-ratio: 1/1;"
+  >
+</div>
+  </div>
+</section>
+ 
+<!-- ===================== FOOTER ===================== -->
+<footer class="pt-14 pb-8 px-4">
+  <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 mb-10">
+ 
+    <div>
+      <p class="footer-heading">CoopMarket</p>
+      <a href="#">À propos</a>
+      <a href="#">Nos coopératives</a>
+      <a href="#">Devenir partenaire</a>
+    </div>
+ 
+    <div>
+      <p class="footer-heading">Aide</p>
+      <a href="#">FAQ</a>
+      <a href="#">Livraison</a>
+      <a href="#">Paiement sécurisé</a>
+    </div>
+ 
+    <div>
+      <p class="footer-heading">Légal</p>
+      <a href="#">CGU</a>
+      <a href="#">Confidentialité</a>
+    </div>
+ 
+    <div>
+      <p class="footer-heading">Suivez-nous</p>
+      <a href="#" class="flex items-center gap-2">
+        <svg width="16" height="16" fill="#c4a890" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        Facebook
+      </a>
+      <a href="#" class="flex items-center gap-2 mt-1">
+        <svg width="16" height="16" fill="none" stroke="#c4a890" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#c4a890" stroke="none"/></svg>
+        Instagram
+      </a>
+    </div>
+ 
+  </div>
+ 
+  <div class="max-w-7xl mx-auto border-t border-opacity-20 pt-6 flex flex-col md:flex-row items-center justify-between gap-2" style="border-color:#6a2030;">
+    <p class="text-xs" style="color:#9a7060; font-family:'Lato',sans-serif;">© 2026 CoopMarket – Soutenir nos coopératives</p>
+    <p class="text-xs" style="color:#9a7060; font-family:'Lato',sans-serif;">🇲🇦 Fait avec ❤️ pour les artisans marocains</p>
+  </div>
+</footer>
+ 
+<!-- ===================== JS ===================== -->
+<script>
+  let cartCount = 3;
+  let toastTimer = null;
+ 
+  const cartBadge = document.getElementById('cart-count');
+  const toast = document.getElementById('toast');
+ 
+  document.querySelectorAll('.add-to-cart').forEach(btn => {
+    btn.addEventListener('click', () => {
+      cartCount++;
+      cartBadge.textContent = cartCount;
+ 
+      // Animate badge
+      cartBadge.style.transform = 'scale(1.5)';
+      setTimeout(() => { cartBadge.style.transform = 'scale(1)'; }, 200);
+      cartBadge.style.transition = 'transform 0.2s';
+ 
+      // Show toast
+      if (toastTimer) clearTimeout(toastTimer);
+      toast.classList.add('show');
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+    });
+  });
+</script>
+ 
+</body>
+</html>
