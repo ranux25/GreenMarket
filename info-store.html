@@ -1416,9 +1416,9 @@
             </div>
           </div>
 
-          <button class="btn-order" onclick="openOrderModal(${shop.id}, '${escapeHtml(shop.name)}', ${productsJson})">
-            🛍️ Commander maintenant
-          </button>
+          <button class="btn-order" onclick="goToCheckout(${shop.id}, '${escapeHtml(shop.name)}', ${JSON.stringify(shopProducts).replace(/</g, '\\u003c')})">
+  🛍️ Commander maintenant
+</button>
         </div>
       </div>
 
@@ -1482,6 +1482,14 @@
   window.closeOrderModalAndRefresh = closeOrderModalAndRefresh;
 
   loadShop();
+  function goToCheckout(shopId, shopName, products) {
+  if (!products || products.length === 0) {
+    showToast("⚠️ Aucun produit disponible dans cette boutique", '#9a4a00');
+    return;
+  }
+  const encodedProducts = encodeURIComponent(JSON.stringify(products));
+  window.location.href = `checkout.html?shopId=${shopId}&shopName=${encodeURIComponent(shopName)}&products=${encodedProducts}`;
+}
 </script>
 </body>
 </html>
