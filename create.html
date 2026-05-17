@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>GreenMarket | Créer un compte</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+  <div class="container d-flex flex-column justify-content-center align-items-center min-vh-100">
+    
+    <div class="d-flex gap-2 align-items-center mb-4">
+      <img src="IMAGES/logo.png" alt="logo" style="width: 60px; height: 60px; object-fit: cover;" class="rounded-circle">
+      <h1 class="h3 mb-0 fw-bold text-theme">GreenMarket</h1>
+    </div>
+
+    <div class="card p-4 shadow-sm w-100" style="max-width: 450px; border-radius: 12px; border: none;">
+      
+      <div class="text-center mb-4">
+        <h2 class="fw-bold h4">Créer un compte</h2>
+        <p class="text-muted small" id="message">Découvrez des produits frais et soutenez l'agriculture locale dès aujourd'hui.</p>
+      </div>
+
+      <form>
+        <p class="mb-2 text-secondary small fw-medium">Je veux</p>
+        
+        <div class="d-flex gap-2 mb-4">
+          <div class="w-50">
+            <input type="radio" class="btn-check" name="role" value="Customer" id="customer-role" checked autocomplete="off">
+            <label class="custom-radio-btn w-100 p-3 text-center d-flex flex-column align-items-center justify-content-center h-100 rounded" for="customer-role">
+              <i class="bi bi-basket2 fs-3 mb-1"></i>
+              <strong>Acheter</strong>
+              <small class="opacity-75">En tant que client</small>
+            </label>
+          </div>
+
+          <div class="w-50">
+            <input type="radio" class="btn-check" name="role" value="Producer" id="producer-role" autocomplete="off">
+            <label class="custom-radio-btn w-100 p-3 text-center d-flex flex-column align-items-center justify-content-center h-100 rounded" for="producer-role">
+              <i class="bi bi-shop fs-3 mb-1"></i>
+              <strong>Vendre</strong>
+              <small class="opacity-75">En tant que producteur</small>
+            </label>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="Full-name" id="label-name" class="form-label small fw-medium">Nom complet</label>
+          <input type="text" class="form-control" id="Full-name" placeholder="Jean Dupont" name="full_name">
+        </div>
+
+        <div class="mb-3">
+          <label for="Email" class="form-label small fw-medium">Adresse Email</label>
+          <input type="email" class="form-control" id="Email" placeholder="vous@exemple.com" name="email">
+        </div>
+
+        <div class="mb-3">
+          <label for="Password" class="form-label small fw-medium">Mot de passe</label>
+          <input type="password" class="form-control" id="Password" placeholder="Créez un mot de passe fort" name="password">
+        </div>
+
+        <div class="mb-3">
+          <label for="Confirmation" class="form-label small fw-medium">Confirmer le mot de passe</label>
+          <input type="password" class="form-control" id="Confirmation" placeholder="Confirmez votre mot de passe" name="confpassword">
+        </div>
+
+        <div class="form-check mb-2">
+          <input type="checkbox" class="form-check-input" id="Terms">
+          <label class="form-check-label small text-muted" for="Terms">
+            J'accepte les <a href="terms.html" class="text-theme text-decoration-none fw-medium">Conditions d'utilisation</a> et la <a href="privacy.html" class="text-theme text-decoration-none fw-medium">Politique de confidentialité</a>
+          </label>
+        </div>
+
+        <div class="form-check mb-4">
+          <input type="checkbox" class="form-check-input" id="Newsletter">
+          <label class="form-check-label small text-muted" for="Newsletter">
+            M'envoyer des nouveautés saisonnières, des histoires de producteurs et des astuces écolos (facultatif)
+          </label>
+        </div>
+        
+        <input type="submit" class="custom-submit-btn w-100 p-2 fw-bold rounded" value="Créer un compte">
+        
+        <div class="d-flex align-items-center my-3">
+          <div class="border-bottom flex-grow-1"></div>
+          <span class="mx-3 text-muted small">Ou</span>
+          <div class="border-bottom flex-grow-1"></div>
+        </div>
+
+        <div class="d-flex gap-2 w-100 mb-4">
+          <button type="button" class="btn btn-light border w-50 d-flex align-items-center justify-content-center py-2">
+            <i class="bi bi-google me-3"></i>Google          
+          </button>
+          <button type="button" class="btn btn-light border w-50 d-flex align-items-center justify-content-center">
+            <i class="bi bi-apple me-3"></i>Apple
+          </button>
+        </div>
+
+        <p class="text-center mt-3 mb-0 text-muted small">
+          Vous avez déjà un compte ? <a href="signin.html" class="text-theme text-decoration-none fw-medium">Se connecter</a>
+        </p>
+
+      </form>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>
