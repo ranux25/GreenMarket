@@ -107,6 +107,68 @@
     </div>
 
   </div>
+<script>
+document.querySelector("form").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const fullName = document.getElementById("Full-name").value.trim();
+  const email = document.getElementById("Email").value.trim();
+  const password = document.getElementById("Password").value.trim();
+  const confirm = document.getElementById("Confirmation").value.trim();
+
+  const role = document.querySelector('input[name="role"]:checked').value;
+
+  if (!fullName || !email || !password || !confirm) {
+    alert("Veuillez remplir tous les champs");
+    return;
+  }
+
+  if (password !== confirm) {
+    alert("Les mots de passe ne correspondent pas");
+    return;
+  }
+
+  // récupérer utilisateurs existants
+  let users = JSON.parse(localStorage.getItem("greenmarket_users")) || [];
+
+  // vérifier email déjà utilisé
+  const exists = users.find(u => u.email === email);
+
+  if (exists) {
+    alert("Cet email existe déjà");
+    return;
+  }
+
+  // créer utilisateur
+  const user = {
+    id: Date.now(),
+    fullName,
+    email,
+    password,
+    role: role === "Producer" ? "productor" : "client",
+    producerId: role === "Producer" ? Date.now() : null
+  };
+
+  users.push(user);
+
+  localStorage.setItem("greenmarket_users", JSON.stringify(users));
+
+  // connecter automatiquement
+  sessionStorage.setItem(
+    "greenmarket_current_user",
+    JSON.stringify(user)
+  );
+
+  alert("Compte créé avec succès ✅");
+
+  // redirection
+  if (user.role === "productor") {
+    window.location.href = "dashboard-producteur.html";
+  } else {
+    window.location.href = "store.html";
+  }
+});
+</script>
 
   <script src="script.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>

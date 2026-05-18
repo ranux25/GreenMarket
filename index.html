@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GreenMarket – Les trésors de nos coopératives</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #5D0D18;
+      --secondary: #9FB2AC;
+      --bg: #FFF9EB;
+      --text-dark: #2C2C2C;
+      --text-light: #6B6B6B;
+      --footer-bg: #3A0A10;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-dark);
+      font-family: 'Lato', sans-serif;
+    }
+
+    h1, h2, h3, .playfair { font-family: 'Playfair Display', serif; }
+
+    header {
+      background: #9FB2AC;
+      border-bottom: 2px solid #f0e8d5;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 16px rgba(93,13,24,0.07);
+    }
+
+    .logo-container {
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .search-bar input {
+      border: 1.5px solid #e8dfc8;
+      background: #fdf8ee;
+      border-radius: 999px;
+      padding: 10px 20px;
+      width: 100%;
+      max-width: 420px;
+      font-family: 'Lato', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      color: var(--text-dark);
+    }
+    .search-bar input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(93,13,24,0.08);
+    }
+
+    .nav-link {
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text-dark);
+      text-decoration: none;
+      letter-spacing: 0.5px;
+      transition: color 0.2s;
+      padding: 4px 0;
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      display: block;
+      height: 2px;
+      background: var(--primary);
+      transform: scaleX(0);
+      transition: transform 0.25s;
+      border-radius: 2px;
+    }
+    .nav-link:hover { color: var(--primary); }
+    .nav-link:hover::after { transform: scaleX(1); }
+
+    .cart-btn {
+      position: relative;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .cart-badge {
+      position: absolute;
+      top: -5px; right: -7px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 999px;
+      min-width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Lato', sans-serif;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 22px;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      letter-spacing: 0.3px;
+    }
+    .btn-primary:hover {
+      background: #7a1020;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(93,13,24,0.25);
+    }
+
+    .hero-section {
+      background: linear-gradient(135deg, #fdf5e0 60%, #f5ede6 100%);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .category-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 28px 16px 22px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.22s, box-shadow 0.22s, background 0.22s;
+      box-shadow: 0 2px 10px rgba(93,13,24,0.06);
+      border: 1.5px solid #f0e8d5;
+    }
+    .category-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 28px rgba(93,13,24,0.13);
+      background: #fff8f0;
+      border-color: var(--secondary);
+    }
+    .category-icon {
+      font-size: 36px;
+      margin-bottom: 10px;
+      display: block;
+      line-height: 1;
+    }
+    .category-name {
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text-dark);
+      letter-spacing: 0.2px;
+    }
+
+    .product-card {
+      background: #fff;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 3px 14px rgba(93,13,24,0.07);
+      transition: transform 0.22s, box-shadow 0.22s;
+      border: 1.5px solid #f0e8d5;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-card:hover {
+      transform: scale(1.025);
+      box-shadow: 0 12px 32px rgba(93,13,24,0.14);
+    }
+
+    .product-img {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      background: linear-gradient(135deg, #f5ede0, #e8d8c4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+      color: #c5a88a;
+    }
+
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Lato', sans-serif;
+      letter-spacing: 0.5px;
+      padding: 3px 11px;
+    }
+    .badge-secondary { background: var(--secondary); color: #fff; }
+    .badge-rare { background: #c0392b; color: #fff; }
+    .badge-bio { background: #6aaf6a; color: #fff; }
+    .badge-fait { background: #c07a1a; color: #fff; }
+
+    .stars { color: #e0a82e; font-size: 14px; }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.15s;
+    }
+    .btn-outline:hover {
+      background: var(--primary);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .coop-card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 3px 14px rgba(93,13,24,0.07);
+      border: 1.5px solid #f0e8d5;
+      transition: transform 0.2s, box-shadow 0.2s;
+      overflow: hidden;
+    }
+    .coop-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 28px rgba(93,13,24,0.12);
+    }
+    .coop-header {
+      height: 80px;
+      background: linear-gradient(135deg, var(--primary) 0%, #a01a28 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+
+    .promo-banner {
+      background: var(--primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-sage {
+      background: var(--secondary);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 24px;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    }
+    .btn-sage:hover {
+      background: #8aa09a;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(159,178,172,0.4);
+    }
+
+    .why-feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 18px 0;
+      border-bottom: 1px solid #f0e8d5;
+    }
+    .why-feature:last-child { border-bottom: none; }
+    .why-check {
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    footer {
+      background: var(--footer-bg);
+      color: #d4b8a0;
+    }
+    footer a {
+      color: #c4a890;
+      text-decoration: none;
+      transition: color 0.2s;
+      font-size: 14px;
+      display: block;
+      margin-bottom: 8px;
+    }
+    footer a:hover { color: #fff; }
+    .footer-heading {
+      font-family: 'Playfair Display', serif;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(22px, 3vw, 32px);
+      font-weight: 700;
+      color: var(--text-dark);
+      position: relative;
+      display: inline-block;
+    }
+    .section-title::after {
+      content: '';
+      display: block;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 2px;
+      margin-top: 8px;
+      width: 60%;
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--primary);
+      color: #fff;
+      padding: 14px 22px;
+      border-radius: 12px;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 8px 24px rgba(93,13,24,0.3);
+      z-index: 9999;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(.22,1,.36,1), opacity 0.3s;
+      pointer-events: none;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+
+    /* Auth Modal */
+    .auth-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .auth-modal-overlay.open { display: flex; }
+    .auth-modal {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 450px;
+      width: 90%;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      background: white;
+    }
+    .auth-tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .auth-tab {
+      background: none;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+      color: #6b5055;
+      font-weight: 500;
+    }
+    .auth-tab.active { color: #5d0d18; border-bottom: 2px solid #5d0d18; }
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
+    .auth-form h3 { color: #5d0d18; margin-bottom: 1rem; font-family: 'Playfair Display', serif; }
+    .auth-form input {
+      width: 100%;
+      padding: 0.7rem;
+      margin-bottom: 1rem;
+      border: 1.5px solid #e8ddd0;
+      border-radius: 8px;
+      font-family: 'Lato', sans-serif;
+      background: #fff9eb;
+    }
+    .auth-error { color: #d9534f; font-size: 0.8rem; margin-top: 0.5rem; text-align: center; }
+    .auth-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #6b5055;
+    }
+    .user-badge {
+      background: #f5e6e8;
+      padding: 0.4rem 1rem;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #5d0d18;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 640px) {
+      .hero-geo { display: none; }
+      .desktop-nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="toast">✓ Produit ajouté au panier !</div>
+
+<!-- Auth Modal -->
+<div class="auth-modal-overlay" id="authModal">
+  <div class="auth-modal">
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Connexion</button>
+      <button class="auth-tab" data-tab="register">Inscription</button>
+    </div>
+    <div id="loginForm" class="auth-form active">
+      <h3>🔐 Se connecter</h3>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Mot de passe">
+      <button class="btn-primary" id="doLoginBtn" style="width:100%">Se connecter</button>
+      <p class="auth-error" id="loginError"></p>
+    </div>
+    <div id="registerForm" class="auth-form">
+      <h3>📝 Créer un compte</h3>
+      <div class="flex gap-4 mb-3" style="display:flex; gap:1rem;">
+        <label style="display:flex; align-items:center; gap:0.3rem;"><input type="radio" name="registerRole" value="client" checked> 👤 Client</label>
+        <label style="display:flex; align-items:center; gap:0.3rem;"><input type="radio" name="registerRole" value="productor"> 🌾 Producteur</label>
+      </div>
+      <input type="text" id="registerName" placeholder="Nom complet">
+      <input type="email" id="registerEmail" placeholder="Email">
+      <input type="password" id="registerPassword" placeholder="Mot de passe">
+      <div id="producerFields" style="display: none;">
+        <input type="text" id="producerShopName" placeholder="Nom de votre boutique">
+        <input type="text" id="producerLocation" placeholder="Localisation">
+        <textarea id="producerBio" placeholder="Décrivez votre activité..." rows="2"></textarea>
+      </div>
+      <button class="btn-primary" id="doRegisterBtn" style="width:100%">S'inscrire</button>
+      <p class="auth-error" id="registerError"></p>
+    </div>
+    <button class="auth-close" id="closeAuthModal">✕</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4 flex-wrap">
+    <div class="flex items-center gap-3">
+      <div class="logo-container overflow-hidden bg-white rounded-full w-12 h-12" style="background:#fff; border-radius:50%;">
+        <div class="w-full h-full flex items-center justify-center text-2xl">🌿</div>
+      </div>
+      <span style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: 1px;">
+        GreenMarket
+      </span>
+    </div>
+
+    <div class="search-bar flex-1 flex justify-center min-w-[180px]">
+      <input type="text" id="searchInputHeader" placeholder="Rechercher un produit traditionnel..." />
+    </div>
+
+    <nav class="desktop-nav hidden md:flex items-center gap-6">
+      <a href="#" class="nav-link" onclick="scrollToSection('products')">Produits</a>
+      <a href="#" class="nav-link" onclick="scrollToSection('coops')">Coopératives</a>
+      <a href="#" class="nav-link" onclick="scrollToSection('contact')">Contact</a>
+    </nav>
+
+    <div class="flex items-center gap-3 ml-auto md:ml-0">
+      <button class="cart-btn" title="Panier" onclick="goToCart()">
+        <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#5D0D18" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 6h14M9 21a1 1 0 1 0 2 0M15 21a1 1 0 1 0 2 0" />
+        </svg>
+        <span class="cart-badge" id="cart-count">0</span>
+      </button>
+
+      <div id="authWidget"></div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO SECTION -->
+<section class="hero-section" style="position: relative; min-height: 75vh; display: flex; align-items: center; overflow: hidden; padding: 0;">
+  <div style="position: absolute; inset: 0; background: linear-gradient(135deg, #fdf5e0 60%, #f5ede6 100%);"></div>
+
+  <div style="position: absolute; inset: 0;">
+    <img 
+      src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1200&q=80" 
+      alt="Hero image"
+      style="width: 100%; height: 100%; object-fit: cover; opacity: 0.3;"
+    />
+  </div>
+
+  <div style="position: absolute; inset: 0; background: linear-gradient(to top, var(--bg), rgba(0,0,0,0));"></div>
+
+  <div style="position: relative; z-index: 2; flex: 1; min-width: 250px; padding-left: 20px; max-width: 700px;">
+    <p class="text-sm font-bold tracking-widest uppercase mb-3" style="color:var(--secondary); font-family:'Lato',sans-serif;">
+      🌿 Commerce équitable & authentique
+    </p>
+    <h1 class="playfair font-bold leading-tight mb-5" style="font-size:clamp(30px,5vw,58px); color:var(--primary);">
+      Les trésors de nos coopératives, directement chez vous
+    </h1>
+    <p class="mb-8 text-lg" style="color:var(--text-light); max-width:500px; font-family:'Lato',sans-serif; line-height:1.7;">
+      Produits authentiques, savoir-faire traditionnel, commerce équitable
+    </p>
+    <button class="btn-sage text-base px-8 py-3" style="font-size:15px;" onclick="scrollToSection('products')">
+      Découvrir nos produits
+    </button>
+  </div>
+</section>
+
+<!-- CATEGORIES SECTION -->
+<section class="py-16 px-4 max-w-7xl mx-auto">
+  <div class="mb-10">
+    <h2 class="section-title">Nos catégories de produits traditionnels</h2>
+  </div>
+  <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 gap-4" id="categoriesGrid">
+    <div class="category-card"><span class="category-icon">🧥</span><span class="category-name">Vêtements traditionnels</span></div>
+    <div class="category-card"><span class="category-icon">🫒</span><span class="category-name">Huiles & Condiments</span></div>
+    <div class="category-card"><span class="category-icon">🌿</span><span class="category-name">Plantes & Herbes</span></div>
+    <div class="category-card"><span class="category-icon">🍯</span><span class="category-name">Miel & Douceurs</span></div>
+    <div class="category-card"><span class="category-icon">🧺</span><span class="category-name">Artisanat & Poterie</span></div>
+    <div class="category-card"><span class="category-icon">🧴</span><span class="category-name">Produits de beauté</span></div>
+    <div class="category-card"><span class="category-icon">🌾</span><span class="category-name">Épicerie fine</span></div>
+    <div class="category-card"><span class="category-icon">🪑</span><span class="category-name">Décoration & Mobilier</span></div>
+  </div>
+</section>
+
+<!-- FEATURED PRODUCTS -->
+<section id="products" class="py-10 px-4" style="background: linear-gradient(180deg, #fdf8ee 0%, #fff9eb 100%)">
+  <div class="max-w-7xl mx-auto">
+    <div class="mb-10">
+      <h2 class="section-title">Produits populaires des coopératives</h2>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6" id="productsGrid">
+      <!-- Products will be inserted here by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- COOPERATIVES SECTION -->
+<section id="coops" class="py-16 px-4 max-w-7xl mx-auto">
+  <div class="text-center mb-3">
+    <h2 class="section-title" style="display:block; text-align:center;">Nos coopératives partenaires</h2>
+    <p class="mt-4 text-base" style="color:var(--text-light); font-family:'Lato',sans-serif;">Soutenez l'artisanat et l'agriculture traditionnelle</p>
+  </div>
+  <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6" id="coopsGrid">
+    <!-- Coops will be inserted here -->
+  </div>
+</section>
+
+<!-- PROMO BANNER -->
+<section class="promo-banner py-12 px-4">
+  <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+    <div>
+      <p class="text-xl font-bold text-white" style="font-family:'Playfair Display',serif;">
+        Livraison offerte dès 250 DH
+      </p>
+      <p class="text-sm mt-1" style="color:#f0c8b0; font-family:'Lato',sans-serif;">Soutenez les coopératives locales et les artisans marocains</p>
+    </div>
+    <button class="btn-sage px-8 py-3 whitespace-nowrap" id="becomePartnerBtn">Devenir partenaire</button>
+  </div>
+</section>
+
+<!-- SECOND PRODUCT ROW -->
+<section class="py-14 px-4" style="background:#fff;">
+  <div class="max-w-7xl mx-auto">
+    <div class="mb-10">
+      <h2 class="section-title">Nouveautés des coopératives</h2>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6" id="newProductsGrid">
+      <!-- New products will be inserted here -->
+    </div>
+  </div>
+</section>
+
+<!-- WHY SECTION -->
+<section class="py-16 px-4" style="background:linear-gradient(135deg,#fdf5e0 0%,#f5ede0 100%);">
+  <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+    <div>
+      <h2 class="section-title mb-8">Pourquoi acheter en coopérative ?</h2>
+      <div>
+        <div class="why-feature">
+          <div class="why-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div>
+            <p class="font-bold text-base" style="color:var(--text-dark); font-family:'Playfair Display',serif;">Produits authentiques et de qualité</p>
+            <p class="text-sm mt-1" style="color:var(--text-light);">Chaque produit est sélectionné avec soin, issu du savoir-faire local.</p>
+          </div>
+        </div>
+        <div class="why-feature">
+          <div class="why-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div>
+            <p class="font-bold text-base" style="color:var(--text-dark); font-family:'Playfair Display',serif;">Prix équitable pour les artisans</p>
+            <p class="text-sm mt-1" style="color:var(--text-light);">Vos achats soutiennent directement les producteurs et artisans locaux.</p>
+          </div>
+        </div>
+        <div class="why-feature">
+          <div class="why-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div>
+            <p class="font-bold text-base" style="color:var(--text-dark); font-family:'Playfair Display',serif;">Traçabilité garantie</p>
+            <p class="text-sm mt-1" style="color:var(--text-light);">Connaissez l'origine exacte de chaque produit, de la coopérative à vous.</p>
+          </div>
+        </div>
+        <div class="why-feature">
+          <div class="why-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div>
+            <p class="font-bold text-base" style="color:var(--text-dark); font-family:'Playfair Display',serif;">Préservation du savoir-faire traditionnel</p>
+            <p class="text-sm mt-1" style="color:var(--text-light);">Contribuez à la transmission des techniques ancestrales marocaines.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center justify-center">
+      <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&h=500&fit=crop" alt="Produits traditionnels marocains" class="rounded-2xl shadow-xl w-full max-w-sm object-cover" style="aspect-ratio: 1/1;">
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="pt-14 pb-8 px-4">
+  <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 mb-10">
+    <div>
+      <p class="footer-heading">GreenMarket</p>
+      <a href="#">À propos</a>
+      <a href="#">Nos coopératives</a>
+      <a href="#">Devenir partenaire</a>
+    </div>
+    <div>
+      <p class="footer-heading">Aide</p>
+      <a href="#">FAQ</a>
+      <a href="#">Livraison</a>
+      <a href="#">Paiement sécurisé</a>
+    </div>
+    <div>
+      <p class="footer-heading">Légal</p>
+      <a href="#">CGU</a>
+      <a href="#">Confidentialité</a>
+    </div>
+    <div>
+      <p class="footer-heading">Suivez-nous</p>
+      <a href="#" class="flex items-center gap-2">📘 Facebook</a>
+      <a href="#" class="flex items-center gap-2 mt-1">📷 Instagram</a>
+    </div>
+  </div>
+  <div class="max-w-7xl mx-auto border-t border-opacity-20 pt-6 flex flex-col md:flex-row items-center justify-between gap-2" style="border-color:#6a2030;">
+    <p class="text-xs" style="color:#9a7060;">© 2026 GreenMarket – Soutenir nos coopératives</p>
+    <p class="text-xs" style="color:#9a7060;">🇲🇦 Fait avec ❤️ pour les artisans marocains</p>
+  </div>
+</footer>
+
+<script>
+  // ========== PRODUCTS DATABASE ==========
+  const products = [
+    { id: 1, name: "Caftan traditionnel", price: "450 DH", image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=300&h=200&fit=crop", coop: "Coopérative Fès Artisanat", rating: 4.5, reviews: 156, badge: "Artisanal", badgeClass: "secondary", category: "popular" },
+    { id: 2, name: "Huile d'olive extra vierge", price: "120 DH / litre", image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&h=200&fit=crop", coop: "Coopérative Atlas", rating: 5, reviews: 234, badge: "Bio - Terroir", badgeClass: "bio", category: "popular" },
+    { id: 3, name: "Mélange plantes médicinales", price: "45 DH", image: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=300&h=200&fit=crop", coop: "Coopérative Ourika", rating: 4.5, reviews: 89, badge: "Rare", badgeClass: "rare", category: "popular" },
+    { id: 4, name: "Tapis berbère", price: "1 200 DH", image: "https://images.unsplash.com/photo-1526721940322-10fb6e3ae94a?w=300&h=200&fit=crop", coop: "Coopérative Haut-Atlas", rating: 5, reviews: 67, badge: "Fait main", badgeClass: "fait", category: "popular" },
+    { id: 5, name: "Savon noir", price: "25 DH", image: "https://images.unsplash.com/photo-1600856208376-8b93bc0ae0ae?w=300&h=200&fit=crop", coop: "Coopérative Atlas", rating: 5, reviews: 112, badge: "Produits de beauté", badgeClass: "secondary", category: "new" },
+    { id: 6, name: "Amlou", price: "35 DH", image: "https://images.unsplash.com/photo-1595876433455-ee7fe3b18d15?w=300&h=200&fit=crop", coop: "Coopérative Haut-Atlas", rating: 4.5, reviews: 78, badge: "Huiles & Condiments", badgeClass: "bio", category: "new" },
+    { id: 7, name: "Tajine en terre cuite", price: "180 DH", image: "https://images.unsplash.com/photo-1567181449286-6e73b0d4815e?w=300&h=200&fit=crop", coop: "Coopérative Fès Artisanat", rating: 5, reviews: 203, badge: "Artisanat", badgeClass: "fait", category: "new" },
+    { id: 8, name: "Ras el Hanout", price: "30 DH", image: "https://images.unsplash.com/photo-1532336414038-cf19250c5757?w=300&h=200&fit=crop", coop: "Coopérative Ourika", rating: 5, reviews: 341, badge: "Épicerie fine", badgeClass: "secondary", category: "new" }
+  ];
+
+  // ========== COOPERATIVES DATABASE ==========
+  const cooperatives = [
+    { name: "Coopérative Atlas", location: "Marrakech", description: "Huiles, produits du terroir et artisanat de la région Atlas.", icon: "🏔️" },
+    { name: "Coopérative Fès Artisanat", location: "Fès", description: "Artisanat authentique, poterie et vêtements traditionnels.", icon: "🏺" },
+    { name: "Coopérative Ourika", location: "Ourika Valley", description: "Plantes médicinales rares et produits naturels de la vallée.", icon: "🌿" }
+  ];
+
+  // ========== PANIER FUNCTIONS ==========
+  let cart = [];
+
+  function loadCart() {
+    const saved = localStorage.getItem('greenmarket_cart');
+    if (saved) {
+      cart = JSON.parse(saved);
+    } else {
+      cart = [];
+    }
+    updateCartCount();
+  }
+
+  function saveCart() {
+    localStorage.setItem('greenmarket_cart', JSON.stringify(cart));
+    updateCartCount();
+  }
+
+  function updateCartCount() {
+    const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const badge = document.getElementById('cart-count');
+    if (badge) badge.textContent = total;
+  }
+
+  function addToCart(product) {
+    const existing = cart.find(item => item.id === product.id);
+    if (existing) {
+      existing.quantity++;
+    } else {
+      cart.push({ ...product, quantity: 1 });
+    }
+    saveCart();
+    showToast(`✓ ${product.name} ajouté au panier !`);
+  }
+
+  function goToCart() {
+    // Show cart summary in a modal or redirect
+    if (cart.length === 0) {
+      showToast("🛒 Votre panier est vide", "#9a4a00");
+      return;
+    }
+    let cartSummary = "🛒 Votre panier:\n";
+    let total = 0;
+    cart.forEach(item => {
+      const priceNum = parseFloat(item.price.toString().replace(/[^0-9.,]/g, '').replace(',', '.'));
+      const itemTotal = priceNum * item.quantity;
+      total += itemTotal;
+      cartSummary += `- ${item.name} x${item.quantity} = ${itemTotal.toFixed(2)} DH\n`;
+    });
+    cartSummary += `\nTotal: ${total.toFixed(2)} DH\n\nValider la commande ?`;
+    if (confirm(cartSummary)) {
+      alert("✅ Commande confirmée ! Merci pour votre achat.");
+      cart = [];
+      saveCart();
+    }
+  }
+
+  function showToast(msg, bg = 'var(--primary)') {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.background = bg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2800);
+  }
+
+  // ========== RENDER FUNCTIONS ==========
+  function renderProducts() {
+    const popularGrid = document.getElementById('productsGrid');
+    const newGrid = document.getElementById('newProductsGrid');
+    
+    const popularProducts = products.filter(p => p.category === 'popular');
+    const newProducts = products.filter(p => p.category === 'new');
+    
+    function createProductCard(p) {
+      const badgeClass = p.badgeClass === 'secondary' ? 'badge-secondary' : 
+                         p.badgeClass === 'bio' ? 'badge-bio' :
+                         p.badgeClass === 'rare' ? 'badge-rare' : 'badge-fait';
+      return `
+        <div class="product-card">
+          <img src="${p.image}" class="product-img" alt="${p.name}" onerror="this.src='https://placehold.co/300x200?text=Produit'">
+          <div class="p-4 flex flex-col flex-1 gap-2">
+            <span class="badge ${badgeClass}">${p.badge}</span>
+            <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display', serif; color: var(--text-dark);">
+              ${p.name}
+            </h3>
+            <p class="text-xs flex items-center gap-1" style="color: var(--text-light)">
+              👩‍🌾 ${p.coop}
+            </p>
+            <div class="flex items-center gap-1">
+              <span class="stars">${'★'.repeat(Math.floor(p.rating))}${p.rating % 1 ? '½' : ''}${'☆'.repeat(5 - Math.ceil(p.rating))}</span>
+              <span class="text-xs" style="color: var(--text-light)">(${p.reviews} avis)</span>
+            </div>
+            <p class="font-bold text-lg mt-auto" style="color: var(--primary); font-family:'Playfair Display', serif;">
+              ${p.price}
+            </p>
+            <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm" onclick='addToCart(${JSON.stringify(p).replace(/'/g, "\\'")})'>
+              Ajouter au panier
+            </button>
+          </div>
+        </div>
+      `;
+    }
+    
+    if (popularGrid) popularGrid.innerHTML = popularProducts.map(createProductCard).join('');
+    if (newGrid) newGrid.innerHTML = newProducts.map(createProductCard).join('');
+  }
+
+  function renderCooperatives() {
+    const coopsGrid = document.getElementById('coopsGrid');
+    if (!coopsGrid) return;
+    
+    coopsGrid.innerHTML = cooperatives.map(coop => `
+      <div class="coop-card">
+        <div class="coop-header">${coop.icon}</div>
+        <div class="p-5">
+          <h3 class="font-bold text-base mb-1" style="font-family:'Playfair Display',serif;">${coop.name}</h3>
+          <p class="text-xs mb-4 flex items-center gap-1" style="color:var(--text-light);">📍 ${coop.location}</p>
+          <p class="text-sm mb-4" style="color:var(--text-light);">${coop.description}</p>
+          <button class="btn-outline w-full" onclick="alert('Boutique ${coop.name} - Page en développement')">Voir la boutique</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ========== AUTH FUNCTIONS ==========
+  let currentUser = null;
+
+  function initUsers() {
+    if (!localStorage.getItem('greenmarket_users')) {
+      const defaultUsers = [
+        { id: 1, name: "Jean Dupont", email: "client@test.com", password: "client123", role: "client", producerId: null },
+        { id: 2, name: "Producteur Local", email: "producteur@test.com", password: "prod123", role: "productor", producerId: 101 }
+      ];
+      localStorage.setItem('greenmarket_users', JSON.stringify(defaultUsers));
+    }
+  }
+
+  function getCurrentUser() {
+    const userJson = sessionStorage.getItem('greenmarket_current_user');
+    return userJson ? JSON.parse(userJson) : null;
+  }
+
+  function setCurrentUser(user) {
+    sessionStorage.setItem('greenmarket_current_user', JSON.stringify(user));
+    currentUser = user;
+    updateAuthUI();
+  }
+
+  function logout() {
+    sessionStorage.removeItem('greenmarket_current_user');
+    currentUser = null;
+    updateAuthUI();
+    showToast("👋 Déconnexion réussie");
+  }
+
+  function login(email, password) {
+    const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
+    const user = users.find(u => u.email === email && u.password === password);
+    if (user) {
+      const { password, ...safeUser } = user;
+      setCurrentUser(safeUser);
+      return { success: true, user: safeUser };
+    }
+    return { success: false, error: "Email ou mot de passe incorrect" };
+  }
+
+  function register(name, email, password, role) {
+    const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
+    if (users.find(u => u.email === email)) {
+      return { success: false, error: "Email déjà utilisé" };
+    }
+    const newUser = { 
+      id: Date.now(), 
+      name, 
+      email, 
+      password, 
+      role: role, 
+      producerId: role === 'productor' ? Date.now() : null 
+    };
+    users.push(newUser);
+    localStorage.setItem('greenmarket_users', JSON.stringify(users));
+    const { password: _, ...safeUser } = newUser;
+    setCurrentUser(safeUser);
+    return { success: true, user: safeUser };
+  }
+
+  function updateAuthUI() {
+    const widget = document.getElementById('authWidget');
+    const user = getCurrentUser();
+    if (user) {
+      const roleText = user.role === 'productor' ? 'Producteur' : 'Client';
+      widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;">🚪</button></div>`;
+      const logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) logoutBtn.addEventListener('click', logout);
+    } else {
+      widget.innerHTML = `<button class="btn-primary" id="showAuthBtn">Connexion</button>`;
+      const showAuthBtn = document.getElementById('showAuthBtn');
+      if (showAuthBtn) showAuthBtn.addEventListener('click', () => showAuthModal('login'));
+    }
+  }
+
+  function showAuthModal(tab = 'login') {
+    const modal = document.getElementById('authModal');
+    const loginTab = document.querySelector('.auth-tab[data-tab="login"]');
+    const registerTab = document.querySelector('.auth-tab[data-tab="register"]');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    if (tab === 'login') {
+      loginTab.classList.add('active');
+      registerTab.classList.remove('active');
+      loginForm.classList.add('active');
+      registerForm.classList.remove('active');
+    } else {
+      loginTab.classList.remove('active');
+      registerTab.classList.add('active');
+      loginForm.classList.remove('active');
+      registerForm.classList.add('active');
+    }
+    modal.classList.add('open');
+  }
+
+  function closeAuthModal() {
+    document.getElementById('authModal').classList.remove('open');
+  }
+
+  function setupAuthModal() {
+    const tabs = document.querySelectorAll('.auth-tab');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const roleRadios = document.querySelectorAll('input[name="registerRole"]');
+    const producerFields = document.getElementById('producerFields');
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        if (tab.dataset.tab === 'login') {
+          loginForm.classList.add('active');
+          registerForm.classList.remove('active');
+        } else {
+          loginForm.classList.remove('active');
+          registerForm.classList.add('active');
+        }
+      });
+    });
+    
+    roleRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        producerFields.style.display = radio.value === 'productor' ? 'block' : 'none';
+      });
+    });
+    
+    document.getElementById('doLoginBtn').addEventListener('click', () => {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const result = login(email, password);
+      if (result.success) {
+        closeAuthModal();
+        showToast(`👋 Bonjour ${result.user.name} !`);
+      } else {
+        document.getElementById('loginError').textContent = result.error;
+      }
+    });
+    
+    document.getElementById('doRegisterBtn').addEventListener('click', () => {
+      const role = document.querySelector('input[name="registerRole"]:checked').value;
+      const name = document.getElementById('registerName').value;
+      const email = document.getElementById('registerEmail').value;
+      const password = document.getElementById('registerPassword').value;
+      if (!name || !email || !password) {
+        document.getElementById('registerError').textContent = "Veuillez remplir tous les champs";
+        return;
+      }
+      const result = register(name, email, password, role);
+      if (result.success) {
+        closeAuthModal();
+        showToast(`✅ Bienvenue ${result.user.name} !`);
+      } else {
+        document.getElementById('registerError').textContent = result.error;
+      }
+    });
+    
+    document.getElementById('closeAuthModal').addEventListener('click', closeAuthModal);
+    document.getElementById('authModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('authModal')) closeAuthModal();
+    });
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  function scrollToSection(sectionId) {
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // Search functionality
+  function setupSearch() {
+    const searchInput = document.getElementById('searchInputHeader');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        const productCards = document.querySelectorAll('.product-card');
+        productCards.forEach(card => {
+          const title = card.querySelector('h3')?.textContent.toLowerCase() || '';
+          const coop = card.querySelector('p.text-xs')?.textContent.toLowerCase() || '';
+          if (title.includes(query) || coop.includes(query)) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    }
+  }
+
+  // Initialize everything
+  function init() {
+    loadCart();
+    renderProducts();
+    renderCooperatives();
+    initUsers();
+    updateAuthUI();
+    setupAuthModal();
+    setupSearch();
+    
+    // Become partner button
+    const partnerBtn = document.getElementById('becomePartnerBtn');
+    if (partnerBtn) {
+      partnerBtn.addEventListener('click', () => {
+        const user = getCurrentUser();
+        if (user && user.role === 'productor') {
+          alert("Vous êtes déjà producteur ! Contactez-nous pour plus d'informations.");
+        } else if (user) {
+          alert("Pour devenir partenaire, vous devez avoir un compte producteur. Créez un nouveau compte avec le rôle 'Producteur'.");
+        } else {
+          showAuthModal('register');
+          document.querySelector('input[name="registerRole"][value="productor"]').checked = true;
+          document.getElementById('producerFields').style.display = 'block';
+        }
+      });
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
