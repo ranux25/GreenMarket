@@ -35,18 +35,38 @@
       overflow-x: hidden;
     }
 
-    /* --- CONTENEUR PRINCIPAL ÉLARGI --- */
+    /* --- CONTENEUR PRINCIPAL (PROPORTIONS EXIGÉES) --- */
     .auth-container {
       background: #ffffff;
-      width: 1300px;
+      width: 1200px; /* Ajusté selon tes exigences */
       max-width: 100%;
-      height: 720px; /* Augmenté légèrement pour le confort des nouveaux champs */
-      min-height: 720px;
+      height: 650px; /* Ajusté selon tes exigences */
       border-radius: 30px;
       box-shadow: 0 20px 60px rgba(93, 13, 24, 0.1);
       position: relative;
       overflow: hidden;
       display: flex;
+    }
+
+    /* --- BOUTON ACCUEIL DISCRET TOUT EN HAUT À GAUCHE --- */
+    .btn-home {
+      position: absolute;
+      top: 20px;
+      left: 25px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #90857d;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      z-index: 30;
+    }
+
+    .btn-home:hover {
+      color: var(--primary-burgundy);
+      transform: translateX(-3px);
     }
 
     /* --- PANNEAU D'ILLUSTRATION GLISSANT (DESKTOP) --- */
@@ -89,21 +109,15 @@
       top: 40px;
     }
 
-    .brand-logo {
-      height: 35px;
-      width: auto;
-      object-fit: contain;
-    }
-
     .plant-illustration {
-      width: 150px;
-      height: 150px;
+      width: 140px;
+      height: 140px;
       background: rgba(255, 249, 235, 0.15);
       border-radius: 40% 60% 60% 40% / 50% 40% 60% 50%;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 4.5rem;
+      font-size: 4rem;
       color: var(--bg-cream);
       margin-bottom: 25px;
       box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.2);
@@ -133,12 +147,13 @@
     .form-box {
       width: 50%;
       height: 100%;
-      padding: 40px 60px;
+      padding: 50px 70px; /* Équilibré pour s'adapter à la nouvelle hauteur de 650px */
       display: flex;
       flex-direction: column;
       justify-content: center;
       transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, z-index 0.5s;
       overflow-y: auto;
+      position: relative;
     }
 
     /* Positions initiales des 3 volets */
@@ -167,7 +182,6 @@
     }
 
     /* --- ÉTATS DE TRANSITION DE L'ANIMATION (DESKTOP) --- */
-    /* État : Inscription active */
     .auth-container.right-panel-active .overlay-panel {
       transform: translateX(100%);
     }
@@ -183,7 +197,6 @@
       pointer-events: all;
     }
 
-    /* État : Mot de passe oublié actif (Le panneau bouge à droite, la boîte forgot s'affiche à gauche) */
     .auth-container.forgot-panel-active .overlay-panel {
       transform: translateX(100%);
     }
@@ -200,37 +213,24 @@
       left: 0;
     }
 
-    /* --- STYLE ÉLÉGANT DES FORMULAIRES --- */
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--primary-burgundy);
-      margin-bottom: 20px;
-    }
-
-    .brand span {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-    }
-
+    /* --- TIMING REHAUSSÉ DES CONTENUS --- */
     h2 {
       font-family: 'Playfair Display', serif;
-      font-size: 1.8rem;
+      font-size: 1.9rem;
       color: var(--primary-burgundy);
       margin-bottom: 6px;
+      margin-top: 15px; /* Laisse de la place sous le bouton Accueil */
     }
 
     .subtitle {
       color: #70665f;
       font-size: 0.9rem;
-      margin-bottom: 25px;
+      margin-bottom: 22px;
     }
 
     .input-group {
       position: relative;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
 
     .input-group i {
@@ -244,7 +244,7 @@
 
     .input-group input, .input-group select {
       width: 100%;
-      padding: 13px 15px 13px 45px;
+      padding: 11px 15px 11px 45px;
       background-color: #fcfaf5;
       border: 1px solid rgba(159, 178, 172, 0.4);
       border-radius: 12px;
@@ -259,7 +259,6 @@
       cursor: pointer;
     }
 
-    /* Flèche personnalisée pour le select */
     .input-group.select-group::after {
       content: '\b1';
       font-family: "bootstrap-icons";
@@ -281,7 +280,7 @@
     .role-container {
       display: flex;
       gap: 15px;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
 
     .role-label-title {
@@ -309,7 +308,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 11px;
+      padding: 10px;
       background: #fcfaf5;
       border: 1px solid rgba(159, 178, 172, 0.4);
       border-radius: 12px;
@@ -325,7 +324,7 @@
       font-weight: 500;
     }
 
-    /* --- SECTION DYNAMIQUE PRODUCTEUR --- */
+    /* --- SECTION DYNAMIQUE PRODUCTEUR EN GRILLE CONTENUE --- */
     .producer-fields {
       max-height: 0;
       overflow: hidden;
@@ -334,9 +333,9 @@
     }
 
     .producer-fields.active {
-      max-height: 300px; /* Espace suffisant pour glisser les nouveaux champs */
+      max-height: 150px;
       opacity: 1;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
     }
 
     .form-options {
@@ -344,7 +343,7 @@
       justify-content: space-between;
       align-items: center;
       font-size: 0.88rem;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .remember-me {
@@ -372,7 +371,7 @@
 
     .btn-submit {
       width: 100%;
-      padding: 14px;
+      padding: 13px;
       background-color: var(--primary-burgundy);
       color: #ffffff;
       border: none;
@@ -389,7 +388,6 @@
       transform: translateY(-2px);
     }
 
-    /* Termes d'utilisations légaux */
     .terms-text {
       font-size: 0.78rem;
       color: #90857d;
@@ -407,7 +405,7 @@
 
     .switch-text {
       text-align: center;
-      margin-top: 20px;
+      margin-top: 15px;
       font-size: 0.9rem;
       color: #70665f;
     }
@@ -424,8 +422,8 @@
     .error-msg {
       color: #c0392b;
       font-size: 0.8rem;
-      margin-top: -12px;
-      margin-bottom: 12px;
+      margin-top: -10px;
+      margin-bottom: 10px;
       display: none;
     }
 
@@ -441,6 +439,13 @@
         height: auto;
         box-shadow: none;
         background: transparent;
+      }
+
+      .btn-home {
+        position: relative;
+        top: 0;
+        left: 0;
+        margin-bottom: 15px;
       }
 
       .overlay-panel {
@@ -472,6 +477,11 @@
         border-radius: 24px;
         padding: 35px 25px;
         box-shadow: 0 10px 30px rgba(93, 13, 24, 0.05);
+      }
+
+      .producer-fields-row {
+        flex-direction: column;
+        gap: 0 !important;
       }
 
       .auth-container .signup-box, 
@@ -508,10 +518,8 @@
     </div>
 
     <div class="form-box login-box" id="loginBox">
-      <div class="brand">
-        <img src="images/logo.png" alt="Logo GreenMarket" class="brand-logo">
-        <span>GreenMarket</span>
-      </div>
+      
+
       <h2>Se connecter</h2>
       <p class="subtitle">Heureux de vous revoir parmi nos coopératives.</p>
       
@@ -537,8 +545,8 @@
         <button type="submit" class="btn-submit">Connexion</button>
         
         <p class="terms-text">
-  En vous inscrivant, vous validez nos <a href="terms.html" target="_blank">CGU</a> et certifiez l'exactitude de vos données.
-</p>
+          En vous connectant, vous acceptez nos <a href="terms.html" target="_blank">CGU</a> et notre <a href="#">Politique de confidentialité</a>.
+        </p>
       </form>
 
       <p class="switch-text">
@@ -548,10 +556,8 @@
     </div>
 
     <div class="form-box signup-box" id="signupBox">
-      <div class="brand">
-        <img src="images/logo.png" alt="Logo GreenMarket" class="brand-logo">
-        <span>GreenMarket</span>
-      </div>
+      
+
       <h2>Créer un compte</h2>
       <p class="subtitle">Créez votre profil pour acheter en direct ou proposer vos récoltes.</p>
       
@@ -577,19 +583,21 @@
           <label class="role-option">
             <input type="radio" name="userRole" value="Producer">
             <div class="role-card">
-              <i class="bi bi-wrenches"></i> Producteur
+              <i class="bi bi-shop"></i> Producteur
             </div>
           </label>
         </div>
 
         <div class="producer-fields" id="producerFields">
-          <div class="input-group">
-            <i class="bi bi-shop"></i>
-            <input type="text" id="farmName" placeholder="Nom de l'exploitation / Coopérative">
-          </div>
-          <div class="input-group">
-            <i class="bi bi-telephone"></i>
-            <input type="tel" id="producerPhone" placeholder="Téléphone professionnel">
+          <div class="producer-fields-row" style="display: flex; gap: 12px;">
+            <div class="input-group" style="flex: 1;">
+              <i class="bi bi-building"></i>
+              <input type="text" id="farmName" placeholder="Exploitation / Coopérative">
+            </div>
+            <div class="input-group" style="flex: 1;">
+              <i class="bi bi-telephone"></i>
+              <input type="tel" id="producerPhone" placeholder="Téléphone pro">
+            </div>
           </div>
           <div class="input-group select-group">
             <i class="bi bi-tags"></i>
@@ -618,8 +626,8 @@
         <button type="submit" class="btn-submit">S'inscrire</button>
         
         <p class="terms-text">
-  En vous inscrivant, vous validez nos <a href="terms.html" target="_blank">CGU</a> et certifiez l'exactitude de vos données.
-</p>
+          En vous inscrivant, vous validez nos <a href="terms.html" target="_blank">CGU</a> et certifiez l'exactitude de vos données.
+        </p>
       </form>
 
       <p class="switch-text">
@@ -629,10 +637,10 @@
     </div>
 
     <div class="form-box forgot-box" id="forgotBox">
-      <div class="brand">
-        <img src="images/logo.png" alt="Logo GreenMarket" class="brand-logo">
-        <span>GreenMarket</span>
-      </div>
+      <a href="index.php" class="btn-home">
+        <i class="bi bi-arrow-left"></i> Accueil
+      </a>
+
       <h2>Mot de passe oublié</h2>
       <p class="subtitle">Pas d'inquiétude. Entrez votre adresse e-mail pour recevoir un lien de réinitialisation.</p>
       
@@ -656,17 +664,14 @@
   <script>
     const authContainer = document.getElementById('authContainer');
     
-    // Boutons de navigation inter-formulaire
     const toSignupBtn = document.getElementById('toSignup');
     const toLoginFromSignup = document.getElementById('toLoginFromSignup');
     const toForgotBtn = document.getElementById('toForgot');
     const toLoginFromForgot = document.getElementById('toLoginFromForgot');
     
-    // Éléments du volet d'illustration
     const panelTitle = document.getElementById('panelTitle');
     const panelDesc = document.getElementById('panelDesc');
 
-    // Gestion de l'affichage dynamique Producteur
     const roleRadios = document.querySelectorAll('input[name="userRole"]');
     const producerFields = document.getElementById('producerFields');
 
@@ -674,7 +679,6 @@
       radio.addEventListener('change', () => {
         if (radio.value === 'Producer') {
           producerFields.classList.add('active');
-          // On rend les nouveaux champs requis si c'est un producteur
           document.getElementById('farmName').required = true;
           document.getElementById('producerPhone').required = true;
         } else {
@@ -685,7 +689,6 @@
       });
     });
 
-    // Aller vers l'Inscription
     toSignupBtn.addEventListener('click', (e) => {
       e.preventDefault();
       authContainer.classList.remove('forgot-panel-active');
@@ -697,7 +700,6 @@
       }, 200);
     });
 
-    // Revenir à la Connexion depuis l'Inscription
     toLoginFromSignup.addEventListener('click', (e) => {
       e.preventDefault();
       authContainer.classList.remove('right-panel-active');
@@ -708,7 +710,6 @@
       }, 200);
     });
 
-    // Aller vers "Mot de passe oublié"
     toForgotBtn.addEventListener('click', (e) => {
       e.preventDefault();
       authContainer.classList.remove('right-panel-active');
@@ -720,7 +721,6 @@
       }, 200);
     });
 
-    // Revenir à la Connexion depuis "Mot de passe oublié"
     toLoginFromForgot.addEventListener('click', (e) => {
       e.preventDefault();
       authContainer.classList.remove('forgot-panel-active');
@@ -731,7 +731,7 @@
       }, 200);
     });
 
-    // Validations de simulation des formulaires
+    // Validations (Simulation)
     document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
       alert("Mode Démo : Connexion lancée !");
