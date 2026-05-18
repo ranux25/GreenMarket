@@ -469,6 +469,80 @@
   .store-card:hover .delete-shop-btn { opacity: 1; }
   .delete-shop-btn:hover { background: var(--wine-dark); }
 
+  .edit-photo-btn {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.52); color: white; border: none;
+    padding: 0.45rem; font-size: 0.72rem; font-weight: 600;
+    cursor: pointer; z-index: 10; opacity: 0; transition: opacity 0.2s;
+    letter-spacing: 0.04em;
+  }
+  .store-banner:hover .edit-photo-btn { opacity: 1; }
+
+  /* ===== MODAL PHOTO ===== */
+  .photo-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+    align-items: center; justify-content: center;
+    z-index: 2000;
+  }
+  .photo-modal-overlay.open { display: flex; }
+  .photo-modal {
+    background: var(--white); border-radius: 14px;
+    padding: 2rem; width: 90%; max-width: 460px;
+    box-shadow: 0 24px 50px rgba(0,0,0,0.25);
+    position: relative; animation: modalIn .25s ease;
+  }
+  @keyframes modalIn { from { transform: translateY(20px); opacity:0; } to { transform: none; opacity:1; } }
+  .photo-modal h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem; color: var(--wine); margin-bottom: 0.25rem;
+  }
+  .photo-modal-shopname {
+    font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.4rem; font-style: italic;
+  }
+  .photo-drop-zone {
+    border: 2.5px dashed var(--border); border-radius: 10px;
+    background: var(--cream); padding: 2rem 1rem;
+    text-align: center; cursor: pointer;
+    transition: border-color .2s, background .2s;
+    margin-bottom: 1rem; position: relative;
+  }
+  .photo-drop-zone:hover, .photo-drop-zone.drag-over {
+    border-color: var(--wine); background: var(--wine-pale);
+  }
+  .photo-drop-zone input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .drop-icon { font-size: 2.2rem; margin-bottom: 0.5rem; }
+  .drop-text { font-size: 0.85rem; color: var(--text-muted); }
+  .drop-text strong { color: var(--wine); }
+  .photo-preview-box {
+    width: 100%; height: 160px; border-radius: 8px; overflow: hidden;
+    border: 1.5px solid var(--border); margin-bottom: 1rem;
+    display: none; position: relative;
+  }
+  .photo-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-preview-box .change-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,0);
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s; cursor: pointer;
+  }
+  .photo-preview-box:hover .change-overlay { background: rgba(0,0,0,0.35); }
+  .photo-preview-box .change-overlay span {
+    color: white; font-size: 0.78rem; font-weight: 600; opacity: 0; transition: opacity .2s;
+  }
+  .photo-preview-box:hover .change-overlay span { opacity: 1; }
+  .photo-preview-box input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .photo-modal-actions { display: flex; gap: 0.7rem; margin-top: 0.5rem; }
+  .photo-modal-close {
+    position: absolute; top: 1rem; right: 1rem;
+    background: none; border: none; font-size: 1.3rem;
+    cursor: pointer; color: var(--text-muted); line-height: 1;
+  }
+  .photo-modal-close:hover { color: var(--wine); }
+
   .toast {
     position: fixed; bottom: 2rem; right: 2rem;
     background: var(--wine); color: var(--cream);
@@ -691,6 +765,35 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- ===== MODAL CHANGEMENT DE PHOTO ===== -->
+<div class="photo-modal-overlay" id="photoModal">
+  <div class="photo-modal">
+    <button class="photo-modal-close" id="closePhotoModal">✕</button>
+    <h3>📷 Changer la photo</h3>
+    <p class="photo-modal-shopname" id="photoModalShopName"></p>
+
+    <div class="photo-drop-zone" id="photoDropZone">
+      <input type="file" id="photoFileInput" accept="image/*">
+      <div class="drop-icon">🖼️</div>
+      <p class="drop-text"><strong>Cliquez ou glissez</strong> une image ici</p>
+      <p class="drop-text" style="font-size:0.75rem; margin-top:0.3rem;">JPG, PNG, WEBP — max 5 Mo</p>
+    </div>
+
+    <div class="photo-preview-box" id="photoPreviewBox">
+      <img id="photoPreviewImg" src="" alt="Aperçu">
+      <div class="change-overlay">
+        <span>🔄 Changer</span>
+        <input type="file" id="photoFileInput2" accept="image/*">
+      </div>
+    </div>
+
+    <div class="photo-modal-actions">
+      <button class="btn-sm-cancel" id="cancelPhotoBtn" style="flex:1; padding:.6rem;">Annuler</button>
+      <button class="btn-sm-wine" id="savePhotoBtn" style="flex:2; padding:.6rem;" disabled>✅ Enregistrer la photo</button>
+    </div>
+  </div>
+</div>
+
 <div class="auth-modal-overlay" id="authModal">
   <div class="auth-modal">
     <div class="auth-tabs"><button class="auth-tab active" data-tab="login">Connexion</button><button class="auth-tab" data-tab="register">Inscription</button></div>
@@ -728,56 +831,127 @@ let categories = [
 ];
 
 // ========== BOUTIQUES ARTISANALES MAROCAINES ==========
+// Images Unsplash thématiques par catégorie — URLs directes et fiables
 let stores = [
-  { id:1, name:"Maison du Caftan", category:'Caftans & Vêtements traditionnels', categoryId:1, badge:'Artisan', badgeClass:'artisan', banner:'https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=700&q=80', desc:'Caftans de luxe en soie et tissus traditionnels, broderies faites main par des maîtres-artisans de Fès.', rating:4.9, reviews:234, products:8, sales:'2 450', tags:['Caftan','Broderie','Soie'], producerId:101, producerName:'Fatima Zahra', location:'Fès', since:'2005' },
-  { id:2, name:"Tapis Berbère d'Atlas", category:'Tapis & Tissage', categoryId:2, badge:'Tradition', badgeClass:'tradition', banner:'https://images.unsplash.com/photo-1526721940322-10fb6e3ae94a?w=700&q=80', desc:'Tapis berbères authentiques tissés à la main par les femmes de l\'Atlas, chaque pièce est unique.', rating:4.8, reviews:189, products:6, sales:'3 200', tags:['Tapis','Berbère','Laine'], producerId:102, producerName:'Rachid El Mansouri', location:'Marrakech', since:'2010' },
-  { id:3, name:"Poterie de Safi", category:'Poterie & Céramique', categoryId:3, badge:'Fait Main', badgeClass:'fait-main', banner:'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=700&q=80', desc:'Poterie traditionnelle de Safi, plats, tajines et vases peints à la main avec des motifs ancestraux.', rating:4.7, reviews:156, products:12, sales:'1 890', tags:['Poterie','Tajine','Céramique'], producerId:103, producerName:'Ahmed Benjelloun', location:'Safi', since:'1998' },
-  { id:4, name:"Marqueterie de Tetouan", category:'Marqueterie & Bois', categoryId:4, badge:'Artisan', badgeClass:'artisan', banner:'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=700&q=80', desc:'Meubles et objets en bois de cèdre incrustés, marqueterie fine selon les techniques ancestrales.', rating:4.9, reviews:112, products:5, sales:'980', tags:['Bois','Marqueterie','Cèdre'], producerId:104, producerName:'Mohamed Alami', location:'Tetouan', since:'2012' },
-  { id:5, name:"Bijoux Amaziagh", category:'Bijoux & Joaillerie', categoryId:5, badge:'Tradition', badgeClass:'tradition', banner:'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=700&q=80', desc:'Bijoux en argent massif inspirés des symboles amazighs, pierres naturelles et motifs ancestraux.', rating:4.9, reviews:203, products:15, sales:'2 100', tags:['Bijoux','Argent','Amazigh'], producerId:105, producerName:'Malika Oufkir', location:'Agadir', since:'2008' },
-  { id:6, name:"Lumières de Marrakech", category:'Lampes & Fer forgé', categoryId:6, badge:'Fait Main', badgeClass:'fait-main', banner:'https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=700&q=80', desc:'Lampes en fer forgé, lanternes en laiton et appliques traditionnelles pour une ambiance orientale.', rating:4.6, reviews:98, products:9, sales:'1 450', tags:['Lampes','Fer forgé','Laiton'], producerId:106, producerName:'Karim Tazi', location:'Marrakech', since:'2015' },
-  { id:7, name:"Argamane Naturel", category:'Cosmétiques naturels', categoryId:7, badge:'Artisan', badgeClass:'artisan', banner:'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=700&q=80', desc:'Savons à l\'huile d\'argan, ghassoul, huiles essentielles et cosmétiques 100% naturels.', rating:4.8, reviews:178, products:11, sales:'890', tags:['Argan','Ghassoul','Bio'], producerId:107, producerName:'Nadia Berrada', location:'Essaouira', since:'2017' },
-  { id:8, name:"Saveurs du Terroir", category:'Produits du terroir', categoryId:8, badge:'Tradition', badgeClass:'tradition', banner:'https://images.unsplash.com/photo-1599851152730-1f83a654bb9a?w=700&q=80', desc:'Huile d\'olive, amlou, miel de montagne, épices et confitures artisanales marocaines.', rating:4.7, reviews:145, products:20, sales:'3 500', tags:['Huile d\'olive','Miel','Amlou'], producerId:108, producerName:'Hassan El Fassi', location:'Meknès', since:'2000' },
-  { id:9, name:"Tissage d'Azilal", category:'Tapis & Tissage', categoryId:2, badge:'Fait Main', badgeClass:'fait-main', banner:'https://images.unsplash.com/photo-1553775282-07af8073453f?w=700&q=80', desc:'Couvertures, tapis et tissages colorés des montagnes d\'Azilal, motifs géométriques uniques.', rating:4.8, reviews:87, products:7, sales:'670', tags:['Tissage','Azilal','Couleurs'], producerId:109, producerName:'Zineb Ait Ali', location:'Azilal', since:'2019' },
-  { id:10, name:"Caftans Impériaux", category:'Caftans & Vêtements traditionnels', categoryId:1, badge:'Artisan', badgeClass:'artisan', banner:'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=700&q=80', desc:'Caftans de cérémonie, takchitas et accessoires pour les grandes occasions. Broderies d\'or et d\'argent.', rating:4.9, reviews:256, products:10, sales:'4 200', tags:['Caftan','Takchita','Broderie'], producerId:110, producerName:'Leila Benani', location:'Casablanca', since:'2006' }
+  {
+    id:1, name:"Maison du Caftan", category:'Caftans & Vêtements traditionnels', categoryId:1,
+    badge:'Artisan', badgeClass:'artisan',
+    banner:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&q=80',
+    desc:'Caftans de luxe en soie et tissus traditionnels, broderies faites main par des maîtres-artisans de Fès.',
+    rating:4.9, reviews:234, products:8, sales:'2 450',
+    tags:['Caftan','Broderie','Soie'], producerId:101, producerName:'Fatima Zahra', location:'Fès', since:'2005'
+  },
+  {
+    id:2, name:"Tapis Berbère d'Atlas", category:'Tapis & Tissage', categoryId:2,
+    badge:'Tradition', badgeClass:'tradition',
+    banner:'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=700&q=80',
+    desc:"Tapis berbères authentiques tissés à la main par les femmes de l'Atlas, chaque pièce est unique.",
+    rating:4.8, reviews:189, products:6, sales:'3 200',
+    tags:['Tapis','Berbère','Laine'], producerId:102, producerName:'Rachid El Mansouri', location:'Marrakech', since:'2010'
+  },
+  {
+    id:3, name:"Poterie de Safi", category:'Poterie & Céramique', categoryId:3,
+    badge:'Fait Main', badgeClass:'fait-main',
+    banner:'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=700&q=80',
+    desc:'Poterie traditionnelle de Safi, plats, tajines et vases peints à la main avec des motifs ancestraux.',
+    rating:4.7, reviews:156, products:12, sales:'1 890',
+    tags:['Poterie','Tajine','Céramique'], producerId:103, producerName:'Ahmed Benjelloun', location:'Safi', since:'1998'
+  },
+  {
+    id:4, name:"Marqueterie de Tetouan", category:'Marqueterie & Bois', categoryId:4,
+    badge:'Artisan', badgeClass:'artisan',
+    banner:'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=700&q=80',
+    desc:'Meubles et objets en bois de cèdre incrustés, marqueterie fine selon les techniques ancestrales.',
+    rating:4.9, reviews:112, products:5, sales:'980',
+    tags:['Bois','Marqueterie','Cèdre'], producerId:104, producerName:'Mohamed Alami', location:'Tetouan', since:'2012'
+  },
+  {
+    id:5, name:"Bijoux Amaziagh", category:'Bijoux & Joaillerie', categoryId:5,
+    badge:'Tradition', badgeClass:'tradition',
+    banner:'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=700&q=80',
+    desc:'Bijoux en argent massif inspirés des symboles amazighs, pierres naturelles et motifs ancestraux.',
+    rating:4.9, reviews:203, products:15, sales:'2 100',
+    tags:['Bijoux','Argent','Amazigh'], producerId:105, producerName:'Malika Oufkir', location:'Agadir', since:'2008'
+  },
+  {
+    id:6, name:"Lumières de Marrakech", category:'Lampes & Fer forgé', categoryId:6,
+    badge:'Fait Main', badgeClass:'fait-main',
+    banner:'https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=700&q=80',
+    desc:'Lampes en fer forgé, lanternes en laiton et appliques traditionnelles pour une ambiance orientale.',
+    rating:4.6, reviews:98, products:9, sales:'1 450',
+    tags:['Lampes','Fer forgé','Laiton'], producerId:106, producerName:'Karim Tazi', location:'Marrakech', since:'2015'
+  },
+  {
+    id:7, name:"Argamane Naturel", category:'Cosmétiques naturels', categoryId:7,
+    badge:'Artisan', badgeClass:'artisan',
+    banner:'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=700&q=80',
+    desc:"Savons à l'huile d'argan, ghassoul, huiles essentielles et cosmétiques 100% naturels.",
+    rating:4.8, reviews:178, products:11, sales:'890',
+    tags:['Argan','Ghassoul','Bio'], producerId:107, producerName:'Nadia Berrada', location:'Essaouira', since:'2017'
+  },
+  {
+    id:8, name:"Saveurs du Terroir", category:'Produits du terroir', categoryId:8,
+    badge:'Tradition', badgeClass:'tradition',
+    banner:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=700&q=80',
+    desc:"Huile d'olive, amlou, miel de montagne, épices et confitures artisanales marocaines.",
+    rating:4.7, reviews:145, products:20, sales:'3 500',
+    tags:["Huile d'olive",'Miel','Amlou'], producerId:108, producerName:'Hassan El Fassi', location:'Meknès', since:'2000'
+  },
+  {
+    id:9, name:"Tissage d'Azilal", category:'Tapis & Tissage', categoryId:2,
+    badge:'Fait Main', badgeClass:'fait-main',
+    banner:'https://images.unsplash.com/photo-1526721940322-10fb6e3ae94a?w=700&q=80',
+    desc:"Couvertures, tapis et tissages colorés des montagnes d'Azilal, motifs géométriques uniques.",
+    rating:4.8, reviews:87, products:7, sales:'670',
+    tags:['Tissage','Azilal','Couleurs'], producerId:109, producerName:'Zineb Ait Ali', location:'Azilal', since:'2019'
+  },
+  {
+    id:10, name:"Caftans Impériaux", category:'Caftans & Vêtements traditionnels', categoryId:1,
+    badge:'Artisan', badgeClass:'artisan',
+    banner:'https://images.unsplash.com/photo-1594938298603-c8148c4b4f7f?w=700&q=80',
+    desc:"Caftans de cérémonie, takchitas et accessoires pour les grandes occasions. Broderies d'or et d'argent.",
+    rating:4.9, reviews:256, products:10, sales:'4 200',
+    tags:['Caftan','Takchita','Broderie'], producerId:110, producerName:'Leila Benani', location:'Casablanca', since:'2006'
+  }
 ];
 
 // ========== PRODUITS PAR DÉFAUT POUR CHAQUE CATÉGORIE ==========
 const defaultProducts = {
-  1: [ // Caftans
-    { id: 101, name: "Caftan en Soie", price: "2 500 DH", stock: 5, image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=300&h=200&fit=crop", description: "Caftan en soie naturelle, broderies faites main" },
-    { id: 102, name: "Takchita Cérémonie", price: "3 200 DH", stock: 3, image: "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=300&h=200&fit=crop", description: "Takchita pour mariage, broderies d'or" },
-    { id: 103, name: "Caftan Moderne", price: "1 800 DH", stock: 8, image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=300&h=200&fit=crop", description: "Caftan à la coupe contemporaine" }
+  1: [
+    { id: 101, name: "Caftan en Soie", price: "2 500 DH", stock: 5, image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop", description: "Caftan en soie naturelle, broderies faites main" },
+    { id: 102, name: "Takchita Cérémonie", price: "3 200 DH", stock: 3, image: "https://images.unsplash.com/photo-1594938298603-c8148c4b4f7f?w=300&h=200&fit=crop", description: "Takchita pour mariage, broderies d'or" },
+    { id: 103, name: "Caftan Moderne", price: "1 800 DH", stock: 8, image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop", description: "Caftan à la coupe contemporaine" }
   ],
-  2: [ // Tapis
-    { id: 201, name: "Tapis Berbère Moyen", price: "1 200 DH", stock: 4, image: "https://images.unsplash.com/photo-1526721940322-10fb6e3ae94a?w=300&h=200&fit=crop", description: "Tapis en laine naturelle, motifs berbères" },
-    { id: 202, name: "Tapis Azilal", price: "950 DH", stock: 6, image: "https://images.unsplash.com/photo-1553775282-07af8073453f?w=300&h=200&fit=crop", description: "Tapis coloré des montagnes d'Azilal" },
-    { id: 203, name: "Coussin Tissé", price: "250 DH", stock: 15, image: "https://images.unsplash.com/photo-1553775282-07af8073453f?w=300&h=200&fit=crop", description: "Coussin décoratif tissé main" }
+  2: [
+    { id: 201, name: "Tapis Berbère Moyen", price: "1 200 DH", stock: 4, image: "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=300&h=200&fit=crop", description: "Tapis en laine naturelle, motifs berbères" },
+    { id: 202, name: "Tapis Azilal", price: "950 DH", stock: 6, image: "https://images.unsplash.com/photo-1526721940322-10fb6e3ae94a?w=300&h=200&fit=crop", description: "Tapis coloré des montagnes d'Azilal" },
+    { id: 203, name: "Coussin Tissé", price: "250 DH", stock: 15, image: "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=300&h=200&fit=crop", description: "Coussin décoratif tissé main" }
   ],
-  3: [ // Poterie
+  3: [
     { id: 301, name: "Tajine Traditionnel", price: "180 DH", stock: 20, image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=200&fit=crop", description: "Tajine en terre cuite, motif peint" },
     { id: 302, name: "Assiettes Décoratives", price: "95 DH", stock: 30, image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=200&fit=crop", description: "Lot de 6 assiettes peintes à la main" },
     { id: 303, name: "Vase Zellij", price: "320 DH", stock: 12, image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=200&fit=crop", description: "Vase inspiré des motifs zellij" }
   ],
-  4: [ // Bois
-    { id: 401, name: "Petite Table Marqueterie", price: "850 DH", stock: 4, image: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=300&h=200&fit=crop", description: "Table en cèdre incrusté" },
-    { id: 402, name: "Coffre à Bijoux", price: "320 DH", stock: 8, image: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=300&h=200&fit=crop", description: "Coffret en bois sculpté" }
+  4: [
+    { id: 401, name: "Petite Table Marqueterie", price: "850 DH", stock: 4, image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=200&fit=crop", description: "Table en cèdre incrusté" },
+    { id: 402, name: "Coffre à Bijoux", price: "320 DH", stock: 8, image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=200&fit=crop", description: "Coffret en bois sculpté" }
   ],
-  5: [ // Bijoux
+  5: [
     { id: 501, name: "Bracelet Argent Amazigh", price: "450 DH", stock: 10, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop", description: "Bracelet en argent, symbole amazigh" },
     { id: 502, name: "Collier Fibule", price: "680 DH", stock: 6, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop", description: "Fibule berbère traditionnelle" },
     { id: 503, name: "Boucles d'Oreilles", price: "280 DH", stock: 15, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop", description: "Boucles en argent, corail" }
   ],
-  6: [ // Lampes
+  6: [
     { id: 601, name: "Lanterne Laiton", price: "380 DH", stock: 8, image: "https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=300&h=200&fit=crop", description: "Lanterne en laiton martelé" },
     { id: 602, name: "Applique Murale", price: "250 DH", stock: 12, image: "https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=300&h=200&fit=crop", description: "Applique en fer forgé" }
   ],
-  7: [ // Cosmétiques
-    { id: 701, name: "Huile d'Argan Bio", price: "120 DH", stock: 50, image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=300&h=200&fit=crop", description: "Huile d'argan 100% pure" },
-    { id: 702, name: "Savon Noir", price: "45 DH", stock: 100, image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=300&h=200&fit=crop", description: "Savon noir traditionnel" }
+  7: [
+    { id: 701, name: "Huile d'Argan Bio", price: "120 DH", stock: 50, image: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=300&h=200&fit=crop", description: "Huile d'argan 100% pure" },
+    { id: 702, name: "Savon Noir", price: "45 DH", stock: 100, image: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=300&h=200&fit=crop", description: "Savon noir traditionnel" }
   ],
-  8: [ // Terroir
-    { id: 801, name: "Huile d'Olive Vierge", price: "85 DH", stock: 40, image: "https://images.unsplash.com/photo-1599851152730-1f83a654bb9a?w=300&h=200&fit=crop", description: "Huile d'olive extra vierge, première pression" },
-    { id: 802, name: "Amlou", price: "95 DH", stock: 25, image: "https://images.unsplash.com/photo-1599851152730-1f83a654bb9a?w=300&h=200&fit=crop", description: "Purée d'amandes et miel d'argan" }
+  8: [
+    { id: 801, name: "Huile d'Olive Vierge", price: "85 DH", stock: 40, image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&h=200&fit=crop", description: "Huile d'olive extra vierge, première pression" },
+    { id: 802, name: "Amlou", price: "95 DH", stock: 25, image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&h=200&fit=crop", description: "Purée d'amandes et miel d'argan" }
   ]
 };
 
@@ -1030,7 +1204,14 @@ function createShop() {
   if (badge === 'Tradition') badgeClass = 'tradition';
   if (badge === 'Fait Main') badgeClass = 'fait-main';
   getImageData((bannerImage) => {
-    const newShop = { id: newId, name, category: cat ? cat.name : 'Non catégorisé', categoryId: catId, badge, badgeClass, banner: bannerImage, desc: desc || "Nouvelle boutique artisanale marocaine", rating: 0, reviews: 0, products: 0, sales: '0', tags: ['Nouveau'], producerId: user.producerId || user.id, producerName: user.name, location: 'Maroc', since: new Date().getFullYear().toString() };
+    const newShop = {
+      id: newId, name, category: cat ? cat.name : 'Non catégorisé', categoryId: catId,
+      badge, badgeClass, banner: bannerImage,
+      desc: desc || "Nouvelle boutique artisanale marocaine",
+      rating: 0, reviews: 0, products: 0, sales: '0',
+      tags: ['Nouveau'], producerId: user.producerId || user.id,
+      producerName: user.name, location: 'Maroc', since: new Date().getFullYear().toString()
+    };
     stores.push(newShop);
     saveStores();
     const defaultProds = getDefaultProductsForCategory(catId);
@@ -1051,13 +1232,35 @@ function createShop() {
 }
 
 function saveStores() { localStorage.setItem('greenmarket_stores', JSON.stringify(stores)); }
-function loadStores() { const s = localStorage.getItem('greenmarket_stores'); if (s) stores = JSON.parse(s); }
+
+// ========== FIX: loadStores ne remplace les données par défaut QUE si localStorage existe déjà ==========
+function loadStores() {
+  const s = localStorage.getItem('greenmarket_stores');
+  if (s) {
+    try {
+      stores = JSON.parse(s);
+    } catch(e) {
+      console.warn('Erreur parsing stores, reset des données par défaut');
+      localStorage.removeItem('greenmarket_stores');
+    }
+  }
+}
+
 function saveCategories() { localStorage.setItem('greenmarket_categories', JSON.stringify(categories)); }
-function loadCategories() { const s = localStorage.getItem('greenmarket_categories'); if (s) categories = JSON.parse(s); }
+function loadCategories() {
+  const s = localStorage.getItem('greenmarket_categories');
+  if (s) {
+    try {
+      categories = JSON.parse(s);
+    } catch(e) {
+      localStorage.removeItem('greenmarket_categories');
+    }
+  }
+}
 
 function escapeHtml(str) {
   if (!str) return '';
-  return str.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]));
+  return str.replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
 }
 function showToast(msg, bg = 'var(--wine)') {
   const t = document.getElementById('toast');
@@ -1079,8 +1282,8 @@ function renderCategories() {
       <span class="cat-count">${stores.length}</span>
     </div>
     ${categories.map(c => `
-      <div class="category-item${activeCategory === c.name ? ' active' : ''}" data-name="${c.name}">
-        <div class="cat-left"><span class="cat-icon">${c.icon}</span><span class="cat-name">${c.name}</span></div>
+      <div class="category-item${activeCategory === c.name ? ' active' : ''}" data-name="${escapeHtml(c.name)}">
+        <div class="cat-left"><span class="cat-icon">${c.icon}</span><span class="cat-name">${escapeHtml(c.name)}</span></div>
         <span class="cat-count">${stores.filter(s => s.category === c.name).length}</span>
       </div>
     `).join('')}
@@ -1119,7 +1322,8 @@ function deleteShop(shopId, event) {
 
 function updateStats() {
   const totalProducts = stores.reduce((sum, s) => sum + (s.products || 0), 0);
-  const avgRating = stores.length ? (stores.reduce((sum, s) => sum + s.rating, 0) / stores.length).toFixed(1) : 0;
+  const ratedStores = stores.filter(s => s.rating > 0);
+  const avgRating = ratedStores.length ? (ratedStores.reduce((sum, s) => sum + s.rating, 0) / ratedStores.length).toFixed(1) : '—';
   document.getElementById('statStores').textContent = stores.length;
   document.getElementById('statProducts').textContent = totalProducts;
   document.getElementById('statRating').textContent = avgRating + ' ★';
@@ -1129,7 +1333,7 @@ function renderStores() {
   const q = document.getElementById('searchInput').value.toLowerCase();
   const sort = document.getElementById('sortFilter').value;
   let list = stores.filter(s => {
-    const ms = !q || s.name.toLowerCase().includes(q) || s.producerName.toLowerCase().includes(q);
+    const ms = !q || s.name.toLowerCase().includes(q) || (s.producerName || '').toLowerCase().includes(q);
     const mc = !activeCategory || s.category === activeCategory;
     return ms && mc;
   });
@@ -1137,7 +1341,9 @@ function renderStores() {
   if (sort === 'rating') list.sort((a, b) => b.rating - a.rating);
   if (sort === 'products') list.sort((a, b) => b.products - a.products);
   if (sort === 'name') list.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
-  document.getElementById('storesTitle').textContent = currentFilter === 'favorites' ? 'Mes boutiques favorites' : (activeCategory || 'Toutes les boutiques artisanales');
+  document.getElementById('storesTitle').textContent = currentFilter === 'favorites'
+    ? 'Mes boutiques favorites'
+    : (activeCategory || 'Toutes les boutiques artisanales');
   document.getElementById('storesCount').textContent = `${list.length} boutique${list.length > 1 ? 's' : ''}`;
   updateStats();
   const grid = document.getElementById('storesGrid');
@@ -1146,27 +1352,42 @@ function renderStores() {
     return;
   }
   const user = getCurrentUser();
+  // ========== FIX PRINCIPAL : s.banner au lieu de stores ==========
   grid.innerHTML = list.map(s => {
     const canDelete = user && (user.role === 'admin' || (user.role === 'productor' && user.producerId === s.producerId));
+    const canEdit = canDelete;
     const favorited = isFavorite(s.id);
+    const fallbackImg = 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=700&q=80';
     return `
       <div class="store-card">
         <div class="store-banner" onclick="window.location.href='info-store.html?id=${s.id}'">
-          <img src="${s.banner}" alt="${s.name}" loading="lazy" onerror="this.src='https://picsum.photos/id/20/700/400'">
-          <span class="store-badge ${s.badgeClass}">${s.badge || ''}</span>
+          <img src="${escapeHtml(s.banner || fallbackImg)}" alt="${escapeHtml(s.name)}" loading="lazy"
+               onerror="this.src='${fallbackImg}'">
+          ${s.badge ? `<span class="store-badge ${escapeHtml(s.badgeClass || '')}">${escapeHtml(s.badge)}</span>` : ''}
+          ${canEdit ? `<button class="edit-photo-btn" onclick="openPhotoModal(${s.id}, event)">📷 Changer la photo</button>` : ''}
         </div>
-        <button class="favorite-btn ${favorited ? 'favorited' : ''}" onclick="toggleFavorite(${s.id}, event)">
+        <button class="favorite-btn ${favorited ? 'favorited' : ''}" onclick="toggleFavorite(${s.id}, event)" title="${favorited ? 'Retirer des favoris' : 'Ajouter aux favoris'}">
           <span class="heart-empty">🤍</span>
           <span class="heart-filled">❤️</span>
         </button>
         <div class="store-body">
           <div class="store-name">${escapeHtml(s.name)}</div>
           <span class="store-category-tag">${escapeHtml(s.category)}</span>
-          <p class="store-desc">${s.desc.length > 100 ? s.desc.slice(0, 100) + '…' : s.desc}</p>
+          <p class="store-desc">${escapeHtml(s.desc.length > 100 ? s.desc.slice(0, 100) + '…' : s.desc)}</p>
           <div class="store-stats">
-            <div class="store-stat"><span class="store-stat-val">${s.rating}</span><div class="store-stars">${stars(s.rating)}</div><span class="store-stat-label">${s.reviews} avis</span></div>
-            <div class="store-stat"><span class="store-stat-val">${s.products}</span><span class="store-stat-label">Produits</span></div>
-            <div class="store-stat"><span class="store-stat-val">${s.sales}</span><span class="store-stat-label">Ventes</span></div>
+            <div class="store-stat">
+              <span class="store-stat-val">${s.rating || '—'}</span>
+              <div class="store-stars">${stars(s.rating)}</div>
+              <span class="store-stat-label">${s.reviews} avis</span>
+            </div>
+            <div class="store-stat">
+              <span class="store-stat-val">${s.products}</span>
+              <span class="store-stat-label">Produits</span>
+            </div>
+            <div class="store-stat">
+              <span class="store-stat-val">${s.sales}</span>
+              <span class="store-stat-label">Ventes</span>
+            </div>
           </div>
         </div>
         ${canDelete ? `<button class="delete-shop-btn" onclick="deleteShop(${s.id}, event)">🗑️ Supprimer</button>` : ''}
@@ -1207,7 +1428,7 @@ document.getElementById('catFilter')?.addEventListener('change', e => {
   renderCategories(); renderStores();
 });
 
-// Rellenar select de filtro de categorías
+// Remplir le select de filtre des catégories
 categories.forEach(c => {
   const opt = document.createElement('option');
   opt.value = c.name; opt.textContent = c.name;
@@ -1215,6 +1436,20 @@ categories.forEach(c => {
 });
 
 // ========== INIT ==========
+// Système de versionnage des données — si la version change, on réinitialise tout
+const DATA_VERSION = 'v3';
+(function checkDataVersion() {
+  const savedVersion = localStorage.getItem('greenmarket_data_version');
+  if (savedVersion !== DATA_VERSION) {
+    // Nouvelle version : purge complète des anciennes données
+    ['greenmarket_stores', 'greenmarket_categories', 'greenmarket_favorites'].forEach(k => localStorage.removeItem(k));
+    // Supprimer aussi les produits par défaut pour les régénérer
+    for (let i = 1; i <= 20; i++) localStorage.removeItem(`products_${i}`);
+    localStorage.setItem('greenmarket_data_version', DATA_VERSION);
+    console.info(`GreenMarket : migration vers ${DATA_VERSION}, données réinitialisées.`);
+  }
+})();
+
 saveDefaultProducts();
 loadStores();
 loadCategories();
@@ -1229,6 +1464,91 @@ updateDashboardLink();
 
 window.deleteShop = deleteShop;
 window.toggleFavorite = toggleFavorite;
+
+// ========== MODAL CHANGEMENT DE PHOTO ==========
+let photoModalShopId = null;
+let pendingPhotoData = null;
+
+function openPhotoModal(shopId, event) {
+  event.stopPropagation();
+  const shop = stores.find(s => s.id === shopId);
+  if (!shop) return;
+  photoModalShopId = shopId;
+  pendingPhotoData = null;
+
+  // Reset UI
+  document.getElementById('photoModalShopName').textContent = '« ' + shop.name + ' »';
+  document.getElementById('photoDropZone').style.display = 'block';
+  document.getElementById('photoPreviewBox').style.display = 'none';
+  document.getElementById('photoFileInput').value = '';
+  document.getElementById('photoFileInput2').value = '';
+  document.getElementById('savePhotoBtn').disabled = true;
+
+  document.getElementById('photoModal').classList.add('open');
+}
+
+function closePhotoModal() {
+  document.getElementById('photoModal').classList.remove('open');
+  photoModalShopId = null;
+  pendingPhotoData = null;
+}
+
+function handlePhotoFile(file) {
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('⚠️ Image trop lourde — max 5 Mo', '#9a4a00'); return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    pendingPhotoData = e.target.result;
+    // Afficher la preview
+    document.getElementById('photoPreviewImg').src = pendingPhotoData;
+    document.getElementById('photoDropZone').style.display = 'none';
+    document.getElementById('photoPreviewBox').style.display = 'block';
+    document.getElementById('savePhotoBtn').disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+function savePhoto() {
+  if (!photoModalShopId || !pendingPhotoData) return;
+  const idx = stores.findIndex(s => s.id === photoModalShopId);
+  if (idx === -1) return;
+  stores[idx].banner = pendingPhotoData;
+  saveStores();
+  renderStores();
+  closePhotoModal();
+  showToast('✅ Photo mise à jour !');
+}
+
+// Événements modal photo
+document.getElementById('closePhotoModal').addEventListener('click', closePhotoModal);
+document.getElementById('cancelPhotoBtn').addEventListener('click', closePhotoModal);
+document.getElementById('savePhotoBtn').addEventListener('click', savePhoto);
+document.getElementById('photoModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('photoModal')) closePhotoModal();
+});
+
+// Input fichier — zone de dépôt
+document.getElementById('photoFileInput').addEventListener('change', e => {
+  handlePhotoFile(e.target.files[0]);
+});
+// Input fichier — sur la preview (changer)
+document.getElementById('photoFileInput2').addEventListener('change', e => {
+  handlePhotoFile(e.target.files[0]);
+});
+
+// Drag & drop
+const dropZone = document.getElementById('photoDropZone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  handlePhotoFile(e.dataTransfer.files[0]);
+});
+
+window.openPhotoModal = openPhotoModal;
 </script>
 </body>
 </html>
