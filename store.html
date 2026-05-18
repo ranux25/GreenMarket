@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GreenMarket – Boutiques</title>
+<title>GreenMarket – Boutiques Artisanales Marocaines</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -37,7 +37,7 @@
     min-height: 100vh;
   }
 
-  /* ========== HEADER (desde accueil.html) ========== */
+  /* ========== HEADER ========== */
   header {
     background: #9FB2AC;
     border-bottom: 2px solid #f0e8d5;
@@ -142,7 +142,7 @@
     .desktop-nav { display: none; }
   }
 
-  /* ========== RESTO DE ESTILOS (store.html) ========== */
+  /* ========== RESTO DE ESTILOS ========== */
   .page-header {
     background: var(--wine);
     padding: 4rem 2.5rem 3rem;
@@ -412,8 +412,9 @@
     font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
     padding: 0.2rem 0.7rem; border-radius: 3px; z-index: 2;
   }
-  .store-badge.organic { background: var(--sage-dark); }
-  .store-badge.artisan { background: #6b5240; }
+  .store-badge.artisan { background: #c0392b; }
+  .store-badge.tradition { background: #d4a017; }
+  .store-badge.fait-main { background: #6b5240; }
 
   .store-body { padding: 1.2rem; }
   .store-name {
@@ -556,32 +557,21 @@
 </head>
 <body>
 
-<!-- ========== HEADER (igual que accueil.html) ========== -->
+<!-- ========== HEADER ========== -->
 <header>
   <div style="max-width: 1280px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
 
     <!-- Logo -->
     <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='accueil.html'">
       <div style="width: 48px; height: 48px; background: white; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-        <img
-          src="images/logo1.png"
-          alt="GreenMarket Logo"
-          style="width: 100%; height: 100%; object-fit: contain; padding: 4px;"
-          onerror="this.src='https://placehold.co/48x48?text=GM'"
-        />
+        <img src="images/logo1.png" alt="GreenMarket Logo" style="width: 100%; height: 100%; object-fit: contain; padding: 4px;" onerror="this.src='https://placehold.co/48x48?text=GM'"/>
       </div>
-      <span style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: 1px;">
-        GreenMarket
-      </span>
+      <span style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: 1px;">GreenMarket</span>
     </div>
 
     <!-- Search -->
     <div class="search-bar" style="flex: 1; display: flex; justify-content: center; min-width: 180px;">
-      <input
-        type="text"
-        id="headerSearchInput"
-        placeholder="Rechercher un produit traditionnel..."
-      />
+      <input type="text" id="headerSearchInput" placeholder="Rechercher une boutique artisanale..."/>
     </div>
 
     <!-- Navigation -->
@@ -597,8 +587,7 @@
     <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
       <button class="cart-btn" title="Panier">
         <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#5D0D18" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 6h14M9 21a1 1 0 1 0 2 0M15 21a1 1 0 1 0 2 0"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 6h14M9 21a1 1 0 1 0 2 0M15 21a1 1 0 1 0 2 0"/>
         </svg>
         <span class="cart-badge" id="cart-count">0</span>
       </button>
@@ -610,13 +599,13 @@
 
 <div class="page-header">
   <div class="header-inner">
-    <div class="header-eyebrow">🌱 Circuits courts &amp; produits du terroir</div>
-    <h1>Nos Boutiques<br><em>Locales</em></h1>
-    <p>Découvrez des producteurs vérifiés, engagés pour l'environnement et la qualité de leur terroir.</p>
+    <div class="header-eyebrow">🇲🇦 Artisanat &amp; Traditions marocaines</div>
+    <h1>Nos Boutiques<br><em>Artisanales</em></h1>
+    <p>Découvrez des artisans marocains passionnés, perpétuant un savoir-faire unique et authentique.</p>
     <div class="header-stats">
-      <div><span class="h-stat-val" id="statStores">6</span><span class="h-stat-label">Boutiques actives</span></div>
-      <div><span class="h-stat-val" id="statProducts">0</span><span class="h-stat-label">Produits locaux</span></div>
-      <div><span class="h-stat-val" id="statRating">0,0 ★</span><span class="h-stat-label">Note moyenne</span></div>
+      <div><span class="h-stat-val" id="statStores">12</span><span class="h-stat-label">Boutiques actives</span></div>
+      <div><span class="h-stat-val" id="statProducts">0</span><span class="h-stat-label">Produits artisanaux</span></div>
+      <div><span class="h-stat-val" id="statRating">4,8 ★</span><span class="h-stat-label">Note moyenne</span></div>
     </div>
   </div>
 </div>
@@ -626,7 +615,7 @@
     <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
       <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
     </svg>
-    <input class="search-input" id="searchInput" type="text" placeholder="Rechercher une boutique, un producteur…">
+    <input class="search-input" id="searchInput" type="text" placeholder="Rechercher une boutique, un artisan, un produit...">
   </div>
   <select class="filter-select" id="catFilter"><option value="">Toutes les catégories</option></select>
   <select class="filter-select" id="sortFilter">
@@ -640,23 +629,23 @@
 <div class="main-layout">
   <aside class="sidebar">
     <div class="sidebar-section">
-      <div class="sidebar-header"><h3>Catégories</h3><button class="add-btn" id="toggleAddCat"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>Ajouter</button></div>
+      <div class="sidebar-header"><h3>Catégories artisanales</h3><button class="add-btn" id="toggleAddCat"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>Ajouter</button></div>
       <div class="category-list" id="categoryList"></div>
       <div class="add-cat-form" id="addCatForm">
         <label for="catNameInput">Nom de la catégorie</label>
-        <input type="text" id="catNameInput" placeholder="Ex : Épices et condiments">
+        <input type="text" id="catNameInput" placeholder="Ex : Poterie, Tissage...">
         <label for="catIconInput">Icône (emoji)</label>
-        <input type="text" id="catIconInput" placeholder="🌶️" maxlength="4">
+        <input type="text" id="catIconInput" placeholder="🏺" maxlength="4">
         <div class="form-actions"><button class="btn-sm-cancel" id="cancelCat">Annuler</button><button class="btn-sm-wine" id="saveCat">Enregistrer</button></div>
       </div>
       <div class="role-notice" id="roleNotice"></div>
     </div>
 
     <div id="createShopSection" class="create-shop-section" style="display: none;">
-      <div class="create-shop-header"><h3>🏪 Créer ma boutique</h3></div>
+      <div class="create-shop-header"><h3>🏪 Créer ma boutique artisanale</h3></div>
       <div class="create-shop-form">
         <label>Nom de la boutique *</label>
-        <input type="text" id="shopName" placeholder="Ex: Les Délices du Terroir">
+        <input type="text" id="shopName" placeholder="Ex: Atelier du Tapis Berbère">
         <label>Catégorie *</label>
         <select id="shopCategory"></select>
         <div class="new-category-row">
@@ -679,9 +668,9 @@
           <div class="helper-text">📁 Choisissez une image depuis votre ordinateur</div>
         </div>
         <label>Description</label>
-        <textarea id="shopDesc" placeholder="Décrivez votre boutique..."></textarea>
+        <textarea id="shopDesc" placeholder="Décrivez votre savoir-faire artisanal..."></textarea>
         <label>Badge (optionnel)</label>
-        <select id="shopBadge"><option value="">Aucun badge</option><option value="Bio">Bio</option><option value="Artisanal">Artisanal</option><option value="Local">Local</option></select>
+        <select id="shopBadge"><option value="">Aucun badge</option><option value="Artisan">Artisan</option><option value="Tradition">Tradition</option><option value="Fait Main">Fait Main</option></select>
         <button class="btn-create-shop" id="createShopBtn">✨ Créer ma boutique</button>
       </div>
     </div>
@@ -689,7 +678,7 @@
 
   <section class="stores-area">
     <div class="stores-title-row">
-      <h2 id="storesTitle">Toutes les boutiques</h2>
+      <h2 id="storesTitle">Toutes les boutiques artisanales</h2>
       <span class="stores-count" id="storesCount"></span>
     </div>
     <div class="filter-buttons">
@@ -713,10 +702,10 @@
     </div>
     <div id="registerForm" class="auth-form">
       <h3>📝 Créer un compte</h3>
-      <div class="role-selector"><label><input type="radio" name="registerRole" value="client" checked> 👤 Client</label><label><input type="radio" name="registerRole" value="productor"> 🌾 Producteur</label></div>
+      <div class="role-selector"><label><input type="radio" name="registerRole" value="client" checked> 👤 Client</label><label><input type="radio" name="registerRole" value="productor"> 🏺 Artisan</label></div>
       <input type="text" id="registerName" placeholder="Nom complet"><input type="email" id="registerEmail" placeholder="Email"><input type="password" id="registerPassword" placeholder="Mot de passe">
       <div id="producerFields" style="display: none;">
-        <input type="text" id="producerShopName" placeholder="Nom de votre boutique"><input type="text" id="producerLocation" placeholder="Localisation"><textarea id="producerBio" placeholder="Décrivez votre activité..." rows="2"></textarea>
+        <input type="text" id="producerShopName" placeholder="Nom de votre boutique"><input type="text" id="producerLocation" placeholder="Ville / Région"><textarea id="producerBio" placeholder="Décrivez votre savoir-faire artisanal..." rows="2"></textarea>
       </div>
       <button class="btn-filled" id="doRegisterBtn" style="width:100%">S'inscrire</button>
       <p class="auth-error" id="registerError"></p>
@@ -726,57 +715,69 @@
 </div>
 
 <script>
-// ========== CATÉGORIES ==========
+// ========== CATÉGORIES ARTISANALES MAROCAINES ==========
 let categories = [
-  { id:1, icon:'🥦', name:'Fruits et légumes' },
-  { id:2, icon:'🧀', name:'Produits laitiers' },
-  { id:3, icon:'🍞', name:'Boulangerie artisanale' },
-  { id:4, icon:'🍯', name:'Miel et apiculture' },
-  { id:5, icon:'🫒', name:'Huiles et conserves' },
-  { id:6, icon:'🌿', name:'Plantes médicinales' }
+  { id:1, icon:'👘', name:'Caftans & Vêtements traditionnels' },
+  { id:2, icon:'🪑', name:'Tapis & Tissage' },
+  { id:3, icon:'🏺', name:'Poterie & Céramique' },
+  { id:4, icon:'🪵', name:'Marqueterie & Bois' },
+  { id:5, icon:'💍', name:'Bijoux & Joaillerie' },
+  { id:6, icon:'🕯️', name:'Lampes & Fer forgé' },
+  { id:7, icon:'🧴', name:'Cosmétiques naturels' },
+  { id:8, icon:'🍯', name:'Produits du terroir' }
 ];
 
+// ========== BOUTIQUES ARTISANALES MAROCAINES ==========
 let stores = [
-  { id:1, name:"Le Verger Céleste", category:'Fruits et légumes', categoryId:1, badge:'Bio', badgeClass:'organic', banner:'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=700&q=80', desc:'Des fruits et légumes cultivés avec amour sous le ciel étoilé, récoltés à maturité parfaite.', rating:4.9, reviews:156, products:4, sales:'1 450', tags:['Bio','Local','Saison'], producerId:101, producerName:'Élodie Moreau', location:'Provence', since:'2018' },
-  { id:2, name:"La Crèmerie des Sommets", category:'Produits laitiers', categoryId:2, badge:'Artisanal', badgeClass:'artisan', banner:'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=700&q=80', desc:'Fromages de chèvre et brebis fabriqués en altitude, affinés en cave naturelle.', rating:4.7, reviews:94, products:4, sales:'620', tags:['Artisanal','Lait cru','Montagne'], producerId:102, producerName:'Benoît Girard', location:'Savoie', since:'2015' },
-  { id:3, name:"Le Pétrin d'Antan", category:'Boulangerie artisanale', categoryId:3, badge:'Local', badgeClass:'', banner:'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=700&q=80', desc:'Pain cuit au feu de bois, viennoiseries et pâtisseries selon les recettes de nos grands-mères.', rating:4.9, reviews:228, products:3, sales:'2 350', tags:['Feu de bois','Levain','Tradition'], producerId:103, producerName:'Marguerite Dufour', location:'Bretagne', since:'2010' },
-  { id:4, name:"Ruchers d'Albion", category:'Miel et apiculture', categoryId:4, badge:'Bio', badgeClass:'organic', banner:'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=700&q=80', desc:'Miels monofloraux et polyfloraux issus de ruches respectueuses des abeilles.', rating:4.8, reviews:72, products:3, sales:'430', tags:['Miel cru','Sans chauffage','Biodiversité'], producerId:104, producerName:'Luc Verdier', location:'Ardèche', since:'2019' },
-  { id:5, name:"L'Olivier Enchanté", category:'Huiles et conserves', categoryId:5, badge:'Artisanal', badgeClass:'artisan', banner:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=700&q=80', desc:'Huiles d\'olive vierge extra, tapenades et conserves du soleil méditerranéen.', rating:4.6, reviews:108, products:3, sales:'890', tags:['Première pression','Sans conservateurs','Méditerranée'], producerId:105, producerName:'Rosa Vivaldi', location:'Nice', since:'2016' },
-  { id:6, name:"L'Herboristerie Vagabonde", category:'Plantes médicinales', categoryId:6, badge:'Local', badgeClass:'', banner:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=700&q=80', desc:'Plantes sauvages séchées, tisanes bio et huiles essentielles de cueillette raisonnée.', rating:4.5, reviews:51, products:3, sales:'340', tags:['Cueillette sauvage','Bio','Tradition'], producerId:106, producerName:'Clémence Sauvage', location:'Massif Central', since:'2020' }
+  { id:1, name:"Maison du Caftan", category:'Caftans & Vêtements traditionnels', categoryId:1, badge:'Artisan', badgeClass:'artisan', banner:'https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=700&q=80', desc:'Caftans de luxe en soie et tissus traditionnels, broderies faites main par des maîtres-artisans de Fès.', rating:4.9, reviews:234, products:8, sales:'2 450', tags:['Caftan','Broderie','Soie'], producerId:101, producerName:'Fatima Zahra', location:'Fès', since:'2005' },
+  { id:2, name:"Tapis Berbère d'Atlas", category:'Tapis & Tissage', categoryId:2, badge:'Tradition', badgeClass:'tradition', banner:'https://images.unsplash.com/photo-1526721940322-10fb6e3ae94a?w=700&q=80', desc:'Tapis berbères authentiques tissés à la main par les femmes de l\'Atlas, chaque pièce est unique.', rating:4.8, reviews:189, products:6, sales:'3 200', tags:['Tapis','Berbère','Laine'], producerId:102, producerName:'Rachid El Mansouri', location:'Marrakech', since:'2010' },
+  { id:3, name:"Poterie de Safi", category:'Poterie & Céramique', categoryId:3, badge:'Fait Main', badgeClass:'fait-main', banner:'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=700&q=80', desc:'Poterie traditionnelle de Safi, plats, tajines et vases peints à la main avec des motifs ancestraux.', rating:4.7, reviews:156, products:12, sales:'1 890', tags:['Poterie','Tajine','Céramique'], producerId:103, producerName:'Ahmed Benjelloun', location:'Safi', since:'1998' },
+  { id:4, name:"Marqueterie de Tetouan", category:'Marqueterie & Bois', categoryId:4, badge:'Artisan', badgeClass:'artisan', banner:'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=700&q=80', desc:'Meubles et objets en bois de cèdre incrustés, marqueterie fine selon les techniques ancestrales.', rating:4.9, reviews:112, products:5, sales:'980', tags:['Bois','Marqueterie','Cèdre'], producerId:104, producerName:'Mohamed Alami', location:'Tetouan', since:'2012' },
+  { id:5, name:"Bijoux Amaziagh", category:'Bijoux & Joaillerie', categoryId:5, badge:'Tradition', badgeClass:'tradition', banner:'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=700&q=80', desc:'Bijoux en argent massif inspirés des symboles amazighs, pierres naturelles et motifs ancestraux.', rating:4.9, reviews:203, products:15, sales:'2 100', tags:['Bijoux','Argent','Amazigh'], producerId:105, producerName:'Malika Oufkir', location:'Agadir', since:'2008' },
+  { id:6, name:"Lumières de Marrakech", category:'Lampes & Fer forgé', categoryId:6, badge:'Fait Main', badgeClass:'fait-main', banner:'https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=700&q=80', desc:'Lampes en fer forgé, lanternes en laiton et appliques traditionnelles pour une ambiance orientale.', rating:4.6, reviews:98, products:9, sales:'1 450', tags:['Lampes','Fer forgé','Laiton'], producerId:106, producerName:'Karim Tazi', location:'Marrakech', since:'2015' },
+  { id:7, name:"Argamane Naturel", category:'Cosmétiques naturels', categoryId:7, badge:'Artisan', badgeClass:'artisan', banner:'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=700&q=80', desc:'Savons à l\'huile d\'argan, ghassoul, huiles essentielles et cosmétiques 100% naturels.', rating:4.8, reviews:178, products:11, sales:'890', tags:['Argan','Ghassoul','Bio'], producerId:107, producerName:'Nadia Berrada', location:'Essaouira', since:'2017' },
+  { id:8, name:"Saveurs du Terroir", category:'Produits du terroir', categoryId:8, badge:'Tradition', badgeClass:'tradition', banner:'https://images.unsplash.com/photo-1599851152730-1f83a654bb9a?w=700&q=80', desc:'Huile d\'olive, amlou, miel de montagne, épices et confitures artisanales marocaines.', rating:4.7, reviews:145, products:20, sales:'3 500', tags:['Huile d\'olive','Miel','Amlou'], producerId:108, producerName:'Hassan El Fassi', location:'Meknès', since:'2000' },
+  { id:9, name:"Tissage d'Azilal", category:'Tapis & Tissage', categoryId:2, badge:'Fait Main', badgeClass:'fait-main', banner:'https://images.unsplash.com/photo-1553775282-07af8073453f?w=700&q=80', desc:'Couvertures, tapis et tissages colorés des montagnes d\'Azilal, motifs géométriques uniques.', rating:4.8, reviews:87, products:7, sales:'670', tags:['Tissage','Azilal','Couleurs'], producerId:109, producerName:'Zineb Ait Ali', location:'Azilal', since:'2019' },
+  { id:10, name:"Caftans Impériaux", category:'Caftans & Vêtements traditionnels', categoryId:1, badge:'Artisan', badgeClass:'artisan', banner:'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=700&q=80', desc:'Caftans de cérémonie, takchitas et accessoires pour les grandes occasions. Broderies d\'or et d\'argent.', rating:4.9, reviews:256, products:10, sales:'4 200', tags:['Caftan','Takchita','Broderie'], producerId:110, producerName:'Leila Benani', location:'Casablanca', since:'2006' }
 ];
 
+// ========== PRODUITS PAR DÉFAUT POUR CHAQUE CATÉGORIE ==========
 const defaultProducts = {
-  1: [
-    { id: 101, name: "Fraises Gariguette", price: "6.50 €/barquette", stock: 45, image: "https://images.pexels.com/photos/46174/strawberries-berries-fruit-freshness-46174.jpeg?w=300&h=200&fit=crop", description: "Fraises parfumées de Provence" },
-    { id: 102, name: "Tomates Anciennes", price: "4.50 €/kg", stock: 60, image: "https://images.pexels.com/photos/533280/close-up-red-tomatoes-tomato-533280.jpeg?w=300&h=200&fit=crop", description: "Tomates coeur de boeuf" },
-    { id: 103, name: "Asperges Vertes", price: "5.00 €/botte", stock: 30, image: "https://images.pexels.com/photos/143133/asperges-vegetables-green-healthy-143133.jpeg?w=300&h=200&fit=crop", description: "Asperges fraîches du printemps" },
-    { id: 104, name: "Pêches Juteuses", price: "4.80 €/kg", stock: 35, image: "https://images.pexels.com/photos/104570/peaches-fruit-sweet-delicious-104570.jpeg?w=300&h=200&fit=crop", description: "Pêches bio du verger" }
+  1: [ // Caftans
+    { id: 101, name: "Caftan en Soie", price: "2 500 DH", stock: 5, image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=300&h=200&fit=crop", description: "Caftan en soie naturelle, broderies faites main" },
+    { id: 102, name: "Takchita Cérémonie", price: "3 200 DH", stock: 3, image: "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=300&h=200&fit=crop", description: "Takchita pour mariage, broderies d'or" },
+    { id: 103, name: "Caftan Moderne", price: "1 800 DH", stock: 8, image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=300&h=200&fit=crop", description: "Caftan à la coupe contemporaine" }
   ],
-  2: [
-    { id: 201, name: "Camembert au Lait Cru", price: "6.50 €", stock: 25, image: "https://images.pexels.com/photos/821365/pexels-photo-821365.jpeg?w=300&h=200&fit=crop", description: "Camembert affiné 3 semaines" },
-    { id: 202, name: "Chèvre Frais", price: "4.50 €", stock: 30, image: "https://images.pexels.com/photos/839443/pexels-photo-839443.jpeg?w=300&h=200&fit=crop", description: "Fromage de chèvre frais" },
-    { id: 203, name: "Brebis Pyrénées", price: "8.50 €", stock: 15, image: "https://images.pexels.com/photos/586568/pexels-photo-586568.jpeg?w=300&h=200&fit=crop", description: "Fromage de brebis" },
-    { id: 204, name: "Yaourt Fermier", price: "2.50 €/pot", stock: 50, image: "https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?w=300&h=200&fit=crop", description: "Yaourt nature bio" }
+  2: [ // Tapis
+    { id: 201, name: "Tapis Berbère Moyen", price: "1 200 DH", stock: 4, image: "https://images.unsplash.com/photo-1526721940322-10fb6e3ae94a?w=300&h=200&fit=crop", description: "Tapis en laine naturelle, motifs berbères" },
+    { id: 202, name: "Tapis Azilal", price: "950 DH", stock: 6, image: "https://images.unsplash.com/photo-1553775282-07af8073453f?w=300&h=200&fit=crop", description: "Tapis coloré des montagnes d'Azilal" },
+    { id: 203, name: "Coussin Tissé", price: "250 DH", stock: 15, image: "https://images.unsplash.com/photo-1553775282-07af8073453f?w=300&h=200&fit=crop", description: "Coussin décoratif tissé main" }
   ],
-  3: [
-    { id: 301, name: "Pain au Levain", price: "4.50 €", stock: 40, image: "https://images.pexels.com/photos/236887/pexels-photo-236887.jpeg?w=300&h=200&fit=crop", description: "Pain bio cuit au feu de bois" },
-    { id: 302, name: "Croissant Pur Beurre", price: "1.20 €", stock: 60, image: "https://images.pexels.com/photos/163957/baking-croissant-pastry-bakery-163957.jpeg?w=300&h=200&fit=crop", description: "Viennoiserie croustillante" },
-    { id: 303, name: "Baguette Tradition", price: "1.10 €", stock: 80, image: "https://images.pexels.com/photos/2474658/pexels-photo-2474658.jpeg?w=300&h=200&fit=crop", description: "Baguette farine bio" }
+  3: [ // Poterie
+    { id: 301, name: "Tajine Traditionnel", price: "180 DH", stock: 20, image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=200&fit=crop", description: "Tajine en terre cuite, motif peint" },
+    { id: 302, name: "Assiettes Décoratives", price: "95 DH", stock: 30, image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=200&fit=crop", description: "Lot de 6 assiettes peintes à la main" },
+    { id: 303, name: "Vase Zellij", price: "320 DH", stock: 12, image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=200&fit=crop", description: "Vase inspiré des motifs zellij" }
   ],
-  4: [
-    { id: 401, name: "Miel de Lavande", price: "18.00 €/pot", stock: 25, image: "https://images.pexels.com/photos/95979/honey-jar-drop-of-honey-comb-95979.jpeg?w=300&h=200&fit=crop", description: "Miel monofloral de Provence" },
-    { id: 402, name: "Miel de Forêt", price: "15.00 €/pot", stock: 20, image: "https://images.pexels.com/photos/129341/pexels-photo-129341.jpeg?w=300&h=200&fit=crop", description: "Miel corsé des montagnes" },
-    { id: 403, name: "Propolis", price: "12.00 €/flacon", stock: 15, image: "https://images.pexels.com/photos/95978/honey-drops-sweet-flow-95978.jpeg?w=300&h=200&fit=crop", description: "Propolis pure" }
+  4: [ // Bois
+    { id: 401, name: "Petite Table Marqueterie", price: "850 DH", stock: 4, image: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=300&h=200&fit=crop", description: "Table en cèdre incrusté" },
+    { id: 402, name: "Coffre à Bijoux", price: "320 DH", stock: 8, image: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=300&h=200&fit=crop", description: "Coffret en bois sculpté" }
   ],
-  5: [
-    { id: 501, name: "Huile d'Olive AOP", price: "15.00 €/500ml", stock: 40, image: "https://images.pexels.com/photos/139535/olive-oil-bottle-olives-olive-oil-139535.jpeg?w=300&h=200&fit=crop", description: "Première pression à froid" },
-    { id: 502, name: "Tapenade Noire", price: "6.00 €/pot", stock: 35, image: "https://images.pexels.com/photos/4962613/pexels-photo-4962613.jpeg?w=300&h=200&fit=crop", description: "Tapenade d'olives noires" },
-    { id: 503, name: "Confiture de Figue", price: "5.50 €/pot", stock: 25, image: "https://images.pexels.com/photos/1028702/figs-honey-fruit-sweet-1028702.jpeg?w=300&h=200&fit=crop", description: "Confiture artisanale" }
+  5: [ // Bijoux
+    { id: 501, name: "Bracelet Argent Amazigh", price: "450 DH", stock: 10, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop", description: "Bracelet en argent, symbole amazigh" },
+    { id: 502, name: "Collier Fibule", price: "680 DH", stock: 6, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop", description: "Fibule berbère traditionnelle" },
+    { id: 503, name: "Boucles d'Oreilles", price: "280 DH", stock: 15, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop", description: "Boucles en argent, corail" }
   ],
-  6: [
-    { id: 601, name: "Tisane Digestive", price: "7.00 €/boîte", stock: 45, image: "https://images.pexels.com/photos/1640145/pexels-photo-1640145.jpeg?w=300&h=200&fit=crop", description: "Mélange de plantes bio" },
-    { id: 602, name: "Romarin Sauvage", price: "5.00 €/sachet", stock: 60, image: "https://images.pexels.com/photos/52824/rosemary-herb-bouquet-pile-52824.jpeg?w=300&h=200&fit=crop", description: "Romarin cueilli à la main" },
-    { id: 603, name: "Menthe Poivrée", price: "4.50 €/sachet", stock: 50, image: "https://images.pexels.com/photos/135173/pexels-photo-135173.jpeg?w=300&h=200&fit=crop", description: "Menthe bio séchée" }
+  6: [ // Lampes
+    { id: 601, name: "Lanterne Laiton", price: "380 DH", stock: 8, image: "https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=300&h=200&fit=crop", description: "Lanterne en laiton martelé" },
+    { id: 602, name: "Applique Murale", price: "250 DH", stock: 12, image: "https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=300&h=200&fit=crop", description: "Applique en fer forgé" }
+  ],
+  7: [ // Cosmétiques
+    { id: 701, name: "Huile d'Argan Bio", price: "120 DH", stock: 50, image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=300&h=200&fit=crop", description: "Huile d'argan 100% pure" },
+    { id: 702, name: "Savon Noir", price: "45 DH", stock: 100, image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=300&h=200&fit=crop", description: "Savon noir traditionnel" }
+  ],
+  8: [ // Terroir
+    { id: 801, name: "Huile d'Olive Vierge", price: "85 DH", stock: 40, image: "https://images.unsplash.com/photo-1599851152730-1f83a654bb9a?w=300&h=200&fit=crop", description: "Huile d'olive extra vierge, première pression" },
+    { id: 802, name: "Amlou", price: "95 DH", stock: 25, image: "https://images.unsplash.com/photo-1599851152730-1f83a654bb9a?w=300&h=200&fit=crop", description: "Purée d'amandes et miel d'argan" }
   ]
 };
 
@@ -825,12 +826,9 @@ let currentUser = null;
 function initUsers() {
   const defaultUsers = [
     { id: 1, name: "Administrateur", email: "admin@greenmarket.com", password: "admin123", role: "admin", producerId: null },
-    { id: 2, name: "Élodie Moreau", email: "elodie@verger.fr", password: "elodie123", role: "productor", producerId: 101 },
-    { id: 3, name: "Benoît Girard", email: "benoit@cremerie.fr", password: "benoit123", role: "productor", producerId: 102 },
-    { id: 4, name: "Marguerite Dufour", email: "marguerite@fournil.fr", password: "marguerite123", role: "productor", producerId: 103 },
-    { id: 5, name: "Luc Verdier", email: "luc@ruchers.fr", password: "luc123", role: "productor", producerId: 104 },
-    { id: 6, name: "Rosa Vivaldi", email: "rosa@olivier.fr", password: "rosa123", role: "productor", producerId: 105 },
-    { id: 7, name: "Clémence Sauvage", email: "clemence@herboristerie.fr", password: "clemence123", role: "productor", producerId: 106 },
+    { id: 2, name: "Fatima Zahra", email: "fatima@caftan.ma", password: "fatima123", role: "productor", producerId: 101 },
+    { id: 3, name: "Rachid El Mansouri", email: "rachid@tapis.ma", password: "rachid123", role: "productor", producerId: 102 },
+    { id: 4, name: "Ahmed Benjelloun", email: "ahmed@poterie.ma", password: "ahmed123", role: "productor", producerId: 103 },
     { id: 8, name: "Client Test", email: "client@test.com", password: "client123", role: "client", producerId: null }
   ];
   if (!localStorage.getItem('greenmarket_users')) {
@@ -891,7 +889,7 @@ function updateAuthUI() {
   const widget = document.getElementById('authWidget');
   const user = getCurrentUser();
   if (user) {
-    const roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Producteur' : 'Client');
+    const roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Artisan' : 'Client');
     widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;">🚪</button></div>`;
     document.getElementById('logoutBtn')?.addEventListener('click', logout);
   } else {
@@ -1018,7 +1016,7 @@ function getImageData(callback) {
 
 function createShop() {
   const user = getCurrentUser();
-  if (!user || (user.role !== 'productor' && user.role !== 'admin')) { showToast("🔒 Vous devez être connecté en tant que producteur", '#9a4a00'); return; }
+  if (!user || (user.role !== 'productor' && user.role !== 'admin')) { showToast("🔒 Vous devez être connecté en tant qu'artisan", '#9a4a00'); return; }
   const name = document.getElementById('shopName').value.trim();
   const catId = parseInt(document.getElementById('shopCategory').value);
   const desc = document.getElementById('shopDesc').value.trim();
@@ -1028,10 +1026,11 @@ function createShop() {
   const cat = categories.find(c => c.id === catId);
   const newId = Math.max(...stores.map(s => s.id), 0) + 1;
   let badgeClass = '';
-  if (badge === 'Bio') badgeClass = 'organic';
-  if (badge === 'Artisanal') badgeClass = 'artisan';
+  if (badge === 'Artisan') badgeClass = 'artisan';
+  if (badge === 'Tradition') badgeClass = 'tradition';
+  if (badge === 'Fait Main') badgeClass = 'fait-main';
   getImageData((bannerImage) => {
-    const newShop = { id: newId, name, category: cat ? cat.name : 'Non catégorisé', categoryId: catId, badge, badgeClass, banner: bannerImage, desc: desc || "Nouvelle boutique artisanale", rating: 0, reviews: 0, products: 0, sales: '0', tags: ['Nouveau'], producerId: user.producerId || user.id, producerName: user.name, location: 'France', since: new Date().getFullYear().toString() };
+    const newShop = { id: newId, name, category: cat ? cat.name : 'Non catégorisé', categoryId: catId, badge, badgeClass, banner: bannerImage, desc: desc || "Nouvelle boutique artisanale marocaine", rating: 0, reviews: 0, products: 0, sales: '0', tags: ['Nouveau'], producerId: user.producerId || user.id, producerName: user.name, location: 'Maroc', since: new Date().getFullYear().toString() };
     stores.push(newShop);
     saveStores();
     const defaultProds = getDefaultProductsForCategory(catId);
@@ -1138,7 +1137,7 @@ function renderStores() {
   if (sort === 'rating') list.sort((a, b) => b.rating - a.rating);
   if (sort === 'products') list.sort((a, b) => b.products - a.products);
   if (sort === 'name') list.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
-  document.getElementById('storesTitle').textContent = currentFilter === 'favorites' ? 'Mes boutiques favorites' : (activeCategory || 'Toutes les boutiques');
+  document.getElementById('storesTitle').textContent = currentFilter === 'favorites' ? 'Mes boutiques favorites' : (activeCategory || 'Toutes les boutiques artisanales');
   document.getElementById('storesCount').textContent = `${list.length} boutique${list.length > 1 ? 's' : ''}`;
   updateStats();
   const grid = document.getElementById('storesGrid');
