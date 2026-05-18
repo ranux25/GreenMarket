@@ -357,68 +357,67 @@
 <body>
  
 <div id="toast">✓ Produit ajouté au panier !</div>
- 
-<!-- ===================== HEADER (shared with store.html) ===================== -->
 <header>
   <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4 flex-wrap">
-<<<<<<< HEAD
-    <!-- Logo + Nom -->
-<div class="flex items-center gap-3">
-  <div class="logo-container overflow-hidden bg-white">
-  <img 
-    src="images/logo1.png" 
-    alt="GreenMarket Logo"
-    class="w-full h-full object-contain p-1"
-  />
-</div>   
-  
-  <span
-    style="
-      font-family: 'Playfair Display', serif;
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--primary);
-      letter-spacing: 1px;
-    ">GreenMarket</span>
-</div>
- 
-    <!-- Search -->
-    <div class="search-bar flex-1 flex justify-center min-w-[180px]">
-      <input type="text" placeholder="Rechercher un produit traditionnel..." />
-=======
+
+    <!-- Logo -->
     <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='accueil.html'">
-      <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl">
-        🌿
+      <div class="w-12 h-12 bg-white rounded-full overflow-hidden flex items-center justify-center">
+        <img
+          src="images/logo1.png"
+          alt="GreenMarket Logo"
+          class="w-full h-full object-contain p-1"
+        />
       </div>
-      <span style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: 1px;">
+
+      <span
+        style="
+          font-family: 'Playfair Display', serif;
+          font-size: 28px;
+          font-weight: 700;
+          color: var(--primary);
+          letter-spacing: 1px;
+        "
+      >
         GreenMarket
       </span>
->>>>>>> d6ea6639aada409e5537cead803fbe711ded606a
     </div>
 
+    <!-- Search -->
     <div class="search-bar flex-1 flex justify-center min-w-[180px]">
-      <input type="text" id="searchInput" placeholder="Rechercher un produit traditionnel..." />
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Rechercher un produit traditionnel..."
+      />
     </div>
 
+    <!-- Navigation -->
     <nav class="desktop-nav hidden md:flex items-center gap-6">
-      <a href="accueil.html" class="nav-link" id="navAccueil">Accueil</a>
-      <a href="store.html" class="nav-link" id="navBoutiques">Boutiques</a>
-      <a href="#" class="nav-link" onclick="scrollToSection('products')">Produits</a>
-      <a href="#" class="nav-link" onclick="scrollToSection('coops')">Coopératives</a>
+      <a href="accueil.html" class="nav-link">Accueil</a>
+      <a href="store.html" class="nav-link">Boutiques</a>
+      <a href="#products" class="nav-link">Produits</a>
+      <a href="#coops" class="nav-link">Coopératives</a>
     </nav>
 
+    <!-- Cart + Auth -->
     <div class="flex items-center gap-3 ml-auto md:ml-0">
       <button class="cart-btn" title="Panier" onclick="goToCart()">
         <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#5D0D18" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 6h14M9 21a1 1 0 1 0 2 0M15 21a1 1 0 1 0 2 0" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 6h14M9 21a1 1 0 1 0 2 0M15 21a1 1 0 1 0 2 0"
+          />
         </svg>
         <span class="cart-badge" id="cart-count">0</span>
       </button>
+
       <div id="authWidget"></div>
     </div>
+
   </div>
 </header>
- 
 <!-- ===================== HERO MODIFIÉE ===================== -->
 <section class="hero-section" style="position: relative; min-height: 75vh; display: flex; align-items: center; overflow: hidden; padding: 0;">
 
