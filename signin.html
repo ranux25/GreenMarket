@@ -3,74 +3,758 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>GreenMarket | Se connecter</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="style.css">
+  <title>GreenMarket | Authentification</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* --- CONFIGURATION GLOBALE --- */
+    :root {
+      --bg-cream: #FFF9EB;
+      --accent-sage: #9FB2AC;
+      --primary-burgundy: #5D0D18;
+      --primary-hover: #44070F;
+      --text-dark: #2D251E;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Jost', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* --- CONTENEUR PRINCIPAL ÉLARGI --- */
+    .auth-container {
+      background: #ffffff;
+      width: 1300px;
+      max-width: 100%;
+      height: 720px; /* Augmenté légèrement pour le confort des nouveaux champs */
+      min-height: 720px;
+      border-radius: 30px;
+      box-shadow: 0 20px 60px rgba(93, 13, 24, 0.1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+    }
+
+    /* --- PANNEAU D'ILLUSTRATION GLISSANT (DESKTOP) --- */
+    .overlay-panel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(135deg, #8FA39D 0%, var(--accent-sage) 100%);
+      z-index: 10;
+      transition: transform 0.7s cubic-bezier(0.66, 0, 0.34, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      color: var(--bg-cream);
+      text-align: center;
+    }
+
+    .overlay-panel::before {
+      content: '';
+      position: absolute;
+      inset: 20px;
+      border: 1px solid rgba(255, 249, 235, 0.3);
+      border-radius: 20px;
+      pointer-events: none;
+    }
+
+    .maroccan-grid {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      opacity: 0.12;
+      background: radial-gradient(circle, var(--bg-cream) 20%, transparent 20%),
+                  radial-gradient(circle, var(--bg-cream) 20%, transparent 20%);
+      background-size: 30px 30px;
+      background-position: 0 0, 15px 15px;
+      top: 40px;
+    }
+
+    .brand-logo {
+      height: 35px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .plant-illustration {
+      width: 150px;
+      height: 150px;
+      background: rgba(255, 249, 235, 0.15);
+      border-radius: 40% 60% 60% 40% / 50% 40% 60% 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 4.5rem;
+      color: var(--bg-cream);
+      margin-bottom: 25px;
+      box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.2);
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-12px) rotate(3deg); }
+    }
+
+    .panel-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .panel-desc {
+      font-size: 1rem;
+      max-width: 320px;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    /* --- BLOCS DE FORMULAIRES --- */
+    .form-box {
+      width: 50%;
+      height: 100%;
+      padding: 40px 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, z-index 0.5s;
+      overflow-y: auto;
+    }
+
+    /* Positions initiales des 3 volets */
+    .login-box {
+      position: absolute;
+      left: 50%;
+      opacity: 1;
+      z-index: 5;
+      pointer-events: all;
+    }
+
+    .signup-box {
+      position: absolute;
+      left: 0;
+      opacity: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .forgot-box {
+      position: absolute;
+      left: 50%;
+      opacity: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* --- ÉTATS DE TRANSITION DE L'ANIMATION (DESKTOP) --- */
+    /* État : Inscription active */
+    .auth-container.right-panel-active .overlay-panel {
+      transform: translateX(100%);
+    }
+    .auth-container.right-panel-active .login-box,
+    .auth-container.right-panel-active .forgot-box {
+      opacity: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .auth-container.right-panel-active .signup-box {
+      opacity: 1;
+      z-index: 5;
+      pointer-events: all;
+    }
+
+    /* État : Mot de passe oublié actif (Le panneau bouge à droite, la boîte forgot s'affiche à gauche) */
+    .auth-container.forgot-panel-active .overlay-panel {
+      transform: translateX(100%);
+    }
+    .auth-container.forgot-panel-active .login-box,
+    .auth-container.forgot-panel-active .signup-box {
+      opacity: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .auth-container.forgot-panel-active .forgot-box {
+      opacity: 1;
+      z-index: 5;
+      pointer-events: all;
+      left: 0;
+    }
+
+    /* --- STYLE ÉLÉGANT DES FORMULAIRES --- */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--primary-burgundy);
+      margin-bottom: 20px;
+    }
+
+    .brand span {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: var(--primary-burgundy);
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      color: #70665f;
+      font-size: 0.9rem;
+      margin-bottom: 25px;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 18px;
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #90857d;
+      font-size: 1.1rem;
+    }
+
+    .input-group input, .input-group select {
+      width: 100%;
+      padding: 13px 15px 13px 45px;
+      background-color: #fcfaf5;
+      border: 1px solid rgba(159, 178, 172, 0.4);
+      border-radius: 12px;
+      outline: none;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      transition: all 0.3s ease;
+      appearance: none;
+    }
+
+    .input-group select {
+      cursor: pointer;
+    }
+
+    /* Flèche personnalisée pour le select */
+    .input-group.select-group::after {
+      content: '\b1';
+      font-family: "bootstrap-icons";
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #90857d;
+      pointer-events: none;
+    }
+
+    .input-group input:focus, .input-group select:focus {
+      border-color: var(--primary-burgundy);
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(93, 13, 24, 0.08);
+    }
+
+    /* Rôles */
+    .role-container {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 18px;
+    }
+
+    .role-label-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #70665f;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .role-option {
+      flex: 1;
+      position: relative;
+    }
+
+    .role-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .role-card {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px;
+      background: #fcfaf5;
+      border: 1px solid rgba(159, 178, 172, 0.4);
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+
+    .role-option input[type="radio"]:checked + .role-card {
+      border-color: var(--primary-burgundy);
+      background-color: rgba(93, 13, 24, 0.03);
+      color: var(--primary-burgundy);
+      font-weight: 500;
+    }
+
+    /* --- SECTION DYNAMIQUE PRODUCTEUR --- */
+    .producer-fields {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease-in-out, opacity 0.3s ease;
+      opacity: 0;
+    }
+
+    .producer-fields.active {
+      max-height: 300px; /* Espace suffisant pour glisser les nouveaux champs */
+      opacity: 1;
+      margin-bottom: 5px;
+    }
+
+    .form-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.88rem;
+      margin-bottom: 20px;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .remember-me input {
+      accent-color: var(--primary-burgundy);
+      width: 16px;
+      height: 16px;
+    }
+
+    .forgot-link {
+      color: #70665f;
+      text-decoration: none;
+    }
+
+    .forgot-link:hover {
+      color: var(--primary-burgundy);
+      text-decoration: underline;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background-color: var(--primary-burgundy);
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 20px rgba(93, 13, 24, 0.15);
+    }
+
+    .btn-submit:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+
+    /* Termes d'utilisations légaux */
+    .terms-text {
+      font-size: 0.78rem;
+      color: #90857d;
+      text-align: center;
+      margin-top: 12px;
+      line-height: 1.4;
+    }
+
+    .terms-text a {
+      color: var(--primary-burgundy);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .terms-text a:hover { text-decoration: underline; }
+
+    .switch-text {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: #70665f;
+    }
+
+    .switch-link {
+      color: var(--primary-burgundy);
+      text-decoration: none;
+      font-weight: 600;
+      margin-left: 5px;
+    }
+
+    .switch-link:hover { text-decoration: underline; }
+
+    .error-msg {
+      color: #c0392b;
+      font-size: 0.8rem;
+      margin-top: -12px;
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    /* --- RESPONSIVE MOBILE --- */
+    @media (max-width: 868px) {
+      body {
+        align-items: flex-start;
+        padding-top: 20px;
+      }
+
+      .auth-container {
+        flex-direction: column;
+        height: auto;
+        box-shadow: none;
+        background: transparent;
+      }
+
+      .overlay-panel {
+        position: relative;
+        width: 100%;
+        height: 180px;
+        border-radius: 24px;
+        margin-bottom: 20px;
+        transform: none !important;
+      }
+
+      .maroccan-grid { display: none; }
+
+      .plant-illustration {
+        width: 60px;
+        height: 60px;
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+      }
+
+      .panel-title { font-size: 1.5rem; margin-bottom: 4px; }
+      .panel-desc { font-size: 0.85rem; max-width: 100%; }
+
+      .form-box {
+        position: relative;
+        width: 100%;
+        left: 0 !important;
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 35px 25px;
+        box-shadow: 0 10px 30px rgba(93, 13, 24, 0.05);
+      }
+
+      .auth-container .signup-box, 
+      .auth-container .forgot-box { display: none; }
+      .auth-container .login-box { display: block; }
+
+      .auth-container.right-panel-active .signup-box {
+        display: block;
+        opacity: 1;
+        pointer-events: all;
+      }
+      .auth-container.right-panel-active .login-box { display: none; }
+
+      .auth-container.forgot-panel-active .forgot-box {
+        display: block;
+        opacity: 1;
+        pointer-events: all;
+      }
+      .auth-container.forgot-panel-active .login-box { display: none; }
+    }
+  </style>
 </head>
 <body>
-  
-  <div class="container d-flex flex-column justify-content-center align-items-center min-vh-100">
+
+  <div class="auth-container" id="authContainer">
     
-    <div class="d-flex gap-2 align-items-center mb-4">
-      <img src="IMAGES/logo.png" alt="logo" style="width: 60px; height: 60px; object-fit: cover;" class="rounded-circle">
-      <h1 class="h3 mb-0 fw-bold text-theme">GreenMarket</h1>
-    </div>
-
-    <div class="card p-4 shadow-sm w-100" style="max-width: 450px; border-radius: 12px; border: none;">
-      
-      <div class="text-center mb-4">
-        <h2 class="fw-bold h4">Se connecter</h2>
-        <p class="text-muted small">Connectez-vous à votre compte pour continuer</p>
+    <div class="overlay-panel">
+      <div class="maroccan-grid"></div>
+      <div class="plant-illustration">
+        <i class="bi bi-flower1"></i>
       </div>
-
-      <form>
-        <div class="mb-3">
-          <label for="Email" class="form-label small fw-medium">Adresse Email</label>
-          <input type="email" class="form-control" id="Email" placeholder="vous@exemple.com" name="email">
-        </div>
-
-        <div class="mb-3">
-          <label for="Password" class="form-label small fw-medium">Mot de passe</label>
-          <input type="password" class="form-control" id="Password" placeholder="Entrez votre mot de passe" name="password">
-        </div>
-
-        <input type="submit" class="custom-submit-btn w-100 p-2 fw-bold rounded" value="Se connecter">
-
-        <div class="d-flex justify-content-between mb-4 mt-3">
-          <div class="form-check mb-0">
-            <input type="checkbox" class="form-check-input" id="remember">
-            <label class="form-check-label small text-muted" for="remember">
-              Se souvenir de moi
-            </label>
-          </div>
-          <div>
-            <a class="text-decoration-none text-muted small" href="forgot_password.html">Mot de passe oublié</a>
-          </div>
-        </div>
-        <div class="d-flex align-items-center mt-2 mb-4">
-          <div class="border-bottom flex-grow-1"></div>
-          <span class="mx-3 text-muted small">Ou</span>
-          <div class="border-bottom flex-grow-1"></div>
-        </div>
-        <div class="d-flex gap-2 w-100 mb-4 mt-3">
-          <button type="button" class="btn btn-light border w-50 d-flex align-items-center justify-content-center py-2">
-            <i class="bi bi-google me-3"></i>Google          
-          </button>
-          <button type="button" class="btn btn-light border w-50 d-flex align-items-center justify-content-center">
-            <i class="bi bi-apple me-3"></i>Apple
-          </button>
-        </div>
-
-        <p class="text-center mt-3 mb-0 text-muted small">
-          Vous n'avez pas de compte ? <a href="create.html" class="text-theme text-decoration-none fw-medium">Créer un compte</a>
-        </p>
-        
-      </form>
-      
+      <h3 class="panel-title" id="panelTitle">Bienvenue !</h3>
+      <p class="panel-desc" id="panelDesc">Rejoignez notre réseau de coopératives et consommez de manière juste, authentique et locale.</p>
     </div>
+
+    <div class="form-box login-box" id="loginBox">
+      <div class="brand">
+        <img src="images/logo.png" alt="Logo GreenMarket" class="brand-logo">
+        <span>GreenMarket</span>
+      </div>
+      <h2>Se connecter</h2>
+      <p class="subtitle">Heureux de vous revoir parmi nos coopératives.</p>
+      
+      <form id="loginForm" novalidate>
+        <div class="input-group">
+          <i class="bi bi-envelope"></i>
+          <input type="email" id="loginEmail" placeholder="Adresse Email" required>
+        </div>
+        
+        <div class="input-group">
+          <i class="bi bi-lock"></i>
+          <input type="password" id="loginPassword" placeholder="Mot de passe" required>
+        </div>
+
+        <div class="form-options">
+          <label class="remember-me">
+            <input type="checkbox" id="rememberMe">
+            Se souvenir de moi
+          </label>
+          <a href="#" class="forgot-link" id="toForgot">Mot de passe oublié ?</a>
+        </div>
+
+        <button type="submit" class="btn-submit">Connexion</button>
+        
+        <p class="terms-text">
+  En vous inscrivant, vous validez nos <a href="terms.html" target="_blank">CGU</a> et certifiez l'exactitude de vos données.
+</p>
+      </form>
+
+      <p class="switch-text">
+        Pas encore membre ? 
+        <a href="#" class="switch-link" id="toSignup">Créer un compte</a>
+      </p>
+    </div>
+
+    <div class="form-box signup-box" id="signupBox">
+      <div class="brand">
+        <img src="images/logo.png" alt="Logo GreenMarket" class="brand-logo">
+        <span>GreenMarket</span>
+      </div>
+      <h2>Créer un compte</h2>
+      <p class="subtitle">Créez votre profil pour acheter en direct ou proposer vos récoltes.</p>
+      
+      <form id="signupForm" novalidate>
+        <div class="input-group">
+          <i class="bi bi-person"></i>
+          <input type="text" id="signupName" placeholder="Nom complet" required>
+        </div>
+
+        <div class="input-group">
+          <i class="bi bi-envelope"></i>
+          <input type="email" id="signupEmail" placeholder="Adresse Email" required>
+        </div>
+
+        <span class="role-label-title">Vous êtes ?</span>
+        <div class="role-container">
+          <label class="role-option">
+            <input type="radio" name="userRole" value="Client" checked>
+            <div class="role-card">
+              <i class="bi bi-basket"></i> Client
+            </div>
+          </label>
+          <label class="role-option">
+            <input type="radio" name="userRole" value="Producer">
+            <div class="role-card">
+              <i class="bi bi-wrenches"></i> Producteur
+            </div>
+          </label>
+        </div>
+
+        <div class="producer-fields" id="producerFields">
+          <div class="input-group">
+            <i class="bi bi-shop"></i>
+            <input type="text" id="farmName" placeholder="Nom de l'exploitation / Coopérative">
+          </div>
+          <div class="input-group">
+            <i class="bi bi-telephone"></i>
+            <input type="tel" id="producerPhone" placeholder="Téléphone professionnel">
+          </div>
+          <div class="input-group select-group">
+            <i class="bi bi-tags"></i>
+            <select id="productType">
+              <option value="" disabled selected>Spécialité principale...</option>
+              <option value="fruits-legumes">Fruits & Légumes</option>
+              <option value="huiles">Huiles & Olives</option>
+              <option value="miel">Miel & Produits du Terroir</option>
+              <option value="autres">Autre spécialité</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <i class="bi bi-lock"></i>
+          <input type="password" id="signupPassword" placeholder="Mot de passe" required>
+        </div>
+
+        <div class="input-group">
+          <i class="bi bi-shield-lock"></i>
+          <input type="password" id="signupConfirmPassword" placeholder="Confirmer le mot de passe" required>
+        </div>
+        
+        <div class="error-msg" id="passwordError">Les mots de passe ne correspondent pas.</div>
+
+        <button type="submit" class="btn-submit">S'inscrire</button>
+        
+        <p class="terms-text">
+  En vous inscrivant, vous validez nos <a href="terms.html" target="_blank">CGU</a> et certifiez l'exactitude de vos données.
+</p>
+      </form>
+
+      <p class="switch-text">
+        Déjà inscrit ? 
+        <a href="#" class="switch-link" id="toLoginFromSignup">Se connecter</a>
+      </p>
+    </div>
+
+    <div class="form-box forgot-box" id="forgotBox">
+      <div class="brand">
+        <img src="images/logo.png" alt="Logo GreenMarket" class="brand-logo">
+        <span>GreenMarket</span>
+      </div>
+      <h2>Mot de passe oublié</h2>
+      <p class="subtitle">Pas d'inquiétude. Entrez votre adresse e-mail pour recevoir un lien de réinitialisation.</p>
+      
+      <form id="forgotForm" novalidate>
+        <div class="input-group">
+          <i class="bi bi-envelope"></i>
+          <input type="email" id="forgotEmail" placeholder="Votre adresse Email" required>
+        </div>
+
+        <button type="submit" class="btn-submit">Envoyer le lien</button>
+      </form>
+
+      <p class="switch-text">
+        Je m'en souviens !
+        <a href="#" class="switch-link" id="toLoginFromForgot">Retour à la connexion</a>
+      </p>
+    </div>
+
   </div>
-  
+
+  <script>
+    const authContainer = document.getElementById('authContainer');
+    
+    // Boutons de navigation inter-formulaire
+    const toSignupBtn = document.getElementById('toSignup');
+    const toLoginFromSignup = document.getElementById('toLoginFromSignup');
+    const toForgotBtn = document.getElementById('toForgot');
+    const toLoginFromForgot = document.getElementById('toLoginFromForgot');
+    
+    // Éléments du volet d'illustration
+    const panelTitle = document.getElementById('panelTitle');
+    const panelDesc = document.getElementById('panelDesc');
+
+    // Gestion de l'affichage dynamique Producteur
+    const roleRadios = document.querySelectorAll('input[name="userRole"]');
+    const producerFields = document.getElementById('producerFields');
+
+    roleRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (radio.value === 'Producer') {
+          producerFields.classList.add('active');
+          // On rend les nouveaux champs requis si c'est un producteur
+          document.getElementById('farmName').required = true;
+          document.getElementById('producerPhone').required = true;
+        } else {
+          producerFields.classList.remove('active');
+          document.getElementById('farmName').required = false;
+          document.getElementById('producerPhone').required = false;
+        }
+      });
+    });
+
+    // Aller vers l'Inscription
+    toSignupBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      authContainer.classList.remove('forgot-panel-active');
+      authContainer.classList.add('right-panel-active');
+      
+      setTimeout(() => {
+        panelTitle.textContent = "Cultivons l'avenir !";
+        panelDesc.textContent = "Découvrez des produits authentiques en direct de nos petits producteurs régionaux.";
+      }, 200);
+    });
+
+    // Revenir à la Connexion depuis l'Inscription
+    toLoginFromSignup.addEventListener('click', (e) => {
+      e.preventDefault();
+      authContainer.classList.remove('right-panel-active');
+      
+      setTimeout(() => {
+        panelTitle.textContent = "Bienvenue !";
+        panelDesc.textContent = "Rejoignez notre réseau de coopératives et consommez de manière juste, authentique et locale.";
+      }, 200);
+    });
+
+    // Aller vers "Mot de passe oublié"
+    toForgotBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      authContainer.classList.remove('right-panel-active');
+      authContainer.classList.add('forgot-panel-active');
+      
+      setTimeout(() => {
+        panelTitle.textContent = "Sécurité d'abord";
+        panelDesc.textContent = "Nous protégeons vos accès afin de garantir la sérénité de nos échanges locaux.";
+      }, 200);
+    });
+
+    // Revenir à la Connexion depuis "Mot de passe oublié"
+    toLoginFromForgot.addEventListener('click', (e) => {
+      e.preventDefault();
+      authContainer.classList.remove('forgot-panel-active');
+      
+      setTimeout(() => {
+        panelTitle.textContent = "Bienvenue !";
+        panelDesc.textContent = "Rejoignez notre réseau de coopératives et consommez de manière juste, authentique et locale.";
+      }, 200);
+    });
+
+    // Validations de simulation des formulaires
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert("Mode Démo : Connexion lancée !");
+    });
+
+    document.getElementById('forgotForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert("Mode Démo : Email de récupération envoyé à " + document.getElementById('forgotEmail').value);
+    });
+
+    document.getElementById('signupForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const psw = document.getElementById('signupPassword').value;
+      const cpsw = document.getElementById('signupConfirmPassword').value;
+      const err = document.getElementById('passwordError');
+      
+      if (psw !== cpsw) {
+        err.style.display = 'block';
+      } else {
+        err.style.display = 'none';
+        alert("Mode Démo : Inscription validée !");
+      }
+    });
+  </script>
 </body>
 </html>
