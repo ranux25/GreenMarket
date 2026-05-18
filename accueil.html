@@ -465,32 +465,211 @@
 </section>
  
 <!-- ===================== CATEGORIES ===================== -->
+<!-- ===================== CATEGORIES ===================== -->
+
 <section class="py-16 px-4 max-w-7xl mx-auto">
+
   <div class="mb-10">
+
     <h2 class="section-title">Nos catégories de produits traditionnels</h2>
+
   </div>
+
   <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 gap-4">
-    <div class="category-card" onclick="window.location.href='store.html?cat=Fruits%20et%20l%C3%A9gumes'"><span class="category-icon">🥦</span><span class="category-name">Fruits & légumes</span></div>
-    <div class="category-card" onclick="window.location.href='store.html?cat=Produits%20laitiers'"><span class="category-icon">🧀</span><span class="category-name">Produits laitiers</span></div>
-    <div class="category-card" onclick="window.location.href='store.html?cat=Boulangerie%20artisanale'"><span class="category-icon">🍞</span><span class="category-name">Boulangerie</span></div>
-    <div class="category-card" onclick="window.location.href='store.html?cat=Miel%20et%20apiculture'"><span class="category-icon">🍯</span><span class="category-name">Miel</span></div>
-    <div class="category-card" onclick="window.location.href='store.html?cat=Huiles%20et%20conserveries'"><span class="category-icon">🫒</span><span class="category-name">Huiles</span></div>
-    <div class="category-card" onclick="window.location.href='store.html?cat=Plantes%20m%C3%A9dicinales'"><span class="category-icon">🌿</span><span class="category-name">Plantes</span></div>
+
+    <div class="category-card"><span class="category-icon">🧥</span><span class="category-name">Vêtements traditionnels</span></div>
+
+    <div class="category-card"><span class="category-icon">🫒</span><span class="category-name">Huiles & Condiments</span></div>
+
+    <div class="category-card"><span class="category-icon">🌿</span><span class="category-name">Plantes & Herbes</span></div>
+
+    <div class="category-card"><span class="category-icon">🍯</span><span class="category-name">Miel & Douceurs</span></div>
+
+    <div class="category-card"><span class="category-icon">🧺</span><span class="category-name">Artisanat & Poterie</span></div>
+
+    <div class="category-card"><span class="category-icon">🧴</span><span class="category-name">Produits de beauté</span></div>
+
+    <div class="category-card"><span class="category-icon">🌾</span><span class="category-name">Épicerie fine</span></div>
+
+    <div class="category-card"><span class="category-icon">🪑</span><span class="category-name">Décoration & Mobilier</span></div>
+
   </div>
+
 </section>
  
 <!-- ===================== STORES SECTION (from store.html) ===================== -->
-<section class="py-10 px-4" style="background: linear-gradient(180deg, #fdf8ee 0%, #fff9eb 100%)">
+<!-- ===================== FEATURED PRODUCTS ===================== -->
+
+<section class="py-10 px-4" style="background:linear-gradient(180deg,#fdf8ee 0%,#fff9eb 100%);">
+
   <div class="max-w-7xl mx-auto">
+
     <div class="mb-10">
-      <h2 class="section-title">Nos boutiques partenaires</h2>
-      <p class="mt-2 text-sm text-gray-500">Découvrez nos producteurs locaux et artisans</p>
+
+      <h2 class="section-title">Produits populaires des coopératives</h2>
+
     </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="storesGrid"></div>
-    <div class="text-center mt-8">
-      <button class="btn-outline" onclick="window.location.href='store.html'">Voir toutes les boutiques →</button>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+
+ 
+
+      <!-- Card 1 -->
+
+      <div class="product-card">
+
+        <div class="product-img">
+          <img 
+      src="images/caftan.jfif" 
+      alt="Caftan traditionnel"
+      class="w-full h-full object-cover"
+    />
+        </div>
+
+        <div class="p-4 flex flex-col flex-1 gap-2">
+
+          <span class="badge badge-secondary">Artisanal</span>
+
+          <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display',serif; color:var(--text-dark);">Caftan traditionnel</h3>
+
+          <p class="text-xs flex items-center gap-1" style="color:var(--text-light);">👩‍🌾 Coopérative Fès Artisanat</p>
+
+          <div class="flex items-center gap-1">
+
+            <span class="stars">★★★★½</span>
+
+            <span class="text-xs" style="color:var(--text-light);">(156 avis)</span>
+
+          </div>
+
+          <p class="font-bold text-lg mt-auto" style="color:var(--primary); font-family:'Playfair Display',serif;">450 DH</p>
+
+          <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">Ajouter au panier</button>
+
+        </div>
+
+      </div>
+
+ 
+
+      <!-- Card 2 -->
+
+      <div class="product-card">
+
+        <div class="product-img">
+          <img 
+      src="images/olive.jfif" 
+      alt="Huile d'Olive vierge"
+      class="w-full h-full object-cover"
+    />
+        </div>
+
+        <div class="p-4 flex flex-col flex-1 gap-2">
+
+          <span class="badge badge-bio">Bio - Terroir</span>
+
+          <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display',serif; color:var(--text-dark);">Huile d'olive extra vierge</h3>
+
+          <p class="text-xs flex items-center gap-1" style="color:var(--text-light);">👩‍🌾 Coopérative Atlas</p>
+
+          <div class="flex items-center gap-1">
+
+            <span class="stars">★★★★★</span>
+
+            <span class="text-xs" style="color:var(--text-light);">(234 avis)</span>
+
+          </div>
+
+          <p class="font-bold text-lg mt-auto" style="color:var(--primary); font-family:'Playfair Display',serif;">120 DH / litre</p>
+
+          <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">Ajouter au panier</button>
+
+        </div>
+
+      </div>
+
+ 
+
+      <!-- Card 3 -->
+
+      <div class="product-card">
+
+        <div class="product-img">
+          <img 
+      src="images/plante.jfif" 
+      alt="Plantes médicinales"
+      class="w-full h-full object-cover"
+    />
+        </div>
+
+        <div class="p-4 flex flex-col flex-1 gap-2">
+
+          <span class="badge badge-rare">Rare</span>
+
+          <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display',serif; color:var(--text-dark);">Mélange plantes médicinales</h3>
+
+          <p class="text-xs flex items-center gap-1" style="color:var(--text-light);">👩‍🌾 Coopérative Ourika</p>
+
+          <div class="flex items-center gap-1">
+
+            <span class="stars">★★★★½</span>
+
+            <span class="text-xs" style="color:var(--text-light);">(89 avis)</span>
+
+          </div>
+
+          <p class="font-bold text-lg mt-auto" style="color:var(--primary); font-family:'Playfair Display',serif;">45 DH</p>
+
+          <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">Ajouter au panier</button>
+
+        </div>
+
+      </div>
+
+ 
+
+      <!-- Card 4 -->
+
+      <div class="product-card">
+
+        <div class="product-img">
+          <img 
+      src="images/tapis.jfif" 
+      alt="Tapis Berbère"
+      class="w-full h-full object-cover"
+    />
+        </div>
+
+        <div class="p-4 flex flex-col flex-1 gap-2">
+
+          <span class="badge badge-fait">Fait main</span>
+
+          <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display',serif; color:var(--text-dark);">Tapis berbère</h3>
+
+          <p class="text-xs flex items-center gap-1" style="color:var(--text-light);">👩‍🌾 Coopérative Haut-Atlas</p>
+
+          <div class="flex items-center gap-1">
+
+            <span class="stars">★★★★★</span>
+
+            <span class="text-xs" style="color:var(--text-light);">(67 avis)</span>
+
+          </div>
+
+          <p class="font-bold text-lg mt-auto" style="color:var(--primary); font-family:'Playfair Display',serif;">1 200 DH</p>
+
+          <button class="btn-primary add-to-cart w-full mt-1 py-2 text-sm">Ajouter au panier</button>
+
+        </div>
+
+      </div>
+
+ 
+
     </div>
+
   </div>
+
 </section>
  
 <!-- ===================== COOPERATIVES ===================== -->
@@ -536,7 +715,7 @@
       </div>
     </div>
     <div class="flex items-center justify-center">
-      <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&h=500&fit=crop" alt="Produits traditionnels marocains" class="rounded-2xl shadow-xl w-full max-w-sm object-cover" style="aspect-ratio: 1/1;">
+      <img src="IMAGES/pic.jfif" alt="Produits traditionnels marocains" class="rounded-2xl shadow-xl w-full max-w-sm object-cover" style="aspect-ratio: 1/1;">
     </div>
   </div>
 </section>
