@@ -31,22 +31,53 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 20px;
+      padding: 40px 20px;
       overflow-x: hidden;
+      position: relative;
     }
 
-    /* --- CONTENEUR PRINCIPAL ÉLARGI --- */
+    /* Botón de regreso a la página de inicio */
+    .back-home-btn {
+      position: fixed;
+      top: 30px;
+      left: 30px;
+      z-index: 100;
+      background: var(--primary-burgundy);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 10px 20px;
+      font-family: 'Jost', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(93, 13, 24, 0.2);
+      text-decoration: none;
+    }
+
+    .back-home-btn:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(93, 13, 24, 0.3);
+    }
+
+    /* --- CONTENEUR PRINCIPAL MÁS PEQUEÑO --- */
     .auth-container {
       background: #ffffff;
-      width: 1300px;
+      width: 1000px;
       max-width: 100%;
-      height: 720px; /* Augmenté légèrement pour le confort des nouveaux champs */
-      min-height: 720px;
+      height: 680px;
+      min-height: 600px;
       border-radius: 30px;
       box-shadow: 0 20px 60px rgba(93, 13, 24, 0.1);
       position: relative;
       overflow: hidden;
       display: flex;
+      margin: 0 auto;
     }
 
     /* --- PANNEAU D'ILLUSTRATION GLISSANT (DESKTOP) --- */
@@ -63,7 +94,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 40px;
+      padding: 30px;
       color: var(--bg-cream);
       text-align: center;
     }
@@ -71,7 +102,7 @@
     .overlay-panel::before {
       content: '';
       position: absolute;
-      inset: 20px;
+      inset: 15px;
       border: 1px solid rgba(255, 249, 235, 0.3);
       border-radius: 20px;
       pointer-events: none;
@@ -79,61 +110,61 @@
 
     .maroccan-grid {
       position: absolute;
-      width: 150px;
-      height: 150px;
+      width: 120px;
+      height: 120px;
       opacity: 0.12;
       background: radial-gradient(circle, var(--bg-cream) 20%, transparent 20%),
                   radial-gradient(circle, var(--bg-cream) 20%, transparent 20%);
-      background-size: 30px 30px;
-      background-position: 0 0, 15px 15px;
-      top: 40px;
+      background-size: 25px 25px;
+      background-position: 0 0, 12px 12px;
+      top: 30px;
     }
 
     .brand-logo {
-      height: 35px;
+      height: 30px;
       width: auto;
       object-fit: contain;
     }
 
     .plant-illustration {
-      width: 150px;
-      height: 150px;
+      width: 100px;
+      height: 100px;
       background: rgba(255, 249, 235, 0.15);
       border-radius: 40% 60% 60% 40% / 50% 40% 60% 50%;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 4.5rem;
+      font-size: 3rem;
       color: var(--bg-cream);
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.2);
       animation: float 4s ease-in-out infinite;
     }
 
     @keyframes float {
       0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-12px) rotate(3deg); }
+      50% { transform: translateY(-10px) rotate(3deg); }
     }
 
     .panel-title {
       font-family: 'Playfair Display', serif;
-      font-size: 2.2rem;
-      margin-bottom: 15px;
+      font-size: 1.8rem;
+      margin-bottom: 12px;
       font-weight: 700;
     }
 
     .panel-desc {
-      font-size: 1rem;
-      max-width: 320px;
+      font-size: 0.85rem;
+      max-width: 280px;
       opacity: 0.9;
-      line-height: 1.6;
+      line-height: 1.5;
     }
 
     /* --- BLOCS DE FORMULAIRES --- */
     .form-box {
       width: 50%;
       height: 100%;
-      padding: 40px 60px;
+      padding: 35px 45px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -167,7 +198,6 @@
     }
 
     /* --- ÉTATS DE TRANSITION DE L'ANIMATION (DESKTOP) --- */
-    /* État : Inscription active */
     .auth-container.right-panel-active .overlay-panel {
       transform: translateX(100%);
     }
@@ -183,7 +213,6 @@
       pointer-events: all;
     }
 
-    /* État : Mot de passe oublié actif (Le panneau bouge à droite, la boîte forgot s'affiche à gauche) */
     .auth-container.forgot-panel-active .overlay-panel {
       transform: translateX(100%);
     }
@@ -204,52 +233,52 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       color: var(--primary-burgundy);
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     .brand span {
       font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       font-weight: 700;
     }
 
     h2 {
       font-family: 'Playfair Display', serif;
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       color: var(--primary-burgundy);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .subtitle {
       color: #70665f;
-      font-size: 0.9rem;
-      margin-bottom: 25px;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
     }
 
     .input-group {
       position: relative;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
 
     .input-group i {
       position: absolute;
-      left: 15px;
+      left: 12px;
       top: 50%;
       transform: translateY(-50%);
       color: #90857d;
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
 
     .input-group input, .input-group select {
       width: 100%;
-      padding: 13px 15px 13px 45px;
+      padding: 11px 12px 11px 38px;
       background-color: #fcfaf5;
       border: 1px solid rgba(159, 178, 172, 0.4);
-      border-radius: 12px;
+      border-radius: 10px;
       outline: none;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: var(--text-dark);
       transition: all 0.3s ease;
       appearance: none;
@@ -259,36 +288,24 @@
       cursor: pointer;
     }
 
-    /* Flèche personnalisée pour le select */
-    .input-group.select-group::after {
-      content: '\b1';
-      font-family: "bootstrap-icons";
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #90857d;
-      pointer-events: none;
-    }
-
     .input-group input:focus, .input-group select:focus {
       border-color: var(--primary-burgundy);
       background-color: #ffffff;
-      box-shadow: 0 0 0 3px rgba(93, 13, 24, 0.08);
+      box-shadow: 0 0 0 2px rgba(93, 13, 24, 0.08);
     }
 
     /* Rôles */
     .role-container {
       display: flex;
-      gap: 15px;
-      margin-bottom: 18px;
+      gap: 12px;
+      margin-bottom: 14px;
     }
 
     .role-label-title {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 500;
       color: #70665f;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
       display: block;
     }
 
@@ -308,13 +325,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 11px;
+      gap: 6px;
+      padding: 9px;
       background: #fcfaf5;
       border: 1px solid rgba(159, 178, 172, 0.4);
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       transition: all 0.3s ease;
     }
 
@@ -334,7 +351,7 @@
     }
 
     .producer-fields.active {
-      max-height: 300px; /* Espace suffisant pour glisser les nouveaux champs */
+      max-height: 250px;
       opacity: 1;
       margin-bottom: 5px;
     }
@@ -343,26 +360,27 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.88rem;
-      margin-bottom: 20px;
+      font-size: 0.8rem;
+      margin-bottom: 18px;
     }
 
     .remember-me {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       cursor: pointer;
     }
 
     .remember-me input {
       accent-color: var(--primary-burgundy);
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
     }
 
     .forgot-link {
       color: #70665f;
       text-decoration: none;
+      font-size: 0.8rem;
     }
 
     .forgot-link:hover {
@@ -372,12 +390,12 @@
 
     .btn-submit {
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       background-color: var(--primary-burgundy);
       color: #ffffff;
       border: none;
-      border-radius: 12px;
-      font-size: 1rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -389,13 +407,12 @@
       transform: translateY(-2px);
     }
 
-    /* Termes d'utilisations légaux */
     .terms-text {
-      font-size: 0.78rem;
+      font-size: 0.7rem;
       color: #90857d;
       text-align: center;
-      margin-top: 12px;
-      line-height: 1.4;
+      margin-top: 10px;
+      line-height: 1.3;
     }
 
     .terms-text a {
@@ -407,8 +424,8 @@
 
     .switch-text {
       text-align: center;
-      margin-top: 20px;
-      font-size: 0.9rem;
+      margin-top: 15px;
+      font-size: 0.85rem;
       color: #70665f;
     }
 
@@ -423,17 +440,23 @@
 
     .error-msg {
       color: #c0392b;
-      font-size: 0.8rem;
-      margin-top: -12px;
-      margin-bottom: 12px;
+      font-size: 0.75rem;
+      margin-top: -10px;
+      margin-bottom: 10px;
       display: none;
     }
 
     /* --- RESPONSIVE MOBILE --- */
-    @media (max-width: 868px) {
+    @media (max-width: 800px) {
       body {
-        align-items: flex-start;
-        padding-top: 20px;
+        padding: 20px;
+      }
+
+      .back-home-btn {
+        top: 15px;
+        left: 15px;
+        padding: 8px 16px;
+        font-size: 0.75rem;
       }
 
       .auth-container {
@@ -441,28 +464,30 @@
         height: auto;
         box-shadow: none;
         background: transparent;
+        margin-top: 55px;
       }
 
       .overlay-panel {
         position: relative;
         width: 100%;
-        height: 180px;
+        height: 160px;
         border-radius: 24px;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
         transform: none !important;
+        padding: 20px;
       }
 
       .maroccan-grid { display: none; }
 
       .plant-illustration {
-        width: 60px;
-        height: 60px;
-        font-size: 1.8rem;
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
         margin-bottom: 8px;
       }
 
-      .panel-title { font-size: 1.5rem; margin-bottom: 4px; }
-      .panel-desc { font-size: 0.85rem; max-width: 100%; }
+      .panel-title { font-size: 1.3rem; margin-bottom: 4px; }
+      .panel-desc { font-size: 0.75rem; max-width: 100%; }
 
       .form-box {
         position: relative;
@@ -470,7 +495,7 @@
         left: 0 !important;
         background: #ffffff;
         border-radius: 24px;
-        padding: 35px 25px;
+        padding: 30px 25px;
         box-shadow: 0 10px 30px rgba(93, 13, 24, 0.05);
       }
 
@@ -496,6 +521,11 @@
 </head>
 <body>
 
+  <!-- Botón para volver a la página de inicio -->
+  <a href="accueil.html" class="back-home-btn">
+    <i class="bi bi-house-door"></i> Accueil
+  </a>
+
   <div class="auth-container" id="authContainer">
     
     <div class="overlay-panel">
@@ -509,7 +539,7 @@
 
     <div class="form-box login-box" id="loginBox">
       <div class="brand">
-        <img src="images/logo.png" alt="Logo GreenMarket" class="brand-logo">
+        <img src="IMAGES/logo.png" alt="Logo GreenMarket" class="brand-logo" onerror="this.src='https://placehold.co/35x35?text=GM'">
         <span>GreenMarket</span>
       </div>
       <h2>Se connecter</h2>
@@ -537,8 +567,8 @@
         <button type="submit" class="btn-submit">Connexion</button>
         
         <p class="terms-text">
-  En vous inscrivant, vous validez nos <a href="terms.html" target="_blank">CGU</a> et certifiez l'exactitude de vos données.
-</p>
+          En vous inscrivant, vous validez nos <a href="terms.html" target="_blank">CGU</a> et certifiez l'exactitude de vos données.
+        </p>
       </form>
 
       <p class="switch-text">
@@ -549,7 +579,7 @@
 
     <div class="form-box signup-box" id="signupBox">
       <div class="brand">
-        <img src="images/logo.png" alt="Logo GreenMarket" class="brand-logo">
+        <img src="IMAGES/logo.png" alt="Logo GreenMarket" class="brand-logo" onerror="this.src='https://placehold.co/35x35?text=GM'">
         <span>GreenMarket</span>
       </div>
       <h2>Créer un compte</h2>
@@ -591,7 +621,7 @@
             <i class="bi bi-telephone"></i>
             <input type="tel" id="producerPhone" placeholder="Téléphone professionnel">
           </div>
-          <div class="input-group select-group">
+          <div class="input-group">
             <i class="bi bi-tags"></i>
             <select id="productType">
               <option value="" disabled selected>Spécialité principale...</option>
@@ -618,8 +648,8 @@
         <button type="submit" class="btn-submit">S'inscrire</button>
         
         <p class="terms-text">
-  En vous inscrivant, vous validez nos <a href="terms.html" target="_blank">CGU</a> et certifiez l'exactitude de vos données.
-</p>
+          En vous inscrivant, vous validez nos <a href="terms.html" target="_blank">CGU</a> et certifiez l'exactitude de vos données.
+        </p>
       </form>
 
       <p class="switch-text">
@@ -630,7 +660,7 @@
 
     <div class="form-box forgot-box" id="forgotBox">
       <div class="brand">
-        <img src="images/logo.png" alt="Logo GreenMarket" class="brand-logo">
+        <img src="IMAGES/logo.png" alt="Logo GreenMarket" class="brand-logo" onerror="this.src='https://placehold.co/35x35?text=GM'">
         <span>GreenMarket</span>
       </div>
       <h2>Mot de passe oublié</h2>
@@ -656,17 +686,14 @@
   <script>
     const authContainer = document.getElementById('authContainer');
     
-    // Boutons de navigation inter-formulaire
     const toSignupBtn = document.getElementById('toSignup');
     const toLoginFromSignup = document.getElementById('toLoginFromSignup');
     const toForgotBtn = document.getElementById('toForgot');
     const toLoginFromForgot = document.getElementById('toLoginFromForgot');
     
-    // Éléments du volet d'illustration
     const panelTitle = document.getElementById('panelTitle');
     const panelDesc = document.getElementById('panelDesc');
 
-    // Gestion de l'affichage dynamique Producteur
     const roleRadios = document.querySelectorAll('input[name="userRole"]');
     const producerFields = document.getElementById('producerFields');
 
@@ -674,7 +701,6 @@
       radio.addEventListener('change', () => {
         if (radio.value === 'Producer') {
           producerFields.classList.add('active');
-          // On rend les nouveaux champs requis si c'est un producteur
           document.getElementById('farmName').required = true;
           document.getElementById('producerPhone').required = true;
         } else {
@@ -685,7 +711,6 @@
       });
     });
 
-    // Aller vers l'Inscription
     toSignupBtn.addEventListener('click', (e) => {
       e.preventDefault();
       authContainer.classList.remove('forgot-panel-active');
@@ -697,7 +722,6 @@
       }, 200);
     });
 
-    // Revenir à la Connexion depuis l'Inscription
     toLoginFromSignup.addEventListener('click', (e) => {
       e.preventDefault();
       authContainer.classList.remove('right-panel-active');
@@ -708,7 +732,6 @@
       }, 200);
     });
 
-    // Aller vers "Mot de passe oublié"
     toForgotBtn.addEventListener('click', (e) => {
       e.preventDefault();
       authContainer.classList.remove('right-panel-active');
@@ -720,7 +743,6 @@
       }, 200);
     });
 
-    // Revenir à la Connexion depuis "Mot de passe oublié"
     toLoginFromForgot.addEventListener('click', (e) => {
       e.preventDefault();
       authContainer.classList.remove('forgot-panel-active');
@@ -731,7 +753,6 @@
       }, 200);
     });
 
-    // Validations de simulation des formulaires
     document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
       alert("Mode Démo : Connexion lancée !");
