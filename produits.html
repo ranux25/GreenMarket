@@ -2,9 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
 <title>GreenMarket – Tous les Produits Artisanaux</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="header.css">
 <style>
   :root {
     --cream:      #fff9eb;
@@ -30,7 +31,14 @@
 
   * { margin:0; padding:0; box-sizing:border-box; }
 
-  body { font-family: 'Jost', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
+  body { 
+    font-family: 'Lato', sans-serif; 
+    background: var(--cream); 
+    color: var(--text); 
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
 
   #header-placeholder { width: 100%; }
 
@@ -55,7 +63,7 @@
     text-transform: uppercase; color: var(--sage-light); margin-bottom: .9rem;
   }
   .page-header h1 {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Playfair Display', serif;
     font-size: 3.6rem; font-weight: 700; line-height: 1.05;
     color: var(--cream); margin-bottom: .7rem;
   }
@@ -66,7 +74,7 @@
     padding-top: 1.8rem; border-top: 1px solid rgba(255,249,235,.14);
   }
   .h-stat-val {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Playfair Display', serif;
     font-size: 2rem; font-weight: 700; color: var(--cream);
     display: block; line-height: 1;
   }
@@ -84,14 +92,14 @@
   .search-input {
     width: 100%; padding: .68rem 1rem .68rem 2.8rem;
     border: 1.5px solid var(--border); border-radius: 3px;
-    background: var(--cream); font-family: 'Jost', sans-serif; font-size: .88rem;
+    background: var(--cream); font-family: 'Lato', sans-serif; font-size: .88rem;
     color: var(--text); outline: none; transition: border-color .2s;
   }
   .search-input:focus { border-color: var(--wine); }
   .filter-select {
     padding: .68rem 2.1rem .68rem 1rem;
     border: 1.5px solid var(--border); border-radius: 3px;
-    background: var(--cream); font-family: 'Jost', sans-serif; font-size: .85rem;
+    background: var(--cream); font-family: 'Lato', sans-serif; font-size: .85rem;
     color: var(--text); outline: none; cursor: pointer; appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 12 12'%3E%3Cpath fill='%235d0d18' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right .8rem center;
@@ -114,7 +122,7 @@
     display: flex; align-items: center; justify-content: space-between;
   }
   .sidebar-header h3 {
-    font-family: 'Cormorant Garamond', serif; color: var(--cream);
+    font-family: 'Playfair Display', serif; color: var(--cream);
     font-size: 1.12rem; font-weight: 600; letter-spacing: .03em;
   }
 
@@ -136,24 +144,24 @@
   .category-item.active .cat-count { background: var(--wine); color: var(--cream); }
 
   .stores-title-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.2rem; }
-  .stores-area h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.75rem; font-weight: 700; color: var(--text); }
+  .stores-area h2 { font-family: 'Playfair Display', serif; font-size: 1.75rem; font-weight: 700; color: var(--text); }
   .stores-count { font-size: .8rem; color: var(--text-muted); }
   .stores-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
 
-  .store-card {
+  .product-card {
     background: var(--white); border: 1.5px solid var(--border);
     border-radius: 8px; overflow: hidden;
     transition: transform .25s, box-shadow .25s, border-color .25s;
     box-shadow: 0 2px 12px var(--shadow); position: relative;
   }
-  .store-card:hover {
+  .product-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 35px var(--shadow-md);
     border-color: var(--sage);
   }
-  .store-banner { height: 220px; position: relative; overflow: hidden; cursor: pointer; }
-  .store-banner img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
-  .store-card:hover .store-banner img { transform: scale(1.05); }
+  .product-banner { height: 220px; position: relative; overflow: hidden; cursor: pointer; }
+  .product-banner img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+  .product-card:hover .product-banner img { transform: scale(1.05); }
   
   .product-price-badge {
     position: absolute; top: 0.8rem; right: 0.8rem; background: var(--wine);
@@ -161,28 +169,28 @@
     padding: 0.3rem 0.8rem; border-radius: 3px; z-index: 2;
   }
 
-  .store-body { padding: 1.2rem; }
-  .store-name {
-    font-family: 'Cormorant Garamond', serif; font-size: 1.2rem;
+  .product-body { padding: 1.2rem; }
+  .product-name {
+    font-family: 'Playfair Display', serif; font-size: 1.2rem;
     font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 0.3rem;
   }
-  .store-category-tag {
+  .product-shop-tag {
     display: inline-block; background: var(--sage-light); color: var(--sage-dark);
     font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em;
     text-transform: uppercase; padding: 0.15rem 0.6rem; border-radius: 3px;
     margin-bottom: 0.6rem; cursor: pointer;
   }
-  .store-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem; font-weight: 300; }
-  .store-stats {
+  .product-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem; font-weight: 300; }
+  .product-stats {
     display: flex; border-top: 1px solid var(--border); padding-top: 0.8rem;
     align-items: center; justify-content: space-between;
   }
-  .store-stat-val { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 700; color: var(--wine); display: block; }
-  .store-stat-label { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; }
+  .product-stock { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--wine); }
+  .stock-label { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; }
 
   .add-cart-btn {
-    background: var(--wine); color: white; border: none; padding: 0.4rem 0.8rem;
-    border-radius: 3px; font-size: 0.7rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
+    background: var(--wine); color: white; border: none; padding: 0.5rem 1rem;
+    border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
   }
   .add-cart-btn:hover { background: var(--wine-dark); }
 
@@ -195,7 +203,52 @@
   }
   .toast.show { transform: translateY(0); opacity: 1; }
 
+  /* Modal de autenticación */
+  .auth-modal-overlay {
+    display: none; position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    align-items: center; justify-content: center;
+    z-index: 1000;
+  }
+  .auth-modal-overlay.open { display: flex; }
+  .auth-modal {
+    background: #fffdf7; border-radius: 16px; padding: 2rem;
+    max-width: 450px; width: 90%; position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  }
+  .auth-tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e8ddd0; }
+  .auth-tab {
+    background: none; border: none; padding: 0.5rem 1rem;
+    font-size: 1rem; cursor: pointer; color: #6b5055; font-weight: 500;
+  }
+  .auth-tab.active { color: #5d0d18; border-bottom: 2px solid #5d0d18; }
+  .auth-form { display: none; }
+  .auth-form.active { display: block; }
+  .auth-form h3 { color: #5d0d18; margin-bottom: 1rem; font-family: 'Cormorant Garamond', serif; }
+  .auth-form input {
+    width: 100%; padding: 0.7rem; margin-bottom: 1rem;
+    border: 1.5px solid #e8ddd0; border-radius: 8px;
+    font-family: 'Jost', sans-serif; background: #fff9eb;
+  }
+  .auth-error { color: #d9534f; font-size: 0.8rem; margin-top: 0.5rem; text-align: center; }
+  .auth-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #6b5055; }
+  .btn-filled {
+    background: #5d0d18; color: #fff9eb;
+    border: none; padding: .5rem 1.3rem; border-radius: 3px;
+    font-family: 'Jost', sans-serif; font-size: .78rem; font-weight: 600;
+    letter-spacing: .07em; text-transform: uppercase;
+    cursor: pointer; transition: background .2s;
+  }
+  .btn-filled:hover { background: #3e0910; }
+
   @media(max-width:900px){ .main-layout { grid-template-columns: 1fr; } .sidebar { position: static; } }
+  @media(max-width:600px){
+    .page-header { padding: 2.5rem 1.2rem 2rem; }
+    .page-header h1 { font-size: 2.4rem; }
+    .search-bar-wrap { flex-wrap: wrap; padding: 1rem; }
+    .main-layout { padding: 1.2rem 1rem; }
+  }
 </style>
 </head>
 <body>
@@ -249,19 +302,279 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Modal de autenticación -->
+<div class="auth-modal-overlay" id="authModal">
+  <div class="auth-modal">
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Connexion</button>
+      <button class="auth-tab" data-tab="register">Inscription Client</button>
+      <button class="auth-tab" data-tab="registerProducer">Inscription Artisan</button>
+    </div>
+    <div id="loginForm" class="auth-form active">
+      <h3>🔐 Se connecter</h3>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Mot de passe">
+      <button class="btn-filled" id="doLoginBtn" style="width:100%">Se connecter</button>
+      <p class="auth-error" id="loginError"></p>
+    </div>
+    <div id="registerForm" class="auth-form">
+      <h3>📝 Inscription Client</h3>
+      <input type="text" id="regName" placeholder="Nom complet">
+      <input type="email" id="regEmail" placeholder="Email">
+      <input type="password" id="regPassword" placeholder="Mot de passe">
+      <button class="btn-filled" id="doRegisterBtn" style="width:100%">S'inscrire</button>
+      <p class="auth-error" id="registerError"></p>
+    </div>
+    <div id="registerProducerForm" class="auth-form">
+      <h3>🏪 Inscription Artisan</h3>
+      <input type="text" id="regProdName" placeholder="Nom de l'artisan">
+      <input type="email" id="regProdEmail" placeholder="Email">
+      <input type="password" id="regProdPassword" placeholder="Mot de passe">
+      <button class="btn-filled" id="doRegisterProducerBtn" style="width:100%">S'inscrire comme artisan</button>
+      <p class="auth-error" id="registerProducerError"></p>
+    </div>
+    <button class="auth-close" id="closeAuthModal">✕</button>
+  </div>
+</div>
+
 <script>
-  function loadHeader() {
-    fetch('header.html')
-      .then(response => {
-        if (!response.ok) throw new Error("Erreur");
-        return response.text();
-      })
-      .then(data => {
-        document.getElementById('header-placeholder').innerHTML = data;
-      })
-      .catch(error => console.error(error));
+  // ========== FUNCIONES DE AUTENTICACIÓN ==========
+  let currentUser = null;
+
+  function initUsers() {
+    if (!localStorage.getItem('greenmarket_users')) {
+      const defaultUsers = [
+        { id: 1, name: "Jean Dupont", email: "client@test.com", password: "client123", role: "client", producerId: null },
+        { id: 2, name: "Fatima Zahra", email: "fatima@caftan.ma", password: "fatima123", role: "productor", producerId: 101 }
+      ];
+      localStorage.setItem('greenmarket_users', JSON.stringify(defaultUsers));
+    }
   }
 
+  function getCurrentUser() {
+    const u = sessionStorage.getItem('greenmarket_current_user');
+    return u ? JSON.parse(u) : null;
+  }
+
+  function setCurrentUser(user) {
+    sessionStorage.setItem('greenmarket_current_user', JSON.stringify(user));
+    currentUser = user;
+    updateAuthUI();
+  }
+
+  function logout() {
+    sessionStorage.removeItem('greenmarket_current_user');
+    currentUser = null;
+    updateAuthUI();
+    showToast("👋 Déconnexion réussie");
+    setTimeout(() => window.location.reload(), 500);
+  }
+
+  function login(email, password) {
+    const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
+    const user = users.find(u => u.email === email && u.password === password);
+    if (user) {
+      const { password, ...safeUser } = user;
+      setCurrentUser(safeUser);
+      return { success: true, user: safeUser };
+    }
+    return { success: false, error: "Email ou mot de passe incorrect" };
+  }
+
+  function registerClient(name, email, password) {
+    const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
+    if (users.find(u => u.email === email)) {
+      return { success: false, error: "Email déjà utilisé" };
+    }
+    const newUser = {
+      id: Date.now(),
+      name: name,
+      email: email,
+      password: password,
+      role: "client",
+      producerId: null
+    };
+    users.push(newUser);
+    localStorage.setItem('greenmarket_users', JSON.stringify(users));
+    const { password: _, ...safeUser } = newUser;
+    setCurrentUser(safeUser);
+    return { success: true, user: safeUser };
+  }
+
+  function registerProducer(name, email, password) {
+    const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
+    if (users.find(u => u.email === email)) {
+      return { success: false, error: "Email déjà utilisé" };
+    }
+    const newProducerId = Date.now();
+    const newUser = {
+      id: Date.now(),
+      name: name,
+      email: email,
+      password: password,
+      role: "productor",
+      producerId: newProducerId
+    };
+    users.push(newUser);
+    localStorage.setItem('greenmarket_users', JSON.stringify(users));
+    const { password: _, ...safeUser } = newUser;
+    setCurrentUser(safeUser);
+    return { success: true, user: safeUser };
+  }
+
+  function updateAuthUI() {
+    const widget = document.getElementById('authWidget');
+    if (!widget) return;
+    
+    const user = getCurrentUser();
+    if (user) {
+      const roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Artisan' : 'Client');
+      widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;">🚪</button></div>`;
+      document.getElementById('logoutBtn')?.addEventListener('click', logout);
+      
+      const dashboardLink = document.getElementById('dashboardLink');
+      if (dashboardLink) {
+        dashboardLink.style.display = (user.role === 'productor' || user.role === 'admin') ? 'inline-block' : 'none';
+      }
+    } else {
+      widget.innerHTML = `<button class="btn-connexion" id="showLoginBtn">🔑 Connexion</button>`;
+      document.getElementById('showLoginBtn')?.addEventListener('click', () => showAuthModal());
+    }
+  }
+
+  function showAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.classList.add('open');
+  }
+
+  function closeAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  function setupAuthModal() {
+    // Tabs
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.dataset.tab;
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+        if (tabName === 'login') document.getElementById('loginForm').classList.add('active');
+        if (tabName === 'register') document.getElementById('registerForm').classList.add('active');
+        if (tabName === 'registerProducer') document.getElementById('registerProducerForm').classList.add('active');
+      });
+    });
+
+    // Login
+    document.getElementById('doLoginBtn')?.addEventListener('click', () => {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const result = login(email, password);
+      if (result.success) {
+        closeAuthModal();
+        updateAuthUI();
+        showToast(`👋 Bonjour ${result.user.name} !`);
+        setTimeout(() => window.location.reload(), 500);
+      } else {
+        document.getElementById('loginError').textContent = result.error;
+      }
+    });
+
+    // Register Client
+    document.getElementById('doRegisterBtn')?.addEventListener('click', () => {
+      const name = document.getElementById('regName').value;
+      const email = document.getElementById('regEmail').value;
+      const password = document.getElementById('regPassword').value;
+      if (!name || !email || !password) {
+        document.getElementById('registerError').textContent = "Tous les champs sont requis";
+        return;
+      }
+      const result = registerClient(name, email, password);
+      if (result.success) {
+        closeAuthModal();
+        updateAuthUI();
+        showToast(`✅ Bienvenue ${result.user.name} !`);
+        setTimeout(() => window.location.reload(), 500);
+      } else {
+        document.getElementById('registerError').textContent = result.error;
+      }
+    });
+
+    // Register Producer
+    document.getElementById('doRegisterProducerBtn')?.addEventListener('click', () => {
+      const name = document.getElementById('regProdName').value;
+      const email = document.getElementById('regProdEmail').value;
+      const password = document.getElementById('regProdPassword').value;
+      if (!name || !email || !password) {
+        document.getElementById('registerProducerError').textContent = "Tous les champs sont requis";
+        return;
+      }
+      const result = registerProducer(name, email, password);
+      if (result.success) {
+        closeAuthModal();
+        updateAuthUI();
+        showToast(`✅ Bienvenue ${result.user.name} ! Vous pouvez maintenant créer votre boutique.`);
+        setTimeout(() => window.location.reload(), 500);
+      } else {
+        document.getElementById('registerProducerError').textContent = result.error;
+      }
+    });
+
+    document.getElementById('closeAuthModal')?.addEventListener('click', closeAuthModal);
+    document.getElementById('authModal')?.addEventListener('click', (e) => {
+      if (e.target === document.getElementById('authModal')) closeAuthModal();
+    });
+  }
+
+  // ========== FUNCIONES DEL CARRITO ==========
+  function showToast(msg, bg = 'var(--wine)') {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.background = bg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2800);
+  }
+
+  function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem('greenmarket_cart') || '[]');
+    const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+    const badge = document.getElementById('cart-count');
+    if (badge) badge.textContent = total;
+  }
+
+  function addToCart(product) {
+    let cart = JSON.parse(localStorage.getItem('greenmarket_cart') || '[]');
+    const existing = cart.find(item => item.id === product.id);
+    
+    let prixNumerique = parseInt(product.price.replace(/\D/g, '')) || 0;
+    
+    if (existing) {
+      existing.quantity = (existing.quantity || 1) + 1;
+    } else {
+      cart.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        prixNumerique: prixNumerique,
+        image: product.image,
+        boutiqueId: product.shopId,
+        boutiqueNom: product.shopName,
+        quantity: 1
+      });
+    }
+    
+    localStorage.setItem('greenmarket_cart', JSON.stringify(cart));
+    updateCartCount();
+    showToast(`✓ ${product.name} ajouté au panier !`);
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
+  }
+
+  // ========== DATOS ==========
   let categories = [
     { id:1, icon:'👘', name:'Caftans & Vêtements traditionnels' },
     { id:2, icon:'🪑', name:'Tapis & Tissage' },
@@ -273,77 +586,45 @@
     { id:8, icon:'🍯', name:'Produits du terroir' }
   ];
 
-  let stores = [
-    { id:1, name:"Maison du Caftan", category:'Caftans & Vêtements traditionnels', categoryId:1 },
-    { id:2, name:"Tapis Berbère d'Atlas", category:'Tapis & Tissage', categoryId:2 },
-    { id:3, name:"Poterie de Safi", category:'Poterie & Céramique', categoryId:3 },
-    { id:4, name:"Marqueterie de Tetouan", category:'Marqueterie & Bois', categoryId:4 },
-    { id:5, name:"Bijoux Amaziagh", category:'Bijoux & Joaillerie', categoryId:5 },
-    { id:6, name:"Lumières de Marrakech", category:'Lampes & Fer forgé', categoryId:6 },
-    { id:7, name:"Argamane Naturel", category:'Cosmétiques naturels', categoryId:7 },
-    { id:8, name:"Saveurs du Terroir", category:'Produits du terroir', categoryId:8 },
-    { id:9, name:"Tissage d'Azilal", category:'Tapis & Tissage', categoryId:2 },
-    { id:10, name:"Caftans Impériaux", category:'Caftans & Vêtements traditionnels', categoryId:1 }
-  ];
-
-  const defaultProducts = {
-    1: [ 
-      { id: 101, name: "Caftan en Soie", price: "2 500 DH", stock: 5, image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=500&h=400&fit=crop", description: "Caftan en soie naturelle" },
-      { id: 102, name: "Takchita Cérémonie", price: "3 200 DH", stock: 3, image: "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=500&h=400&fit=crop", description: "Takchita mariage" }
-    ],
-    2: [ 
-      { id: 201, name: "Tapis Berbère Moyen", price: "1 200 DH", stock: 4, image: "https://images.unsplash.com/photo-1526721940322-10fb6e3ae94a?w=500&h=400&fit=crop", description: "Tapis laine naturelle" }
-    ],
-    3: [ 
-      { id: 301, name: "Tajine Traditionnel", price: "180 DH", stock: 20, image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=500&h=400&fit=crop", description: "Terre cuite peinte" }
-    ],
-    4: [ 
-      { id: 401, name: "Petite Table Marqueterie", price: "850 DH", stock: 4, image: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=500&h=400&fit=crop", description: "Table cèdre incrusté" }
-    ],
-    5: [ 
-      { id: 501, name: "Bracelet Argent Amazigh", price: "450 DH", stock: 10, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500&h=400&fit=crop", description: "Argent, symbole amazigh" }
-    ],
-    6: [ 
-      { id: 601, name: "Lanterne Laiton", price: "380 DH", stock: 8, image: "https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=500&h=400&fit=crop", description: "Laiton martelé" }
-    ],
-    7: [ 
-      { id: 701, name: "Huile d'Argan Bio", price: "120 DH", stock: 50, image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=500&h=400&fit=crop", description: "Argan 100% pur" }
-    ],
-    8: [ 
-      { id: 801, name: "Huile d'Olive Vierge", price: "85 DH", stock: 40, image: "https://images.unsplash.com/photo-1599851152730-1f83a654bb9a?w=500&h=400&fit=crop", description: "Extra vierge" }
-    ]
-  };
-
   let allProducts = [];
 
   function loadAllProducts() {
-    allProducts = [];
-    const s = localStorage.getItem('greenmarket_stores');
-    let currentStores = s ? JSON.parse(s) : stores;
-    currentStores.forEach(shop => {
-      let shopProducts = JSON.parse(localStorage.getItem(`products_${shop.id}`)) || defaultProducts[shop.categoryId] || [];
-      shopProducts.forEach(prod => {
-        allProducts.push({ ...prod, shopId: shop.id, shopName: shop.name, category: shop.category });
-      });
-    });
+    allProducts = [
+      { id: 101, name: "Caftan en Soie", price: "2 500 DH", stock: 5, image: "IMAGES/CaftanSoie.jpg", description: "Caftan en soie naturelle, broderies faites main par des maîtres-artisans de Fès.", shopId: 1, shopName: "Maison du Caftan", category: "Caftans & Vêtements traditionnels" },
+      { id: 102, name: "Takchita Cérémonie", price: "3 200 DH", stock: 3, image: "IMAGES/1779140603090.png", description: "Takchita pour mariage, broderies d'or et d'argent.", shopId: 10, shopName: "Caftans Impériaux", category: "Caftans & Vêtements traditionnels" },
+      { id: 103, name: "Caftan Moderne", price: "1 800 DH", stock: 8, image: "IMAGES/CaftanModerne.jpg", description: "Caftan à la coupe contemporaine, idéal pour les occasions spéciales.", shopId: 1, shopName: "Maison du Caftan", category: "Caftans & Vêtements traditionnels" },
+      { id: 201, name: "Tapis Berbère Moyen", price: "1 200 DH", stock: 4, image: "IMAGES/1779140612922.png", description: "Tapis en laine naturelle, motifs berbères authentiques.", shopId: 2, shopName: "Tapis Berbère d'Atlas", category: "Tapis & Tissage" },
+      { id: 202, name: "Tapis Azilal", price: "950 DH", stock: 6, image: "IMAGES/1779141008846.png", description: "Tapis coloré des montagnes d'Azilal, motifs géométriques uniques.", shopId: 9, shopName: "Tissage d'Azilal", category: "Tapis & Tissage" },
+      { id: 301, name: "Tajine Traditionnel", price: "180 DH", stock: 20, image: "IMAGES/1779140622713.png", description: "Tajine en terre cuite, motif peint à la main.", shopId: 3, shopName: "Poterie de Safi", category: "Poterie & Céramique" },
+      { id: 401, name: "Petite Table Marqueterie", price: "850 DH", stock: 4, image: "IMAGES/1779140702263.png", description: "Table en cèdre incrusté, marqueterie fine.", shopId: 4, shopName: "Marqueterie de Tetouan", category: "Marqueterie & Bois" },
+      { id: 501, name: "Bracelet Argent Amazigh", price: "450 DH", stock: 10, image: "IMAGES/1779140781327.png", description: "Bracelet en argent, symbole amazigh.", shopId: 5, shopName: "Bijoux Amaziagh", category: "Bijoux & Joaillerie" },
+      { id: 601, name: "Lanterne Laiton", price: "380 DH", stock: 8, image: "IMAGES/1779140836694.png", description: "Lanterne en laiton martelé, ambiance orientale.", shopId: 6, shopName: "Lumières de Marrakech", category: "Lampes & Fer forgé" },
+      { id: 701, name: "Huile d'Argan Bio", price: "120 DH", stock: 50, image: "IMAGES/1779140886747.png", description: "Huile d'argan 100% pure, certifiée bio.", shopId: 7, shopName: "Argamane Naturel", category: "Cosmétiques naturels" },
+      { id: 801, name: "Huile d'Olive Vierge", price: "85 DH", stock: 40, image: "IMAGES/1779140962074.png", description: "Huile d'olive extra vierge, première pression.", shopId: 8, shopName: "Saveurs du Terroir", category: "Produits du terroir" },
+      { id: 802, name: "Amlou", price: "95 DH", stock: 25, image: "IMAGES/1779140962074.png", description: "Purée d'amandes et miel d'argan, délice marocain.", shopId: 8, shopName: "Saveurs du Terroir", category: "Produits du terroir" }
+    ];
   }
 
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+  function getPriceValue(priceStr) {
+    return parseInt(priceStr.replace(/\D/g, '')) || 0;
   }
 
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.innerHTML = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3200);
+  function updateStats() {
+    const statsProducts = document.getElementById('statProducts');
+    const statsStores = document.getElementById('statStores');
+    if (statsProducts) statsProducts.textContent = allProducts.length;
+    if (statsStores) {
+      const uniqueStores = [...new Set(allProducts.map(p => p.shopId))].length;
+      statsStores.textContent = uniqueStores;
+    }
   }
 
   let activeCategory = null;
 
   function renderCategories() {
     const list = document.getElementById('categoryList');
+    if (!list) return;
+    
     list.innerHTML = `
       <div class="category-item${activeCategory === null ? ' active' : ''}" data-name="">
         <div class="cat-left"><span class="cat-icon">📦</span><span class="cat-name">Tous les produits</span></div>
@@ -356,29 +637,21 @@
         </div>
       `).join('')}
     `;
+    
     list.querySelectorAll('.category-item').forEach(el => {
       el.addEventListener('click', () => {
         activeCategory = el.dataset.name || null;
-        document.getElementById('catFilter').value = activeCategory || '';
+        const catFilter = document.getElementById('catFilter');
+        if (catFilter) catFilter.value = activeCategory || '';
         renderCategories(); 
         renderProducts();
       });
     });
   }
 
-  function updateStats() {
-    document.getElementById('statProducts').textContent = allProducts.length;
-    const uniqueStores = [...new Set(allProducts.map(p => p.shopId))].length;
-    document.getElementById('statStores').textContent = uniqueStores;
-  }
-
-  function getPriceValue(priceStr) {
-    return parseInt(priceStr.replace(/\D/g, '')) || 0;
-  }
-
   function renderProducts() {
-    const q = document.getElementById('searchInput').value.toLowerCase();
-    const sort = document.getElementById('sortFilter').value;
+    const q = document.getElementById('searchInput')?.value.toLowerCase() || '';
+    const sort = document.getElementById('sortFilter')?.value || '';
     
     let list = allProducts.filter(p => {
       const ms = !q || p.name.toLowerCase().includes(q) || p.shopName.toLowerCase().includes(q);
@@ -390,36 +663,72 @@
     else if (sort === 'price_desc') list.sort((a, b) => getPriceValue(b.price) - getPriceValue(a.price));
     else if (sort === 'name') list.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
 
-    document.getElementById('storesTitle').textContent = activeCategory || 'Tous les produits artisanaux';
-    document.getElementById('storesCount').textContent = `${list.length} produit${list.length > 1 ? 's' : ''}`;
+    const storesTitle = document.getElementById('storesTitle');
+    const storesCount = document.getElementById('storesCount');
+    if (storesTitle) storesTitle.textContent = activeCategory || 'Tous les produits artisanaux';
+    if (storesCount) storesCount.textContent = `${list.length} produit${list.length > 1 ? 's' : ''}`;
     
     updateStats();
     
     const grid = document.getElementById('productsGrid');
+    if (!grid) return;
+    
     if (!list.length) {
       grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2rem;">Aucun produit trouvé.</div>`;
       return;
     }
     
     grid.innerHTML = list.map(p => `
-      <div class="store-card">
-        <div class="store-banner" onclick="window.location.href='info-store.html?id=${p.shopId}'">
-          <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=700&q=80'">
+      <div class="product-card">
+        <div class="product-banner" onclick="window.location.href='store-detail.html?id=${p.shopId}'">
+          <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.src='https://placehold.co/500x400?text=Produit'">
           <span class="product-price-badge">${escapeHtml(p.price)}</span>
         </div>
-        <div class="store-body">
-          <div class="store-name">${escapeHtml(p.name)}</div>
-          <span class="store-category-tag" onclick="window.location.href='info-store.html?id=${p.shopId}'">🏪 ${escapeHtml(p.shopName)}</span>
-          <p class="store-desc">${escapeHtml(p.description)}</p>
-          <div class="store-stats">
-            <div><span class="store-stat-val">${p.stock}</span><span class="store-stat-label">En stock</span></div>
-            <button class="add-cart-btn" onclick="showToast('🛒 ${escapeHtml(p.name)} ajouté au panier')">Ajouter au panier</button>
+        <div class="product-body">
+          <div class="product-name">${escapeHtml(p.name)}</div>
+          <span class="product-shop-tag" onclick="window.location.href='store-detail.html?id=${p.shopId}'">🏪 ${escapeHtml(p.shopName)}</span>
+          <p class="product-desc">${escapeHtml(p.description)}</p>
+          <div class="product-stats">
+            <div>
+              <span class="product-stock">${p.stock}</span>
+              <span class="stock-label"> En stock</span>
+            </div>
+            <button class="add-cart-btn" onclick="addToCart({id:${p.id}, name:'${escapeHtml(p.name)}', price:'${p.price}', image:'${p.image}', shopId:${p.shopId}, shopName:'${escapeHtml(p.shopName)}'})">🛒 Ajouter</button>
           </div>
         </div>
       </div>
     `).join('');
   }
 
+  // ========== CARGAR HEADER E INICIALIZAR ==========
+  async function loadHeaderAndInit() {
+    try {
+      const response = await fetch('header.html');
+      if (!response.ok) throw new Error('Error cargando header');
+      const headerHtml = await response.text();
+      document.getElementById('header-placeholder').innerHTML = headerHtml;
+      
+      setTimeout(() => {
+        initUsers();
+        updateCartCount();
+        updateAuthUI();
+        setupAuthModal();
+        loadAllProducts();
+        renderCategories();
+        renderProducts();
+      }, 100);
+    } catch (error) {
+      console.error('Error:', error);
+      initUsers();
+      updateAuthUI();
+      setupAuthModal();
+      loadAllProducts();
+      renderCategories();
+      renderProducts();
+    }
+  }
+
+  // Event listeners
   document.getElementById('searchInput')?.addEventListener('input', renderProducts);
   document.getElementById('sortFilter')?.addEventListener('change', renderProducts);
   document.getElementById('catFilter')?.addEventListener('change', e => {
@@ -428,16 +737,15 @@
     renderProducts();
   });
 
+  // Llenar catFilter
   categories.forEach(c => {
     const opt = document.createElement('option');
-    opt.value = c.name; opt.textContent = c.name;
+    opt.value = c.name;
+    opt.textContent = c.name;
     document.getElementById('catFilter')?.appendChild(opt);
   });
 
-  loadHeader();
-  loadAllProducts();
-  renderCategories();
-  renderProducts();
+  loadHeaderAndInit();
 </script>
 </body>
 </html>

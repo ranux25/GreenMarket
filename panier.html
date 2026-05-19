@@ -2,9 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
 <title>GreenMarket – Mon Panier</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="header.css">
 <style>
 :root{
   --cream:#fff9eb;
@@ -21,7 +22,13 @@
 
 *{ margin:0; padding:0; box-sizing:border-box; }
 
-body{ font-family:'Jost',sans-serif; background:var(--cream); color:var(--text); }
+body{ 
+  font-family:'Lato', sans-serif; 
+  background:var(--cream); 
+  color:var(--text); 
+  margin:0;
+  padding:0;
+}
 
 #header-placeholder { width: 100%; }
 
@@ -44,7 +51,7 @@ body{ font-family:'Jost',sans-serif; background:var(--cream); color:var(--text);
 }
 
 .page-header h1{
-  font-family:'Cormorant Garamond',serif;
+  font-family:'Playfair Display', serif;
   font-size:3rem;
 }
 
@@ -109,7 +116,7 @@ body{ font-family:'Jost',sans-serif; background:var(--cream); color:var(--text);
   box-shadow:0 10px 30px var(--shadow);
 }
 
-.summary h2{ font-family:'Cormorant Garamond',serif; margin-bottom:1rem; }
+.summary h2{ font-family:'Playfair Display', serif; margin-bottom:1rem; }
 
 .summary-line{ display:flex; justify-content:space-between; margin:.8rem 0; }
 
@@ -155,18 +162,39 @@ body{ font-family:'Jost',sans-serif; background:var(--cream); color:var(--text);
 </div>
 
 <script>
-  function loadHeader() {
-    fetch('header.html')
-      .then(response => {
-        if (!response.ok) throw new Error("Erreur");
-        return response.text();
-      })
-      .then(data => {
-        document.getElementById('header-placeholder').innerHTML = data;
-      })
-      .catch(error => console.error(error));
+  // ========== FUNCIONES GLOBALES ==========
+  function showToast(msg, bg = 'var(--wine)') {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+      const t = document.createElement('div');
+      t.id = 'toast';
+      t.style.cssText = `
+        position: fixed; bottom: 28px; right: 28px;
+        background: var(--wine); color: #fff;
+        padding: 14px 22px; border-radius: 12px;
+        font-family: 'Lato', sans-serif; font-weight: 700;
+        font-size: 14px; box-shadow: 0 8px 24px rgba(93,13,24,0.3);
+        z-index: 9999; transform: translateY(80px);
+        opacity: 0; transition: transform 0.35s, opacity 0.3s;
+        pointer-events: none;
+      `;
+      document.body.appendChild(t);
+    }
+    toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.background = bg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2800);
   }
 
+  function updateCartCount() {
+    const panier = getPanier();
+    const total = panier.reduce((sum, item) => sum + (item.quantite || 1), 0);
+    const badge = document.getElementById('cart-count');
+    if (badge) badge.textContent = total;
+  }
+
+  // ========== FUNCIONES DEL PANIER ==========
   function getPanier(){
     const saved = localStorage.getItem('greenmarket_panier');
     return saved ? JSON.parse(saved) : [];
@@ -174,6 +202,7 @@ body{ font-family:'Jost',sans-serif; background:var(--cream); color:var(--text);
 
   function savePanier(panier){
     localStorage.setItem('greenmarket_panier', JSON.stringify(panier));
+    updateCartCount();
     renderCart();
   }
 
@@ -181,6 +210,7 @@ body{ font-family:'Jost',sans-serif; background:var(--cream); color:var(--text);
     let panier = getPanier();
     panier = panier.filter(item => item.id !== id);
     savePanier(panier);
+    showToast("🗑️ Produit supprimé du panier");
   }
 
   function changeQuantity(id, delta){
@@ -197,7 +227,9 @@ body{ font-family:'Jost',sans-serif; background:var(--cream); color:var(--text);
   function clearCart(){
     if(confirm("Vider le panier ?")){
       localStorage.removeItem('greenmarket_panier');
+      updateCartCount();
       renderCart();
+      showToast("🛒 Panier vidé");
     }
   }
 
@@ -208,7 +240,7 @@ body{ font-family:'Jost',sans-serif; background:var(--cream); color:var(--text);
   function goCheckout(){
     const panier = getPanier();
     if(panier.length === 0){
-      alert("Panier vide");
+      showToast("🛒 Votre panier est vide", "#9a4a00");
       return;
     }
     const productosParaCheckout = panier.map(item => ({
@@ -246,10 +278,10 @@ body{ font-family:'Jost',sans-serif; background:var(--cream); color:var(--text);
         <div class="cart-items">
           ${panier.map(item => `
             <div class="cart-item">
-              <img src="${item.image}" alt="${item.nom}">
+              <img src="${item.image}" alt="${item.nom}" onerror="this.src='https://placehold.co/110x110?text=Produit'">
               <div class="item-info">
-                <div class="item-name">${item.nom}</div>
-                <div class="item-shop">Boutique : ${item.boutiqueNom}</div>
+                <div class="item-name">${escapeHtml(item.nom)}</div>
+                <div class="item-shop">Boutique : ${escapeHtml(item.boutiqueNom)}</div>
                 <div class="item-price">${item.prix}</div>
                 <div class="quantity-controls">
                   <button onclick="changeQuantity(${item.id}, -1)">-</button>
@@ -278,8 +310,31 @@ body{ font-family:'Jost',sans-serif; background:var(--cream); color:var(--text);
     `;
   }
 
-  loadHeader();
-  renderCart();
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
+  }
+
+  // ========== CARGAR HEADER ==========
+  async function loadHeaderAndInit() {
+    try {
+      const response = await fetch('header.html');
+      if (!response.ok) throw new Error('Error cargando header');
+      const headerHtml = await response.text();
+      document.getElementById('header-placeholder').innerHTML = headerHtml;
+      
+      setTimeout(() => {
+        updateCartCount();
+        renderCart();
+      }, 100);
+    } catch (error) {
+      console.error('Error:', error);
+      renderCart();
+    }
+  }
+
+  // Iniciar
+  loadHeaderAndInit();
 </script>
 </body>
 </html>
