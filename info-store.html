@@ -595,19 +595,57 @@
   .image-preview {
     margin-top: 0.5rem;
     width: 100%;
-    height: 100px;
+    min-height: 120px;
     background: var(--cream);
-    border: 1.5px solid var(--border);
+    border: 2px dashed var(--border);
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    position: relative;
+    transition: all 0.2s;
+  }
+  .image-preview.drag-over {
+    border-color: var(--wine);
+    background: var(--wine-pale);
   }
   .image-preview img {
     max-width: 100%;
-    max-height: 100%;
+    max-height: 150px;
     object-fit: contain;
+  }
+  .preview-placeholder {
+    text-align: center;
+    padding: 1rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+  .preview-placeholder::before {
+    content: "🖼️ ";
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+  .btn-clear-image {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(93,13,24,0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .btn-clear-image:hover {
+    background: var(--wine);
   }
   .modal-actions {
     display: flex;
@@ -713,6 +751,33 @@
   }
   .btn-filled:hover { background: var(--wine-dark); }
 
+  /* Estilos para el input de archivo */
+  .file-input-wrapper {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+  .file-input-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--sage-light);
+    color: var(--sage-dark);
+    padding: 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: background 0.2s;
+  }
+  .file-input-label:hover {
+    background: var(--sage);
+    color: white;
+  }
+  .file-input-label input {
+    display: none;
+  }
+
   @media (max-width: 700px) {
     .desktop-nav { display: none; }
     .container { padding: 0 1rem; }
@@ -798,6 +863,7 @@
 <script>
   let currentUser = null;
   let productsData = {};
+  let currentImageDataUrl = null; // Para almacenar la imagen seleccionada temporalmente
 
   function getPanier() {
     const saved = localStorage.getItem('greenmarket_panier');
@@ -1017,7 +1083,7 @@
       name: product.name,
       price: product.price,
       stock: product.stock || 0,
-      image: product.image || 'https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop',
+      image: product.image || 'https://images.unsplash.com/-1542838132-92c533f91d2a?w=300&h=200&fit=crop',
       description: product.description || ''
     });
     saveProductsToStorage(shopId);
@@ -1073,26 +1139,53 @@
     document.getElementById('productName').value = product?.name || '';
     document.getElementById('productPrice').value = product?.price || '';
     document.getElementById('productStock').value = product?.stock || 0;
-    document.getElementById('productImageUrl').value = product?.image || '';
     document.getElementById('productDesc').value = product?.description || '';
-    document.getElementById('productImageFile').value = '';
-    document.getElementById('imagePreview').innerHTML = product?.image ? `<img src="${product.image}" alt="Aperçu">` : '<div class="preview-placeholder">Aucune image</div>';
     
-    document.querySelector('input[name="productImageType"][value="url"]').checked = true;
-    document.getElementById('productUrlContainer').style.display = 'block';
-    document.getElementById('productFileContainer').style.display = 'none';
+    // Limpiar y resetear la vista previa
+    currentImageDataUrl = null;
+    const previewDiv = document.getElementById('imagePreview');
+    if (product?.image && product.image !== 'https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop') {
+      previewDiv.innerHTML = `<img src="${product.image}" alt="Aperçu"><button class="btn-clear-image" onclick="clearImagePreview()">✕</button>`;
+    } else {
+      previewDiv.innerHTML = '<div class="preview-placeholder">Haz clic para seleccionar una imagen de tu galería</div>';
+    }
+    
+    // Resetear el input de archivo
+    const fileInput = document.getElementById('productImageFile');
+    if (fileInput) fileInput.value = '';
+    
+    // Asegurar que la opción de archivo esté seleccionada por defecto (para subir desde galería)
+    document.querySelector('input[name="productImageType"][value="file"]').checked = true;
+    document.getElementById('productUrlContainer').style.display = 'none';
+    document.getElementById('productFileContainer').style.display = 'block';
     
     document.getElementById('productModal').classList.add('open');
+  }
+
+  function clearImagePreview() {
+    const previewDiv = document.getElementById('imagePreview');
+    previewDiv.innerHTML = '<div class="preview-placeholder">Haz clic para seleccionar una imagen de tu galería</div>';
+    currentImageDataUrl = null;
+    const fileInput = document.getElementById('productImageFile');
+    if (fileInput) fileInput.value = '';
   }
 
   function closeProductModal() {
     document.getElementById('productModal').classList.remove('open');
     editingProductId = null;
     currentShopId = null;
+    currentImageDataUrl = null;
   }
 
   function getProductImage(callback) {
     const imageType = document.querySelector('input[name="productImageType"]:checked').value;
+    
+    // Si tenemos una imagen guardada desde la vista previa, usarla
+    if (currentImageDataUrl) {
+      callback(currentImageDataUrl);
+      return;
+    }
+    
     if (imageType === 'url') {
       const url = document.getElementById('productImageUrl').value.trim();
       callback(url || 'https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop');
@@ -1101,11 +1194,18 @@
       if (file) {
         const reader = new FileReader();
         reader.onload = function(event) {
+          currentImageDataUrl = event.target.result;
           callback(event.target.result);
         };
         reader.readAsDataURL(file);
       } else {
-        callback('https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop');
+        // Si no hay archivo seleccionado, mantener la imagen actual o usar por defecto
+        const previewImg = document.querySelector('#imagePreview img');
+        if (previewImg && previewImg.src && !previewImg.src.includes('placeholder')) {
+          callback(previewImg.src);
+        } else {
+          callback('https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop');
+        }
       }
     }
   }
@@ -1124,10 +1224,10 @@
     getProductImage((image) => {
       if (editingProductId) {
         updateProduct(currentShopId, editingProductId, { name, price, stock, image, description });
-        showToast("✅ Produit modifié");
+        showToast("✅ Produit modifié avec succès");
       } else {
         addProduct(currentShopId, { name, price, stock, image, description });
-        showToast("✅ Produit ajouté");
+        showToast("✅ Produit ajouté avec succès");
       }
       closeProductModal();
       loadShop();
@@ -1146,24 +1246,55 @@
       radioUrl.addEventListener('change', () => {
         urlContainer.style.display = 'block';
         fileContainer.style.display = 'none';
+        currentImageDataUrl = null;
       });
       radioFile.addEventListener('change', () => {
         urlContainer.style.display = 'none';
         fileContainer.style.display = 'block';
+        currentImageDataUrl = null;
       });
     }
     
+    // Mejorar la selección de archivos desde la galería
     if (fileInput) {
+      // Hacer que el área de preview sea clickeable para abrir la galería
+      if (preview) {
+        preview.style.cursor = 'pointer';
+        preview.addEventListener('click', (e) => {
+          if (e.target.classList && e.target.classList.contains('btn-clear-image')) return;
+          fileInput.click();
+        });
+      }
+      
       fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
+          // Validar que sea una imagen
+          if (!file.type.startsWith('image/')) {
+            showToast("❌ Por favor selecciona una imagen válida (JPG, PNG, GIF)", '#9a4a00');
+            fileInput.value = '';
+            return;
+          }
+          
           const reader = new FileReader();
           reader.onload = function(event) {
-            preview.innerHTML = `<img src="${event.target.result}" alt="Aperçu">`;
+            currentImageDataUrl = event.target.result;
+            preview.innerHTML = `<img src="${event.target.result}" alt="Aperçu"><button class="btn-clear-image" onclick="clearImagePreview()">✕</button>`;
+            showToast("📸 Image chargée depuis votre galerie", 'var(--sage)');
           };
           reader.readAsDataURL(file);
-        } else {
-          preview.innerHTML = '<div class="preview-placeholder">Aucune image</div>';
+        }
+      });
+    }
+    
+    // Mejorar el preview para URL
+    const imageUrlInput = document.getElementById('productImageUrl');
+    if (imageUrlInput) {
+      imageUrlInput.addEventListener('input', (e) => {
+        const url = e.target.value.trim();
+        if (url && (url.startsWith('http') || url.startsWith('https'))) {
+          const preview = document.getElementById('imagePreview');
+          preview.innerHTML = `<img src="${url}" alt="Aperçu"><button class="btn-clear-image" onclick="clearImagePreview()">✕</button>`;
         }
       });
     }
@@ -1300,20 +1431,22 @@
           <input type="number" id="productStock" placeholder="Stock">
           
           <div class="image-option-group">
-            <label><input type="radio" name="productImageType" value="url" checked> 🌐 URL d'image</label>
-            <label><input type="radio" name="productImageType" value="file"> 📁 Télécharger un fichier</label>
+            <label><input type="radio" name="productImageType" value="file" checked> 📸 Depuis ma galerie</label>
+            <label><input type="radio" name="productImageType" value="url"> 🌐 URL d'image</label>
           </div>
-          <div id="productUrlContainer">
+          <div id="productFileContainer" style="display: block;">
+            <div id="imagePreview" class="image-preview" style="cursor: pointer;">
+              <div class="preview-placeholder">📸 Haz clic aquí para seleccionar una imagen de tu galería</div>
+            </div>
+            <input type="file" id="productImageFile" accept="image/*" style="display: none;">
+          </div>
+          <div id="productUrlContainer" style="display: none;">
             <input type="text" id="productImageUrl" placeholder="https://images.unsplash.com/...">
-          </div>
-          <div id="productFileContainer" style="display: none;">
-            <input type="file" id="productImageFile" accept="image/*">
-            <div id="imagePreview" class="image-preview"><div class="preview-placeholder">Aucune image</div></div>
           </div>
           
           <textarea id="productDesc" placeholder="Description" rows="2"></textarea>
           <div class="modal-actions">
-            <button class="btn-save" id="saveProductBtn">Enregistrer</button>
+            <button class="btn-save" id="saveProductBtn">💾 Enregistrer</button>
             <button class="btn-cancel" id="cancelProductBtn">Annuler</button>
           </div>
         </div>
@@ -1341,11 +1474,13 @@
     };
   }
 
+  // Exponer funciones globalmente
   window.openProductModal = openProductModal;
   window.deleteProductConfirm = deleteProductConfirm;
   window.closeProductModal = closeProductModal;
   window.ajouterAuPanier = ajouterAuPanier;
   window.acheterMaintenant = acheterMaintenant;
+  window.clearImagePreview = clearImagePreview;
 
   function initAuth() {
     updateAuthUI();

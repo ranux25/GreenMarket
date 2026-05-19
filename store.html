@@ -689,7 +689,7 @@
         <input type="text" id="catIconInput" placeholder="🏺" maxlength="4">
         <div class="form-actions"><button class="btn-sm-cancel" id="cancelCat">Annuler</button><button class="btn-sm-wine" id="saveCat">Enregistrer</button></div>
       </div>
-      <div class="role-notice" id="roleNotice"></div>
+      
     </div>
     <div id="createShopSection" class="create-shop-section" style="display: none;">
       <div class="create-shop-header"><h3>🏪 Créer ma boutique artisanale</h3></div>
@@ -1180,7 +1180,6 @@ function updateCategoriesPermissions() {
     notice.innerHTML = '';
   } else {
     btn.style.display = 'none';
-    notice.innerHTML = '🔒 Seuls les administrateurs peuvent gérer les catégories.';
   }
 }
 
