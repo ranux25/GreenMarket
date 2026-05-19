@@ -25,20 +25,34 @@
 
 <div class="container">
   <h2>Tous nos produits</h2>
-  <div class="grid" id="productGrid">
-  </div>
+  <div class="grid" id="productGrid"></div>
 </div>
 
 <script>
   function renderAllProducts() {
     const grid = document.getElementById('productGrid');
-    const stores = JSON.parse(localStorage.getItem('greenmarket_stores') || '[]');
     let allProducts = [];
 
+    // 1. إضافة المنتجات الثابتة من accueil.html
+    const staticProducts = [
+      { id: 1, name: "Caftan traditionnel", price: "450 DH", image: "images/caftan.jfif", shopId: 1 },
+      { id: 2, name: "Huile d'olive extra vierge", price: "120 DH / litre", image: "images/olive.jfif", shopId: 2 },
+      { id: 3, name: "Mélange plantes médicinales", price: "45 DH", image: "images/plante.jfif", shopId: 3 },
+      { id: 4, name: "Tapis berbère", price: "1 200 DH", image: "images/tapis.jfif", shopId: 1 }
+    ];
+    allProducts = [...staticProducts];
+
+    // 2. دمج المنتجات من localStorage
+    const stores = JSON.parse(localStorage.getItem('greenmarket_stores') || '[]');
     stores.forEach(store => {
-      const products = JSON.parse(localStorage.getItem(`products_${store.id}`) || '[]');
-      products.forEach(p => {
-        allProducts.push({ ...p, shopId: store.id });
+      const storedProducts = JSON.parse(localStorage.getItem(`products_${store.id}`) || '[]');
+      storedProducts.forEach(p => {
+        allProducts.push({ 
+          name: p.name, 
+          price: p.price, 
+          image: p.image || 'https://placehold.co/300x200', 
+          shopId: store.id 
+        });
       });
     });
 
@@ -50,7 +64,7 @@
     grid.innerHTML = allProducts.map(p => `
       <div class="product-card" onclick="window.location.href='info-store.html?id=${p.shopId}'">
         <div class="product-img">
-          <img src="${p.image}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover;">
+          <img src="${p.image}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://placehold.co/300x200?text=Produit'">
         </div>
         <div class="product-info">
           <h3>${p.name}</h3>
