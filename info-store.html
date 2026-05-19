@@ -37,16 +37,6 @@
     min-height: 100vh;
   }
 
-  /* ========== HEADER ========== */
-  header {
-    background: #9FB2AC;
-    border-bottom: 2px solid #f0e8d5;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 16px rgba(93,13,24,0.07);
-  }
-
   .search-bar input {
     border: 1.5px solid #e8dfc8;
     background: #fdf8ee;
@@ -751,7 +741,6 @@
   }
   .btn-filled:hover { background: var(--wine-dark); }
 
-  /* Estilos para el input de archivo */
   .file-input-wrapper {
     position: relative;
     margin-bottom: 1rem;
@@ -791,40 +780,7 @@
 </head>
 <body>
 
-<header>
-  <div style="max-width: 1280px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-
-    <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='accueil.html'">
-      <div style="height: 65px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-        <img src="IMAGES/logo.png" alt="GreenMarket Logo" style="height: 100%; width: auto; object-fit: contain;" onerror="this.src='https://placehold.co/65x65?text=GM'"/>
-      </div>
-      <span style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: 1px;">GreenMarket</span>
-    </div>
-
-    <div class="search-bar" style="flex: 1; display: flex; justify-content: center; min-width: 180px;">
-      <input type="text" id="headerSearchInput" placeholder="Rechercher un produit traditionnel..."/>
-    </div>
-
-    <nav class="desktop-nav">
-      <a href="accueil.html" class="nav-link">Accueil</a>
-      <a href="store.html" class="nav-link">Boutiques</a>
-      <a href="#" class="nav-link">Produits</a>
-      <a href="#" class="nav-link">À propos</a>
-      <a href="dashboard-producteur.html" id="dashboardLink" class="nav-link" style="display: none;">📊 Dashboard</a>
-    </nav>
-
-    <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
-      <button class="cart-btn" title="Panier">
-        <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#5D0D18" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 6h14M9 21a1 1 0 1 0 2 0M15 21a1 1 0 1 0 2 0"/>
-        </svg>
-        <span class="cart-badge" id="cart-count">0</span>
-      </button>
-      <div id="authWidget"></div>
-    </div>
-
-  </div>
-</header>
+<div id="header-placeholder"></div>
 
 <div class="page-header">
   <div class="header-inner">
@@ -861,9 +817,27 @@
 </div>
 
 <script>
+  function loadHeaderAndInit() {
+    fetch('header.html')
+      .then(response => {
+        if (!response.ok) throw new Error("Erreur");
+        return response.text();
+      })
+      .then(data => {
+        document.getElementById('header-placeholder').innerHTML = data;
+        initAuth();
+        loadShop();
+      })
+      .catch(error => {
+        console.error(error);
+        initAuth();
+        loadShop();
+      });
+  }
+
   let currentUser = null;
   let productsData = {};
-  let currentImageDataUrl = null; // Para almacenar la imagen seleccionada temporalmente
+  let currentImageDataUrl = null;
 
   function getPanier() {
     const saved = localStorage.getItem('greenmarket_panier');
@@ -963,6 +937,7 @@
 
   function updateAuthUI() {
     const widget = document.getElementById('authWidget');
+    if (!widget) return;
     const user = getCurrentUser();
     if (user) {
       const roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Artisan' : 'Client');
@@ -983,31 +958,39 @@
 
   function showAuthModal() {
     const modal = document.getElementById('authModal');
-    modal.classList.add('open');
+    if(modal) modal.classList.add('open');
   }
 
   function closeAuthModal() {
-    document.getElementById('authModal').classList.remove('open');
+    const modal = document.getElementById('authModal');
+    if(modal) modal.classList.remove('open');
   }
 
   function setupAuthModal() {
-    document.getElementById('doLoginBtn').addEventListener('click', () => {
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      const result = login(email, password);
-      if (result.success) {
-        closeAuthModal();
-        updateAuthUI();
-        showToast(`👋 Bonjour ${result.user.name} !`);
-        location.reload();
-      } else {
-        document.getElementById('loginError').textContent = result.error;
-      }
-    });
-    document.getElementById('closeAuthModal').addEventListener('click', closeAuthModal);
-    document.getElementById('authModal').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('authModal')) closeAuthModal();
-    });
+    const btn = document.getElementById('doLoginBtn');
+    if(btn) {
+      btn.addEventListener('click', () => {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const result = login(email, password);
+        if (result.success) {
+          closeAuthModal();
+          updateAuthUI();
+          showToast(`👋 Bonjour ${result.user.name} !`);
+          location.reload();
+        } else {
+          document.getElementById('loginError').textContent = result.error;
+        }
+      });
+    }
+    const closeBtn = document.getElementById('closeAuthModal');
+    if(closeBtn) closeBtn.addEventListener('click', closeAuthModal);
+    const modal = document.getElementById('authModal');
+    if(modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeAuthModal();
+      });
+    }
   }
 
   function login(email, password) {
@@ -1141,7 +1124,6 @@
     document.getElementById('productStock').value = product?.stock || 0;
     document.getElementById('productDesc').value = product?.description || '';
     
-    // Limpiar y resetear la vista previa
     currentImageDataUrl = null;
     const previewDiv = document.getElementById('imagePreview');
     if (product?.image && product.image !== 'https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop') {
@@ -1150,11 +1132,9 @@
       previewDiv.innerHTML = '<div class="preview-placeholder">Haz clic para seleccionar una imagen de tu galería</div>';
     }
     
-    // Resetear el input de archivo
     const fileInput = document.getElementById('productImageFile');
     if (fileInput) fileInput.value = '';
     
-    // Asegurar que la opción de archivo esté seleccionada por defecto (para subir desde galería)
     document.querySelector('input[name="productImageType"][value="file"]').checked = true;
     document.getElementById('productUrlContainer').style.display = 'none';
     document.getElementById('productFileContainer').style.display = 'block';
@@ -1180,7 +1160,6 @@
   function getProductImage(callback) {
     const imageType = document.querySelector('input[name="productImageType"]:checked').value;
     
-    // Si tenemos una imagen guardada desde la vista previa, usarla
     if (currentImageDataUrl) {
       callback(currentImageDataUrl);
       return;
@@ -1199,7 +1178,6 @@
         };
         reader.readAsDataURL(file);
       } else {
-        // Si no hay archivo seleccionado, mantener la imagen actual o usar por defecto
         const previewImg = document.querySelector('#imagePreview img');
         if (previewImg && previewImg.src && !previewImg.src.includes('placeholder')) {
           callback(previewImg.src);
@@ -1255,9 +1233,7 @@
       });
     }
     
-    // Mejorar la selección de archivos desde la galería
     if (fileInput) {
-      // Hacer que el área de preview sea clickeable para abrir la galería
       if (preview) {
         preview.style.cursor = 'pointer';
         preview.addEventListener('click', (e) => {
@@ -1269,7 +1245,6 @@
       fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
-          // Validar que sea una imagen
           if (!file.type.startsWith('image/')) {
             showToast("❌ Por favor selecciona una imagen válida (JPG, PNG, GIF)", '#9a4a00');
             fileInput.value = '';
@@ -1287,7 +1262,6 @@
       });
     }
     
-    // Mejorar el preview para URL
     const imageUrlInput = document.getElementById('productImageUrl');
     if (imageUrlInput) {
       imageUrlInput.addEventListener('input', (e) => {
@@ -1313,7 +1287,8 @@
     const shopId = getShopIdFromURL();
 
     if (!shopId) {
-      document.getElementById('content').innerHTML = `<div class="error"><h2>❌ Boutique non spécifiée</h2><a href="store.html" class="btn-back">Retour</a></div>`;
+      const content = document.getElementById('content');
+      if(content) content.innerHTML = `<div class="error"><h2>❌ Boutique non spécifiée</h2><a href="store.html" class="btn-back">Retour</a></div>`;
       return;
     }
 
@@ -1321,7 +1296,8 @@
     const shop = shops.find(s => s.id == shopId);
 
     if (!shop) {
-      document.getElementById('content').innerHTML = `<div class="error"><h2>❌ Boutique introuvable</h2><a href="store.html" class="btn-back">Retour</a></div>`;
+      const content = document.getElementById('content');
+      if(content) content.innerHTML = `<div class="error"><h2>❌ Boutique introuvable</h2><a href="store.html" class="btn-back">Retour</a></div>`;
       return;
     }
 
@@ -1436,7 +1412,7 @@
           </div>
           <div id="productFileContainer" style="display: block;">
             <div id="imagePreview" class="image-preview" style="cursor: pointer;">
-              <div class="preview-placeholder">📸 Haz clic aquí para seleccionar una imagen de tu galería</div>
+              <div class="preview-placeholder">📸 Haz clic aquí para seleccionar una imagen de tu galerie</div>
             </div>
             <input type="file" id="productImageFile" accept="image/*" style="display: none;">
           </div>
@@ -1453,7 +1429,8 @@
       </div>
     `;
 
-    document.getElementById('content').innerHTML = html;
+    const content = document.getElementById('content');
+    if(content) content.innerHTML = html;
 
     setupProductModalEvents();
     
@@ -1474,7 +1451,6 @@
     };
   }
 
-  // Exponer funciones globalmente
   window.openProductModal = openProductModal;
   window.deleteProductConfirm = deleteProductConfirm;
   window.closeProductModal = closeProductModal;
@@ -1488,8 +1464,7 @@
   }
 
   mettreAJourCompteurPanier();
-  initAuth();
-  loadShop();
+  loadHeaderAndInit();
 </script>
 </body>
 </html>

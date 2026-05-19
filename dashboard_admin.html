@@ -41,15 +41,6 @@
     min-height: 100vh;
   }
 
-  /* ── HEADER ── */
-  header {
-    background: #9FB2AC;
-    border-bottom: 2px solid #f0e8d5;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 16px rgba(93,13,24,0.07);
-  }
   .nav-link {
     font-family: 'Lato', sans-serif;
     font-weight: 700;
@@ -69,7 +60,6 @@
     color: var(--wine); font-weight: 600; font-size: 0.85rem;
   }
 
-  /* ── PAGE HEADER ── */
   .page-header {
     background: var(--wine);
     padding: 3rem 2.5rem 2rem;
@@ -89,7 +79,6 @@
     color: var(--sage-light); margin-top: 0.4rem; font-size: 0.95rem;
   }
 
-  /* ── STATS GRID (TB Admin – CDC §3) ── */
   .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -120,7 +109,6 @@
     text-transform: uppercase; letter-spacing: 0.05em;
   }
 
-  /* ── MAIN CONTAINER ── */
   .admin-container {
     max-width: 1400px;
     margin: 0 auto;
@@ -130,7 +118,6 @@
     gap: 2rem;
   }
 
-  /* ── SECTIONS ── */
   .admin-section {
     background: var(--white);
     border: 1.5px solid var(--border);
@@ -154,7 +141,6 @@
     font-family: 'Jost', sans-serif;
   }
 
-  /* ── TABLES ── */
   .table-wrapper { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
   th {
@@ -177,7 +163,6 @@
     padding: 2rem; font-style: italic;
   }
 
-  /* ── BADGES ── */
   .badge {
     padding: 0.25rem 0.65rem; border-radius: 4px;
     font-size: 0.73rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;
@@ -189,7 +174,6 @@
   .badge-info     { background: #e3f1fb; color: var(--info); }
   .badge-neutral  { background: #e8ddd0; color: var(--text-muted); }
 
-  /* ── BUTTONS ── */
   .btn {
     padding: 0.4rem 0.85rem; border-radius: 4px;
     font-size: 0.8rem; font-weight: 500; cursor: pointer;
@@ -207,7 +191,6 @@
   .btn-info:hover:not(:disabled)    { background: #1e6fa0; }
   .action-group { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 
-  /* ── CATEGORY FORM ── */
   .category-form {
     padding: 1.2rem 1.5rem;
     display: grid;
@@ -229,7 +212,6 @@
   }
   .form-group input:focus { border-color: var(--wine); }
 
-  /* ── SIGNALEMENTS / REPORTS SECTION ── */
   .report-item {
     display: flex; align-items: flex-start; gap: 1rem;
     padding: 1rem 1.5rem; border-bottom: 1px solid var(--border);
@@ -241,7 +223,6 @@
   .report-meta  { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
   .report-actions { display: flex; gap: 0.4rem; margin-top: 0.5rem; }
 
-  /* ── STATISTIQUES GLOBALES ── */
   .stats-global-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -257,7 +238,6 @@
   .stat-global-val   { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; color: var(--wine); margin-top: 4px; }
   .stat-global-sub   { font-size: 0.75rem; color: var(--success); margin-top: 2px; }
 
-  /* ── PRODUITS POPULAIRES ── */
   .popular-list { padding: 0.5rem 0; }
   .popular-item {
     display: flex; align-items: center; gap: 1rem;
@@ -278,7 +258,6 @@
   .popular-shop  { font-size: 0.78rem; color: var(--text-muted); }
   .popular-sales { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; color: var(--wine); }
 
-  /* ── TOAST ── */
   .toast {
     position: fixed; bottom: 2rem; right: 2rem;
     background: var(--wine); color: var(--cream);
@@ -291,10 +270,8 @@
   }
   .toast.show { transform: translateY(0); opacity: 1; }
 
-  /* ── TWO-COL LAYOUT for popular + stats ── */
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
 
-  /* ── RESPONSIVE ── */
   @media(max-width: 900px) {
     .two-col { grid-template-columns: 1fr; }
     .category-form { grid-template-columns: 1fr; }
@@ -313,27 +290,8 @@
 </head>
 <body>
 
-<!-- ═══════════════════════ HEADER ═══════════════════════ -->
-<header>
-  <div style="max-width:1280px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-    <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="window.location.href='newstore.html'">
-      <div style="height:65px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-        <img src="IMAGES/logo.png" alt="GreenMarket Logo" style="height:100%;width:auto;object-fit:contain;" onerror="this.src='https://placehold.co/65x65?text=GM'"/>
-      </div>
-      <span style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--primary);letter-spacing:1px;">GreenMarket</span>
-    </div>
-    <nav style="margin-left:2rem;display:flex;gap:1.5rem;">
-      <a href="accueil.html" class="nav-link">Accueil</a>
-      <a href="newstore.html" class="nav-link">Boutiques</a>
-      <a href="dashboard-admin.html" class="nav-link active">📊 Panel Admin</a>
-    </nav>
-    <div style="display:flex;align-items:center;gap:12px;margin-left:auto;">
-      <div id="authWidget"></div>
-    </div>
-  </div>
-</header>
+<div id="header-placeholder"></div>
 
-<!-- ═══════════════════════ PAGE HEADER ═══════════════════════ -->
 <div class="page-header">
   <div class="header-inner">
     <h1>Tableau de Bord Administrateur</h1>
@@ -341,8 +299,6 @@
   </div>
 </div>
 
-<!-- ═══════════════════════ STATS (TB Admin – CDC) ═══════════════════════ -->
-<!-- Indicateurs: Nombre total utilisateurs | Producteurs actifs | Volume total ventes | Signalements -->
 <div class="dashboard-grid">
   <div class="stat-card">
     <span class="stat-icon">👥</span>
@@ -364,7 +320,6 @@
     <span class="stat-val" id="totalReportsCount">0</span>
     <span class="stat-label">Signalements</span>
   </div>
-  <!-- OF: Statistiques globales – produits populaires count -->
   <div class="stat-card">
     <span class="stat-icon">📦</span>
     <span class="stat-val" id="totalProductsCount">0</span>
@@ -377,13 +332,10 @@
   </div>
 </div>
 
-<!-- ═══════════════════════ MAIN CONTENT ═══════════════════════ -->
 <div class="admin-container">
 
-  <!-- ① Statistiques Globales + Produits Populaires (CDC: TB Admin) -->
   <div class="two-col">
 
-    <!-- Statistiques Globales -->
     <div class="admin-section">
       <div class="section-header">📈 Statistiques Globales</div>
       <div class="stats-global-grid">
@@ -420,17 +372,14 @@
       </div>
     </div>
 
-    <!-- Produits Populaires (CDC: TB Admin – Produits populaires) -->
     <div class="admin-section">
       <div class="section-header">🏆 Produits Populaires</div>
       <div class="popular-list" id="popularProductsList">
-        <!-- Filled by JS -->
       </div>
     </div>
 
   </div>
 
-  <!-- ② Validation des Boutiques / Producteurs (CDC: Valider compte producteur) -->
   <div class="admin-section">
     <div class="section-header">
       🏪 Validation des Boutiques / Producteurs
@@ -454,7 +403,6 @@
     </div>
   </div>
 
-  <!-- ③ Validation des Produits (CDC: Valider produit avant publication) -->
   <div class="admin-section">
     <div class="section-header">
       📦 Validation des Produits
@@ -476,18 +424,15 @@
     </div>
   </div>
 
-  <!-- ④ Signalements (CDC: TB Admin – Signalements + Traiter réclamation) -->
   <div class="admin-section">
     <div class="section-header">
       🚨 Signalements & Réclamations
       <span class="badge-count" id="reportsCount">0 signalement(s)</span>
     </div>
     <div id="reportsList">
-      <!-- Filled by JS -->
     </div>
   </div>
 
-  <!-- ⑤ Gestion des Catégories (CDC: Ajouter / Modifier / Supprimer catégorie) -->
   <div class="admin-section">
     <div class="section-header">🗂️ Gestion des Catégories</div>
     <div class="category-form">
@@ -517,13 +462,11 @@
     </div>
   </div>
 
-  <!-- ⑥ Gestion des Utilisateurs (CDC: Voir liste | Valider | Suspendre / désactiver) -->
   <div class="admin-section">
     <div class="section-header">
       👤 Gestion des Utilisateurs
       <span class="badge-count" id="usersCount">0 utilisateur(s)</span>
     </div>
-    <!-- Filtre rapide -->
     <div style="padding:1rem 1.5rem;background:var(--cream);border-bottom:1px solid var(--border);display:flex;gap:0.5rem;flex-wrap:wrap;">
       <button class="btn btn-wine" onclick="filterUsers('all')" id="filterAll">Tous</button>
       <button class="btn btn-info" onclick="filterUsers('client')" id="filterClient">Clients</button>
@@ -547,17 +490,28 @@
     </div>
   </div>
 
-</div><!-- /.admin-container -->
+</div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- ═══════════════════════════ JAVASCRIPT ═══════════════════════════ -->
 <script>
-/* ─── DATA ─── */
+function loadHeader() {
+  fetch('header.html')
+    .then(response => {
+      if (!response.ok) throw new Error("Erreur");
+      return response.text();
+    })
+    .then(data => {
+      document.getElementById('header-placeholder').innerHTML = data;
+      showAdminUI(); 
+    })
+    .catch(error => {
+      console.error(error);
+    });
+}
+
 let categories = [], stores = [], users = [], pendingProducts = [], reports = [], currentFilter = 'all';
 
-/* Données populaires fixes (simulées) */
 const popularProductsData = [
   { rank:1, name:'Caftan Brodé en Soie',        shop:'Maison du Caftan',       sales:'142 vendus',  rankClass:'gold'   },
   { rank:2, name:'Tapis Berbère Azrou',          shop:"Tapis Berbère d'Atlas",  sales:'97 vendus',   rankClass:'silver' },
@@ -566,7 +520,6 @@ const popularProductsData = [
   { rank:5, name:'Savon Beldi Naturel',          shop:'Cosmétiques du Souss',   sales:'58 vendus',   rankClass:''       },
 ];
 
-/* ─── INIT ─── */
 function initLocalStorageData() {
   const defaultCategories = [
     { id:1, icon:'👘', name:'Caftans & Vêtements traditionnels' },
@@ -609,7 +562,6 @@ function initLocalStorageData() {
   ];
   localStorage.setItem('greenmarket_pending_products', JSON.stringify(defaultProducts));
 
-  /* Signalements (CDC: Signalements + Traiter réclamation) */
   const defaultReports = [
     { id:1, type:'avis',     title:'Avis inapproprié signalé',         detail:'Un avis contient des propos offensants sur la boutique "Maison du Caftan".', user:'Karim Alami',   date:'18/05/2026', status:'pending' },
     { id:2, type:'commande', title:'Problème commande #CMD-0042',      detail:'Le client n\'a pas reçu sa commande après 15 jours.', user:'Sara Idrissi',  date:'17/05/2026', status:'pending' },
@@ -627,7 +579,6 @@ function loadData() {
   reports        = JSON.parse(localStorage.getItem('greenmarket_reports')          || '[]');
 }
 
-/* ─── SAVE ─── */
 function saveAll() {
   localStorage.setItem('greenmarket_categories',       JSON.stringify(categories));
   localStorage.setItem('greenmarket_stores',           JSON.stringify(stores));
@@ -636,7 +587,6 @@ function saveAll() {
   localStorage.setItem('greenmarket_reports',          JSON.stringify(reports));
 }
 
-/* ─── STATS ─── */
 function updateStats() {
   const activeProducers  = users.filter(u => u.role==='productor' && !u.suspendu).length;
   const suspendedUsers   = users.filter(u => u.suspendu).length;
@@ -657,29 +607,30 @@ function updateStats() {
   document.getElementById('usersCount').textContent         = users.length + ' utilisateur(s)';
 }
 
-/* ─── HEADER ─── */
 function showAdminUI() {
   let name = 'Administrateur';
   const s = sessionStorage.getItem('greenmarket_current_user');
   if (s) name = JSON.parse(s).name;
-  document.getElementById('authWidget').innerHTML =
-    `<div class="user-badge">👋 Admin: ${name}
-       <button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;font-size:1rem;">Sortir 🚪</button>
-     </div>`;
-  document.getElementById('logoutBtn')?.addEventListener('click', () => {
-    sessionStorage.removeItem('greenmarket_current_user');
-    window.location.href = 'newstore.html';
-  });
+  
+  const authWidget = document.getElementById('authWidget');
+  if(authWidget) {
+      authWidget.innerHTML =
+        `<div class="user-badge">👋 Admin: ${name}
+           <button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;font-size:1rem;">Sortir 🚪</button>
+         </div>`;
+      document.getElementById('logoutBtn')?.addEventListener('click', () => {
+        sessionStorage.removeItem('greenmarket_current_user');
+        window.location.href = 'newstore.html';
+      });
+  }
 }
 
-/* ─── TOAST ─── */
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.innerHTML = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3200);
 }
 
-/* ─── BOUTIQUES ─── */
 function renderPendingStores() {
   const tbody = document.getElementById('pendingStoresTable');
   tbody.innerHTML = '';
@@ -717,7 +668,6 @@ function toggleStoreStatus(id) {
   saveAll(); renderPendingStores(); updateStats();
 }
 
-/* ─── PRODUITS (validation avant publication – CDC) ─── */
 function renderPendingProducts() {
   const tbody = document.getElementById('pendingProductsTable');
   tbody.innerHTML = '';
@@ -752,7 +702,6 @@ function rejectProduct(id) {
   saveAll(); showToast(`❌ Produit "${p?.name}" rejeté.`); renderPendingProducts(); updateStats();
 }
 
-/* ─── SIGNALEMENTS (CDC: Traiter réclamation + Supprimer avis inapproprié) ─── */
 function renderReports() {
   const container = document.getElementById('reportsList');
   container.innerHTML = '';
@@ -791,7 +740,6 @@ function deleteReport(id) {
   saveAll(); showToast('🗑️ Signalement supprimé.'); renderReports(); updateStats();
 }
 
-/* ─── CATÉGORIES (CDC: Voir | Ajouter | Modifier | Supprimer) ─── */
 function renderCategories() {
   const tbody = document.getElementById('categoriesTable');
   tbody.innerHTML = '';
@@ -848,7 +796,6 @@ function deleteCategory(id) {
   saveAll(); showToast('🗑️ Catégorie supprimée.'); renderCategories(); updateStats();
 }
 
-/* ─── UTILISATEURS (CDC: Voir liste | Valider compte | Suspendre / désactiver) ─── */
 function filterUsers(filter) {
   currentFilter = filter;
   ['all','client','productor','suspended'].forEach(f => {
@@ -902,7 +849,6 @@ function toggleUserStatus(id) {
   users = users.map(u => {
     if (u.id === id && u.role !== 'admin') {
       u.suspendu = !u.suspendu;
-      /* Synchroniser les boutiques liées */
       if (u.suspendu) {
         stores = stores.map(s => {
           if (s.producerId === u.producerId) s.est_valider = false;
@@ -916,7 +862,6 @@ function toggleUserStatus(id) {
   saveAll(); renderUsers(); renderPendingStores(); updateStats();
 }
 
-/* ─── PRODUITS POPULAIRES (CDC: TB Admin – Produits populaires) ─── */
 function renderPopularProducts() {
   const container = document.getElementById('popularProductsList');
   container.innerHTML = '';
@@ -933,16 +878,17 @@ function renderPopularProducts() {
   });
 }
 
-/* ─── INIT ─── */
-loadData();
-showAdminUI();
-updateStats();
-renderPendingStores();
-renderPendingProducts();
-renderReports();
-renderCategories();
-renderPopularProducts();
-filterUsers('all');
+window.addEventListener('DOMContentLoaded', () => {
+  loadHeader();
+  loadData();
+  updateStats();
+  renderPendingStores();
+  renderPendingProducts();
+  renderReports();
+  renderCategories();
+  renderPopularProducts();
+  filterUsers('all');
+});
 </script>
 </body>
 </html>

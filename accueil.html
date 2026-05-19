@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GreenMarket – Les trésors de nos coopératives</title>
+  <title>GreenMarket – Les treasures de nos coopératives</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
   <style>
@@ -26,112 +26,6 @@
  
     h1, h2, h3, .playfair { font-family: 'Playfair Display', serif; }
  
-    /* ========== HEADER ========== */
-    header {
-      background: #9FB2AC;
-      border-bottom: 2px solid #f0e8d5;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 16px rgba(93,13,24,0.07);
-    }
- 
-    .search-bar input {
-      border: 1.5px solid #e8dfc8;
-      background: #fdf8ee;
-      border-radius: 999px;
-      padding: 10px 20px;
-      width: 100%;
-      max-width: 420px;
-      font-family: 'Lato', sans-serif;
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.2s;
-      color: var(--text-dark);
-    }
-    .search-bar input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(93,13,24,0.08);
-    }
- 
-    .nav-link {
-      font-family: 'Lato', sans-serif;
-      font-weight: 700;
-      font-size: 14px;
-      color: var(--text-dark);
-      text-decoration: none;
-      letter-spacing: 0.5px;
-      transition: color 0.2s;
-      padding: 4px 0;
-      position: relative;
-    }
-    .nav-link::after {
-      content: '';
-      display: block;
-      height: 2px;
-      background: var(--primary);
-      transform: scaleX(0);
-      transition: transform 0.25s;
-      border-radius: 2px;
-    }
-    .nav-link:hover { color: var(--primary); }
-    .nav-link:hover::after { transform: scaleX(1); }
-    .nav-link.active { color: var(--primary); }
-    .nav-link.active::after { transform: scaleX(1); }
- 
-    /* Botón de conexión */
-    .btn-connexion {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 999px;
-      padding: 8px 20px;
-      font-family: 'Lato', sans-serif;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-      letter-spacing: 0.3px;
-    }
-    .btn-connexion:hover {
-      background: #7a1020;
-      transform: translateY(-1px);
-    }
- 
-    .cart-btn {
-      position: relative;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 4px;
-    }
-    .cart-badge {
-      position: absolute;
-      top: -5px; right: -7px;
-      background: var(--primary);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-      border-radius: 999px;
-      min-width: 18px;
-      height: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Lato', sans-serif;
-    }
- 
-    .desktop-nav {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-    }
- 
-    @media (max-width: 640px) {
-      .desktop-nav { display: none; }
-    }
- 
-    /* ========== RESTO DE ESTILOS ========== */
     .hero-section {
       background: linear-gradient(135deg, #fdf5e0 60%, #f5ede6 100%);
       overflow: hidden;
@@ -370,7 +264,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      color: var(--wine);
+      color: var(--primary);
       font-weight: 600;
       font-size: 0.85rem;
     }
@@ -378,53 +272,52 @@
     @media (max-width: 640px) {
       .desktop-nav { display: none; }
     }
+
+    .auth-modal-overlay {
+      display: none; position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    .auth-modal-overlay.open { display: flex; }
+    .auth-modal {
+      background: #fffdf7; border-radius: 16px; padding: 2rem;
+      max-width: 450px; width: 90%; position: relative;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    .auth-tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e8ddd0; }
+    .auth-tab {
+      background: none; border: none; padding: 0.5rem 1rem;
+      font-size: 1rem; cursor: pointer; color: #6b5055; font-weight: 500;
+    }
+    .auth-tab.active { color: #5d0d18; border-bottom: 2px solid #5d0d18; }
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
+    .auth-form h3 { color: #5d0d18; margin-bottom: 1rem; font-family: 'Cormorant Garamond', serif; }
+    .auth-form input {
+      width: 100%; padding: 0.7rem; margin-bottom: 1rem;
+      border: 1.5px solid #e8ddd0; border-radius: 8px;
+      font-family: 'Jost', sans-serif; background: #fff9eb;
+    }
+    .auth-error { color: #d9534f; font-size: 0.8rem; margin-top: 0.5rem; text-align: center; }
+    .auth-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #6b5055; }
+    .btn-filled {
+      background: #5d0d18; color: #fff9eb;
+      border: none; padding: .5rem 1.3rem; border-radius: 3px;
+      font-family: 'Jost', sans-serif; font-size: .78rem; font-weight: 600;
+      letter-spacing: .07em; text-transform: uppercase;
+      cursor: pointer; transition: background .2s;
+    }
+    .btn-filled:hover { background: #3e0910; }
   </style>
 </head>
 <body>
  
 <div id="toast">✓ Produit ajouté au panier !</div>
 
-<!-- ========== HEADER IDÉNTICO A STORE.HTML ========== -->
-<header>
-  <div style="max-width: 1280px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+<div id="header-placeholder"></div>
 
-    <!-- Logo -->
-    <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='accueil.html'">
-      <div style="height: 65px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-        <img src="IMAGES/logo.png" alt="GreenMarket Logo" style="height: 100%; width: auto; object-fit: contain;" onerror="this.src='https://placehold.co/65x65?text=GM'"/>
-      </div>
-      <span style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: 1px;">GreenMarket</span>
-    </div>
-
-    <!-- Search -->
-    <div class="search-bar" style="flex: 1; display: flex; justify-content: center; min-width: 180px;">
-      <input type="text" id="headerSearchInput" placeholder="Rechercher un produit traditionnel..."/>
-    </div>
-
-    <!-- Navigation -->
-    <nav class="desktop-nav">
-      <a href="accueil.html" class="nav-link active">Accueil</a>
-      <a href="store.html" class="nav-link">Boutiques</a>
-      <a href="produits.html" class="nav-link">Produits</a>
-      <a href="#" class="nav-link">À propos</a>
-      <a href="dashboard-producteur.html" id="dashboardLink" class="nav-link" style="display: none;">📊 Dashboard</a>
-    </nav>
-
-    <!-- Cart + Auth (solo conexión) -->
-    <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
-      <button class="cart-btn" title="Panier" onclick="goToCart()">
-        <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#5D0D18" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 6h14M9 21a1 1 0 1 0 2 0M15 21a1 1 0 1 0 2 0"/>
-        </svg>
-        <span class="cart-badge" id="cart-count">0</span>
-      </button>
-      <div id="authWidget"></div>
-    </div>
-
-  </div>
-</header>
-
-<!-- ===================== HERO ===================== -->
 <section class="hero-section" style="position: relative; min-height: 75vh; display: flex; align-items: center; overflow: hidden; padding: 0;">
 
   <div style="position: absolute; inset: 0;">
@@ -454,7 +347,6 @@
   </div>
 </section>
  
-<!-- ===================== CATEGORIES ===================== -->
 <section class="py-16 px-4 max-w-7xl mx-auto">
   <div class="mb-10">
     <h2 class="section-title">Nos catégories de produits traditionnels</h2>
@@ -471,7 +363,6 @@
   </div>
 </section>
  
-<!-- ===================== FEATURED PRODUCTS ===================== -->
 <section class="py-10 px-4" style="background:linear-gradient(180deg,#fdf8ee 0%,#fff9eb 100%);">
   <div class="max-w-7xl mx-auto">
     <div class="mb-10">
@@ -481,7 +372,6 @@
   </div>
 </section>
 
-<!-- ===================== STORES SECTION ===================== -->
 <section id="stores-section" class="py-16 px-4 max-w-7xl mx-auto">
   <div class="mb-10 flex justify-between items-center flex-wrap gap-4">
     <div>
@@ -493,7 +383,6 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="storesGrid"></div>
 </section>
 
-<!-- ===================== COOPERATIVES ===================== -->
 <section id="coops" class="py-16 px-4 max-w-7xl mx-auto">
   <div class="text-center mb-3">
     <h2 class="section-title" style="display:block; text-align:center;">Nos coopératives partenaires</h2>
@@ -502,7 +391,6 @@
   <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6" id="coopsGrid"></div>
 </section>
  
-<!-- ===================== PROMO BANNER ===================== -->
 <section class="promo-banner py-12 px-4">
   <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
     <div>
@@ -513,7 +401,6 @@
   </div>
 </section>
  
-<!-- ===================== WHY SECTION ===================== -->
 <section class="py-16 px-4" style="background:linear-gradient(135deg,#fdf5e0 0%,#f5ede0 100%);">
   <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
     <div>
@@ -531,7 +418,6 @@
   </div>
 </section>
  
-<!-- ===================== FOOTER ===================== -->
 <footer class="pt-14 pb-8 px-4">
   <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 mb-10">
     <div><p class="footer-heading">GreenMarket</p><a href="#">À propos</a><a href="#">Nos coopératives</a><a href="#">Devenir partenaire</a></div>
@@ -558,49 +444,7 @@
   </div>
 </div>
 
-<style>
-  /* Estilos para el modal de autenticación */
-  .auth-modal-overlay {
-    display: none; position: fixed; top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    align-items: center; justify-content: center;
-    z-index: 1000;
-  }
-  .auth-modal-overlay.open { display: flex; }
-  .auth-modal {
-    background: #fffdf7; border-radius: 16px; padding: 2rem;
-    max-width: 450px; width: 90%; position: relative;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-  }
-  .auth-tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e8ddd0; }
-  .auth-tab {
-    background: none; border: none; padding: 0.5rem 1rem;
-    font-size: 1rem; cursor: pointer; color: #6b5055; font-weight: 500;
-  }
-  .auth-tab.active { color: #5d0d18; border-bottom: 2px solid #5d0d18; }
-  .auth-form { display: none; }
-  .auth-form.active { display: block; }
-  .auth-form h3 { color: #5d0d18; margin-bottom: 1rem; font-family: 'Cormorant Garamond', serif; }
-  .auth-form input {
-    width: 100%; padding: 0.7rem; margin-bottom: 1rem;
-    border: 1.5px solid #e8ddd0; border-radius: 8px;
-    font-family: 'Jost', sans-serif; background: #fff9eb;
-  }
-  .auth-error { color: #d9534f; font-size: 0.8rem; margin-top: 0.5rem; text-align: center; }
-  .auth-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #6b5055; }
-  .btn-filled {
-    background: #5d0d18; color: #fff9eb;
-    border: none; padding: .5rem 1.3rem; border-radius: 3px;
-    font-family: 'Jost', sans-serif; font-size: .78rem; font-weight: 600;
-    letter-spacing: .07em; text-transform: uppercase;
-    cursor: pointer; transition: background .2s;
-  }
-  .btn-filled:hover { background: #3e0910; }
-</style>
-
 <script>
-// ========== DONNÉES DES BOUTIQUES ==========
 let stores = [];
 
 function loadStores() {
@@ -640,7 +484,6 @@ function renderStoresOnAccueil() {
   `).join('');
 }
 
-// ========== PRODUITS ==========
 const products = [
   { id: 1, name: "Caftan traditionnel", price: "450 DH", image: "images/caftan.jfif", coop: "Coopérative Fès Artisanat", rating: 4.5, reviews: 156, badge: "Artisanal", badgeClass: "secondary" },
   { id: 2, name: "Huile d'olive extra vierge", price: "120 DH / litre", image: "images/olive.jfif", coop: "Coopérative Atlas", rating: 5, reviews: 234, badge: "Bio", badgeClass: "bio" },
@@ -654,7 +497,6 @@ const cooperatives = [
   { name: "Coopérative Ourika", location: "Ourika Valley", description: "Plantes médicinales rares et produits naturels.", icon: "🌿" }
 ];
 
-// ========== PANIER ==========
 let cart = [];
 
 function loadCart() {
@@ -679,7 +521,7 @@ function addToCart(product) {
   showToast(`✓ ${product.name} ajouté au panier !`);
 }
 
-function goToCart() {
+window.goToCart = function() {
   if (cart.length === 0) { showToast("🛒 Votre panier est vide", "#9a4a00"); return; }
   let summary = "🛒 Votre panier:\n";
   let total = 0;
@@ -722,7 +564,7 @@ function renderProducts() {
           <p class="text-xs flex items-center gap-1 text-gray-500">👩‍🌾 ${p.coop}</p>
           <div class="flex items-center gap-1"><span class="stars">${'★'.repeat(Math.floor(p.rating))}${p.rating % 1 ? '½' : ''}${'☆'.repeat(5 - Math.ceil(p.rating))}</span><span class="text-xs text-gray-500">(${p.reviews} avis)</span></div>
           <p class="font-bold text-lg mt-auto" style="color: var(--primary);">${p.price}</p>
-          <button class="btn-primary w-full mt-1 py-2 text-sm" onclick='addToCart(${JSON.stringify(p).replace(/'/g, "\\'")})'>Ajouter au panier</button>
+          <button class="btn-primary w-full mt-1 py-2 text-sm" style="background:var(--primary); color:white; border-radius:99px; font-weight:bold;" onclick='addToCart(${JSON.stringify(p).replace(/'/g, "\\'")})'>Ajouter au panier</button>
         </div>
       </div>
     `;
@@ -746,7 +588,6 @@ function renderCooperatives() {
   `).join('');
 }
 
-// ========== AUTH ==========
 let currentUser = null;
 
 function initUsers() {
@@ -790,28 +631,30 @@ function login(email, password) {
 
 function updateAuthUI() {
   const widget = document.getElementById('authWidget');
+  if(!widget) return;
   const user = getCurrentUser();
   if (user) {
     const roleText = user.role === 'productor' ? 'Producteur' : 'Client';
-    widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;">🚪</button></div>`;
+    widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:var(--primary);cursor:pointer;margin-left:8px;">🚪</button></div>`;
     document.getElementById('logoutBtn')?.addEventListener('click', logout);
   } else {
     widget.innerHTML = `<button class="btn-connexion" id="showLoginBtn">🔑 Connexion</button>`;
-    document.getElementById('showLoginBtn')?.addEventListener('click', () => showAuthModal('login'));
+    document.getElementById('showLoginBtn')?.addEventListener('click', () => showAuthModal());
   }
 }
 
-function showAuthModal() {
+window.showAuthModal = function() {
   const modal = document.getElementById('authModal');
-  modal.classList.add('open');
+  if(modal) modal.classList.add('open');
 }
 
 function closeAuthModal() {
-  document.getElementById('authModal').classList.remove('open');
+  const modal = document.getElementById('authModal');
+  if(modal) modal.classList.remove('open');
 }
 
 function setupAuthModal() {
-  document.getElementById('doLoginBtn').addEventListener('click', () => {
+  document.getElementById('doLoginBtn')?.addEventListener('click', () => {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
     const result = login(email, password);
@@ -823,8 +666,8 @@ function setupAuthModal() {
       document.getElementById('loginError').textContent = result.error;
     }
   });
-  document.getElementById('closeAuthModal').addEventListener('click', closeAuthModal);
-  document.getElementById('authModal').addEventListener('click', (e) => {
+  document.getElementById('closeAuthModal')?.addEventListener('click', closeAuthModal);
+  document.getElementById('authModal')?.addEventListener('click', (e) => {
     if (e.target === document.getElementById('authModal')) closeAuthModal();
   });
 }
@@ -848,7 +691,6 @@ function setupSearch() {
   }
 }
 
-// ========== INIT ==========
 function init() {
   loadStores();
   loadCart();
@@ -868,7 +710,23 @@ function init() {
   });
 }
 
-init();
+function loadHeaderAndInit() {
+  fetch('header.html')
+    .then(response => {
+      if (!response.ok) throw new Error("Erreur lors du chargement du header");
+      return response.text();
+    })
+    .then(data => {
+      document.getElementById('header-placeholder').innerHTML = data;
+      init();
+    })
+    .catch(error => {
+      console.error("Erreur fetch header:", error);
+      init(); 
+    });
+}
+
+loadHeaderAndInit();
 </script>
 </body>
 </html>

@@ -34,13 +34,6 @@
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Jost',sans-serif; background:var(--cream); color:var(--text); min-height:100vh; }
 
-  /* ══ HEADER (identique au dashboard admin) ══ */
-  header {
-    background:#9FB2AC;
-    border-bottom:2px solid #f0e8d5;
-    position:sticky; top:0; z-index:100;
-    box-shadow:0 2px 16px rgba(93,13,24,0.07);
-  }
   .nav-link {
     font-family:'Lato',sans-serif; font-weight:700; font-size:14px;
     color:var(--text-dark); text-decoration:none; letter-spacing:.5px;
@@ -54,7 +47,6 @@
     color:var(--wine); font-weight:600; font-size:.85rem;
   }
 
-  /* ══ PAGE HEADER ══ */
   .page-header {
     background:var(--wine);
     padding:3rem 2.5rem 2rem;
@@ -68,7 +60,6 @@
   .page-header h1 { font-family:'Cormorant Garamond',serif; font-size:3rem; font-weight:700; color:var(--cream); }
   .page-header p  { color:var(--sage-light); margin-top:.4rem; font-size:.95rem; }
 
-  /* ══ NOTIFICATION BELL ══ */
   .notif-btn {
     position:relative; background:rgba(255,255,255,.15); border:none; border-radius:50%;
     width:44px; height:44px; cursor:pointer; font-size:1.3rem;
@@ -95,7 +86,6 @@
   .notif-text  { color:var(--text); line-height:1.4; }
   .notif-time  { font-size:.73rem; color:var(--text-muted); margin-top:3px; }
 
-  /* ══ STATS GRID (TB Client – CDC) ══ */
   .dashboard-grid {
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
@@ -114,7 +104,6 @@
   .stat-val   { font-family:'Cormorant Garamond',serif; font-size:2.4rem; font-weight:700; color:var(--wine); line-height:1; }
   .stat-label { font-size:.78rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
 
-  /* ══ TABS ══ */
   .tabs-container { max-width:1400px; margin:0 auto; padding:0 2.5rem; }
   .tabs {
     display:flex; gap:0; border-bottom:2px solid var(--border);
@@ -130,12 +119,10 @@
   .tab-btn:hover  { color:var(--wine); }
   .tab-btn.active { color:var(--wine); border-bottom-color:var(--wine); font-weight:600; }
 
-  /* ══ MAIN CONTENT ══ */
   .main-content { max-width:1400px; margin:0 auto; padding:2rem 2.5rem 3rem; }
   .tab-panel { display:none; }
   .tab-panel.active { display:block; animation:fadeIn .25s ease; }
 
-  /* ══ CARDS / SECTIONS ══ */
   .section-card {
     background:var(--white); border:1.5px solid var(--border);
     border-radius:8px; box-shadow:0 2px 12px var(--shadow);
@@ -153,7 +140,6 @@
     padding:2px 10px; font-size:.8rem; font-family:'Jost',sans-serif;
   }
 
-  /* ══ TABLE ══ */
   .table-wrapper { overflow-x:auto; }
   table { width:100%; border-collapse:collapse; font-size:.88rem; text-align:left; }
   th { background:var(--cream); font-weight:600; padding:.9rem 1rem; border-bottom:1.5px solid var(--border); white-space:nowrap; }
@@ -162,7 +148,6 @@
   tbody tr:hover { background:#fdf8f0; }
   .empty-state { padding:3rem; text-align:center; color:var(--text-muted); font-style:italic; }
 
-  /* ══ BADGES ══ */
   .badge { padding:.25rem .65rem; border-radius:4px; font-size:.73rem; font-weight:600; text-transform:uppercase; letter-spacing:.03em; white-space:nowrap; }
   .badge-success { background:#e2f7e7; color:var(--success); }
   .badge-danger  { background:#fce8e6; color:var(--danger);  }
@@ -170,7 +155,6 @@
   .badge-info    { background:#e3f1fb; color:var(--info);    }
   .badge-neutral { background:#e8ddd0; color:var(--text-muted); }
 
-  /* ══ BUTTONS ══ */
   .btn { padding:.45rem .9rem; border-radius:4px; font-size:.8rem; font-weight:500; cursor:pointer; border:none; transition:background .2s; font-family:'Jost',sans-serif; }
   .btn-wine    { background:var(--wine);    color:#fff; }
   .btn-wine:hover    { background:var(--wine-dark); }
@@ -184,7 +168,6 @@
   .btn-outline:hover { border-color:var(--wine); color:var(--wine); }
   .action-group { display:flex; gap:.4rem; flex-wrap:wrap; }
 
-  /* ══ PANIER ══ */
   .cart-item {
     display:grid; grid-template-columns:60px 1fr auto auto;
     gap:1rem; align-items:center; padding:1rem 1.5rem;
@@ -203,7 +186,6 @@
   .cart-total { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:700; color:var(--wine); }
   .cart-total-label { font-size:.78rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; }
 
-  /* ══ PAIEMENT ══ */
   .payment-modes { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; padding:1.5rem; }
   .payment-option {
     border:2px solid var(--border); border-radius:8px; padding:1.2rem;
@@ -215,7 +197,6 @@
   .payment-option .pay-name { font-weight:600; font-size:.9rem; color:var(--text); }
   .payment-option .pay-desc { font-size:.75rem; color:var(--text-muted); margin-top:3px; }
 
-  /* ══ FAVORIS ══ */
   .favorites-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1.2rem; padding:1.5rem; }
   .fav-card {
     border:1.5px solid var(--border); border-radius:8px; overflow:hidden;
@@ -229,7 +210,6 @@
   .fav-price { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:700; color:var(--wine); margin-top:.4rem; }
   .fav-actions { display:flex; gap:.4rem; margin-top:.7rem; }
 
-  /* ══ AVIS ══ */
   .stars { color:#f39c12; font-size:1.1rem; letter-spacing:2px; cursor:pointer; }
   .stars span { transition:opacity .15s; }
   .stars span:hover,
@@ -251,7 +231,6 @@
   .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--wine); }
   .form-group textarea { resize:vertical; min-height:80px; }
 
-  /* ══ SUIVI COMMANDES ══ */
   .tracking-stepper { display:flex; justify-content:space-between; padding:1.5rem 2rem; position:relative; }
   .tracking-stepper::before {
     content:''; position:absolute; top:2.2rem; left:2rem; right:2rem; height:3px; background:var(--border); z-index:0;
@@ -268,10 +247,8 @@
   .step-label.done    { color:var(--success); }
   .step-label.current { color:var(--wine); font-weight:700; }
 
-  /* ══ FACTURE ══ */
   .invoice-actions { padding:1.2rem 1.5rem; background:var(--cream); border-top:1px solid var(--border); display:flex; gap:.5rem; flex-wrap:wrap; }
 
-  /* ══ PROFIL ══ */
   .profile-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; padding:1.5rem; }
   .profile-avatar-area { display:flex; flex-direction:column; align-items:center; gap:1rem; padding:1.5rem; border-right:1px solid var(--border); }
   .avatar-circle { width:90px; height:90px; border-radius:50%; background:var(--wine); display:flex; align-items:center; justify-content:center; font-size:2.4rem; color:var(--cream); }
@@ -279,10 +256,8 @@
   .profile-email { font-size:.82rem; color:var(--text-muted); }
   .profile-form  { padding:1.5rem; }
 
-  /* ══ ANIMATIONS ══ */
   @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-  /* ══ TOAST ══ */
   .toast {
     position:fixed; bottom:2rem; right:2rem;
     background:var(--wine); color:var(--cream);
@@ -293,7 +268,6 @@
   }
   .toast.show { transform:translateY(0); opacity:1; }
 
-  /* ══ RESPONSIVE ══ */
   @media(max-width:768px) {
     .dashboard-grid { padding:1.5rem 1rem; }
     .tabs-container { padding:0 1rem; }
@@ -310,27 +284,8 @@
 </head>
 <body>
 
-<!-- ═══════════════════ HEADER (identique admin) ═══════════════════ -->
-<header>
-  <div style="max-width:1280px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-    <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="window.location.href='newstore.html'">
-      <div style="height:65px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-        <img src="IMAGES/logo.png" alt="GreenMarket Logo" style="height:100%;width:auto;object-fit:contain;" onerror="this.src='https://placehold.co/65x65?text=GM'"/>
-      </div>
-      <span style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--primary);letter-spacing:1px;">GreenMarket</span>
-    </div>
-    <nav style="margin-left:2rem;display:flex;gap:1.5rem;">
-      <a href="accueil.html" class="nav-link">Accueil</a>
-      <a href="newstore.html" class="nav-link">Boutiques</a>
-      <a href="dashboard-client.html" class="nav-link active">🛍️ Mon Espace</a>
-    </nav>
-    <div style="display:flex;align-items:center;gap:12px;margin-left:auto;">
-      <div id="authWidget"></div>
-    </div>
-  </div>
-</header>
+<div id="header-placeholder"></div>
 
-<!-- ═══════════════════ PAGE HEADER ═══════════════════ -->
 <div class="page-header" style="position:relative;">
   <div class="header-inner">
     <div>
@@ -343,7 +298,6 @@
     </button>
   </div>
 
-  <!-- Panneau notifications (CDC: Notification nouvelle commande / statut / produit) -->
   <div class="notif-panel" id="notifPanel">
     <div class="notif-header">
       🔔 Notifications
@@ -353,7 +307,6 @@
   </div>
 </div>
 
-<!-- ═══════════════════ STATS (TB Client – CDC) ═══════════════════ -->
 <div class="dashboard-grid">
   <div class="stat-card">
     <span class="stat-icon">📦</span>
@@ -377,7 +330,6 @@
   </div>
 </div>
 
-<!-- ═══════════════════ TABS ═══════════════════ -->
 <div class="tabs-container">
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('panier')">🛒 Panier</button>
@@ -389,17 +341,15 @@
   </div>
 </div>
 
-<!-- ═══════════════════ TAB CONTENT ═══════════════════ -->
 <div class="main-content">
 
-  <!-- ① PANIER (CDC: Ajouter/Modifier quantité/Supprimer/Voir total/Valider/Annuler) -->
   <div class="tab-panel active" id="tab-panier">
     <div class="section-card">
       <div class="section-header">
         🛒 Mon Panier
         <span class="badge-count" id="cartCount">0 article(s)</span>
       </div>
-      <div id="cartItems"><!-- JS --></div>
+      <div id="cartItems"></div>
       <div class="cart-footer" id="cartFooter" style="display:none;">
         <div>
           <div class="cart-total-label">Total à payer</div>
@@ -413,7 +363,6 @@
     </div>
   </div>
 
-  <!-- ② COMMANDES (CDC: Voir statut / Annuler / Voir historique / Signaler problème / Générer facture) -->
   <div class="tab-panel" id="tab-commandes">
     <div class="section-card">
       <div class="section-header">
@@ -437,20 +386,17 @@
       </div>
     </div>
 
-    <!-- Suivi détaillé (CDC: Voir statut commande) -->
     <div class="section-card" id="trackingSection" style="display:none;">
       <div class="section-header">🚚 Suivi de la Commande <span id="trackingOrderId"></span></div>
-      <div class="tracking-stepper" id="trackingStepper"><!-- JS --></div>
+      <div class="tracking-stepper" id="trackingStepper"></div>
       <div style="padding:1rem 1.5rem;background:var(--cream);border-top:1px solid var(--border);">
         <div style="font-size:.85rem;color:var(--text-muted);">Dernière mise à jour : <strong id="trackingDate"></strong></div>
       </div>
     </div>
   </div>
 
-  <!-- ③ PAIEMENTS (CDC: Choisir mode / Paiement en ligne / Livraison / Confirmation / Facture PDF / Historique) -->
   <div class="tab-panel" id="tab-paiements">
 
-    <!-- Checkout (affiché si vient du panier) -->
     <div class="section-card" id="checkoutBlock" style="display:none;">
       <div class="section-header">💳 Finaliser la Commande</div>
       <div style="padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);">
@@ -482,7 +428,6 @@
       </div>
     </div>
 
-    <!-- Historique paiements (CDC: Voir historique paiements) -->
     <div class="section-card">
       <div class="section-header">🧾 Historique des Paiements</div>
       <div class="table-wrapper">
@@ -504,21 +449,18 @@
     </div>
   </div>
 
-  <!-- ④ FAVORIS (CDC: TB Client – Produits favoris) -->
   <div class="tab-panel" id="tab-favoris">
     <div class="section-card">
       <div class="section-header">
         ❤️ Mes Produits Favoris
         <span class="badge-count" id="favsCount">0 favori(s)</span>
       </div>
-      <div class="favorites-grid" id="favoritesGrid"><!-- JS --></div>
+      <div class="favorites-grid" id="favoritesGrid"></div>
     </div>
   </div>
 
-  <!-- ⑤ AVIS (CDC: Noter / Commenter / Modifier / Supprimer son avis) -->
   <div class="tab-panel" id="tab-avis">
 
-    <!-- Formulaire nouvel avis -->
     <div class="section-card">
       <div class="section-header">⭐ Laisser un Avis</div>
       <div class="review-form">
@@ -532,7 +474,7 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Note (CDC: Noter un produit)</label>
+          <label>Note</label>
           <div class="stars" id="starRating">
             <span onclick="setRating(1)" title="1 étoile">★</span>
             <span onclick="setRating(2)" title="2 étoiles">★</span>
@@ -542,21 +484,19 @@
           </div>
         </div>
         <div class="form-group">
-          <label>Votre commentaire (CDC: Laisser commentaire)</label>
+          <label>Votre commentaire</label>
           <textarea id="reviewText" placeholder="Partagez votre expérience avec ce produit…"></textarea>
         </div>
         <button class="btn btn-wine" onclick="submitReview()">Publier mon avis</button>
       </div>
     </div>
 
-    <!-- Mes avis publiés -->
     <div class="section-card">
       <div class="section-header">📝 Mes Avis Publiés</div>
-      <div id="myReviews"><!-- JS --></div>
+      <div id="myReviews"></div>
     </div>
   </div>
 
-  <!-- ⑥ PROFIL (CDC: Modifier profil / Changer mot de passe) -->
   <div class="tab-panel" id="tab-profil">
     <div class="section-card">
       <div class="section-header">👤 Mon Profil</div>
@@ -595,7 +535,6 @@
       </div>
     </div>
 
-    <!-- Changer mot de passe (CDC: Changer mot de passe) -->
     <div class="section-card">
       <div class="section-header">🔒 Changer le Mot de Passe</div>
       <div class="profile-form">
@@ -618,16 +557,29 @@
     </div>
   </div>
 
-</div><!-- /.main-content -->
+</div>
 
 <div class="toast" id="toast"></div>
 
-<!-- ═══════════════════════════ JAVASCRIPT ═══════════════════════════ -->
 <script>
-/* ─── DATA ─── */
 let cart, orders, payments, favorites, myReviewsList, notifications;
 let currentRating = 0;
 let selectedPaymentMode = 'card';
+
+function loadHeader() {
+  fetch('header.html')
+    .then(response => {
+      if (!response.ok) throw new Error("Erreur");
+      return response.text();
+    })
+    .then(data => {
+      document.getElementById('header-placeholder').innerHTML = data;
+      showClientUI();
+    })
+    .catch(error => {
+      console.error(error);
+    });
+}
 
 function initData() {
   cart = [
@@ -663,12 +615,12 @@ function initData() {
   ];
 }
 
-/* ─── UTILS ─── */
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.innerHTML = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3200);
 }
+
 function switchTab(name) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -677,7 +629,6 @@ function switchTab(name) {
   document.querySelectorAll('.tab-btn')[idx]?.classList.add('active');
 }
 
-/* ─── STATS ─── */
 function updateStats() {
   const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
   const spent  = payments.filter(p => p.status === 'payé').reduce((s,p) => s + p.amount, 0);
@@ -687,23 +638,24 @@ function updateStats() {
   document.getElementById('statPanier').textContent    = cart.reduce((s,i) => s + i.qty, 0);
 }
 
-/* ─── HEADER / AUTH ─── */
 function showClientUI() {
   const s = sessionStorage.getItem('greenmarket_current_user');
   let name = 'Sara Idrissi';
   if (s) name = JSON.parse(s).name;
   document.getElementById('welcomeName').textContent = name;
-  document.getElementById('authWidget').innerHTML =
-    `<div class="user-badge">👋 ${name}
-       <button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;font-size:1rem;">Sortir 🚪</button>
-     </div>`;
-  document.getElementById('logoutBtn')?.addEventListener('click', () => {
-    sessionStorage.removeItem('greenmarket_current_user');
-    window.location.href = 'newstore.html';
-  });
+  const authWidget = document.getElementById('authWidget');
+  if(authWidget) {
+      authWidget.innerHTML =
+        `<div class="user-badge">👋 ${name}
+           <button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;font-size:1rem;">Sortir 🚪</button>
+         </div>`;
+      document.getElementById('logoutBtn')?.addEventListener('click', () => {
+        sessionStorage.removeItem('greenmarket_current_user');
+        window.location.href = 'newstore.html';
+      });
+  }
 }
 
-/* ─── NOTIFICATIONS (CDC: Notification nouvelle commande / statut / produit / avis) ─── */
 function renderNotifications() {
   const list = document.getElementById('notifList');
   const unread = notifications.filter(n => !n.read).length;
@@ -723,21 +675,24 @@ function renderNotifications() {
       </div>`;
   });
 }
+
 function toggleNotif() {
   document.getElementById('notifPanel').classList.toggle('open');
 }
+
 function markAllRead() {
   notifications = notifications.map(n => ({ ...n, read:true }));
   renderNotifications();
   showToast('✅ Toutes les notifications marquées comme lues.');
 }
+
 document.addEventListener('click', e => {
   if (!e.target.closest('.notif-btn') && !e.target.closest('.notif-panel')) {
-    document.getElementById('notifPanel').classList.remove('open');
+    const notifPanel = document.getElementById('notifPanel');
+    if(notifPanel) notifPanel.classList.remove('open');
   }
 });
 
-/* ─── PANIER (CDC: Modifier quantité / Supprimer / Voir total automatique / Valider / Annuler) ─── */
 function renderCart() {
   const container = document.getElementById('cartItems');
   const footer    = document.getElementById('cartFooter');
@@ -780,12 +735,14 @@ function changeQty(id, delta) {
   });
   renderCart();
 }
+
 function removeFromCart(id) {
   const item = cart.find(i => i.id === id);
   cart = cart.filter(i => i.id !== id);
   showToast(`🗑️ "${item?.name}" retiré du panier.`);
   renderCart();
 }
+
 function clearCart() {
   if (!cart.length) return;
   if (!confirm('Vider tout le panier ?')) return;
@@ -794,7 +751,6 @@ function clearCart() {
   renderCart();
 }
 
-/* ─── COMMANDES (CDC: Voir statut / Annuler si non traitée / Voir historique / Signaler problème / Générer facture) ─── */
 function renderOrders() {
   const tbody = document.getElementById('ordersTable');
   document.getElementById('ordersCount').textContent = orders.length + ' commande(s)';
@@ -838,10 +794,10 @@ function generateInvoice(id) {
   showToast(`🧾 Facture ${id} générée — téléchargement PDF en cours…`);
 }
 
-/* Suivi commande (CDC: Voir statut commande) */
 const trackingSteps = {
   'en préparation': 1, 'en transit': 2, 'livré': 3, 'annulé': -1
 };
+
 function showTracking(id) {
   const order = orders.find(o => o.id === id);
   if (!order) return;
@@ -868,7 +824,6 @@ function showTracking(id) {
   section.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
-/* ─── PAIEMENTS (CDC: Choisir mode / Confirmation / Télécharger facture PDF / Historique) ─── */
 function selectPayment(el, mode) {
   document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
   el.classList.add('selected');
@@ -923,7 +878,6 @@ function downloadInvoice(id) {
   showToast(`📄 Téléchargement de la facture ${id} en cours…`);
 }
 
-/* ─── FAVORIS (CDC: TB Client – Produits favoris) ─── */
 function renderFavorites() {
   const grid = document.getElementById('favoritesGrid');
   document.getElementById('favsCount').textContent = favorites.length + ' favori(s)';
@@ -962,7 +916,6 @@ function removeFav(id) {
   renderFavorites(); updateStats();
 }
 
-/* ─── AVIS (CDC: Noter / Commenter / Modifier / Supprimer son avis) ─── */
 function setRating(n) {
   currentRating = n;
   const spans = document.querySelectorAll('#starRating span');
@@ -1025,7 +978,6 @@ function deleteReview(id) {
   renderReviews();
 }
 
-/* ─── PROFIL (CDC: Modifier profil / Changer mot de passe) ─── */
 function saveProfile() {
   const first = document.getElementById('profileFirstName').value.trim();
   const last  = document.getElementById('profileLastName').value.trim();
@@ -1049,16 +1001,17 @@ function changePassword() {
   showToast('✅ Mot de passe mis à jour avec succès !');
 }
 
-/* ─── INIT ─── */
-initData();
-showClientUI();
-updateStats();
-renderNotifications();
-renderCart();
-renderOrders();
-renderPayments();
-renderFavorites();
-renderReviews();
+window.addEventListener('DOMContentLoaded', () => {
+  loadHeader();
+  initData();
+  updateStats();
+  renderNotifications();
+  renderCart();
+  renderOrders();
+  renderPayments();
+  renderFavorites();
+  renderReviews();
+});
 </script>
 </body>
 </html>

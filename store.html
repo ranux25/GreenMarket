@@ -618,35 +618,8 @@
 </head>
 <body>
 
-<header>
-  <div style="max-width: 1280px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-    <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='accueil.html'">
-      <div style="height: 65px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-        <img src="IMAGES/logo.png" alt="GreenMarket Logo" style="height: 100%; width: auto; object-fit: contain;" onerror="this.src='https://placehold.co/65x65?text=GM'"/>
-      </div>
-      <span style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: 1px;">GreenMarket</span>
-    </div>
-    <div class="search-bar" style="flex: 1; display: flex; justify-content: center; min-width: 180px;">
-      <input type="text" id="headerSearchInput" placeholder="Rechercher une boutique artisanale..."/>
-    </div>
-    <nav class="desktop-nav">
-      <a href="accueil.html" class="nav-link">Accueil</a>
-      <a href="store.html" class="nav-link active">Boutiques</a>
-      <a href="#" class="nav-link">Produits</a>
-      <a href="#" class="nav-link">À propos</a>
-      <a href="dashboard-producteur.html" id="dashboardLink" class="nav-link" style="display: none;">📊 Dashboard</a>
-    </nav>
-    <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
-      <button class="cart-btn" title="Panier">
-        <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#5D0D18" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 6h14M9 21a1 1 0 1 0 2 0M15 21a1 1 0 1 0 2 0"/>
-        </svg>
-        <span class="cart-badge" id="cart-count">0</span>
-      </button>
-      <div id="authWidget"></div>
-    </div>
-  </div>
-</header>
+<div id="header-placeholder"></div>
+
 
 <div class="page-header">
   <div class="header-inner">
@@ -1398,5 +1371,17 @@ dropZone.addEventListener('drop', e => {
 
 window.openPhotoModal = openPhotoModal;
 </script>
+<script>
+function loadHeader() {
+  fetch('header.html')
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('header-placeholder').innerHTML = data;
+    });
+}
+
+loadHeader();
+</script>
+
 </body>
 </html>

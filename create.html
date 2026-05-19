@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  
+
   <div class="container d-flex flex-column justify-content-center align-items-center min-vh-100">
     
     <div class="d-flex gap-2 align-items-center mb-4">
@@ -107,68 +107,80 @@
     </div>
 
   </div>
-<script>
-document.querySelector("form").addEventListener("submit", function(e) {
-  e.preventDefault();
 
-  const fullName = document.getElementById("Full-name").value.trim();
-  const email = document.getElementById("Email").value.trim();
-  const password = document.getElementById("Password").value.trim();
-  const confirm = document.getElementById("Confirmation").value.trim();
+  <script>
+    function loadHeader() {
+      fetch('header.html')
+        .then(response => {
+          if (!response.ok) throw new Error("Erreur");
+          return response.text();
+        })
+        .then(data => {
+          document.getElementById('header-placeholder').innerHTML = data;
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    }
 
-  const role = document.querySelector('input[name="role"]:checked').value;
+    document.querySelector("form").addEventListener("submit", function(e) {
+      e.preventDefault();
 
-  if (!fullName || !email || !password || !confirm) {
-    alert("Veuillez remplir tous les champs");
-    return;
-  }
+      const fullName = document.getElementById("Full-name").value.trim();
+      const email = document.getElementById("Email").value.trim();
+      const password = document.getElementById("Password").value.trim();
+      const confirm = document.getElementById("Confirmation").value.trim();
 
-  if (password !== confirm) {
-    alert("Les mots de passe ne correspondent pas");
-    return;
-  }
+      const role = document.querySelector('input[name="role"]:checked').value;
 
-  // récupérer utilisateurs existants
-  let users = JSON.parse(localStorage.getItem("greenmarket_users")) || [];
+      if (!fullName || !email || !password || !confirm) {
+        alert("Veuillez remplir tous les champs");
+        return;
+      }
 
-  // vérifier email déjà utilisé
-  const exists = users.find(u => u.email === email);
+      if (password !== confirm) {
+        alert("Les mots de passe ne correspondent pas");
+        return;
+      }
 
-  if (exists) {
-    alert("Cet email existe déjà");
-    return;
-  }
+      let users = JSON.parse(localStorage.getItem("greenmarket_users")) || [];
 
-  // créer utilisateur
-  const user = {
-    id: Date.now(),
-    fullName,
-    email,
-    password,
-    role: role === "Producer" ? "productor" : "client",
-    producerId: role === "Producer" ? Date.now() : null
-  };
+      const exists = users.find(u => u.email === email);
 
-  users.push(user);
+      if (exists) {
+        alert("Cet email existe déjà");
+        return;
+      }
 
-  localStorage.setItem("greenmarket_users", JSON.stringify(users));
+      const user = {
+        id: Date.now(),
+        fullName,
+        email,
+        password,
+        role: role === "Producer" ? "productor" : "client",
+        producerId: role === "Producer" ? Date.now() : null
+      };
 
-  // connecter automatiquement
-  sessionStorage.setItem(
-    "greenmarket_current_user",
-    JSON.stringify(user)
-  );
+      users.push(user);
 
-  alert("Compte créé avec succès ✅");
+      localStorage.setItem("greenmarket_users", JSON.stringify(users));
 
-  // redirection
-  if (user.role === "productor") {
-    window.location.href = "dashboard-producteur.html";
-  } else {
-    window.location.href = "store.html";
-  }
-});
-</script>
+      sessionStorage.setItem(
+        "greenmarket_current_user",
+        JSON.stringify(user)
+      );
+
+      alert("Compte créé avec succès ✅");
+
+      if (user.role === "productor") {
+        window.location.href = "dashboard-producteur.html";
+      } else {
+        window.location.href = "store.html";
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', loadHeader);
+  </script>
 
   <script src="script.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>

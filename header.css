@@ -1,0 +1,160 @@
+:root {
+  --primary: #5D0D18;
+  --secondary: #9FB2AC;
+  --bg: #FFF9EB;
+  --text-dark: #2C2C2C;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Lato', sans-serif;
+  background-color: var(--bg);
+  color: var(--text-dark);
+}
+
+header {
+  background: #9FB2AC;
+  border-bottom: 2px solid #f0e8d5;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 16px rgba(93, 13, 24, 0.07);
+}
+
+header > div {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: nowrap;
+}
+
+header > div > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+header > div > div:first-child > div {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+header > div > div:first-child img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+}
+
+header > div > div:first-child span {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 1px;
+}
+
+.search-bar {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.search-bar input {
+  border: 1.5px solid #e8dfc8;
+  background: #fdf8ee;
+  border-radius: 999px;
+  padding: 9px 16px;
+  width: 100%;
+  max-width: 400px;
+  outline: none;
+}
+
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.nav-link {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-dark);
+  text-decoration: none;
+}
+
+.cart-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.mobile-menu-btn {
+  display: none !important;
+  font-size: 24px;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+@media (max-width: 768px) {
+  header > div {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    grid-template-areas: 
+      "logo cart menu"
+      "search search search";
+    gap: 10px;
+    padding: 10px;
+  }
+
+  header > div > div:first-child {
+    grid-area: logo;
+    justify-content: start;
+  }
+
+  header > div > div:first-child > div {
+    height: 35px;
+  }
+
+  header > div > div:first-child span {
+    font-size: 16px;
+  }
+
+  header > div > div:last-child {
+    grid-area: menu;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  .cart-btn {
+    grid-area: cart;
+    display: block !important;
+  }
+
+  .mobile-menu-btn {
+    grid-area: menu;
+    display: flex !important;
+  }
+
+  .search-bar {
+    grid-area: search;
+    width: 100%;
+    margin-top: 5px;
+  }
+
+  .desktop-nav, .btn-connexion, .user-badge {
+    display: none;
+  }
+}

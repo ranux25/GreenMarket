@@ -19,39 +19,11 @@
   --shadow:rgba(93,13,24,.12);
 }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
+*{ margin:0; padding:0; box-sizing:border-box; }
 
-body{
-  font-family:'Jost',sans-serif;
-  background:var(--cream);
-  color:var(--text);
-}
+body{ font-family:'Jost',sans-serif; background:var(--cream); color:var(--text); }
 
-nav{
-  background:var(--white);
-  height:70px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 2rem;
-  border-bottom:1px solid var(--border);
-}
-
-.nav-logo{
-  font-family:'Cormorant Garamond',serif;
-  font-size:1.8rem;
-  font-weight:700;
-  color:var(--wine);
-}
-
-.nav-logo span{
-  color:var(--sage-dark);
-  font-style:italic;
-}
+#header-placeholder { width: 100%; }
 
 .btn-back{
   background:var(--wine);
@@ -61,6 +33,8 @@ nav{
   text-decoration:none;
   font-size:.8rem;
   font-weight:600;
+  display: inline-block;
+  margin-top: 10px;
 }
 
 .page-header{
@@ -107,53 +81,24 @@ nav{
   border-radius:8px;
 }
 
-.item-info{
-  flex:1;
-}
+.item-info{ flex:1; }
 
-.item-name{
-  font-weight:700;
-  color:var(--wine);
-  font-size:1rem;
-}
+.item-name{ font-weight:700; color:var(--wine); font-size:1rem; }
 
-.item-shop{
-  font-size:.8rem;
-  color:var(--text-muted);
-  margin:.3rem 0;
-}
+.item-shop{ font-size:.8rem; color:var(--text-muted); margin:.3rem 0; }
 
-.item-price{
-  font-size:1rem;
-  font-weight:700;
-  color:var(--sage-dark);
-}
+.item-price{ font-size:1rem; font-weight:700; color:var(--sage-dark); }
 
-.quantity-controls{
-  display:flex;
-  align-items:center;
-  gap:.5rem;
-  margin-top:.7rem;
-}
+.quantity-controls{ display:flex; align-items:center; gap:.5rem; margin-top:.7rem; }
 
 .quantity-controls button{
-  width:30px;
-  height:30px;
-  border:none;
-  background:var(--wine);
-  color:white;
-  border-radius:4px;
-  cursor:pointer;
+  width:30px; height:30px; border:none; background:var(--wine);
+  color:white; border-radius:4px; cursor:pointer;
 }
 
 .btn-delete{
-  background:#eee;
-  color:var(--wine);
-  border:none;
-  padding:.5rem .8rem;
-  border-radius:4px;
-  cursor:pointer;
-  margin-top:.8rem;
+  background:#eee; color:var(--wine); border:none;
+  padding:.5rem .8rem; border-radius:4px; cursor:pointer; margin-top:.8rem;
 }
 
 .summary{
@@ -164,81 +109,41 @@ nav{
   box-shadow:0 10px 30px var(--shadow);
 }
 
-.summary h2{
-  font-family:'Cormorant Garamond',serif;
-  margin-bottom:1rem;
-}
+.summary h2{ font-family:'Cormorant Garamond',serif; margin-bottom:1rem; }
 
-.summary-line{
-  display:flex;
-  justify-content:space-between;
-  margin:.8rem 0;
-}
+.summary-line{ display:flex; justify-content:space-between; margin:.8rem 0; }
 
 .total{
-  font-size:1.3rem;
-  font-weight:700;
-  color:var(--wine);
-  border-top:1px solid var(--border);
-  padding-top:1rem;
+  font-size:1.3rem; font-weight:700; color:var(--wine);
+  border-top:1px solid var(--border); padding-top:1rem;
 }
 
 .btn-checkout{
-  width:100%;
-  margin-top:1.5rem;
-  background:var(--wine);
-  color:white;
-  border:none;
-  padding:1rem;
-  border-radius:6px;
-  font-weight:700;
-  cursor:pointer;
-  font-size:1rem;
+  width:100%; margin-top:1.5rem; background:var(--wine);
+  color:white; border:none; padding:1rem; border-radius:6px;
+  font-weight:700; cursor:pointer; font-size:1rem;
 }
 
-.btn-checkout:hover{
-  background:var(--wine-dark);
-}
+.btn-checkout:hover{ background:var(--wine-dark); }
 
 .btn-clear{
-  width:100%;
-  margin-top:1rem;
-  background:var(--sage);
-  color:white;
-  border:none;
-  padding:.8rem;
-  border-radius:6px;
-  cursor:pointer;
+  width:100%; margin-top:1rem; background:var(--sage);
+  color:white; border:none; padding:.8rem; border-radius:6px; cursor:pointer;
 }
 
-.empty{
-  text-align:center;
-  padding:4rem;
-  background:var(--white);
-  border-radius:10px;
-}
+.empty{ text-align:center; padding:4rem; background:var(--white); border-radius:10px; }
 
 @media(max-width:850px){
-  .cart-layout{
-    grid-template-columns:1fr;
-  }
-  .cart-item{
-    flex-direction:column;
-  }
-  .cart-item img{
-    width:100%;
-    height:220px;
-  }
+  .cart-layout{ grid-template-columns:1fr; }
+  .cart-item{ flex-direction:column; }
+  .cart-item img{ width:100%; height:220px; }
 }
 </style>
 </head>
 
 <body>
 
-<nav>
-  <div class="nav-logo">🌿 Green<span>Market</span></div>
-  <a href="store.html" class="btn-back">← Continuer les achats</a>
-</nav>
+<div id="header-placeholder"></div>
 
 <div class="page-header">
   <h1>🛒 Mon Panier</h1>
@@ -250,127 +155,131 @@ nav{
 </div>
 
 <script>
+  function loadHeader() {
+    fetch('header.html')
+      .then(response => {
+        if (!response.ok) throw new Error("Erreur");
+        return response.text();
+      })
+      .then(data => {
+        document.getElementById('header-placeholder').innerHTML = data;
+      })
+      .catch(error => console.error(error));
+  }
 
-function getPanier(){
-  const saved = localStorage.getItem('greenmarket_panier');
-  return saved ? JSON.parse(saved) : [];
-}
+  function getPanier(){
+    const saved = localStorage.getItem('greenmarket_panier');
+    return saved ? JSON.parse(saved) : [];
+  }
 
-function savePanier(panier){
-  localStorage.setItem('greenmarket_panier', JSON.stringify(panier));
-  renderCart();
-}
-
-function removeItem(id){
-  let panier = getPanier();
-  panier = panier.filter(item => item.id !== id);
-  savePanier(panier);
-}
-
-function changeQuantity(id, delta){
-  let panier = getPanier();
-  panier = panier.map(item => {
-    if(item.id === id){
-      item.quantite += delta;
-      if(item.quantite < 1){
-        item.quantite = 1;
-      }
-    }
-    return item;
-  });
-  savePanier(panier);
-}
-
-function clearCart(){
-  if(confirm("Vider le panier ?")){
-    localStorage.removeItem('greenmarket_panier');
+  function savePanier(panier){
+    localStorage.setItem('greenmarket_panier', JSON.stringify(panier));
     renderCart();
   }
-}
 
-function getTotal(panier){
-  return panier.reduce((sum,item)=>{
-    return sum + (item.prixNumerique * item.quantite);
-  },0);
-}
-
-function goCheckout(){
-  const panier = getPanier();
-  if(panier.length === 0){
-    alert("Panier vide");
-    return;
+  function removeItem(id){
+    let panier = getPanier();
+    panier = panier.filter(item => item.id !== id);
+    savePanier(panier);
   }
-  
-  // Convertir los productos al formato esperado por checkout.html
-  const productosParaCheckout = panier.map(item => ({
-    id: item.id,
-    name: item.nom,
-    price: item.prix,
-    image: item.image,
-    quantity: item.quantite,
-    boutiqueId: item.boutiqueId,
-    boutiqueNom: item.boutiqueNom
-  }));
-  
-  const encoded = encodeURIComponent(JSON.stringify(productosParaCheckout));
-  window.location.href = `checkout.html?products=${encoded}`;
-}
 
-function renderCart(){
-  const panier = getPanier();
-  const container = document.getElementById('cartContent');
+  function changeQuantity(id, delta){
+    let panier = getPanier();
+    panier = panier.map(item => {
+      if(item.id === id){
+        item.quantite = Math.max(1, item.quantite + delta);
+      }
+      return item;
+    });
+    savePanier(panier);
+  }
 
-  if(panier.length === 0){
+  function clearCart(){
+    if(confirm("Vider le panier ?")){
+      localStorage.removeItem('greenmarket_panier');
+      renderCart();
+    }
+  }
+
+  function getTotal(panier){
+    return panier.reduce((sum,item) => sum + (item.prixNumerique * item.quantite), 0);
+  }
+
+  function goCheckout(){
+    const panier = getPanier();
+    if(panier.length === 0){
+      alert("Panier vide");
+      return;
+    }
+    const productosParaCheckout = panier.map(item => ({
+      id: item.id,
+      name: item.nom,
+      price: item.prix,
+      image: item.image,
+      quantity: item.quantite,
+      boutiqueId: item.boutiqueId,
+      boutiqueNom: item.boutiqueNom
+    }));
+    
+    const encoded = encodeURIComponent(JSON.stringify(productosParaCheckout));
+    window.location.href = `checkout.html?products=${encoded}`;
+  }
+
+  function renderCart(){
+    const panier = getPanier();
+    const container = document.getElementById('cartContent');
+
+    if(panier.length === 0){
+      container.innerHTML = `
+        <div class="empty">
+          <h2>🛒 Votre panier est vide</h2>
+          <a href="store.html" class="btn-back">← Continuer les achats</a>
+        </div>
+      `;
+      return;
+    }
+
+    const total = getTotal(panier);
+
     container.innerHTML = `
-      <div class="empty">
-        <h2>🛒 Votre panier est vide</h2>
-        <p style="margin-top:1rem;">Ajoutez des produits depuis les boutiques.</p>
+      <div class="cart-layout">
+        <div class="cart-items">
+          ${panier.map(item => `
+            <div class="cart-item">
+              <img src="${item.image}" alt="${item.nom}">
+              <div class="item-info">
+                <div class="item-name">${item.nom}</div>
+                <div class="item-shop">Boutique : ${item.boutiqueNom}</div>
+                <div class="item-price">${item.prix}</div>
+                <div class="quantity-controls">
+                  <button onclick="changeQuantity(${item.id}, -1)">-</button>
+                  <span>${item.quantite}</span>
+                  <button onclick="changeQuantity(${item.id}, 1)">+</button>
+                </div>
+                <button class="btn-delete" onclick="removeItem(${item.id})">🗑️ Supprimer</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="summary">
+          <h2>Résumé</h2>
+          <div class="summary-line">
+            <span>Produits</span>
+            <span>${panier.length}</span>
+          </div>
+          <div class="summary-line total">
+            <span>Total</span>
+            <span>${total.toFixed(2)} €</span>
+          </div>
+          <button class="btn-checkout" onclick="goCheckout()">✅ Passer la commande</button>
+          <button class="btn-clear" onclick="clearCart()">🗑️ Vider le panier</button>
+        </div>
       </div>
     `;
-    return;
   }
 
-  const total = getTotal(panier);
-
-  container.innerHTML = `
-    <div class="cart-layout">
-      <div class="cart-items">
-        ${panier.map(item => `
-          <div class="cart-item">
-            <img src="${item.image}" alt="${item.nom}">
-            <div class="item-info">
-              <div class="item-name">${item.nom}</div>
-              <div class="item-shop">Boutique : ${item.boutiqueNom}</div>
-              <div class="item-price">${item.prix}</div>
-              <div class="quantity-controls">
-                <button onclick="changeQuantity(${item.id}, -1)">-</button>
-                <span>${item.quantite}</span>
-                <button onclick="changeQuantity(${item.id}, 1)">+</button>
-              </div>
-              <button class="btn-delete" onclick="removeItem(${item.id})">🗑️ Supprimer</button>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-      <div class="summary">
-        <h2>Résumé</h2>
-        <div class="summary-line">
-          <span>Produits</span>
-          <span>${panier.length}</span>
-        </div>
-        <div class="summary-line total">
-          <span>Total</span>
-          <span>${total.toFixed(2)} €</span>
-        </div>
-        <button class="btn-checkout" onclick="goCheckout()">✅ Passer la commande</button>
-        <button class="btn-clear" onclick="clearCart()">🗑️ Vider le panier</button>
-      </div>
-    </div>
-  `;
-}
-
-renderCart();
-
+  loadHeader();
+  renderCart();
 </script>
 </body>
 </html>
