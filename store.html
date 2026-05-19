@@ -37,6 +37,7 @@
     min-height: 100vh;
   }
 
+  /* ========== HEADER STYLES ========== */
   header {
     background: #9FB2AC;
     border-bottom: 2px solid #f0e8d5;
@@ -44,6 +45,16 @@
     top: 0;
     z-index: 100;
     box-shadow: 0 2px 16px rgba(93,13,24,0.07);
+  }
+
+  header > div {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
   }
 
   .search-bar input {
@@ -315,12 +326,6 @@
     cursor: pointer; transition: background .2s;
   }
   .btn-sm-cancel:hover { background: #d9cfc0; }
-  .role-notice {
-    padding: .8rem 1.3rem; background: #fdf5e4;
-    border-top: 1px solid var(--border);
-    font-size: .77rem; color: var(--text-muted);
-    display: flex; align-items: center; gap: .4rem; min-height: 42px;
-  }
 
   .create-shop-section {
     background: var(--white);
@@ -601,6 +606,9 @@
   }
   .btn-filled:hover { background: var(--wine-dark); }
 
+  .empty-state { text-align: center; padding: 3rem; color: var(--text-light); }
+  .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+
   @media(max-width:900px){ .main-layout { grid-template-columns: 1fr; } .sidebar { position: static; } }
   @media(max-width:600px){
     .page-header { padding: 2.5rem 1.2rem 2rem; }
@@ -618,8 +626,39 @@
 </head>
 <body>
 
-<div id="header-placeholder"></div>
+<!-- HEADER COMPLETO (integrado directamente para que funcione) -->
+<header>
+  <div>
+    <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='accueil.html'">
+      <div style="height: 65px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <img src="IMAGES/logo.png" alt="GreenMarket Logo" style="height: 100%; width: auto; object-fit: contain;" onerror="this.src='https://placehold.co/65x65?text=GM'"/>
+      </div>
+      <span style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: 1px;">GreenMarket</span>
+    </div>
 
+    <div class="search-bar" style="flex: 1; display: flex; justify-content: center; min-width: 180px;">
+      <input type="text" id="headerSearchInput" placeholder="Rechercher une boutique artisanale..."/>
+    </div>
+
+    <nav class="desktop-nav">
+      <a href="accueil.html" class="nav-link">Accueil</a>
+      <a href="store.html" class="nav-link active">Boutiques</a>
+      <a href="#" class="nav-link">Produits</a>
+      <a href="#" class="nav-link">À propos</a>
+      <a href="dashboard-producteur.html" id="dashboardLink" class="nav-link" style="display: none;">📊 Dashboard</a>
+    </nav>
+
+    <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
+      <button class="cart-btn" title="Panier">
+        <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#5D0D18" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 6h14M9 21a1 1 0 1 0 2 0M15 21a1 1 0 1 0 2 0"/>
+        </svg>
+        <span class="cart-badge" id="cart-count">0</span>
+      </button>
+      <div id="authWidget"></div>
+    </div>
+  </div>
+</header>
 
 <div class="page-header">
   <div class="header-inner">
@@ -662,7 +701,6 @@
         <input type="text" id="catIconInput" placeholder="🏺" maxlength="4">
         <div class="form-actions"><button class="btn-sm-cancel" id="cancelCat">Annuler</button><button class="btn-sm-wine" id="saveCat">Enregistrer</button></div>
       </div>
-      
     </div>
     <div id="createShopSection" class="create-shop-section" style="display: none;">
       <div class="create-shop-header"><h3>🏪 Créer ma boutique artisanale</h3></div>
@@ -750,6 +788,7 @@
 </div>
 
 <script>
+// ========== DATOS ==========
 let categories = [
   { id:1, icon:'👘', name:'Caftans & Vêtements traditionnels' },
   { id:2, icon:'🪑', name:'Tapis & Tissage' },
@@ -774,55 +813,14 @@ let stores = [
   { id:10, name:"Caftans Impériaux", category:'Caftans & Vêtements traditionnels', categoryId:1, badge:'Artisan', badgeClass:'artisan', banner:'IMAGES/1779141052204.png', desc:'Caftans de cérémonie, takchitas et accessoires pour les grandes occasions. Broderies d\'or et d\'argent.', rating:4.9, reviews:256, products:10, sales:'4 200', tags:['Caftan','Takchita','Broderie'], producerId:110, producerName:'Leila Benani', location:'Casablanca', since:'2006' }
 ];
 
-const defaultProducts = {
-  1: [ 
-    { id: 101, name: "Caftan en Soie", price: "2 500 DH", stock: 5, image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=300&h=200&fit=crop", description: "Caftan en soie naturelle, broderies faites main" },
-    { id: 102, name: "Takchita Cérémonie", price: "3 200 DH", stock: 3, image: "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=300&h=200&fit=crop", description: "Takchita pour mariage, broderies d'or" },
-    { id: 103, name: "Caftan Moderne", price: "1 800 DH", stock: 8, image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=300&h=200&fit=crop", description: "Caftan à la coupe contemporaine" }
-  ],
-  2: [ 
-    { id: 201, name: "Tapis Berbère Moyen", price: "1 200 DH", stock: 4, image: "https://images.unsplash.com/photo-1526721940322-10fb6e3ae94a?w=300&h=200&fit=crop", description: "Tapis en laine naturelle, motifs berbères" },
-    { id: 202, name: "Tapis Azilal", price: "950 DH", stock: 6, image: "https://images.unsplash.com/photo-1553775282-07af8073453f?w=300&h=200&fit=crop", description: "Tapis coloré des montagnes d'Azilal" },
-    { id: 203, name: "Coussin Tissé", price: "250 DH", stock: 15, image: "https://images.unsplash.com/photo-1553775282-07af8073453f?w=300&h=200&fit=crop", description: "Coussin décoratif tissé main" }
-  ],
-  3: [ 
-    { id: 301, name: "Tajine Traditionnel", price: "180 DH", stock: 20, image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=200&fit=crop", description: "Tajine en terre cuite, motif peint" },
-    { id: 302, name: "Assiettes Décoratives", price: "95 DH", stock: 30, image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=200&fit=crop", description: "Lot de 6 assiettes peintes à la main" },
-    { id: 303, name: "Vase Zellij", price: "320 DH", stock: 12, image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=200&fit=crop", description: "Vase inspiré des motifs zellij" }
-  ],
-  4: [ 
-    { id: 401, name: "Petite Table Marqueterie", price: "850 DH", stock: 4, image: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=300&h=200&fit=crop", description: "Table en cèdre incrusté" },
-    { id: 402, name: "Coffre à Bijoux", price: "320 DH", stock: 8, image: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=300&h=200&fit=crop", description: "Coffret en bois sculpté" }
-  ],
-  5: [ 
-    { id: 501, name: "Bracelet Argent Amazigh", price: "450 DH", stock: 10, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop", description: "Bracelet en argent, symbole amazigh" },
-    { id: 502, name: "Collier Fibule", price: "680 DH", stock: 6, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop", description: "Fibule berbère traditionnelle" },
-    { id: 503, name: "Boucles d'Oreilles", price: "280 DH", stock: 15, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop", description: "Boucles en argent, corail" }
-  ],
-  6: [ 
-    { id: 601, name: "Lanterne Laiton", price: "380 DH", stock: 8, image: "https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=300&h=200&fit=crop", description: "Lanterne en laiton martelé" },
-    { id: 602, name: "Applique Murale", price: "250 DH", stock: 12, image: "https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=300&h=200&fit=crop", description: "Applique en fer forgé" }
-  ],
-  7: [ 
-    { id: 701, name: "Huile d'Argan Bio", price: "120 DH", stock: 50, image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=300&h=200&fit=crop", description: "Huile d'argan 100% pure" },
-    { id: 702, name: "Savon Noir", price: "45 DH", stock: 100, image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=300&h=200&fit=crop", description: "Savon noir traditionnel" }
-  ],
-  8: [ 
-    { id: 801, name: "Huile d'Olive Vierge", price: "85 DH", stock: 40, image: "https://images.unsplash.com/photo-1599851152730-1f83a654bb9a?w=300&h=200&fit=crop", description: "Huile d'olive extra vierge, première pression" },
-    { id: 802, name: "Amlou", price: "95 DH", stock: 25, image: "https://images.unsplash.com/photo-1599851152730-1f83a654bb9a?w=300&h=200&fit=crop", description: "Purée d'amandes et miel d'argan" }
-  ]
-};
-
-function saveDefaultProducts() {
-  for (const shopId in defaultProducts) {
-    if (!localStorage.getItem(`products_${shopId}`)) {
-      localStorage.setItem(`products_${shopId}`, JSON.stringify(defaultProducts[shopId]));
-    }
+function saveStores() { localStorage.setItem('greenmarket_stores', JSON.stringify(stores)); }
+function loadStoresFromStorage() {
+  const saved = localStorage.getItem('greenmarket_stores');
+  if (saved && JSON.parse(saved).length > 0) {
+    stores = JSON.parse(saved);
+  } else {
+    saveStores();
   }
-}
-
-function getDefaultProductsForCategory(categoryId) {
-  return defaultProducts[categoryId] || defaultProducts[1];
 }
 
 let favorites = [];
@@ -856,16 +854,6 @@ let currentUser = null;
 function initUsers() {
   const defaultUsers = [
     { id: 1, name: "Administrateur", email: "admin@greenmarket.com", password: "admin123", role: "admin", producerId: null },
-    { id: 2, name: "Fatima Zahra", email: "fatima@caftan.ma", password: "fatima123", role: "productor", producerId: 101 },
-    { id: 3, name: "Rachid El Mansouri", email: "rachid@tapis.ma", password: "rachid123", role: "productor", producerId: 102 },
-    { id: 4, name: "Ahmed Benjelloun", email: "ahmed@poterie.ma", password: "ahmed123", role: "productor", producerId: 103 },
-    { id: 5, name: "Mohamed Alami", email: "mohamed@bois.ma", password: "mohamed123", role: "productor", producerId: 104 },
-    { id: 6, name: "Malika Oufkir", email: "malika@bijoux.ma", password: "malika123", role: "productor", producerId: 105 },
-    { id: 7, name: "Karim Tazi", email: "karim@lampes.ma", password: "karim123", role: "productor", producerId: 106 },
-    { id: 8, name: "Nadia Berrada", email: "nadia@cosmetiques.ma", password: "nadia123", role: "productor", producerId: 107 },
-    { id: 9, name: "Hassan El Fassi", email: "hassan@terroir.ma", password: "hassan123", role: "productor", producerId: 108 },
-    { id: 10, name: "Zineb Ait Ali", email: "zineb@tissage.ma", password: "zineb123", role: "productor", producerId: 109 },
-    { id: 11, name: "Leila Benani", email: "leila@caftans.ma", password: "leila123", role: "productor", producerId: 110 },
     { id: 12, name: "Client Test", email: "client@test.com", password: "client123", role: "client", producerId: null }
   ];
   if (!localStorage.getItem('greenmarket_users')) {
@@ -900,30 +888,10 @@ function login(email, password) {
   }
   return { success: false, error: "Email ou mot de passe incorrect" };
 }
-function registerClient(name, email, password) {
-  const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
-  if (users.find(u => u.email === email)) return { success: false, error: "Email déjà utilisé" };
-  const newUser = { id: Date.now(), name, email, password, role: "client", producerId: null };
-  users.push(newUser);
-  localStorage.setItem('greenmarket_users', JSON.stringify(users));
-  const { password: _, ...safeUser } = newUser;
-  setCurrentUser(safeUser);
-  return { success: true, user: safeUser };
-}
-function registerProducer(name, email, password) {
-  const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
-  if (users.find(u => u.email === email)) return { success: false, error: "Email déjà utilisé" };
-  const newProducerId = Date.now();
-  const newUser = { id: Date.now(), name, email, password, role: "productor", producerId: newProducerId };
-  users.push(newUser);
-  localStorage.setItem('greenmarket_users', JSON.stringify(users));
-  const { password: _, ...safeUser } = newUser;
-  setCurrentUser(safeUser);
-  return { success: true, user: safeUser };
-}
 
 function updateAuthUI() {
   const widget = document.getElementById('authWidget');
+  if (!widget) return;
   const user = getCurrentUser();
   if (user) {
     const roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Artisan' : 'Client');
@@ -931,9 +899,10 @@ function updateAuthUI() {
     document.getElementById('logoutBtn')?.addEventListener('click', logout);
   } else {
     widget.innerHTML = `<button class="btn-connexion" id="showLoginBtn">🔑 Connexion</button>`;
-    document.getElementById('showLoginBtn')?.addEventListener('click', () => showAuthModal('login'));
+    document.getElementById('showLoginBtn')?.addEventListener('click', () => showAuthModal());
   }
   updateCategoriesPermissions();
+  updateDashboardLink();
 }
 
 function updateDashboardLink() {
@@ -985,112 +954,27 @@ function setupImageOptions() {
   }
 }
 
-function showAuthModal(tab = 'login') {
+function showAuthModal() {
   const modal = document.getElementById('authModal');
-  document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-  document.getElementById('loginForm').classList.toggle('active', tab === 'login');
-  modal.classList.add('open');
+  if (modal) modal.classList.add('open');
 }
-function closeAuthModal() { document.getElementById('authModal').classList.remove('open'); }
+function closeAuthModal() { document.getElementById('authModal')?.classList.remove('open'); }
 
 function setupAuthModal() {
-  document.querySelectorAll('.auth-tab').forEach(tab => {
-    tab.addEventListener('click', () => showAuthModal(tab.dataset.tab));
-  });
-  document.getElementById('doLoginBtn').addEventListener('click', () => {
+  document.getElementById('doLoginBtn')?.addEventListener('click', () => {
     const result = login(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
-    if (result.success) { closeAuthModal(); updateAuthUI(); updateCreateShopVisibility(); renderStores(); showToast(`👋 Bonjour ${result.user.name} !`); }
-    else document.getElementById('loginError').textContent = result.error;
-  });
-  document.getElementById('closeAuthModal').addEventListener('click', closeAuthModal);
-  document.getElementById('authModal').addEventListener('click', (e) => { if (e.target === document.getElementById('authModal')) closeAuthModal(); });
-}
-
-function addNewCategory() {
-  const newName = document.getElementById('newCategoryName').value.trim();
-  if (!newName) { showToast("⚠️ Veuillez saisir un nom", '#9a4a00'); return; }
-  if (categories.find(c => c.name.toLowerCase() === newName.toLowerCase())) { showToast("⚠️ Catégorie existe déjà", '#9a4a00'); return; }
-  const newId = Math.max(...categories.map(c => c.id), 0) + 1;
-  categories.push({ id: newId, icon: '📦', name: newName });
-  saveCategories();
-  updateCategorySelect();
-  document.getElementById('newCategoryName').value = '';
-  showToast(`✅ Catégorie "${newName}" ajoutée !`);
-}
-
-function getImageData(callback) {
-  const imageType = document.querySelector('input[name="imageType"]:checked').value;
-  if (imageType === 'url') {
-    callback(document.getElementById('shopBannerUrl').value.trim() || 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=700&q=80');
-  } else {
-    const file = document.getElementById('shopBannerFile').files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => callback(ev.target.result);
-      reader.readAsDataURL(file);
+    if (result.success) { 
+      closeAuthModal(); 
+      updateAuthUI(); 
+      updateCreateShopVisibility(); 
+      renderStores(); 
+      showToast(`👋 Bonjour ${result.user.name} !`); 
     } else {
-      callback('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=700&q=80');
+      document.getElementById('loginError').textContent = result.error;
     }
-  }
-}
-
-function createShop() {
-  const user = getCurrentUser();
-  if (!user || (user.role !== 'productor' && user.role !== 'admin')) { showToast("🔒 Vous devez être connecté en tant qu'artisan", '#9a4a00'); return; }
-  const name = document.getElementById('shopName').value.trim();
-  const catId = parseInt(document.getElementById('shopCategory').value);
-  const desc = document.getElementById('shopDesc').value.trim();
-  const badge = document.getElementById('shopBadge').value;
-  if (!name) { showToast("⚠️ Veuillez saisir un nom", '#9a4a00'); return; }
-  if (!catId) { showToast("⚠️ Veuillez sélectionner une catégorie", '#9a4a00'); return; }
-  const cat = categories.find(c => c.id === catId);
-  const newId = Math.max(...stores.map(s => s.id), 0) + 1;
-  let badgeClass = '';
-  if (badge === 'Artisan') badgeClass = 'artisan';
-  if (badge === 'Tradition') badgeClass = 'tradition';
-  if (badge === 'Fait Main') badgeClass = 'fait-main';
-  getImageData((bannerImage) => {
-    const newShop = {
-      id: newId, name, category: cat ? cat.name : 'Non catégorisé', categoryId: catId,
-      badge, badgeClass, banner: bannerImage,
-      desc: desc || "Nouvelle boutique artisanale marocaine",
-      rating: 0, reviews: 0, products: 0, sales: '0',
-      tags: ['Nouveau'], producerId: user.producerId || user.id,
-      producerName: user.name, location: 'Maroc', since: new Date().getFullYear().toString()
-    };
-    stores.push(newShop);
-    saveStores();
-    const defaultProds = getDefaultProductsForCategory(catId);
-    if (defaultProds && defaultProds.length > 0) {
-      const productsToSave = defaultProds.map(p => ({ ...p, id: Date.now() + Math.random() * 1000 }));
-      localStorage.setItem(`products_${newId}`, JSON.stringify(productsToSave));
-      newShop.products = productsToSave.length;
-    }
-    document.getElementById('shopName').value = '';
-    document.getElementById('shopDesc').value = '';
-    document.getElementById('shopBannerUrl').value = '';
-    document.getElementById('shopBannerFile').value = '';
-    document.getElementById('imagePreview').innerHTML = '<div class="preview-placeholder">Aucune image sélectionnée</div>';
-    renderStores();
-    renderCategories();
-    showToast(`✅ Boutique "${name}" créée avec ${newShop.products} produits par défaut !`);
   });
-}
-
-function saveStores() { localStorage.setItem('greenmarket_stores', JSON.stringify(stores)); }
-
-function loadStores() {
-  const s = localStorage.getItem('greenmarket_stores');
-  if (s) {
-    try {
-      stores = JSON.parse(s);
-    } catch(e) {
-      console.warn('Erreur parsing stores, sauvegarde des données par défaut');
-      saveStores();
-    }
-  } else {
-    saveStores();
-  }
+  document.getElementById('closeAuthModal')?.addEventListener('click', closeAuthModal);
+  document.getElementById('authModal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('authModal')) closeAuthModal(); });
 }
 
 function saveCategories() { localStorage.setItem('greenmarket_categories', JSON.stringify(categories)); }
@@ -1123,6 +1007,7 @@ let activeCategory = null;
 
 function renderCategories() {
   const list = document.getElementById('categoryList');
+  if (!list) return;
   list.innerHTML = `
     <div class="category-item${activeCategory === null ? ' active' : ''}" data-name="">
       <div class="cat-left"><span class="cat-icon">🏪</span><span class="cat-name">Toutes les boutiques</span></div>
@@ -1146,13 +1031,13 @@ function renderCategories() {
 
 function updateCategoriesPermissions() {
   const btn = document.getElementById('toggleAddCat');
-  const notice = document.getElementById('roleNotice');
   const user = getCurrentUser();
-  if (user && user.role === 'admin') {
-    btn.style.display = 'flex';
-    notice.innerHTML = '';
-  } else {
-    btn.style.display = 'none';
+  if (btn) {
+    if (user && user.role === 'admin') {
+      btn.style.display = 'flex';
+    } else {
+      btn.style.display = 'none';
+    }
   }
 }
 
@@ -1170,14 +1055,17 @@ function updateStats() {
   const totalProducts = stores.reduce((sum, s) => sum + (s.products || 0), 0);
   const ratedStores = stores.filter(s => s.rating > 0);
   const avgRating = ratedStores.length ? (ratedStores.reduce((sum, s) => sum + s.rating, 0) / ratedStores.length).toFixed(1) : '—';
-  document.getElementById('statStores').textContent = stores.length;
-  document.getElementById('statProducts').textContent = totalProducts;
-  document.getElementById('statRating').textContent = avgRating + ' ★';
+  const statStores = document.getElementById('statStores');
+  const statProducts = document.getElementById('statProducts');
+  const statRating = document.getElementById('statRating');
+  if (statStores) statStores.textContent = stores.length;
+  if (statProducts) statProducts.textContent = totalProducts;
+  if (statRating) statRating.textContent = avgRating + ' ★';
 }
 
 function renderStores() {
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  const sort = document.getElementById('sortFilter').value;
+  const q = document.getElementById('searchInput')?.value.toLowerCase() || '';
+  const sort = document.getElementById('sortFilter')?.value || '';
   let list = stores.filter(s => {
     const ms = !q || s.name.toLowerCase().includes(q) || (s.producerName || '').toLowerCase().includes(q);
     const mc = !activeCategory || s.category === activeCategory;
@@ -1187,28 +1075,32 @@ function renderStores() {
   if (sort === 'rating') list.sort((a, b) => b.rating - a.rating);
   if (sort === 'products') list.sort((a, b) => b.products - a.products);
   if (sort === 'name') list.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
-  document.getElementById('storesTitle').textContent = currentFilter === 'favorites'
-    ? 'Mes boutiques favorites'
-    : (activeCategory || 'Toutes les boutiques artisanales');
-  document.getElementById('storesCount').textContent = `${list.length} boutique${list.length > 1 ? 's' : ''}`;
+  
+  const storesTitle = document.getElementById('storesTitle');
+  const storesCount = document.getElementById('storesCount');
+  if (storesTitle) {
+    storesTitle.textContent = currentFilter === 'favorites' ? 'Mes boutiques favorites' : (activeCategory || 'Toutes les boutiques artisanales');
+  }
+  if (storesCount) storesCount.textContent = `${list.length} boutique${list.length > 1 ? 's' : ''}`;
   updateStats();
+  
   const grid = document.getElementById('storesGrid');
+  if (!grid) return;
   if (!list.length) {
     grid.innerHTML = `<div class="empty-state"><div class="empty-icon">${currentFilter === 'favorites' ? '❤️' : '🔍'}</div><p>${currentFilter === 'favorites' ? 'Aucune boutique dans vos favoris' : 'Aucune boutique trouvée.'}</p></div>`;
     return;
   }
   const user = getCurrentUser();
+  const fallbackImg = 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=700&q=80';
   grid.innerHTML = list.map(s => {
     const canDelete = user && (user.role === 'admin' || (user.role === 'productor' && user.producerId === s.producerId));
-    const canEdit = canDelete;
     const favorited = isFavorite(s.id);
-    const fallbackImg = 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=700&q=80';
     return `
       <div class="store-card">
         <div class="store-banner" onclick="window.location.href='info-store.html?id=${s.id}'">
           <img src="${escapeHtml(s.banner || fallbackImg)}" alt="${escapeHtml(s.name)}" loading="lazy" onerror="this.src='${fallbackImg}'">
           ${s.badge ? `<span class="store-badge ${escapeHtml(s.badgeClass || '')}">${escapeHtml(s.badge)}</span>` : ''}
-          ${canEdit ? `<button class="edit-photo-btn" onclick="openPhotoModal(${s.id}, event)">📷 Changer la photo</button>` : ''}
+          ${canDelete ? `<button class="edit-photo-btn" onclick="openPhotoModal(${s.id}, event)">📷 Changer la photo</button>` : ''}
         </div>
         <button class="favorite-btn ${favorited ? 'favorited' : ''}" onclick="toggleFavorite(${s.id}, event)" title="${favorited ? 'Retirer des favoris' : 'Ajouter aux favoris'}">
           <span class="heart-empty">🤍</span>
@@ -1217,19 +1109,19 @@ function renderStores() {
         <div class="store-body">
           <div class="store-name">${escapeHtml(s.name)}</div>
           <span class="store-category-tag">${escapeHtml(s.category)}</span>
-          <p class="store-desc">${escapeHtml(s.desc.length > 100 ? s.desc.slice(0, 100) + '…' : s.desc)}</p>
+          <p class="store-desc">${escapeHtml((s.desc || '').length > 100 ? (s.desc || '').slice(0, 100) + '…' : (s.desc || ''))}</p>
           <div class="store-stats">
             <div class="store-stat">
               <span class="store-stat-val">${s.rating || '—'}</span>
-              <div class="store-stars">${stars(s.rating)}</div>
-              <span class="store-stat-label">${s.reviews} avis</span>
+              <div class="store-stars">${stars(s.rating || 0)}</div>
+              <span class="store-stat-label">${s.reviews || 0} avis</span>
             </div>
             <div class="store-stat">
-              <span class="store-stat-val">${s.products}</span>
+              <span class="store-stat-val">${s.products || 0}</span>
               <span class="store-stat-label">Produits</span>
             </div>
             <div class="store-stat">
-              <span class="store-stat-val">${s.sales}</span>
+              <span class="store-stat-val">${s.sales || '0'}</span>
               <span class="store-stat-label">Ventes</span>
             </div>
           </div>
@@ -1240,6 +1132,7 @@ function renderStores() {
   }).join('');
 }
 
+// Event listeners
 document.getElementById('toggleAddCat')?.addEventListener('click', () => document.getElementById('addCatForm')?.classList.toggle('open'));
 document.getElementById('cancelCat')?.addEventListener('click', () => {
   document.getElementById('addCatForm')?.classList.remove('open');
@@ -1253,7 +1146,8 @@ document.getElementById('saveCat')?.addEventListener('click', () => {
   if (categories.find(c => c.name.toLowerCase() === name.toLowerCase())) { showToast('⚠️ Catégorie existe déjà', '#9a4a00'); return; }
   const newId = Math.max(...categories.map(c => c.id), 0) + 1;
   categories.push({ id: newId, icon, name });
-  saveCategories(); updateCategorySelect();
+  saveCategories(); 
+  updateCategorySelect();
   document.getElementById('addCatForm')?.classList.remove('open');
   document.getElementById('catNameInput').value = '';
   document.getElementById('catIconInput').value = '';
@@ -1262,8 +1156,80 @@ document.getElementById('saveCat')?.addEventListener('click', () => {
 });
 
 document.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', () => setFilter(btn.dataset.filter)));
-document.getElementById('addNewCategoryBtn')?.addEventListener('click', addNewCategory);
-document.getElementById('createShopBtn')?.addEventListener('click', createShop);
+document.getElementById('addNewCategoryBtn')?.addEventListener('click', () => {
+  const newName = document.getElementById('newCategoryName').value.trim();
+  if (!newName) { showToast("⚠️ Veuillez saisir un nom", '#9a4a00'); return; }
+  if (categories.find(c => c.name.toLowerCase() === newName.toLowerCase())) { showToast("⚠️ Catégorie existe déjà", '#9a4a00'); return; }
+  const newId = Math.max(...categories.map(c => c.id), 0) + 1;
+  categories.push({ id: newId, icon: '📦', name: newName });
+  saveCategories();
+  updateCategorySelect();
+  document.getElementById('newCategoryName').value = '';
+  showToast(`✅ Catégorie "${newName}" ajoutée !`);
+});
+document.getElementById('createShopBtn')?.addEventListener('click', () => {
+  const user = getCurrentUser();
+  if (!user || (user.role !== 'productor' && user.role !== 'admin')) { showToast("🔒 Vous devez être connecté en tant qu'artisan", '#9a4a00'); return; }
+  const name = document.getElementById('shopName').value.trim();
+  const catId = parseInt(document.getElementById('shopCategory').value);
+  const desc = document.getElementById('shopDesc').value.trim();
+  const badge = document.getElementById('shopBadge').value;
+  if (!name) { showToast("⚠️ Veuillez saisir un nom", '#9a4a00'); return; }
+  if (!catId) { showToast("⚠️ Veuillez sélectionner une catégorie", '#9a4a00'); return; }
+  const cat = categories.find(c => c.id === catId);
+  const newId = Math.max(...stores.map(s => s.id), 0) + 1;
+  let badgeClass = '';
+  if (badge === 'Artisan') badgeClass = 'artisan';
+  if (badge === 'Tradition') badgeClass = 'tradition';
+  if (badge === 'Fait Main') badgeClass = 'fait-main';
+  
+  const imageType = document.querySelector('input[name="imageType"]:checked').value;
+  let bannerImage = 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=700&q=80';
+  if (imageType === 'url') {
+    bannerImage = document.getElementById('shopBannerUrl').value.trim() || bannerImage;
+  } else {
+    const file = document.getElementById('shopBannerFile').files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const newShop = {
+          id: newId, name, category: cat ? cat.name : 'Non catégorisé', categoryId: catId,
+          badge, badgeClass, banner: ev.target.result,
+          desc: desc || "Nouvelle boutique artisanale marocaine",
+          rating: 0, reviews: 0, products: 0, sales: '0',
+          tags: ['Nouveau'], producerId: user.producerId || user.id,
+          producerName: user.name, location: 'Maroc', since: new Date().getFullYear().toString()
+        };
+        stores.push(newShop);
+        saveStores();
+        renderStores();
+        renderCategories();
+        showToast(`✅ Boutique "${name}" créée !`);
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+  }
+  
+  const newShop = {
+    id: newId, name, category: cat ? cat.name : 'Non catégorisé', categoryId: catId,
+    badge, badgeClass, banner: bannerImage,
+    desc: desc || "Nouvelle boutique artisanale marocaine",
+    rating: 0, reviews: 0, products: 0, sales: '0',
+    tags: ['Nouveau'], producerId: user.producerId || user.id,
+    producerName: user.name, location: 'Maroc', since: new Date().getFullYear().toString()
+  };
+  stores.push(newShop);
+  saveStores();
+  document.getElementById('shopName').value = '';
+  document.getElementById('shopDesc').value = '';
+  document.getElementById('shopBannerUrl').value = '';
+  document.getElementById('shopBannerFile').value = '';
+  document.getElementById('imagePreview').innerHTML = '<div class="preview-placeholder">Aucune image sélectionnée</div>';
+  renderStores();
+  renderCategories();
+  showToast(`✅ Boutique "${name}" créée !`);
+});
 document.getElementById('searchInput')?.addEventListener('input', renderStores);
 document.getElementById('sortFilter')?.addEventListener('change', renderStores);
 document.getElementById('catFilter')?.addEventListener('change', e => {
@@ -1271,49 +1237,42 @@ document.getElementById('catFilter')?.addEventListener('change', e => {
   renderCategories(); renderStores();
 });
 
+// Llenar catFilter
 categories.forEach(c => {
   const opt = document.createElement('option');
   opt.value = c.name; opt.textContent = c.name;
   document.getElementById('catFilter')?.appendChild(opt);
 });
 
-saveDefaultProducts();
-loadStores();
-loadCategories();
-loadFavorites();
-initUsers();
-updateAuthUI();
-setupAuthModal();
-renderCategories();
-renderStores();
-updateCreateShopVisibility();
-updateDashboardLink();
-
-window.deleteShop = deleteShop;
-window.toggleFavorite = toggleFavorite;
-
+// Photo modal functions
 let photoModalShopId = null;
 let pendingPhotoData = null;
 
-function openPhotoModal(shopId, event) {
+window.openPhotoModal = function(shopId, event) {
   event.stopPropagation();
   const shop = stores.find(s => s.id === shopId);
   if (!shop) return;
   photoModalShopId = shopId;
   pendingPhotoData = null;
-
-  document.getElementById('photoModalShopName').textContent = '« ' + shop.name + ' »';
-  document.getElementById('photoDropZone').style.display = 'block';
-  document.getElementById('photoPreviewBox').style.display = 'none';
-  document.getElementById('photoFileInput').value = '';
-  document.getElementById('photoFileInput2').value = '';
-  document.getElementById('savePhotoBtn').disabled = true;
-
-  document.getElementById('photoModal').classList.add('open');
-}
+  const nameSpan = document.getElementById('photoModalShopName');
+  if (nameSpan) nameSpan.textContent = '« ' + shop.name + ' »';
+  const dropZone = document.getElementById('photoDropZone');
+  const previewBox = document.getElementById('photoPreviewBox');
+  const saveBtn = document.getElementById('savePhotoBtn');
+  if (dropZone) dropZone.style.display = 'block';
+  if (previewBox) previewBox.style.display = 'none';
+  const fileInput = document.getElementById('photoFileInput');
+  const fileInput2 = document.getElementById('photoFileInput2');
+  if (fileInput) fileInput.value = '';
+  if (fileInput2) fileInput2.value = '';
+  if (saveBtn) saveBtn.disabled = true;
+  const modal = document.getElementById('photoModal');
+  if (modal) modal.classList.add('open');
+};
 
 function closePhotoModal() {
-  document.getElementById('photoModal').classList.remove('open');
+  const modal = document.getElementById('photoModal');
+  if (modal) modal.classList.remove('open');
   photoModalShopId = null;
   pendingPhotoData = null;
 }
@@ -1326,10 +1285,14 @@ function handlePhotoFile(file) {
   const reader = new FileReader();
   reader.onload = (e) => {
     pendingPhotoData = e.target.result;
-    document.getElementById('photoPreviewImg').src = pendingPhotoData;
-    document.getElementById('photoDropZone').style.display = 'none';
-    document.getElementById('photoPreviewBox').style.display = 'block';
-    document.getElementById('savePhotoBtn').disabled = false;
+    const previewImg = document.getElementById('photoPreviewImg');
+    if (previewImg) previewImg.src = pendingPhotoData;
+    const dropZone = document.getElementById('photoDropZone');
+    const previewBox = document.getElementById('photoPreviewBox');
+    const saveBtn = document.getElementById('savePhotoBtn');
+    if (dropZone) dropZone.style.display = 'none';
+    if (previewBox) previewBox.style.display = 'block';
+    if (saveBtn) saveBtn.disabled = false;
   };
   reader.readAsDataURL(file);
 }
@@ -1345,43 +1308,42 @@ function savePhoto() {
   showToast('✅ Photo mise à jour !');
 }
 
-document.getElementById('closePhotoModal').addEventListener('click', closePhotoModal);
-document.getElementById('cancelPhotoBtn').addEventListener('click', closePhotoModal);
-document.getElementById('savePhotoBtn').addEventListener('click', savePhoto);
-document.getElementById('photoModal').addEventListener('click', e => {
+document.getElementById('closePhotoModal')?.addEventListener('click', closePhotoModal);
+document.getElementById('cancelPhotoBtn')?.addEventListener('click', closePhotoModal);
+document.getElementById('savePhotoBtn')?.addEventListener('click', savePhoto);
+document.getElementById('photoModal')?.addEventListener('click', e => {
   if (e.target === document.getElementById('photoModal')) closePhotoModal();
 });
-
-document.getElementById('photoFileInput').addEventListener('change', e => {
+document.getElementById('photoFileInput')?.addEventListener('change', e => {
   handlePhotoFile(e.target.files[0]);
 });
-
-document.getElementById('photoFileInput2').addEventListener('change', e => {
+document.getElementById('photoFileInput2')?.addEventListener('change', e => {
   handlePhotoFile(e.target.files[0]);
 });
-
 const dropZone = document.getElementById('photoDropZone');
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('drag-over');
-  handlePhotoFile(e.dataTransfer.files[0]);
-});
-
-window.openPhotoModal = openPhotoModal;
-</script>
-<script>
-function loadHeader() {
-  fetch('header.html')
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById('header-placeholder').innerHTML = data;
-    });
+if (dropZone) {
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    handlePhotoFile(e.dataTransfer.files[0]);
+  });
 }
 
-loadHeader();
-</script>
+// Inicialización
+loadStoresFromStorage();
+loadCategories();
+loadFavorites();
+initUsers();
+updateAuthUI();
+setupAuthModal();
+renderCategories();
+renderStores();
+updateCreateShopVisibility();
 
+window.deleteShop = deleteShop;
+window.toggleFavorite = toggleFavorite;
+</script>
 </body>
 </html>
