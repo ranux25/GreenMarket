@@ -112,25 +112,6 @@
     font-family: 'Lato', sans-serif;
   }
 
-  .btn-primary-header {
-    background: var(--primary);
-    color: #fff;
-    border: none;
-    border-radius: 999px;
-    padding: 10px 22px;
-    font-family: 'Lato', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-    letter-spacing: 0.3px;
-  }
-  .btn-primary-header:hover {
-    background: #7a1020;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(93,13,24,0.25);
-  }
-
   .desktop-nav {
     display: flex;
     align-items: center;
@@ -139,6 +120,36 @@
 
   @media (max-width: 640px) {
     .desktop-nav { display: none; }
+  }
+
+  .btn-connexion {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 20px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .btn-connexion:hover {
+    background: #7a1020;
+    transform: translateY(-1px);
+  }
+
+  .user-badge {
+    background: var(--wine-pale);
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--wine);
+    font-weight: 600;
+    font-size: 0.85rem;
   }
 
   .page-header {
@@ -476,7 +487,6 @@
   }
   .store-banner:hover .edit-photo-btn { opacity: 1; }
 
-  /* ===== MODAL PHOTO ===== */
   .photo-modal-overlay {
     display: none; position: fixed; inset: 0;
     background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
@@ -574,25 +584,14 @@
   .auth-form { display: none; }
   .auth-form.active { display: block; }
   .auth-form h3 { color: var(--wine); margin-bottom: 1rem; font-family: 'Cormorant Garamond', serif; }
-  .auth-form input, .auth-form textarea {
+  .auth-form input {
     width: 100%; padding: 0.7rem; margin-bottom: 1rem;
     border: 1.5px solid var(--border); border-radius: 8px;
     font-family: 'Jost', sans-serif; background: var(--cream);
   }
-  .auth-form textarea { border-radius: 8px; resize: vertical; }
   .auth-error { color: #d9534f; font-size: 0.8rem; margin-top: 0.5rem; text-align: center; }
-  .role-selector { display: flex; gap: 1rem; margin-bottom: 1rem; }
-  .role-selector label { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; }
   .auth-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); }
 
-  .btn-outline {
-    border: 1.5px solid var(--wine); background: transparent; color: var(--wine);
-    padding: .45rem 1.2rem; border-radius: 3px;
-    font-family: 'Jost', sans-serif; font-size: .78rem; font-weight: 600;
-    letter-spacing: .07em; text-transform: uppercase;
-    cursor: pointer; transition: all .2s;
-  }
-  .btn-outline:hover { background: var(--wine); color: var(--cream); }
   .btn-filled {
     background: var(--wine); color: var(--cream);
     border: none; padding: .5rem 1.3rem; border-radius: 3px;
@@ -601,12 +600,6 @@
     cursor: pointer; transition: background .2s;
   }
   .btn-filled:hover { background: var(--wine-dark); }
-
-  .user-badge {
-    background: var(--wine-pale); padding: 0.4rem 1rem; border-radius: 30px;
-    display: flex; align-items: center; gap: 10px;
-    color: var(--wine); font-weight: 600; font-size: 0.85rem;
-  }
 
   @media(max-width:900px){ .main-layout { grid-template-columns: 1fr; } .sidebar { position: static; } }
   @media(max-width:600px){
@@ -627,20 +620,15 @@
 
 <header>
   <div style="max-width: 1280px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-
-        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='accueil.html'">
+    <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='accueil.html'">
       <div style="height: 65px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-<img src="IMAGES/logo.png" alt="GreenMarket Logo" style="height: 100%; width: auto; object-fit: contain;" />
-
+        <img src="IMAGES/logo.png" alt="GreenMarket Logo" style="height: 100%; width: auto; object-fit: contain;" onerror="this.src='https://placehold.co/65x65?text=GM'"/>
       </div>
       <span style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: 1px;">GreenMarket</span>
     </div>
-
-
     <div class="search-bar" style="flex: 1; display: flex; justify-content: center; min-width: 180px;">
       <input type="text" id="headerSearchInput" placeholder="Rechercher une boutique artisanale..."/>
     </div>
-
     <nav class="desktop-nav">
       <a href="accueil.html" class="nav-link">Accueil</a>
       <a href="store.html" class="nav-link active">Boutiques</a>
@@ -648,7 +636,6 @@
       <a href="#" class="nav-link">À propos</a>
       <a href="dashboard-producteur.html" id="dashboardLink" class="nav-link" style="display: none;">📊 Dashboard</a>
     </nav>
-
     <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
       <button class="cart-btn" title="Panier">
         <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#5D0D18" stroke-width="1.8">
@@ -658,7 +645,6 @@
       </button>
       <div id="authWidget"></div>
     </div>
-
   </div>
 </header>
 
@@ -668,9 +654,9 @@
     <h1>Nos Boutiques<br><em>Artisanales</em></h1>
     <p>Découvrez des artisans marocains passionnés, perpétuant un savoir-faire unique et authentique.</p>
     <div class="header-stats">
-      <div><span class="h-stat-val" id="statStores">12</span><span class="h-stat-label">Boutiques actives</span></div>
+      <div><span class="h-stat-val" id="statStores">0</span><span class="h-stat-label">Boutiques actives</span></div>
       <div><span class="h-stat-val" id="statProducts">0</span><span class="h-stat-label">Produits artisanaux</span></div>
-      <div><span class="h-stat-val" id="statRating">4,8 ★</span><span class="h-stat-label">Note moyenne</span></div>
+      <div><span class="h-stat-val" id="statRating">0 ★</span><span class="h-stat-label">Note moyenne</span></div>
     </div>
   </div>
 </div>
@@ -705,7 +691,6 @@
       </div>
       <div class="role-notice" id="roleNotice"></div>
     </div>
-
     <div id="createShopSection" class="create-shop-section" style="display: none;">
       <div class="create-shop-header"><h3>🏪 Créer ma boutique artisanale</h3></div>
       <div class="create-shop-form">
@@ -740,7 +725,6 @@
       </div>
     </div>
   </aside>
-
   <section class="stores-area">
     <div class="stores-title-row">
       <h2 id="storesTitle">Toutes les boutiques artisanales</h2>
@@ -755,21 +739,17 @@
 </div>
 
 <div class="toast" id="toast"></div>
-
-<!-- ===== MODAL CHANGEMENT DE PHOTO ===== -->
 <div class="photo-modal-overlay" id="photoModal">
   <div class="photo-modal">
     <button class="photo-modal-close" id="closePhotoModal">✕</button>
     <h3>📷 Changer la photo</h3>
     <p class="photo-modal-shopname" id="photoModalShopName"></p>
-
     <div class="photo-drop-zone" id="photoDropZone">
       <input type="file" id="photoFileInput" accept="image/*">
       <div class="drop-icon">🖼️</div>
       <p class="drop-text"><strong>Cliquez ou glissez</strong> une image ici</p>
       <p class="drop-text" style="font-size:0.75rem; margin-top:0.3rem;">JPG, PNG, WEBP — max 5 Mo</p>
     </div>
-
     <div class="photo-preview-box" id="photoPreviewBox">
       <img id="photoPreviewImg" src="" alt="Aperçu">
       <div class="change-overlay">
@@ -777,32 +757,20 @@
         <input type="file" id="photoFileInput2" accept="image/*">
       </div>
     </div>
-
     <div class="photo-modal-actions">
       <button class="btn-sm-cancel" id="cancelPhotoBtn" style="flex:1; padding:.6rem;">Annuler</button>
       <button class="btn-sm-wine" id="savePhotoBtn" style="flex:2; padding:.6rem;" disabled>✅ Enregistrer la photo</button>
     </div>
   </div>
 </div>
-
 <div class="auth-modal-overlay" id="authModal">
   <div class="auth-modal">
-    <div class="auth-tabs"><button class="auth-tab active" data-tab="login">Connexion</button><button class="auth-tab" data-tab="register">Inscription</button></div>
+    <div class="auth-tabs"><button class="auth-tab active" data-tab="login">Connexion</button></div>
     <div id="loginForm" class="auth-form active">
       <h3>🔐 Se connecter</h3>
       <input type="email" id="loginEmail" placeholder="Email"><input type="password" id="loginPassword" placeholder="Mot de passe">
       <button class="btn-filled" id="doLoginBtn" style="width:100%">Se connecter</button>
       <p class="auth-error" id="loginError"></p>
-    </div>
-    <div id="registerForm" class="auth-form">
-      <h3>📝 Créer un compte</h3>
-      <div class="role-selector"><label><input type="radio" name="registerRole" value="client" checked> 👤 Client</label><label><input type="radio" name="registerRole" value="productor"> 🏺 Artisan</label></div>
-      <input type="text" id="registerName" placeholder="Nom complet"><input type="email" id="registerEmail" placeholder="Email"><input type="password" id="registerPassword" placeholder="Mot de passe">
-      <div id="producerFields" style="display: none;">
-        <input type="text" id="producerShopName" placeholder="Nom de votre boutique"><input type="text" id="producerLocation" placeholder="Ville / Région"><textarea id="producerBio" placeholder="Décrivez votre savoir-faire artisanal..." rows="2"></textarea>
-      </div>
-      <button class="btn-filled" id="doRegisterBtn" style="width:100%">S'inscrire</button>
-      <p class="auth-error" id="registerError"></p>
     </div>
     <button class="auth-close" id="closeAuthModal">✕</button>
   </div>
@@ -820,91 +788,6 @@ let categories = [
   { id:8, icon:'🍯', name:'Produits du terroir' }
 ];
 
-<<<<<<< HEAD
-// ========== BOUTIQUES ARTISANALES MAROCAINES ==========
-// Images Unsplash thématiques par catégorie — URLs directes et fiables
-let stores = [
-  {
-    id:1, name:"Maison du Caftan", category:'Caftans & Vêtements traditionnels', categoryId:1,
-    badge:'Artisan', badgeClass:'artisan',
-    banner:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&q=80',
-    desc:'Caftans de luxe en soie et tissus traditionnels, broderies faites main par des maîtres-artisans de Fès.',
-    rating:4.9, reviews:234, products:8, sales:'2 450',
-    tags:['Caftan','Broderie','Soie'], producerId:101, producerName:'Fatima Zahra', location:'Fès', since:'2005'
-  },
-  {
-    id:2, name:"Tapis Berbère d'Atlas", category:'Tapis & Tissage', categoryId:2,
-    badge:'Tradition', badgeClass:'tradition',
-    banner:'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=700&q=80',
-    desc:"Tapis berbères authentiques tissés à la main par les femmes de l'Atlas, chaque pièce est unique.",
-    rating:4.8, reviews:189, products:6, sales:'3 200',
-    tags:['Tapis','Berbère','Laine'], producerId:102, producerName:'Rachid El Mansouri', location:'Marrakech', since:'2010'
-  },
-  {
-    id:3, name:"Poterie de Safi", category:'Poterie & Céramique', categoryId:3,
-    badge:'Fait Main', badgeClass:'fait-main',
-    banner:'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=700&q=80',
-    desc:'Poterie traditionnelle de Safi, plats, tajines et vases peints à la main avec des motifs ancestraux.',
-    rating:4.7, reviews:156, products:12, sales:'1 890',
-    tags:['Poterie','Tajine','Céramique'], producerId:103, producerName:'Ahmed Benjelloun', location:'Safi', since:'1998'
-  },
-  {
-    id:4, name:"Marqueterie de Tetouan", category:'Marqueterie & Bois', categoryId:4,
-    badge:'Artisan', badgeClass:'artisan',
-    banner:'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=700&q=80',
-    desc:'Meubles et objets en bois de cèdre incrustés, marqueterie fine selon les techniques ancestrales.',
-    rating:4.9, reviews:112, products:5, sales:'980',
-    tags:['Bois','Marqueterie','Cèdre'], producerId:104, producerName:'Mohamed Alami', location:'Tetouan', since:'2012'
-  },
-  {
-    id:5, name:"Bijoux Amaziagh", category:'Bijoux & Joaillerie', categoryId:5,
-    badge:'Tradition', badgeClass:'tradition',
-    banner:'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=700&q=80',
-    desc:'Bijoux en argent massif inspirés des symboles amazighs, pierres naturelles et motifs ancestraux.',
-    rating:4.9, reviews:203, products:15, sales:'2 100',
-    tags:['Bijoux','Argent','Amazigh'], producerId:105, producerName:'Malika Oufkir', location:'Agadir', since:'2008'
-  },
-  {
-    id:6, name:"Lumières de Marrakech", category:'Lampes & Fer forgé', categoryId:6,
-    badge:'Fait Main', badgeClass:'fait-main',
-    banner:'https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=700&q=80',
-    desc:'Lampes en fer forgé, lanternes en laiton et appliques traditionnelles pour une ambiance orientale.',
-    rating:4.6, reviews:98, products:9, sales:'1 450',
-    tags:['Lampes','Fer forgé','Laiton'], producerId:106, producerName:'Karim Tazi', location:'Marrakech', since:'2015'
-  },
-  {
-    id:7, name:"Argamane Naturel", category:'Cosmétiques naturels', categoryId:7,
-    badge:'Artisan', badgeClass:'artisan',
-    banner:'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=700&q=80',
-    desc:"Savons à l'huile d'argan, ghassoul, huiles essentielles et cosmétiques 100% naturels.",
-    rating:4.8, reviews:178, products:11, sales:'890',
-    tags:['Argan','Ghassoul','Bio'], producerId:107, producerName:'Nadia Berrada', location:'Essaouira', since:'2017'
-  },
-  {
-    id:8, name:"Saveurs du Terroir", category:'Produits du terroir', categoryId:8,
-    badge:'Tradition', badgeClass:'tradition',
-    banner:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=700&q=80',
-    desc:"Huile d'olive, amlou, miel de montagne, épices et confitures artisanales marocaines.",
-    rating:4.7, reviews:145, products:20, sales:'3 500',
-    tags:["Huile d'olive",'Miel','Amlou'], producerId:108, producerName:'Hassan El Fassi', location:'Meknès', since:'2000'
-  },
-  {
-    id:9, name:"Tissage d'Azilal", category:'Tapis & Tissage', categoryId:2,
-    badge:'Fait Main', badgeClass:'fait-main',
-    banner:'https://images.unsplash.com/photo-1526721940322-10fb6e3ae94a?w=700&q=80',
-    desc:"Couvertures, tapis et tissages colorés des montagnes d'Azilal, motifs géométriques uniques.",
-    rating:4.8, reviews:87, products:7, sales:'670',
-    tags:['Tissage','Azilal','Couleurs'], producerId:109, producerName:'Zineb Ait Ali', location:'Azilal', since:'2019'
-  },
-  {
-    id:10, name:"Caftans Impériaux", category:'Caftans & Vêtements traditionnels', categoryId:1,
-    badge:'Artisan', badgeClass:'artisan',
-    banner:'https://images.unsplash.com/photo-1594938298603-c8148c4b4f7f?w=700&q=80',
-    desc:"Caftans de cérémonie, takchitas et accessoires pour les grandes occasions. Broderies d'or et d'argent.",
-    rating:4.9, reviews:256, products:10, sales:'4 200',
-    tags:['Caftan','Takchita','Broderie'], producerId:110, producerName:'Leila Benani', location:'Casablanca', since:'2006'
-  }
-=======
 let stores = [
   { id:1, name:"Maison du Caftan", category:'Caftans & Vêtements traditionnels', categoryId:1, badge:'Artisan', badgeClass:'artisan', banner:'IMAGES/1779140603090.png', desc:'Caftans de luxe en soie et tissus traditionnels, broderies faites main par des maîtres-artisans de Fès.', rating:4.9, reviews:234, products:8, sales:'2 450', tags:['Caftan','Broderie','Soie'], producerId:101, producerName:'Fatima Zahra', location:'Fès', since:'2005' },
   { id:2, name:"Tapis Berbère d'Atlas", category:'Tapis & Tissage', categoryId:2, badge:'Tradition', badgeClass:'tradition', banner:'IMAGES/1779140612922.png', desc:'Tapis berbères authentiques tissés à la main par les femmes de l\'Atlas, chaque pièce est unique.', rating:4.8, reviews:189, products:6, sales:'3 200', tags:['Tapis','Berbère','Laine'], producerId:102, producerName:'Rachid El Mansouri', location:'Marrakech', since:'2010' },
@@ -916,23 +799,9 @@ let stores = [
   { id:8, name:"Saveurs du Terroir", category:'Produits du terroir', categoryId:8, badge:'Tradition', badgeClass:'tradition', banner:'IMAGES/1779140962074.png', desc:'Huile d\'olive, amlou, miel de montagne, épices et confitures artisanales marocaines.', rating:4.7, reviews:145, products:20, sales:'3 500', tags:['Huile d\'olive','Miel','Amlou'], producerId:108, producerName:'Hassan El Fassi', location:'Meknès', since:'2000' },
   { id:9, name:"Tissage d'Azilal", category:'Tapis & Tissage', categoryId:2, badge:'Fait Main', badgeClass:'fait-main', banner:'IMAGES/1779141008846.png', desc:'Couvertures, tapis et tissages colorés des montagnes d\'Azilal, motifs géométriques uniques.', rating:4.8, reviews:87, products:7, sales:'670', tags:['Tissage','Azilal','Couleurs'], producerId:109, producerName:'Zineb Ait Ali', location:'Azilal', since:'2019' },
   { id:10, name:"Caftans Impériaux", category:'Caftans & Vêtements traditionnels', categoryId:1, badge:'Artisan', badgeClass:'artisan', banner:'IMAGES/1779141052204.png', desc:'Caftans de cérémonie, takchitas et accessoires pour les grandes occasions. Broderies d\'or et d\'argent.', rating:4.9, reviews:256, products:10, sales:'4 200', tags:['Caftan','Takchita','Broderie'], producerId:110, producerName:'Leila Benani', location:'Casablanca', since:'2006' }
->>>>>>> f338907cf75356ae6a17dca5bb5f87dcf11251fc
 ];
 
 const defaultProducts = {
-<<<<<<< HEAD
-  1: [
-    { id: 101, name: "Caftan en Soie", price: "2 500 DH", stock: 5, image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop", description: "Caftan en soie naturelle, broderies faites main" },
-    { id: 102, name: "Takchita Cérémonie", price: "3 200 DH", stock: 3, image: "https://images.unsplash.com/photo-1594938298603-c8148c4b4f7f?w=300&h=200&fit=crop", description: "Takchita pour mariage, broderies d'or" },
-    { id: 103, name: "Caftan Moderne", price: "1 800 DH", stock: 8, image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop", description: "Caftan à la coupe contemporaine" }
-  ],
-  2: [
-    { id: 201, name: "Tapis Berbère Moyen", price: "1 200 DH", stock: 4, image: "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=300&h=200&fit=crop", description: "Tapis en laine naturelle, motifs berbères" },
-    { id: 202, name: "Tapis Azilal", price: "950 DH", stock: 6, image: "https://images.unsplash.com/photo-1526721940322-10fb6e3ae94a?w=300&h=200&fit=crop", description: "Tapis coloré des montagnes d'Azilal" },
-    { id: 203, name: "Coussin Tissé", price: "250 DH", stock: 15, image: "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=300&h=200&fit=crop", description: "Coussin décoratif tissé main" }
-  ],
-  3: [
-=======
   1: [ 
     { id: 101, name: "Caftan en Soie", price: "2 500 DH", stock: 5, image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=300&h=200&fit=crop", description: "Caftan en soie naturelle, broderies faites main" },
     { id: 102, name: "Takchita Cérémonie", price: "3 200 DH", stock: 3, image: "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=300&h=200&fit=crop", description: "Takchita pour mariage, broderies d'or" },
@@ -944,41 +813,19 @@ const defaultProducts = {
     { id: 203, name: "Coussin Tissé", price: "250 DH", stock: 15, image: "https://images.unsplash.com/photo-1553775282-07af8073453f?w=300&h=200&fit=crop", description: "Coussin décoratif tissé main" }
   ],
   3: [ 
->>>>>>> f338907cf75356ae6a17dca5bb5f87dcf11251fc
     { id: 301, name: "Tajine Traditionnel", price: "180 DH", stock: 20, image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=200&fit=crop", description: "Tajine en terre cuite, motif peint" },
     { id: 302, name: "Assiettes Décoratives", price: "95 DH", stock: 30, image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=200&fit=crop", description: "Lot de 6 assiettes peintes à la main" },
     { id: 303, name: "Vase Zellij", price: "320 DH", stock: 12, image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=200&fit=crop", description: "Vase inspiré des motifs zellij" }
   ],
-<<<<<<< HEAD
-  4: [
-    { id: 401, name: "Petite Table Marqueterie", price: "850 DH", stock: 4, image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=200&fit=crop", description: "Table en cèdre incrusté" },
-    { id: 402, name: "Coffre à Bijoux", price: "320 DH", stock: 8, image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=200&fit=crop", description: "Coffret en bois sculpté" }
-  ],
-  5: [
-=======
   4: [ 
     { id: 401, name: "Petite Table Marqueterie", price: "850 DH", stock: 4, image: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=300&h=200&fit=crop", description: "Table en cèdre incrusté" },
     { id: 402, name: "Coffre à Bijoux", price: "320 DH", stock: 8, image: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=300&h=200&fit=crop", description: "Coffret en bois sculpté" }
   ],
   5: [ 
->>>>>>> f338907cf75356ae6a17dca5bb5f87dcf11251fc
     { id: 501, name: "Bracelet Argent Amazigh", price: "450 DH", stock: 10, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop", description: "Bracelet en argent, symbole amazigh" },
     { id: 502, name: "Collier Fibule", price: "680 DH", stock: 6, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop", description: "Fibule berbère traditionnelle" },
     { id: 503, name: "Boucles d'Oreilles", price: "280 DH", stock: 15, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop", description: "Boucles en argent, corail" }
   ],
-<<<<<<< HEAD
-  6: [
-    { id: 601, name: "Lanterne Laiton", price: "380 DH", stock: 8, image: "https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=300&h=200&fit=crop", description: "Lanterne en laiton martelé" },
-    { id: 602, name: "Applique Murale", price: "250 DH", stock: 12, image: "https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=300&h=200&fit=crop", description: "Applique en fer forgé" }
-  ],
-  7: [
-    { id: 701, name: "Huile d'Argan Bio", price: "120 DH", stock: 50, image: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=300&h=200&fit=crop", description: "Huile d'argan 100% pure" },
-    { id: 702, name: "Savon Noir", price: "45 DH", stock: 100, image: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=300&h=200&fit=crop", description: "Savon noir traditionnel" }
-  ],
-  8: [
-    { id: 801, name: "Huile d'Olive Vierge", price: "85 DH", stock: 40, image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&h=200&fit=crop", description: "Huile d'olive extra vierge, première pression" },
-    { id: 802, name: "Amlou", price: "95 DH", stock: 25, image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&h=200&fit=crop", description: "Purée d'amandes et miel d'argan" }
-=======
   6: [ 
     { id: 601, name: "Lanterne Laiton", price: "380 DH", stock: 8, image: "https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=300&h=200&fit=crop", description: "Lanterne en laiton martelé" },
     { id: 602, name: "Applique Murale", price: "250 DH", stock: 12, image: "https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=300&h=200&fit=crop", description: "Applique en fer forgé" }
@@ -990,7 +837,6 @@ const defaultProducts = {
   8: [ 
     { id: 801, name: "Huile d'Olive Vierge", price: "85 DH", stock: 40, image: "https://images.unsplash.com/photo-1599851152730-1f83a654bb9a?w=300&h=200&fit=crop", description: "Huile d'olive extra vierge, première pression" },
     { id: 802, name: "Amlou", price: "95 DH", stock: 25, image: "https://images.unsplash.com/photo-1599851152730-1f83a654bb9a?w=300&h=200&fit=crop", description: "Purée d'amandes et miel d'argan" }
->>>>>>> f338907cf75356ae6a17dca5bb5f87dcf11251fc
   ]
 };
 
@@ -1040,7 +886,14 @@ function initUsers() {
     { id: 2, name: "Fatima Zahra", email: "fatima@caftan.ma", password: "fatima123", role: "productor", producerId: 101 },
     { id: 3, name: "Rachid El Mansouri", email: "rachid@tapis.ma", password: "rachid123", role: "productor", producerId: 102 },
     { id: 4, name: "Ahmed Benjelloun", email: "ahmed@poterie.ma", password: "ahmed123", role: "productor", producerId: 103 },
-    { id: 8, name: "Client Test", email: "client@test.com", password: "client123", role: "client", producerId: null }
+    { id: 5, name: "Mohamed Alami", email: "mohamed@bois.ma", password: "mohamed123", role: "productor", producerId: 104 },
+    { id: 6, name: "Malika Oufkir", email: "malika@bijoux.ma", password: "malika123", role: "productor", producerId: 105 },
+    { id: 7, name: "Karim Tazi", email: "karim@lampes.ma", password: "karim123", role: "productor", producerId: 106 },
+    { id: 8, name: "Nadia Berrada", email: "nadia@cosmetiques.ma", password: "nadia123", role: "productor", producerId: 107 },
+    { id: 9, name: "Hassan El Fassi", email: "hassan@terroir.ma", password: "hassan123", role: "productor", producerId: 108 },
+    { id: 10, name: "Zineb Ait Ali", email: "zineb@tissage.ma", password: "zineb123", role: "productor", producerId: 109 },
+    { id: 11, name: "Leila Benani", email: "leila@caftans.ma", password: "leila123", role: "productor", producerId: 110 },
+    { id: 12, name: "Client Test", email: "client@test.com", password: "client123", role: "client", producerId: null }
   ];
   if (!localStorage.getItem('greenmarket_users')) {
     localStorage.setItem('greenmarket_users', JSON.stringify(defaultUsers));
@@ -1104,9 +957,8 @@ function updateAuthUI() {
     widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;">🚪</button></div>`;
     document.getElementById('logoutBtn')?.addEventListener('click', logout);
   } else {
-    widget.innerHTML = `<button class="btn-outline" id="showLoginBtn">Connexion</button><button class="btn-filled" id="showRegisterBtn" style="margin-left:6px;">S'inscrire</button>`;
+    widget.innerHTML = `<button class="btn-connexion" id="showLoginBtn">🔑 Connexion</button>`;
     document.getElementById('showLoginBtn')?.addEventListener('click', () => showAuthModal('login'));
-    document.getElementById('showRegisterBtn')?.addEventListener('click', () => showAuthModal('register'));
   }
   updateCategoriesPermissions();
 }
@@ -1164,7 +1016,6 @@ function showAuthModal(tab = 'login') {
   const modal = document.getElementById('authModal');
   document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
   document.getElementById('loginForm').classList.toggle('active', tab === 'login');
-  document.getElementById('registerForm').classList.toggle('active', tab === 'register');
   modal.classList.add('open');
 }
 function closeAuthModal() { document.getElementById('authModal').classList.remove('open'); }
@@ -1173,25 +1024,10 @@ function setupAuthModal() {
   document.querySelectorAll('.auth-tab').forEach(tab => {
     tab.addEventListener('click', () => showAuthModal(tab.dataset.tab));
   });
-  document.querySelectorAll('input[name="registerRole"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-      document.getElementById('producerFields').style.display = radio.value === 'productor' ? 'block' : 'none';
-    });
-  });
   document.getElementById('doLoginBtn').addEventListener('click', () => {
     const result = login(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
     if (result.success) { closeAuthModal(); updateAuthUI(); updateCreateShopVisibility(); renderStores(); showToast(`👋 Bonjour ${result.user.name} !`); }
     else document.getElementById('loginError').textContent = result.error;
-  });
-  document.getElementById('doRegisterBtn').addEventListener('click', () => {
-    const role = document.querySelector('input[name="registerRole"]:checked').value;
-    const name = document.getElementById('registerName').value;
-    const email = document.getElementById('registerEmail').value;
-    const password = document.getElementById('registerPassword').value;
-    if (!name || !email || !password) { document.getElementById('registerError').textContent = "Veuillez remplir tous les champs"; return; }
-    const result = role === 'productor' ? registerProducer(name, email, password) : registerClient(name, email, password);
-    if (result.success) { closeAuthModal(); updateAuthUI(); updateCreateShopVisibility(); renderStores(); showToast(`✅ Bienvenue ${result.user.name} !`); }
-    else document.getElementById('registerError').textContent = result.error;
   });
   document.getElementById('closeAuthModal').addEventListener('click', closeAuthModal);
   document.getElementById('authModal').addEventListener('click', (e) => { if (e.target === document.getElementById('authModal')) closeAuthModal(); });
@@ -1270,16 +1106,17 @@ function createShop() {
 
 function saveStores() { localStorage.setItem('greenmarket_stores', JSON.stringify(stores)); }
 
-// ========== FIX: loadStores ne remplace les données par défaut QUE si localStorage existe déjà ==========
 function loadStores() {
   const s = localStorage.getItem('greenmarket_stores');
   if (s) {
     try {
       stores = JSON.parse(s);
     } catch(e) {
-      console.warn('Erreur parsing stores, reset des données par défaut');
-      localStorage.removeItem('greenmarket_stores');
+      console.warn('Erreur parsing stores, sauvegarde des données par défaut');
+      saveStores();
     }
+  } else {
+    saveStores();
   }
 }
 
@@ -1389,7 +1226,6 @@ function renderStores() {
     return;
   }
   const user = getCurrentUser();
-  // ========== FIX PRINCIPAL : s.banner au lieu de stores ==========
   grid.innerHTML = list.map(s => {
     const canDelete = user && (user.role === 'admin' || (user.role === 'productor' && user.producerId === s.producerId));
     const canEdit = canDelete;
@@ -1398,8 +1234,7 @@ function renderStores() {
     return `
       <div class="store-card">
         <div class="store-banner" onclick="window.location.href='info-store.html?id=${s.id}'">
-          <img src="${escapeHtml(s.banner || fallbackImg)}" alt="${escapeHtml(s.name)}" loading="lazy"
-               onerror="this.src='${fallbackImg}'">
+          <img src="${escapeHtml(s.banner || fallbackImg)}" alt="${escapeHtml(s.name)}" loading="lazy" onerror="this.src='${fallbackImg}'">
           ${s.badge ? `<span class="store-badge ${escapeHtml(s.badgeClass || '')}">${escapeHtml(s.badge)}</span>` : ''}
           ${canEdit ? `<button class="edit-photo-btn" onclick="openPhotoModal(${s.id}, event)">📷 Changer la photo</button>` : ''}
         </div>
@@ -1464,35 +1299,12 @@ document.getElementById('catFilter')?.addEventListener('change', e => {
   renderCategories(); renderStores();
 });
 
-<<<<<<< HEAD
-// Remplir le select de filtre des catégories
-=======
->>>>>>> f338907cf75356ae6a17dca5bb5f87dcf11251fc
 categories.forEach(c => {
   const opt = document.createElement('option');
   opt.value = c.name; opt.textContent = c.name;
   document.getElementById('catFilter')?.appendChild(opt);
 });
 
-<<<<<<< HEAD
-// ========== INIT ==========
-// Système de versionnage des données — si la version change, on réinitialise tout
-const DATA_VERSION = 'v3';
-(function checkDataVersion() {
-  const savedVersion = localStorage.getItem('greenmarket_data_version');
-  if (savedVersion !== DATA_VERSION) {
-    // Nouvelle version : purge complète des anciennes données
-    ['greenmarket_stores', 'greenmarket_categories', 'greenmarket_favorites'].forEach(k => localStorage.removeItem(k));
-    // Supprimer aussi les produits par défaut pour les régénérer
-    for (let i = 1; i <= 20; i++) localStorage.removeItem(`products_${i}`);
-    localStorage.setItem('greenmarket_data_version', DATA_VERSION);
-    console.info(`GreenMarket : migration vers ${DATA_VERSION}, données réinitialisées.`);
-  }
-})();
-
-=======
-localStorage.clear();
->>>>>>> f338907cf75356ae6a17dca5bb5f87dcf11251fc
 saveDefaultProducts();
 loadStores();
 loadCategories();
@@ -1508,7 +1320,6 @@ updateDashboardLink();
 window.deleteShop = deleteShop;
 window.toggleFavorite = toggleFavorite;
 
-// ========== MODAL CHANGEMENT DE PHOTO ==========
 let photoModalShopId = null;
 let pendingPhotoData = null;
 
@@ -1519,7 +1330,6 @@ function openPhotoModal(shopId, event) {
   photoModalShopId = shopId;
   pendingPhotoData = null;
 
-  // Reset UI
   document.getElementById('photoModalShopName').textContent = '« ' + shop.name + ' »';
   document.getElementById('photoDropZone').style.display = 'block';
   document.getElementById('photoPreviewBox').style.display = 'none';
@@ -1544,7 +1354,6 @@ function handlePhotoFile(file) {
   const reader = new FileReader();
   reader.onload = (e) => {
     pendingPhotoData = e.target.result;
-    // Afficher la preview
     document.getElementById('photoPreviewImg').src = pendingPhotoData;
     document.getElementById('photoDropZone').style.display = 'none';
     document.getElementById('photoPreviewBox').style.display = 'block';
@@ -1564,7 +1373,6 @@ function savePhoto() {
   showToast('✅ Photo mise à jour !');
 }
 
-// Événements modal photo
 document.getElementById('closePhotoModal').addEventListener('click', closePhotoModal);
 document.getElementById('cancelPhotoBtn').addEventListener('click', closePhotoModal);
 document.getElementById('savePhotoBtn').addEventListener('click', savePhoto);
@@ -1572,16 +1380,14 @@ document.getElementById('photoModal').addEventListener('click', e => {
   if (e.target === document.getElementById('photoModal')) closePhotoModal();
 });
 
-// Input fichier — zone de dépôt
 document.getElementById('photoFileInput').addEventListener('change', e => {
   handlePhotoFile(e.target.files[0]);
 });
-// Input fichier — sur la preview (changer)
+
 document.getElementById('photoFileInput2').addEventListener('change', e => {
   handlePhotoFile(e.target.files[0]);
 });
 
-// Drag & drop
 const dropZone = document.getElementById('photoDropZone');
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));

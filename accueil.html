@@ -26,6 +26,7 @@
  
     h1, h2, h3, .playfair { font-family: 'Playfair Display', serif; }
  
+    /* ========== HEADER ========== */
     header {
       background: #9FB2AC;
       border-bottom: 2px solid #f0e8d5;
@@ -75,6 +76,27 @@
     }
     .nav-link:hover { color: var(--primary); }
     .nav-link:hover::after { transform: scaleX(1); }
+    .nav-link.active { color: var(--primary); }
+    .nav-link.active::after { transform: scaleX(1); }
+ 
+    /* Botón de conexión */
+    .btn-connexion {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 20px;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      letter-spacing: 0.3px;
+    }
+    .btn-connexion:hover {
+      background: #7a1020;
+      transform: translateY(-1px);
+    }
  
     .cart-btn {
       position: relative;
@@ -99,25 +121,17 @@
       font-family: 'Lato', sans-serif;
     }
  
-    .btn-primary {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 999px;
-      padding: 10px 22px;
-      font-family: 'Lato', sans-serif;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-      letter-spacing: 0.3px;
-    }
-    .btn-primary:hover {
-      background: #7a1020;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(93,13,24,0.25);
+    .desktop-nav {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
     }
  
+    @media (max-width: 640px) {
+      .desktop-nav { display: none; }
+    }
+ 
+    /* ========== RESTO DE ESTILOS ========== */
     .hero-section {
       background: linear-gradient(135deg, #fdf5e0 60%, #f5ede6 100%);
       overflow: hidden;
@@ -326,7 +340,6 @@
     }
     #toast.show { transform: translateY(0); opacity: 1; }
  
-    /* Styles pour les boutiques sur l'accueil */
     .store-card {
       background: #fff;
       border-radius: 12px;
@@ -350,9 +363,16 @@
     .store-category { font-size: 0.7rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
     .store-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; }
  
-    .view-all-link {
-      text-align: center;
-      margin-top: 30px;
+    .user-badge {
+      background: #f5e6e8;
+      padding: 0.4rem 1rem;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--wine);
+      font-weight: 600;
+      font-size: 0.85rem;
     }
  
     @media (max-width: 640px) {
@@ -363,63 +383,41 @@
 <body>
  
 <div id="toast">✓ Produit ajouté au panier !</div>
+
+<!-- ========== HEADER IDÉNTICO A STORE.HTML ========== -->
 <header>
-  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4 flex-wrap">
+  <div style="max-width: 1280px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
 
     <!-- Logo -->
-    <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='accueil.html'">
-      <div class="w-12 h-12 bg-white rounded-full overflow-hidden flex items-center justify-center">
-        <img
-          src="images/logo1.png"
-          alt="GreenMarket Logo"
-          class="w-full h-full object-contain p-1"
-          onerror="this.src='https://placehold.co/48x48?text=GM'"
-        />
+    <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='accueil.html'">
+      <div style="height: 65px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <img src="IMAGES/logo.png" alt="GreenMarket Logo" style="height: 100%; width: auto; object-fit: contain;" onerror="this.src='https://placehold.co/65x65?text=GM'"/>
       </div>
-
-      <span
-        style="
-          font-family: 'Playfair Display', serif;
-          font-size: 28px;
-          font-weight: 700;
-          color: var(--primary);
-          letter-spacing: 1px;
-        "
-      >
-        GreenMarket
-      </span>
+      <span style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: 1px;">GreenMarket</span>
     </div>
 
     <!-- Search -->
-    <div class="search-bar flex-1 flex justify-center min-w-[180px]">
-      <input
-        type="text"
-        id="searchInput"
-        placeholder="Rechercher un produit traditionnel..."
-      />
+    <div class="search-bar" style="flex: 1; display: flex; justify-content: center; min-width: 180px;">
+      <input type="text" id="headerSearchInput" placeholder="Rechercher un produit traditionnel..."/>
     </div>
 
     <!-- Navigation -->
-    <nav class="desktop-nav hidden md:flex items-center gap-6">
-      <a href="accueil.html" class="nav-link">Accueil</a>
+    <nav class="desktop-nav">
+      <a href="accueil.html" class="nav-link active">Accueil</a>
       <a href="store.html" class="nav-link">Boutiques</a>
-      <a href="#products" class="nav-link">Produits</a>
-      <a href="#coops" class="nav-link">Coopératives</a>
+      <a href="#" class="nav-link">Produits</a>
+      <a href="#" class="nav-link">À propos</a>
+      <a href="dashboard-producteur.html" id="dashboardLink" class="nav-link" style="display: none;">📊 Dashboard</a>
     </nav>
 
-    <!-- Cart + Auth -->
-    <div class="flex items-center gap-3 ml-auto md:ml-0">
+    <!-- Cart + Auth (solo conexión) -->
+    <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
       <button class="cart-btn" title="Panier" onclick="goToCart()">
         <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#5D0D18" stroke-width="1.8">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 6h14M9 21a1 1 0 1 0 2 0M15 21a1 1 0 1 0 2 0"
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 6h14M9 21a1 1 0 1 0 2 0M15 21a1 1 0 1 0 2 0"/>
         </svg>
         <span class="cart-badge" id="cart-count">0</span>
       </button>
-
       <div id="authWidget"></div>
     </div>
 
@@ -438,44 +436,29 @@
     />
   </div>
 
-  <div style="
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top,  var(--bg), rgba(0,0,0,0));
-  "></div>
+  <div style="position: absolute; inset: 0; background: linear-gradient(to top, var(--bg), rgba(0,0,0,0));"></div>
 
   <div style="position: relative; z-index: 2; flex: 1; min-width: 250px; padding-left: 20px; max-width: 700px;">
-
-    <p class="text-sm font-bold tracking-widest uppercase mb-3"
-       style="color:var(--secondary); font-family:'Lato',sans-serif;">
+    <p class="text-sm font-bold tracking-widest uppercase mb-3" style="color:var(--secondary); font-family:'Lato',sans-serif;">
       🌿 Commerce équitable & authentique
     </p>
-
-    <h1 class="playfair font-bold leading-tight mb-5"
-        style="font-size:clamp(30px,5vw,58px); color:var(--primary);">
+    <h1 class="playfair font-bold leading-tight mb-5" style="font-size:clamp(30px,5vw,58px); color:var(--primary);">
       Les trésors de nos coopératives, directement chez vous
     </h1>
-
-    <p class="mb-8 text-lg"
-       style="color:var(--text-light); max-width:500px; font-family:'Lato',sans-serif; line-height:1.7;">
+    <p class="mb-8 text-lg" style="color:var(--text-light); max-width:500px; font-family:'Lato',sans-serif; line-height:1.7;">
       Produits authentiques, savoir-faire traditionnel, commerce équitable
     </p>
-
     <button class="btn-sage text-base px-8 py-3" style="font-size:15px;" onclick="document.getElementById('stores-section')?.scrollIntoView({behavior:'smooth'})">
       Découvrir nos boutiques
     </button>
-
   </div>
-
 </section>
  
 <!-- ===================== CATEGORIES ===================== -->
 <section class="py-16 px-4 max-w-7xl mx-auto">
-
   <div class="mb-10">
     <h2 class="section-title">Nos catégories de produits traditionnels</h2>
   </div>
-
   <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 gap-4">
     <div class="category-card"><span class="category-icon">🧥</span><span class="category-name">Vêtements traditionnels</span></div>
     <div class="category-card"><span class="category-icon">🫒</span><span class="category-name">Huiles & Condiments</span></div>
@@ -486,35 +469,37 @@
     <div class="category-card"><span class="category-icon">🌾</span><span class="category-name">Épicerie fine</span></div>
     <div class="category-card"><span class="category-icon">🪑</span><span class="category-name">Décoration & Mobilier</span></div>
   </div>
-
 </section>
  
 <!-- ===================== FEATURED PRODUCTS ===================== -->
 <section class="py-10 px-4" style="background:linear-gradient(180deg,#fdf8ee 0%,#fff9eb 100%);">
-
   <div class="max-w-7xl mx-auto">
-
     <div class="mb-10">
       <h2 class="section-title">Produits populaires des coopératives</h2>
     </div>
-
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6" id="productsGrid"></div>
-
   </div>
-
 </section>
 
-<!-- ===================== STORES SECTION (NOUVEAU - BOUTIQUES SUR L'ACCUEIL) ===================== -->
+<!-- ===================== STORES SECTION ===================== -->
 <section id="stores-section" class="py-16 px-4 max-w-7xl mx-auto">
   <div class="mb-10 flex justify-between items-center flex-wrap gap-4">
     <div>
-      <h2 class="section-title">Nos coopératives partenaires</h2>
+      <h2 class="section-title">Nos boutiques partenaires</h2>
       <p class="mt-4 text-base" style="color:var(--text-light); font-family:'Lato',sans-serif;">Découvrez les producteurs et artisans de nos coopératives</p>
     </div>
     <a href="store.html" class="btn-outline">Voir toutes les boutiques →</a>
   </div>
-
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="storesGrid"></div>
+</section>
+
+<!-- ===================== COOPERATIVES ===================== -->
+<section id="coops" class="py-16 px-4 max-w-7xl mx-auto">
+  <div class="text-center mb-3">
+    <h2 class="section-title" style="display:block; text-align:center;">Nos coopératives partenaires</h2>
+    <p class="mt-4 text-base" style="color:var(--text-light); font-family:'Lato',sans-serif;">Soutenez l'artisanat et l'agriculture traditionnelle</p>
+  </div>
+  <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6" id="coopsGrid"></div>
 </section>
  
 <!-- ===================== PROMO BANNER ===================== -->
@@ -528,7 +513,6 @@
   </div>
 </section>
  
-
 <!-- ===================== WHY SECTION ===================== -->
 <section class="py-16 px-4" style="background:linear-gradient(135deg,#fdf5e0 0%,#f5ede0 100%);">
   <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -561,6 +545,60 @@
   </div>
 </footer>
 
+<div class="auth-modal-overlay" id="authModal">
+  <div class="auth-modal">
+    <div class="auth-tabs"><button class="auth-tab active" data-tab="login">Connexion</button></div>
+    <div id="loginForm" class="auth-form active">
+      <h3>🔐 Se connecter</h3>
+      <input type="email" id="loginEmail" placeholder="Email"><input type="password" id="loginPassword" placeholder="Mot de passe">
+      <button class="btn-filled" id="doLoginBtn" style="width:100%">Se connecter</button>
+      <p class="auth-error" id="loginError"></p>
+    </div>
+    <button class="auth-close" id="closeAuthModal">✕</button>
+  </div>
+</div>
+
+<style>
+  /* Estilos para el modal de autenticación */
+  .auth-modal-overlay {
+    display: none; position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    align-items: center; justify-content: center;
+    z-index: 1000;
+  }
+  .auth-modal-overlay.open { display: flex; }
+  .auth-modal {
+    background: #fffdf7; border-radius: 16px; padding: 2rem;
+    max-width: 450px; width: 90%; position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  }
+  .auth-tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e8ddd0; }
+  .auth-tab {
+    background: none; border: none; padding: 0.5rem 1rem;
+    font-size: 1rem; cursor: pointer; color: #6b5055; font-weight: 500;
+  }
+  .auth-tab.active { color: #5d0d18; border-bottom: 2px solid #5d0d18; }
+  .auth-form { display: none; }
+  .auth-form.active { display: block; }
+  .auth-form h3 { color: #5d0d18; margin-bottom: 1rem; font-family: 'Cormorant Garamond', serif; }
+  .auth-form input {
+    width: 100%; padding: 0.7rem; margin-bottom: 1rem;
+    border: 1.5px solid #e8ddd0; border-radius: 8px;
+    font-family: 'Jost', sans-serif; background: #fff9eb;
+  }
+  .auth-error { color: #d9534f; font-size: 0.8rem; margin-top: 0.5rem; text-align: center; }
+  .auth-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #6b5055; }
+  .btn-filled {
+    background: #5d0d18; color: #fff9eb;
+    border: none; padding: .5rem 1.3rem; border-radius: 3px;
+    font-family: 'Jost', sans-serif; font-size: .78rem; font-weight: 600;
+    letter-spacing: .07em; text-transform: uppercase;
+    cursor: pointer; transition: background .2s;
+  }
+  .btn-filled:hover { background: #3e0910; }
+</style>
+
 <script>
 // ========== DONNÉES DES BOUTIQUES ==========
 let stores = [];
@@ -570,32 +608,10 @@ function loadStores() {
   if (saved && JSON.parse(saved).length > 0) {
     stores = JSON.parse(saved);
   } else {
-    // Boutiques par défaut
     stores = [
-      { 
-        id:1, name:"Le Verger Céleste", category:'Fruits et légumes', 
-        badge:'Bio', badgeClass:'organic', 
-        banner:'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=700&q=80', 
-        desc:'Des fruits et légumes cultivés avec amour sous le ciel étoilé, récoltés à maturité parfaite.', 
-        rating:4.9, reviews:156, products:4, sales:'1 450', 
-        producerName:'Élodie Moreau', location:'Provence' 
-      },
-      { 
-        id:2, name:"La Crèmerie des Sommets", category:'Produits laitiers', 
-        badge:'Artisanal', badgeClass:'artisan', 
-        banner:'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=700&q=80', 
-        desc:'Fromages de chèvre et brebis fabriqués en altitude, affinés en cave naturelle.', 
-        rating:4.7, reviews:94, products:4, sales:'620', 
-        producerName:'Benoît Girard', location:'Savoie' 
-      },
-      { 
-        id:3, name:"Le Pétrin d'Antan", category:'Boulangerie artisanale', 
-        badge:'Local', badgeClass:'', 
-        banner:'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=700&q=80', 
-        desc:'Pain cuit au feu de bois, viennoiseries et pâtisseries selon les recettes de nos grands-mères.', 
-        rating:4.9, reviews:228, products:3, sales:'2 350', 
-        producerName:'Marguerite Dufour', location:'Bretagne' 
-      }
+      { id:1, name:"Le Verger Céleste", category:'Fruits et légumes', badge:'Bio', banner:'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=700&q=80', desc:'Des fruits et légumes cultivés avec amour sous le ciel étoilé.', rating:4.9, reviews:156, products:4, producerName:'Élodie Moreau', location:'Provence' },
+      { id:2, name:"La Crèmerie des Sommets", category:'Produits laitiers', badge:'Artisanal', banner:'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=700&q=80', desc:'Fromages de chèvre et brebis fabriqués en altitude.', rating:4.7, reviews:94, products:4, producerName:'Benoît Girard', location:'Savoie' },
+      { id:3, name:"Le Pétrin d'Antan", category:'Boulangerie artisanale', badge:'Local', banner:'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=700&q=80', desc:'Pain cuit au feu de bois, viennoiseries traditionnelles.', rating:4.9, reviews:228, products:3, producerName:'Marguerite Dufour', location:'Bretagne' }
     ];
   }
 }
@@ -603,15 +619,11 @@ function loadStores() {
 function renderStoresOnAccueil() {
   const grid = document.getElementById('storesGrid');
   if (!grid) return;
-  
-  // Afficher seulement les 3 premières boutiques
   const storesToShow = stores.slice(0, 3);
-  
   if (storesToShow.length === 0) {
     grid.innerHTML = '<div class="text-center col-span-3" style="color:var(--text-light); padding: 40px;">Aucune boutique pour le moment</div>';
     return;
   }
-  
   grid.innerHTML = storesToShow.map(store => `
     <div class="store-card" onclick="window.location.href='store.html?id=${store.id}'">
       <img src="${store.banner}" class="store-banner" alt="${store.name}" onerror="this.src='https://placehold.co/400x200?text=Boutique'">
@@ -781,20 +793,40 @@ function updateAuthUI() {
   const user = getCurrentUser();
   if (user) {
     const roleText = user.role === 'productor' ? 'Producteur' : 'Client';
-    widget.innerHTML = `<div class="flex items-center gap-2 bg-white rounded-full px-3 py-1"><span>👋 ${user.name}</span><button onclick="logout()" class="text-red-600 ml-2">🚪</button></div>`;
+    widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;">🚪</button></div>`;
+    document.getElementById('logoutBtn')?.addEventListener('click', logout);
   } else {
-    widget.innerHTML = `<button class="btn-primary" onclick="showLoginModal()">Connexion</button>`;
+    widget.innerHTML = `<button class="btn-connexion" id="showLoginBtn">🔑 Connexion</button>`;
+    document.getElementById('showLoginBtn')?.addEventListener('click', () => showAuthModal('login'));
   }
 }
 
-function showLoginModal() {
-  const email = prompt("Email (client@test.com pour tester):");
-  const password = prompt("Mot de passe (client123):");
-  if (email && password) {
+function showAuthModal() {
+  const modal = document.getElementById('authModal');
+  modal.classList.add('open');
+}
+
+function closeAuthModal() {
+  document.getElementById('authModal').classList.remove('open');
+}
+
+function setupAuthModal() {
+  document.getElementById('doLoginBtn').addEventListener('click', () => {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
     const result = login(email, password);
-    if (result.success) showToast(`👋 Bonjour ${result.user.name} !`);
-    else alert(result.error);
-  }
+    if (result.success) {
+      closeAuthModal();
+      updateAuthUI();
+      showToast(`👋 Bonjour ${result.user.name} !`);
+    } else {
+      document.getElementById('loginError').textContent = result.error;
+    }
+  });
+  document.getElementById('closeAuthModal').addEventListener('click', closeAuthModal);
+  document.getElementById('authModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('authModal')) closeAuthModal();
+  });
 }
 
 function escapeHtml(str) {
@@ -802,13 +834,11 @@ function escapeHtml(str) {
   return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
 }
 
-// ========== RECHERCHE ==========
 function setupSearch() {
-  const searchInput = document.getElementById('searchInput');
+  const searchInput = document.getElementById('headerSearchInput');
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
       const query = e.target.value.toLowerCase();
-      // Filtrer les produits
       document.querySelectorAll('.product-card').forEach(card => {
         const title = card.querySelector('h3')?.textContent.toLowerCase() || '';
         const coop = card.querySelector('p.text-xs')?.textContent.toLowerCase() || '';
@@ -828,12 +858,13 @@ function init() {
   initUsers();
   updateAuthUI();
   setupSearch();
+  setupAuthModal();
   
   document.getElementById('becomePartnerBtn')?.addEventListener('click', () => {
     const user = getCurrentUser();
     if (user && user.role === 'productor') alert("Vous êtes déjà producteur !");
     else if (user) alert("Pour devenir partenaire, créez un compte producteur.");
-    else showLoginModal();
+    else showAuthModal();
   });
 }
 
