@@ -37,7 +37,6 @@
     min-height: 100vh;
   }
 
-  /* ========== HEADER ========== */
   header {
     background: #9FB2AC;
     border-bottom: 2px solid #f0e8d5;
@@ -142,7 +141,6 @@
     .desktop-nav { display: none; }
   }
 
-  /* ========== RESTO DE ESTILOS ========== */
   .page-header {
     background: var(--wine);
     padding: 4rem 2.5rem 3rem;
@@ -554,10 +552,6 @@
   }
   .toast.show { transform: translateY(0); opacity: 1; }
 
-  .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
-  .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
-
-  /* Auth modal */
   .auth-modal-overlay {
     display: none; position: fixed; top: 0; left: 0;
     width: 100%; height: 100%;
@@ -631,24 +625,22 @@
 </head>
 <body>
 
-<!-- ========== HEADER ========== -->
 <header>
   <div style="max-width: 1280px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
 
-    <!-- Logo -->
-    <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='accueil.html'">
-      <div style="width: 48px; height: 48px; background: white; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-        <img src="images/logo1.png" alt="GreenMarket Logo" style="width: 100%; height: 100%; object-fit: contain; padding: 4px;" onerror="this.src='https://placehold.co/48x48?text=GM'"/>
+        <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='accueil.html'">
+      <div style="height: 65px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+<img src="IMAGES/logo.png" alt="GreenMarket Logo" style="height: 100%; width: auto; object-fit: contain;" />
+
       </div>
       <span style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: 1px;">GreenMarket</span>
     </div>
 
-    <!-- Search -->
+
     <div class="search-bar" style="flex: 1; display: flex; justify-content: center; min-width: 180px;">
       <input type="text" id="headerSearchInput" placeholder="Rechercher une boutique artisanale..."/>
     </div>
 
-    <!-- Navigation -->
     <nav class="desktop-nav">
       <a href="accueil.html" class="nav-link">Accueil</a>
       <a href="store.html" class="nav-link active">Boutiques</a>
@@ -657,7 +649,6 @@
       <a href="dashboard-producteur.html" id="dashboardLink" class="nav-link" style="display: none;">📊 Dashboard</a>
     </nav>
 
-    <!-- Cart + Auth -->
     <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
       <button class="cart-btn" title="Panier">
         <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#5D0D18" stroke-width="1.8">
@@ -818,7 +809,6 @@
 </div>
 
 <script>
-// ========== CATÉGORIES ARTISANALES MAROCAINES ==========
 let categories = [
   { id:1, icon:'👘', name:'Caftans & Vêtements traditionnels' },
   { id:2, icon:'🪑', name:'Tapis & Tissage' },
@@ -830,6 +820,7 @@ let categories = [
   { id:8, icon:'🍯', name:'Produits du terroir' }
 ];
 
+<<<<<<< HEAD
 // ========== BOUTIQUES ARTISANALES MAROCAINES ==========
 // Images Unsplash thématiques par catégorie — URLs directes et fiables
 let stores = [
@@ -913,10 +904,23 @@ let stores = [
     rating:4.9, reviews:256, products:10, sales:'4 200',
     tags:['Caftan','Takchita','Broderie'], producerId:110, producerName:'Leila Benani', location:'Casablanca', since:'2006'
   }
+=======
+let stores = [
+  { id:1, name:"Maison du Caftan", category:'Caftans & Vêtements traditionnels', categoryId:1, badge:'Artisan', badgeClass:'artisan', banner:'IMAGES/1779140603090.png', desc:'Caftans de luxe en soie et tissus traditionnels, broderies faites main par des maîtres-artisans de Fès.', rating:4.9, reviews:234, products:8, sales:'2 450', tags:['Caftan','Broderie','Soie'], producerId:101, producerName:'Fatima Zahra', location:'Fès', since:'2005' },
+  { id:2, name:"Tapis Berbère d'Atlas", category:'Tapis & Tissage', categoryId:2, badge:'Tradition', badgeClass:'tradition', banner:'IMAGES/1779140612922.png', desc:'Tapis berbères authentiques tissés à la main par les femmes de l\'Atlas, chaque pièce est unique.', rating:4.8, reviews:189, products:6, sales:'3 200', tags:['Tapis','Berbère','Laine'], producerId:102, producerName:'Rachid El Mansouri', location:'Marrakech', since:'2010' },
+  { id:3, name:"Poterie de Safi", category:'Poterie & Céramique', categoryId:3, badge:'Fait Main', badgeClass:'fait-main', banner:'IMAGES/1779140622713.png', desc:'Poterie traditionnelle de Safi, plats, tajines et vases peints à la main avec des motifs ancestraux.', rating:4.7, reviews:156, products:12, sales:'1 890', tags:['Poterie','Tajine','Céramique'], producerId:103, producerName:'Ahmed Benjelloun', location:'Safi', since:'1998' },
+  { id:4, name:"Marqueterie de Tetouan", category:'Marqueterie & Bois', categoryId:4, badge:'Artisan', badgeClass:'artisan', banner:'IMAGES/1779140702263.png', desc:'Meubles et objets en bois de cèdre incrustés, marqueterie fine selon les techniques ancestrales.', rating:4.9, reviews:112, products:5, sales:'980', tags:['Bois','Marqueterie','Cèdre'], producerId:104, producerName:'Mohamed Alami', location:'Tetouan', since:'2012' },
+  { id:5, name:"Bijoux Amaziagh", category:'Bijoux & Joaillerie', categoryId:5, badge:'Tradition', badgeClass:'tradition', banner:'IMAGES/1779140781327.png', desc:'Bijoux en argent massif inspirés des symboles amazighs, pierres naturelles et motifs ancestraux.', rating:4.9, reviews:203, products:15, sales:'2 100', tags:['Bijoux','Argent','Amazigh'], producerId:105, producerName:'Malika Oufkir', location:'Agadir', since:'2008' },
+  { id:6, name:"Lumières de Marrakech", category:'Lampes & Fer forgé', categoryId:6, badge:'Fait Main', badgeClass:'fait-main', banner:'IMAGES/1779140836694.png', desc:'Lampes en fer forgé, lanternes en laiton et appliques traditionnelles pour une ambiance orientale.', rating:4.6, reviews:98, products:9, sales:'1 450', tags:['Lampes','Fer forgé','Laiton'], producerId:106, producerName:'Karim Tazi', location:'Marrakech', since:'2015' },
+  { id:7, name:"Argamane Naturel", category:'Cosmétiques naturels', categoryId:7, badge:'Artisan', badgeClass:'artisan', banner:'IMAGES/1779140886747.png', desc:'Savons à l\'huile d\'argan, ghassoul, huiles essentielles et cosmétiques 100% naturels.', rating:4.8, reviews:178, products:11, sales:'890', tags:['Argan','Ghassoul','Bio'], producerId:107, producerName:'Nadia Berrada', location:'Essaouira', since:'2017' },
+  { id:8, name:"Saveurs du Terroir", category:'Produits du terroir', categoryId:8, badge:'Tradition', badgeClass:'tradition', banner:'IMAGES/1779140962074.png', desc:'Huile d\'olive, amlou, miel de montagne, épices et confitures artisanales marocaines.', rating:4.7, reviews:145, products:20, sales:'3 500', tags:['Huile d\'olive','Miel','Amlou'], producerId:108, producerName:'Hassan El Fassi', location:'Meknès', since:'2000' },
+  { id:9, name:"Tissage d'Azilal", category:'Tapis & Tissage', categoryId:2, badge:'Fait Main', badgeClass:'fait-main', banner:'IMAGES/1779141008846.png', desc:'Couvertures, tapis et tissages colorés des montagnes d\'Azilal, motifs géométriques uniques.', rating:4.8, reviews:87, products:7, sales:'670', tags:['Tissage','Azilal','Couleurs'], producerId:109, producerName:'Zineb Ait Ali', location:'Azilal', since:'2019' },
+  { id:10, name:"Caftans Impériaux", category:'Caftans & Vêtements traditionnels', categoryId:1, badge:'Artisan', badgeClass:'artisan', banner:'IMAGES/1779141052204.png', desc:'Caftans de cérémonie, takchitas et accessoires pour les grandes occasions. Broderies d\'or et d\'argent.', rating:4.9, reviews:256, products:10, sales:'4 200', tags:['Caftan','Takchita','Broderie'], producerId:110, producerName:'Leila Benani', location:'Casablanca', since:'2006' }
+>>>>>>> f338907cf75356ae6a17dca5bb5f87dcf11251fc
 ];
 
-// ========== PRODUITS PAR DÉFAUT POUR CHAQUE CATÉGORIE ==========
 const defaultProducts = {
+<<<<<<< HEAD
   1: [
     { id: 101, name: "Caftan en Soie", price: "2 500 DH", stock: 5, image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop", description: "Caftan en soie naturelle, broderies faites main" },
     { id: 102, name: "Takchita Cérémonie", price: "3 200 DH", stock: 3, image: "https://images.unsplash.com/photo-1594938298603-c8148c4b4f7f?w=300&h=200&fit=crop", description: "Takchita pour mariage, broderies d'or" },
@@ -928,19 +932,41 @@ const defaultProducts = {
     { id: 203, name: "Coussin Tissé", price: "250 DH", stock: 15, image: "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=300&h=200&fit=crop", description: "Coussin décoratif tissé main" }
   ],
   3: [
+=======
+  1: [ 
+    { id: 101, name: "Caftan en Soie", price: "2 500 DH", stock: 5, image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=300&h=200&fit=crop", description: "Caftan en soie naturelle, broderies faites main" },
+    { id: 102, name: "Takchita Cérémonie", price: "3 200 DH", stock: 3, image: "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=300&h=200&fit=crop", description: "Takchita pour mariage, broderies d'or" },
+    { id: 103, name: "Caftan Moderne", price: "1 800 DH", stock: 8, image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=300&h=200&fit=crop", description: "Caftan à la coupe contemporaine" }
+  ],
+  2: [ 
+    { id: 201, name: "Tapis Berbère Moyen", price: "1 200 DH", stock: 4, image: "https://images.unsplash.com/photo-1526721940322-10fb6e3ae94a?w=300&h=200&fit=crop", description: "Tapis en laine naturelle, motifs berbères" },
+    { id: 202, name: "Tapis Azilal", price: "950 DH", stock: 6, image: "https://images.unsplash.com/photo-1553775282-07af8073453f?w=300&h=200&fit=crop", description: "Tapis coloré des montagnes d'Azilal" },
+    { id: 203, name: "Coussin Tissé", price: "250 DH", stock: 15, image: "https://images.unsplash.com/photo-1553775282-07af8073453f?w=300&h=200&fit=crop", description: "Coussin décoratif tissé main" }
+  ],
+  3: [ 
+>>>>>>> f338907cf75356ae6a17dca5bb5f87dcf11251fc
     { id: 301, name: "Tajine Traditionnel", price: "180 DH", stock: 20, image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=200&fit=crop", description: "Tajine en terre cuite, motif peint" },
     { id: 302, name: "Assiettes Décoratives", price: "95 DH", stock: 30, image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=200&fit=crop", description: "Lot de 6 assiettes peintes à la main" },
     { id: 303, name: "Vase Zellij", price: "320 DH", stock: 12, image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=200&fit=crop", description: "Vase inspiré des motifs zellij" }
   ],
+<<<<<<< HEAD
   4: [
     { id: 401, name: "Petite Table Marqueterie", price: "850 DH", stock: 4, image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=200&fit=crop", description: "Table en cèdre incrusté" },
     { id: 402, name: "Coffre à Bijoux", price: "320 DH", stock: 8, image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=200&fit=crop", description: "Coffret en bois sculpté" }
   ],
   5: [
+=======
+  4: [ 
+    { id: 401, name: "Petite Table Marqueterie", price: "850 DH", stock: 4, image: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=300&h=200&fit=crop", description: "Table en cèdre incrusté" },
+    { id: 402, name: "Coffre à Bijoux", price: "320 DH", stock: 8, image: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=300&h=200&fit=crop", description: "Coffret en bois sculpté" }
+  ],
+  5: [ 
+>>>>>>> f338907cf75356ae6a17dca5bb5f87dcf11251fc
     { id: 501, name: "Bracelet Argent Amazigh", price: "450 DH", stock: 10, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop", description: "Bracelet en argent, symbole amazigh" },
     { id: 502, name: "Collier Fibule", price: "680 DH", stock: 6, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop", description: "Fibule berbère traditionnelle" },
     { id: 503, name: "Boucles d'Oreilles", price: "280 DH", stock: 15, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=200&fit=crop", description: "Boucles en argent, corail" }
   ],
+<<<<<<< HEAD
   6: [
     { id: 601, name: "Lanterne Laiton", price: "380 DH", stock: 8, image: "https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=300&h=200&fit=crop", description: "Lanterne en laiton martelé" },
     { id: 602, name: "Applique Murale", price: "250 DH", stock: 12, image: "https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=300&h=200&fit=crop", description: "Applique en fer forgé" }
@@ -952,6 +978,19 @@ const defaultProducts = {
   8: [
     { id: 801, name: "Huile d'Olive Vierge", price: "85 DH", stock: 40, image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&h=200&fit=crop", description: "Huile d'olive extra vierge, première pression" },
     { id: 802, name: "Amlou", price: "95 DH", stock: 25, image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&h=200&fit=crop", description: "Purée d'amandes et miel d'argan" }
+=======
+  6: [ 
+    { id: 601, name: "Lanterne Laiton", price: "380 DH", stock: 8, image: "https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=300&h=200&fit=crop", description: "Lanterne en laiton martelé" },
+    { id: 602, name: "Applique Murale", price: "250 DH", stock: 12, image: "https://images.unsplash.com/photo-1507470853409-1d29409a8fb3?w=300&h=200&fit=crop", description: "Applique en fer forgé" }
+  ],
+  7: [ 
+    { id: 701, name: "Huile d'Argan Bio", price: "120 DH", stock: 50, image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=300&h=200&fit=crop", description: "Huile d'argan 100% pure" },
+    { id: 702, name: "Savon Noir", price: "45 DH", stock: 100, image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=300&h=200&fit=crop", description: "Savon noir traditionnel" }
+  ],
+  8: [ 
+    { id: 801, name: "Huile d'Olive Vierge", price: "85 DH", stock: 40, image: "https://images.unsplash.com/photo-1599851152730-1f83a654bb9a?w=300&h=200&fit=crop", description: "Huile d'olive extra vierge, première pression" },
+    { id: 802, name: "Amlou", price: "95 DH", stock: 25, image: "https://images.unsplash.com/photo-1599851152730-1f83a654bb9a?w=300&h=200&fit=crop", description: "Purée d'amandes et miel d'argan" }
+>>>>>>> f338907cf75356ae6a17dca5bb5f87dcf11251fc
   ]
 };
 
@@ -967,7 +1006,6 @@ function getDefaultProductsForCategory(categoryId) {
   return defaultProducts[categoryId] || defaultProducts[1];
 }
 
-// ========== FAVORIS ==========
 let favorites = [];
 function loadFavorites() {
   const saved = localStorage.getItem('greenmarket_favorites');
@@ -995,7 +1033,6 @@ function setFilter(filter) {
   renderStores();
 }
 
-// ========== AUTH ==========
 let currentUser = null;
 function initUsers() {
   const defaultUsers = [
@@ -1396,7 +1433,6 @@ function renderStores() {
   }).join('');
 }
 
-// ========== ÉVÉNEMENTS ==========
 document.getElementById('toggleAddCat')?.addEventListener('click', () => document.getElementById('addCatForm')?.classList.toggle('open'));
 document.getElementById('cancelCat')?.addEventListener('click', () => {
   document.getElementById('addCatForm')?.classList.remove('open');
@@ -1428,13 +1464,17 @@ document.getElementById('catFilter')?.addEventListener('change', e => {
   renderCategories(); renderStores();
 });
 
+<<<<<<< HEAD
 // Remplir le select de filtre des catégories
+=======
+>>>>>>> f338907cf75356ae6a17dca5bb5f87dcf11251fc
 categories.forEach(c => {
   const opt = document.createElement('option');
   opt.value = c.name; opt.textContent = c.name;
   document.getElementById('catFilter')?.appendChild(opt);
 });
 
+<<<<<<< HEAD
 // ========== INIT ==========
 // Système de versionnage des données — si la version change, on réinitialise tout
 const DATA_VERSION = 'v3';
@@ -1450,6 +1490,9 @@ const DATA_VERSION = 'v3';
   }
 })();
 
+=======
+localStorage.clear();
+>>>>>>> f338907cf75356ae6a17dca5bb5f87dcf11251fc
 saveDefaultProducts();
 loadStores();
 loadCategories();
