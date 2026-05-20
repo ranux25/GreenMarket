@@ -203,44 +203,37 @@
   }
   .toast.show { transform: translateY(0); opacity: 1; }
 
-  /* Modal de autenticación */
-  .auth-modal-overlay {
-    display: none; position: fixed; top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    align-items: center; justify-content: center;
-    z-index: 1000;
+  .btn-connexion {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 20px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.3px;
+    text-decoration: none;
+    display: inline-block;
   }
-  .auth-modal-overlay.open { display: flex; }
-  .auth-modal {
-    background: #fffdf7; border-radius: 16px; padding: 2rem;
-    max-width: 450px; width: 90%; position: relative;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  .btn-connexion:hover {
+    background: #7a1020;
+    transform: translateY(-1px);
   }
-  .auth-tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e8ddd0; }
-  .auth-tab {
-    background: none; border: none; padding: 0.5rem 1rem;
-    font-size: 1rem; cursor: pointer; color: #6b5055; font-weight: 500;
+
+  .user-badge {
+    background: var(--wine-pale);
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--wine);
+    font-weight: 600;
+    font-size: 0.85rem;
   }
-  .auth-tab.active { color: #5d0d18; border-bottom: 2px solid #5d0d18; }
-  .auth-form { display: none; }
-  .auth-form.active { display: block; }
-  .auth-form h3 { color: #5d0d18; margin-bottom: 1rem; font-family: 'Cormorant Garamond', serif; }
-  .auth-form input {
-    width: 100%; padding: 0.7rem; margin-bottom: 1rem;
-    border: 1.5px solid #e8ddd0; border-radius: 8px;
-    font-family: 'Jost', sans-serif; background: #fff9eb;
-  }
-  .auth-error { color: #d9534f; font-size: 0.8rem; margin-top: 0.5rem; text-align: center; }
-  .auth-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #6b5055; }
-  .btn-filled {
-    background: #5d0d18; color: #fff9eb;
-    border: none; padding: .5rem 1.3rem; border-radius: 3px;
-    font-family: 'Jost', sans-serif; font-size: .78rem; font-weight: 600;
-    letter-spacing: .07em; text-transform: uppercase;
-    cursor: pointer; transition: background .2s;
-  }
-  .btn-filled:hover { background: #3e0910; }
 
   @media(max-width:900px){ .main-layout { grid-template-columns: 1fr; } .sidebar { position: static; } }
   @media(max-width:600px){
@@ -302,64 +295,13 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- Modal de autenticación -->
-<div class="auth-modal-overlay" id="authModal">
-  <div class="auth-modal">
-    <div class="auth-tabs">
-      <button class="auth-tab active" data-tab="login">Connexion</button>
-      <button class="auth-tab" data-tab="register">Inscription Client</button>
-      <button class="auth-tab" data-tab="registerProducer">Inscription Artisan</button>
-    </div>
-    <div id="loginForm" class="auth-form active">
-      <h3>🔐 Se connecter</h3>
-      <input type="email" id="loginEmail" placeholder="Email">
-      <input type="password" id="loginPassword" placeholder="Mot de passe">
-      <button class="btn-filled" id="doLoginBtn" style="width:100%">Se connecter</button>
-      <p class="auth-error" id="loginError"></p>
-    </div>
-    <div id="registerForm" class="auth-form">
-      <h3>📝 Inscription Client</h3>
-      <input type="text" id="regName" placeholder="Nom complet">
-      <input type="email" id="regEmail" placeholder="Email">
-      <input type="password" id="regPassword" placeholder="Mot de passe">
-      <button class="btn-filled" id="doRegisterBtn" style="width:100%">S'inscrire</button>
-      <p class="auth-error" id="registerError"></p>
-    </div>
-    <div id="registerProducerForm" class="auth-form">
-      <h3>🏪 Inscription Artisan</h3>
-      <input type="text" id="regProdName" placeholder="Nom de l'artisan">
-      <input type="email" id="regProdEmail" placeholder="Email">
-      <input type="password" id="regProdPassword" placeholder="Mot de passe">
-      <button class="btn-filled" id="doRegisterProducerBtn" style="width:100%">S'inscrire comme artisan</button>
-      <p class="auth-error" id="registerProducerError"></p>
-    </div>
-    <button class="auth-close" id="closeAuthModal">✕</button>
-  </div>
-</div>
-
 <script>
   // ========== FUNCIONES DE AUTENTICACIÓN ==========
   let currentUser = null;
 
-  function initUsers() {
-    if (!localStorage.getItem('greenmarket_users')) {
-      const defaultUsers = [
-        { id: 1, name: "Jean Dupont", email: "client@test.com", password: "client123", role: "client", producerId: null },
-        { id: 2, name: "Fatima Zahra", email: "fatima@caftan.ma", password: "fatima123", role: "productor", producerId: 101 }
-      ];
-      localStorage.setItem('greenmarket_users', JSON.stringify(defaultUsers));
-    }
-  }
-
   function getCurrentUser() {
     const u = sessionStorage.getItem('greenmarket_current_user');
     return u ? JSON.parse(u) : null;
-  }
-
-  function setCurrentUser(user) {
-    sessionStorage.setItem('greenmarket_current_user', JSON.stringify(user));
-    currentUser = user;
-    updateAuthUI();
   }
 
   function logout() {
@@ -368,58 +310,6 @@
     updateAuthUI();
     showToast("👋 Déconnexion réussie");
     setTimeout(() => window.location.reload(), 500);
-  }
-
-  function login(email, password) {
-    const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
-    const user = users.find(u => u.email === email && u.password === password);
-    if (user) {
-      const { password, ...safeUser } = user;
-      setCurrentUser(safeUser);
-      return { success: true, user: safeUser };
-    }
-    return { success: false, error: "Email ou mot de passe incorrect" };
-  }
-
-  function registerClient(name, email, password) {
-    const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
-    if (users.find(u => u.email === email)) {
-      return { success: false, error: "Email déjà utilisé" };
-    }
-    const newUser = {
-      id: Date.now(),
-      name: name,
-      email: email,
-      password: password,
-      role: "client",
-      producerId: null
-    };
-    users.push(newUser);
-    localStorage.setItem('greenmarket_users', JSON.stringify(users));
-    const { password: _, ...safeUser } = newUser;
-    setCurrentUser(safeUser);
-    return { success: true, user: safeUser };
-  }
-
-  function registerProducer(name, email, password) {
-    const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
-    if (users.find(u => u.email === email)) {
-      return { success: false, error: "Email déjà utilisé" };
-    }
-    const newProducerId = Date.now();
-    const newUser = {
-      id: Date.now(),
-      name: name,
-      email: email,
-      password: password,
-      role: "productor",
-      producerId: newProducerId
-    };
-    users.push(newUser);
-    localStorage.setItem('greenmarket_users', JSON.stringify(users));
-    const { password: _, ...safeUser } = newUser;
-    setCurrentUser(safeUser);
-    return { success: true, user: safeUser };
   }
 
   function updateAuthUI() {
@@ -437,94 +327,8 @@
         dashboardLink.style.display = (user.role === 'productor' || user.role === 'admin') ? 'inline-block' : 'none';
       }
     } else {
-      widget.innerHTML = `<button class="btn-connexion" id="showLoginBtn">🔑 Connexion</button>`;
-      document.getElementById('showLoginBtn')?.addEventListener('click', () => showAuthModal());
+      widget.innerHTML = `<a href="signin.html"><button class="btn-connexion">🔑 Connexion</button></a>`;
     }
-  }
-
-  function showAuthModal() {
-    const modal = document.getElementById('authModal');
-    if (modal) modal.classList.add('open');
-  }
-
-  function closeAuthModal() {
-    const modal = document.getElementById('authModal');
-    if (modal) modal.classList.remove('open');
-  }
-
-  function setupAuthModal() {
-    // Tabs
-    document.querySelectorAll('.auth-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        const tabName = tab.dataset.tab;
-        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
-        if (tabName === 'login') document.getElementById('loginForm').classList.add('active');
-        if (tabName === 'register') document.getElementById('registerForm').classList.add('active');
-        if (tabName === 'registerProducer') document.getElementById('registerProducerForm').classList.add('active');
-      });
-    });
-
-    // Login
-    document.getElementById('doLoginBtn')?.addEventListener('click', () => {
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      const result = login(email, password);
-      if (result.success) {
-        closeAuthModal();
-        updateAuthUI();
-        showToast(`👋 Bonjour ${result.user.name} !`);
-        setTimeout(() => window.location.reload(), 500);
-      } else {
-        document.getElementById('loginError').textContent = result.error;
-      }
-    });
-
-    // Register Client
-    document.getElementById('doRegisterBtn')?.addEventListener('click', () => {
-      const name = document.getElementById('regName').value;
-      const email = document.getElementById('regEmail').value;
-      const password = document.getElementById('regPassword').value;
-      if (!name || !email || !password) {
-        document.getElementById('registerError').textContent = "Tous les champs sont requis";
-        return;
-      }
-      const result = registerClient(name, email, password);
-      if (result.success) {
-        closeAuthModal();
-        updateAuthUI();
-        showToast(`✅ Bienvenue ${result.user.name} !`);
-        setTimeout(() => window.location.reload(), 500);
-      } else {
-        document.getElementById('registerError').textContent = result.error;
-      }
-    });
-
-    // Register Producer
-    document.getElementById('doRegisterProducerBtn')?.addEventListener('click', () => {
-      const name = document.getElementById('regProdName').value;
-      const email = document.getElementById('regProdEmail').value;
-      const password = document.getElementById('regProdPassword').value;
-      if (!name || !email || !password) {
-        document.getElementById('registerProducerError').textContent = "Tous les champs sont requis";
-        return;
-      }
-      const result = registerProducer(name, email, password);
-      if (result.success) {
-        closeAuthModal();
-        updateAuthUI();
-        showToast(`✅ Bienvenue ${result.user.name} ! Vous pouvez maintenant créer votre boutique.`);
-        setTimeout(() => window.location.reload(), 500);
-      } else {
-        document.getElementById('registerProducerError').textContent = result.error;
-      }
-    });
-
-    document.getElementById('closeAuthModal')?.addEventListener('click', closeAuthModal);
-    document.getElementById('authModal')?.addEventListener('click', (e) => {
-      if (e.target === document.getElementById('authModal')) closeAuthModal();
-    });
   }
 
   // ========== FUNCIONES DEL CARRITO ==========
@@ -709,19 +513,15 @@
       document.getElementById('header-placeholder').innerHTML = headerHtml;
       
       setTimeout(() => {
-        initUsers();
         updateCartCount();
         updateAuthUI();
-        setupAuthModal();
         loadAllProducts();
         renderCategories();
         renderProducts();
       }, 100);
     } catch (error) {
       console.error('Error:', error);
-      initUsers();
       updateAuthUI();
-      setupAuthModal();
       loadAllProducts();
       renderCategories();
       renderProducts();
