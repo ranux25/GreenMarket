@@ -790,8 +790,7 @@ function updateAuthUI() {
     }
   } else {
     widget.innerHTML = `<button class="btn-connexion" id="showLoginBtn">🔑 Connexion</button>`;
-    document.getElementById('showLoginBtn')?.addEventListener('click', () => showAuthModal());
-  }
+    widget.innerHTML = `<button class="btn-connexion" onclick="window.location.href='signin.html'">🔑 Connexion</button>`;
 }
 
 window.showAuthModal = function() {

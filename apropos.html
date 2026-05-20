@@ -598,7 +598,7 @@
       }
     } else {
       widget.innerHTML = `<button class="btn-connexion" id="showLoginBtn" style="background:#5D0D18; color:#fff; border:none; border-radius:999px; padding:8px 20px; font-family:'Lato',sans-serif; font-weight:700; font-size:14px; cursor:pointer;">🔑 Connexion</button>`;
-      document.getElementById('showLoginBtn')?.addEventListener('click', () => showAuthModal());
+      widget.innerHTML = `<button class="btn-connexion" onclick="window.location.href='signin.html'">🔑 Connexion</button>`;
     }
   }
 
