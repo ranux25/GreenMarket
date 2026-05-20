@@ -33,41 +33,6 @@
     min-height: 100vh;
   }
 
-  nav {
-    background: var(--white);
-    border-bottom: 1.5px solid var(--border);
-    padding: 0 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 68px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .nav-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.7rem;
-    font-weight: 700;
-    color: var(--wine);
-    display: flex;
-    align-items: center;
-    gap: .4rem;
-  }
-  .nav-logo span { color: var(--sage-dark); font-weight: 400; font-style: italic; }
-  .nav-links { display: flex; gap: 2rem; }
-  .nav-links a {
-    text-decoration: none;
-    color: var(--text-muted);
-    font-size: .82rem;
-    font-weight: 500;
-    letter-spacing: .09em;
-    text-transform: uppercase;
-    transition: color .2s;
-  }
-  .nav-links a:hover, .nav-links a.active { color: var(--wine); }
-  .nav-actions { display: flex; gap: .8rem; align-items: center; }
-
   .btn-outline {
     border: 1.5px solid var(--wine);
     background: transparent;
@@ -362,8 +327,6 @@
     .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
     .charts-row { grid-template-columns: 1fr; }
     .container { padding: 0 1rem; }
-    nav { padding: 0 1rem; }
-    .nav-links { display: none; }
   }
   @media (max-width: 700px) {
     .stats-dashboard { grid-template-columns: 1fr; }
@@ -374,16 +337,7 @@
 </head>
 <body>
 
-<nav>
-  <div class="nav-logo">🌿 Green<span>Market</span></div>
-  <div class="nav-links">
-    <a href="store.html">Boutiques</a>
-    <a href="#" class="active">Dashboard</a>
-    <a href="#">Produits</a>
-    <a href="#">À propos</a>
-  </div>
-  <div class="nav-actions" id="authWidget"></div>
-</nav>
+<div id="header-placeholder"></div>
 
 <div class="page-header">
   <div class="header-inner">
@@ -424,6 +378,19 @@
 let currentUser = null;
 let currentProducerId = null;
 
+function loadHeader() {
+  fetch('header.html')
+    .then(response => {
+      if (!response.ok) throw new Error("Erreur");
+      return response.text();
+    })
+    .then(data => {
+      document.getElementById('header-placeholder').innerHTML = data;
+      updateAuthUI();
+    })
+    .catch(error => console.error(error));
+}
+
 function getCurrentUser() {
   const u = sessionStorage.getItem('greenmarket_current_user');
   return u ? JSON.parse(u) : null;
@@ -436,6 +403,7 @@ function logout() {
 
 function updateAuthUI() {
   const widget = document.getElementById('authWidget');
+  if (!widget) return;
   const user = getCurrentUser();
   if (user) {
     let roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Producteur' : 'Client');
@@ -740,7 +708,7 @@ function deleteProductConfirm(shopId, productId) {
 }
 
 function init() {
-  updateAuthUI();
+  loadHeader();
   loadDashboard();
   document.getElementById('saveProductBtn').onclick = saveProduct;
   document.getElementById('closeProductModal').onclick = closeProductModal;

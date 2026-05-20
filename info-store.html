@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GreenMarket – Détail boutique</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --cream:      #fff9eb;
@@ -21,6 +21,11 @@
     --white:      #fffdf7;
     --shadow:     rgba(93,13,24,.10);
     --shadow-md:  rgba(93,13,24,.18);
+    --primary: #5D0D18;
+    --secondary: #9FB2AC;
+    --bg: #FFF9EB;
+    --text-dark: #2C2C2C;
+    --text-light: #6B6B6B;
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -32,58 +37,110 @@
     min-height: 100vh;
   }
 
-  nav {
-    background: var(--white);
-    border-bottom: 1.5px solid var(--border);
-    padding: 0 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 68px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+  .search-bar input {
+    border: 1.5px solid #e8dfc8;
+    background: #fdf8ee;
+    border-radius: 999px;
+    padding: 10px 20px;
+    width: 100%;
+    max-width: 420px;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    color: var(--text-dark);
   }
-  .nav-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.7rem;
+  .search-bar input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(93,13,24,0.08);
+  }
+
+  .nav-link {
+    font-family: 'Lato', sans-serif;
     font-weight: 700;
-    color: var(--wine);
-    display: flex;
-    align-items: center;
-    gap: .4rem;
-  }
-  .nav-logo span { color: var(--sage-dark); font-weight: 400; font-style: italic; }
-  .nav-links { display: flex; gap: 2rem; align-items: center; }
-  .nav-links a {
+    font-size: 14px;
+    color: var(--text-dark);
     text-decoration: none;
-    color: var(--text-muted);
-    font-size: .82rem;
-    font-weight: 500;
-    letter-spacing: .09em;
-    text-transform: uppercase;
-    transition: color .2s;
-  }
-  .nav-links a:hover { color: var(--wine); }
-  
-  /* Icono del carrito */
-  .cart-link {
+    letter-spacing: 0.5px;
+    transition: color 0.2s;
+    padding: 4px 0;
     position: relative;
+  }
+  .nav-link::after {
+    content: '';
+    display: block;
+    height: 2px;
+    background: var(--primary);
+    transform: scaleX(0);
+    transition: transform 0.25s;
+    border-radius: 2px;
+  }
+  .nav-link:hover { color: var(--primary); }
+  .nav-link:hover::after { transform: scaleX(1); }
+
+  .cart-btn {
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .cart-badge {
+    position: absolute;
+    top: -5px; right: -7px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 999px;
+    min-width: 18px;
+    height: 18px;
     display: flex;
     align-items: center;
-    gap: 0.3rem;
+    justify-content: center;
+    font-family: 'Lato', sans-serif;
   }
-  .cart-count {
-    background: var(--wine);
-    color: white;
-    font-size: 0.65rem;
+
+  .desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .desktop-nav { display: none; }
+  }
+
+  .btn-connexion {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 20px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .btn-connexion:hover {
+    background: #7a1020;
+    transform: translateY(-1px);
+  }
+
+  .user-badge {
+    background: var(--wine-pale);
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--wine);
     font-weight: 600;
-    padding: 0.1rem 0.4rem;
-    border-radius: 50%;
-    min-width: 18px;
-    text-align: center;
+    font-size: 0.85rem;
   }
-  
+
   .btn-back {
     background: var(--wine-pale);
     color: var(--wine);
@@ -420,11 +477,6 @@
     justify-content: center;
     overflow: hidden;
   }
-  .producer-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
   .producer-info {
     flex: 1;
   }
@@ -533,19 +585,57 @@
   .image-preview {
     margin-top: 0.5rem;
     width: 100%;
-    height: 100px;
+    min-height: 120px;
     background: var(--cream);
-    border: 1.5px solid var(--border);
+    border: 2px dashed var(--border);
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    position: relative;
+    transition: all 0.2s;
+  }
+  .image-preview.drag-over {
+    border-color: var(--wine);
+    background: var(--wine-pale);
   }
   .image-preview img {
     max-width: 100%;
-    max-height: 100%;
+    max-height: 150px;
     object-fit: contain;
+  }
+  .preview-placeholder {
+    text-align: center;
+    padding: 1rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+  .preview-placeholder::before {
+    content: "🖼️ ";
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+  .btn-clear-image {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(93,13,24,0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .btn-clear-image:hover {
+    background: var(--wine);
   }
   .modal-actions {
     display: flex;
@@ -598,9 +688,87 @@
   }
   .toast.show { transform: translateY(0); opacity: 1; }
 
+  .auth-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .auth-modal-overlay.open { display: flex; }
+  .auth-modal {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 450px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  }
+  .auth-tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+  .auth-tab {
+    background: none;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .auth-tab.active { color: var(--wine); border-bottom: 2px solid var(--wine); }
+  .auth-form { display: none; }
+  .auth-form.active { display: block; }
+  .auth-form h3 { color: var(--wine); margin-bottom: 1rem; font-family: 'Cormorant Garamond', serif; }
+  .auth-form input {
+    width: 100%; padding: 0.7rem; margin-bottom: 1rem;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    font-family: 'Jost', sans-serif; background: var(--cream);
+  }
+  .auth-error { color: #d9534f; font-size: 0.8rem; margin-top: 0.5rem; text-align: center; }
+  .auth-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); }
+
+  .btn-filled {
+    background: var(--wine); color: var(--cream);
+    border: none; padding: .5rem 1.3rem; border-radius: 3px;
+    font-family: 'Jost', sans-serif; font-size: .78rem; font-weight: 600;
+    letter-spacing: .07em; text-transform: uppercase;
+    cursor: pointer; transition: background .2s;
+  }
+  .btn-filled:hover { background: var(--wine-dark); }
+
+  .file-input-wrapper {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+  .file-input-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--sage-light);
+    color: var(--sage-dark);
+    padding: 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: background 0.2s;
+  }
+  .file-input-label:hover {
+    background: var(--sage);
+    color: white;
+  }
+  .file-input-label input {
+    display: none;
+  }
+
   @media (max-width: 700px) {
-    nav { padding: 0 1rem; }
-    .nav-links { display: none; }
+    .desktop-nav { display: none; }
     .container { padding: 0 1rem; }
     .shop-body { padding: 1rem; }
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -612,16 +780,7 @@
 </head>
 <body>
 
-<nav>
-  <div class="nav-logo">🌿 Green<span>Market</span></div>
-  <div class="nav-links">
-    <a href="store.html">Accueil</a>
-    <a href="store.html">Boutiques</a>
-    <a href="panier.html" class="cart-link">🛒 Panier <span id="cartCount" class="cart-count">0</span></a>
-    <a href="#">À propos</a>
-  </div>
-  <a href="store.html" class="btn-back">← Retour</a>
-</nav>
+<div id="header-placeholder"></div>
 
 <div class="page-header">
   <div class="header-inner">
@@ -630,6 +789,7 @@
       <h1>Détail de la<br>boutique</h1>
       <p>Tous les produits et informations du producteur</p>
     </div>
+    <a href="store.html" class="btn-back">← Retour aux boutiques</a>
   </div>
 </div>
 
@@ -643,11 +803,42 @@
   🌿 GreenMarket – Mettre en valeur les producteurs locaux
 </div>
 
+<div class="auth-modal-overlay" id="authModal">
+  <div class="auth-modal">
+    <div class="auth-tabs"><button class="auth-tab active" data-tab="login">Connexion</button></div>
+    <div id="loginForm" class="auth-form active">
+      <h3>🔐 Se connecter</h3>
+      <input type="email" id="loginEmail" placeholder="Email"><input type="password" id="loginPassword" placeholder="Mot de passe">
+      <button class="btn-filled" id="doLoginBtn" style="width:100%">Se connecter</button>
+      <p class="auth-error" id="loginError"></p>
+    </div>
+    <button class="auth-close" id="closeAuthModal">✕</button>
+  </div>
+</div>
+
 <script>
+  function loadHeaderAndInit() {
+    fetch('header.html')
+      .then(response => {
+        if (!response.ok) throw new Error("Erreur");
+        return response.text();
+      })
+      .then(data => {
+        document.getElementById('header-placeholder').innerHTML = data;
+        initAuth();
+        loadShop();
+      })
+      .catch(error => {
+        console.error(error);
+        initAuth();
+        loadShop();
+      });
+  }
+
   let currentUser = null;
   let productsData = {};
+  let currentImageDataUrl = null;
 
-  // ========== GESTION DU PANIER ==========
   function getPanier() {
     const saved = localStorage.getItem('greenmarket_panier');
     return saved ? JSON.parse(saved) : [];
@@ -661,7 +852,7 @@
   function mettreAJourCompteurPanier() {
     const panier = getPanier();
     const totalItems = panier.reduce((sum, item) => sum + item.quantite, 0);
-    const cartCountSpan = document.getElementById('cartCount');
+    const cartCountSpan = document.getElementById('cart-count');
     if (cartCountSpan) {
       cartCountSpan.textContent = totalItems;
     }
@@ -674,7 +865,6 @@
     if (existing) {
       existing.quantite += 1;
     } else {
-      // Extraire le prix numérique
       let prixNumerique = 5;
       if (produit.price) {
         const match = String(produit.price).match(/(\d+(?:[.,]\d+)?)/);
@@ -700,7 +890,6 @@
   }
 
   function acheterMaintenant(produit, boutiqueId, boutiqueNom) {
-    // Vider le panier et ajouter seulement ce produit
     let panier = [];
     let prixNumerique = 5;
     if (produit.price) {
@@ -723,7 +912,6 @@
     
     sauvegarderPanier(panier);
     
-    // Rediriger vers le checkout
     const produitsPourCheckout = panier.map(p => ({
       id: p.id,
       name: p.nom,
@@ -738,25 +926,83 @@
     window.location.href = `checkout.html?shopId=${boutiqueId}&shopName=${encodeURIComponent(boutiqueNom)}&products=${encodedProducts}`;
   }
 
-  // ========== FUNCIONES EXISTENTES ==========
   function getCurrentUser() {
-const userJson = sessionStorage.getItem("greenmarket_current_user");
+    const userJson = sessionStorage.getItem("greenmarket_current_user");
+    if (!userJson) return null;
+    const user = JSON.parse(userJson);
+    if (user.role === "Producer") user.role = "productor";
+    if (user.role === "Customer") user.role = "client";
+    return user;
+  }
 
-if (!userJson) return null;
+  function updateAuthUI() {
+    const widget = document.getElementById('authWidget');
+    if (!widget) return;
+    const user = getCurrentUser();
+    if (user) {
+      const roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Artisan' : 'Client');
+      widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;">🚪</button></div>`;
+      document.getElementById('logoutBtn')?.addEventListener('click', logout);
+    } else {
+      widget.innerHTML = `<button class="btn-connexion" id="showLoginBtn">🔑 Connexion</button>`;
+      document.getElementById('showLoginBtn')?.addEventListener('click', () => window.location.href = 'signin.html');
+    }
+  }
 
-const user = JSON.parse(userJson);
+  function logout() {
+    sessionStorage.removeItem('greenmarket_current_user');
+    currentUser = null;
+    updateAuthUI();
+    location.reload();
+  }
 
-// compatibilidad de roles
-if (user.role === "Producer") {
-user.role = "productor";
-}
+  function showAuthModal() {
+    const modal = document.getElementById('authModal');
+    if(modal) modal.classList.add('open');
+  }
 
-if (user.role === "Customer") {
-user.role = "client";
-}
+  function closeAuthModal() {
+    const modal = document.getElementById('authModal');
+    if(modal) modal.classList.remove('open');
+  }
 
-return user;
-}
+  function setupAuthModal() {
+    const btn = document.getElementById('doLoginBtn');
+    if(btn) {
+      btn.addEventListener('click', () => {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const result = login(email, password);
+        if (result.success) {
+          closeAuthModal();
+          updateAuthUI();
+          showToast(`👋 Bonjour ${result.user.name} !`);
+          location.reload();
+        } else {
+          document.getElementById('loginError').textContent = result.error;
+        }
+      });
+    }
+    const closeBtn = document.getElementById('closeAuthModal');
+    if(closeBtn) closeBtn.addEventListener('click', closeAuthModal);
+    const modal = document.getElementById('authModal');
+    if(modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeAuthModal();
+      });
+    }
+  }
+
+  function login(email, password) {
+    const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
+    const user = users.find(u => u.email === email && u.password === password);
+    if (user) {
+      const { password, ...safeUser } = user;
+      sessionStorage.setItem('greenmarket_current_user', JSON.stringify(safeUser));
+      return { success: true, user: safeUser };
+    }
+    return { success: false, error: "Email ou mot de passe incorrect" };
+  }
 
   function escapeHtml(str) {
     if (!str) return '';
@@ -798,7 +1044,6 @@ return user;
     setTimeout(() => t.classList.remove('show'), 3200);
   }
 
-  // ========== GESTIÓN DE PRODUCTOS ==========
   function loadProductsFromStorage(shopId) {
     const saved = localStorage.getItem(`products_${shopId}`);
     if (saved) {
@@ -821,7 +1066,7 @@ return user;
       name: product.name,
       price: product.price,
       stock: product.stock || 0,
-      image: product.image || 'https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop',
+      image: product.image || 'IMAGES/default-product.jpg',
       description: product.description || ''
     });
     saveProductsToStorage(shopId);
@@ -859,27 +1104,12 @@ return user;
     }
   }
 
-  // ========== CARGAR DATOS ==========
   function loadStores() {
     const saved = localStorage.getItem('greenmarket_stores');
     if (saved) return JSON.parse(saved);
     return [];
   }
 
-  function loadCategories() {
-    const saved = localStorage.getItem('greenmarket_categories');
-    if (saved) return JSON.parse(saved);
-    return [
-      { id: 1, name: 'Fruits et légumes' },
-      { id: 2, name: 'Produits laitiers' },
-      { id: 3, name: 'Boulangerie artisanale' },
-      { id: 4, name: 'Miel et apiculture' },
-      { id: 5, name: 'Huiles et conserves' },
-      { id: 6, name: 'Plantes médicinales' }
-    ];
-  }
-
-  // ========== MODAL DE PRODUCTO ==========
   let currentShopId = null;
   let editingProductId = null;
 
@@ -892,26 +1122,49 @@ return user;
     document.getElementById('productName').value = product?.name || '';
     document.getElementById('productPrice').value = product?.price || '';
     document.getElementById('productStock').value = product?.stock || 0;
-    document.getElementById('productImageUrl').value = product?.image || '';
     document.getElementById('productDesc').value = product?.description || '';
-    document.getElementById('productImageFile').value = '';
-    document.getElementById('imagePreview').innerHTML = product?.image ? `<img src="${product.image}" alt="Aperçu">` : '<div class="preview-placeholder">Aucune image</div>';
     
-    document.querySelector('input[name="productImageType"][value="url"]').checked = true;
-    document.getElementById('productUrlContainer').style.display = 'block';
-    document.getElementById('productFileContainer').style.display = 'none';
+    currentImageDataUrl = null;
+    const previewDiv = document.getElementById('imagePreview');
+    if (product?.image && product.image !== 'https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop') {
+      previewDiv.innerHTML = `<img src="${product.image}" alt="Aperçu"><button class="btn-clear-image" onclick="clearImagePreview()">✕</button>`;
+    } else {
+      previewDiv.innerHTML = '<div class="preview-placeholder">Haz clic para seleccionar una imagen de tu galería</div>';
+    }
+    
+    const fileInput = document.getElementById('productImageFile');
+    if (fileInput) fileInput.value = '';
+    
+    document.querySelector('input[name="productImageType"][value="file"]').checked = true;
+    document.getElementById('productUrlContainer').style.display = 'none';
+    document.getElementById('productFileContainer').style.display = 'block';
     
     document.getElementById('productModal').classList.add('open');
+  }
+
+  function clearImagePreview() {
+    const previewDiv = document.getElementById('imagePreview');
+    previewDiv.innerHTML = '<div class="preview-placeholder">Haz clic para seleccionar una imagen de tu galería</div>';
+    currentImageDataUrl = null;
+    const fileInput = document.getElementById('productImageFile');
+    if (fileInput) fileInput.value = '';
   }
 
   function closeProductModal() {
     document.getElementById('productModal').classList.remove('open');
     editingProductId = null;
     currentShopId = null;
+    currentImageDataUrl = null;
   }
 
   function getProductImage(callback) {
     const imageType = document.querySelector('input[name="productImageType"]:checked').value;
+    
+    if (currentImageDataUrl) {
+      callback(currentImageDataUrl);
+      return;
+    }
+    
     if (imageType === 'url') {
       const url = document.getElementById('productImageUrl').value.trim();
       callback(url || 'https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop');
@@ -920,11 +1173,17 @@ return user;
       if (file) {
         const reader = new FileReader();
         reader.onload = function(event) {
+          currentImageDataUrl = event.target.result;
           callback(event.target.result);
         };
         reader.readAsDataURL(file);
       } else {
-        callback('https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop');
+        const previewImg = document.querySelector('#imagePreview img');
+        if (previewImg && previewImg.src && !previewImg.src.includes('placeholder')) {
+          callback(previewImg.src);
+        } else {
+          callback('https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop');
+        }
       }
     }
   }
@@ -943,10 +1202,10 @@ return user;
     getProductImage((image) => {
       if (editingProductId) {
         updateProduct(currentShopId, editingProductId, { name, price, stock, image, description });
-        showToast("✅ Produit modifié");
+        showToast("✅ Produit modifié avec succès");
       } else {
         addProduct(currentShopId, { name, price, stock, image, description });
-        showToast("✅ Produit ajouté");
+        showToast("✅ Produit ajouté avec succès");
       }
       closeProductModal();
       loadShop();
@@ -965,24 +1224,51 @@ return user;
       radioUrl.addEventListener('change', () => {
         urlContainer.style.display = 'block';
         fileContainer.style.display = 'none';
+        currentImageDataUrl = null;
       });
       radioFile.addEventListener('change', () => {
         urlContainer.style.display = 'none';
         fileContainer.style.display = 'block';
+        currentImageDataUrl = null;
       });
     }
     
     if (fileInput) {
+      if (preview) {
+        preview.style.cursor = 'pointer';
+        preview.addEventListener('click', (e) => {
+          if (e.target.classList && e.target.classList.contains('btn-clear-image')) return;
+          fileInput.click();
+        });
+      }
+      
       fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
+          if (!file.type.startsWith('image/')) {
+            showToast("❌ Por favor selecciona una imagen válida (JPG, PNG, GIF)", '#9a4a00');
+            fileInput.value = '';
+            return;
+          }
+          
           const reader = new FileReader();
           reader.onload = function(event) {
-            preview.innerHTML = `<img src="${event.target.result}" alt="Aperçu">`;
+            currentImageDataUrl = event.target.result;
+            preview.innerHTML = `<img src="${event.target.result}" alt="Aperçu"><button class="btn-clear-image" onclick="clearImagePreview()">✕</button>`;
+            showToast("📸 Image chargée depuis votre galerie", 'var(--sage)');
           };
           reader.readAsDataURL(file);
-        } else {
-          preview.innerHTML = '<div class="preview-placeholder">Aucune image</div>';
+        }
+      });
+    }
+    
+    const imageUrlInput = document.getElementById('productImageUrl');
+    if (imageUrlInput) {
+      imageUrlInput.addEventListener('input', (e) => {
+        const url = e.target.value.trim();
+        if (url && (url.startsWith('http') || url.startsWith('https'))) {
+          const preview = document.getElementById('imagePreview');
+          preview.innerHTML = `<img src="${url}" alt="Aperçu"><button class="btn-clear-image" onclick="clearImagePreview()">✕</button>`;
         }
       });
     }
@@ -996,41 +1282,27 @@ return user;
     }
   }
 
-  // ========== PÁGINA PRINCIPAL ==========
   function loadShop() {
     currentUser = getCurrentUser();
     const shopId = getShopIdFromURL();
 
     if (!shopId) {
-      document.getElementById('content').innerHTML = `<div class="error"><h2>❌ Boutique non spécifiée</h2><a href="store.html" class="btn-back">Retour</a></div>`;
+      const content = document.getElementById('content');
+      if(content) content.innerHTML = `<div class="error"><h2>❌ Boutique non spécifiée</h2><a href="store.html" class="btn-back">Retour</a></div>`;
       return;
     }
 
     let shops = loadStores();
-    let categories = loadCategories();
     const shop = shops.find(s => s.id == shopId);
 
     if (!shop) {
-      document.getElementById('content').innerHTML = `<div class="error"><h2>❌ Boutique introuvable</h2><a href="store.html" class="btn-back">Retour</a></div>`;
+      const content = document.getElementById('content');
+      if(content) content.innerHTML = `<div class="error"><h2>❌ Boutique introuvable</h2><a href="store.html" class="btn-back">Retour</a></div>`;
       return;
     }
 
-    const category = categories.find(c => c.id === shop.categoryId);
     const shopProducts = loadProductsFromStorage(shopId);
-    const isOwner =
-(
-currentUser &&
-(
-currentUser.role === 'productor' ||
-currentUser.role === 'Producer'
-) &&
-currentUser.producerId == shop.producerId
-)
-||
-(
-currentUser &&
-currentUser.role === 'admin'
-);
+    const isOwner = (currentUser && currentUser.role === 'productor' && currentUser.producerId == shop.producerId) || (currentUser && currentUser.role === 'admin');
 
     const bannerImage = shop.banner || 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1000&q=80';
 
@@ -1070,7 +1342,7 @@ currentUser.role === 'admin'
         <div class="shop-body">
           <div class="shop-title">
             <h1 class="shop-name">${escapeHtml(shop.name)}</h1>
-            <div class="shop-category">${category ? escapeHtml(category.name) : shop.category || 'Boutique'}</div>
+            <div class="shop-category">${escapeHtml(shop.category)}</div>
             <div class="shop-tags">
               ${(shop.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
             </div>
@@ -1112,15 +1384,14 @@ currentUser.role === 'admin'
               <div class="producer-info">
                 <div class="producer-name">${escapeHtml(shop.producerName || 'Producteur local')}</div>
                 <div class="producer-meta">
-                  <span>📍 ${escapeHtml(shop.location || 'France')}</span>
+                  <span>📍 ${escapeHtml(shop.location || 'Maroc')}</span>
                   <span>📅 Producteur depuis ${shop.since || '2022'}</span>
                 </div>
-                <div class="producer-bio">Producteur passionné par les produits du terroir et la qualité artisanale.</div>
+                <div class="producer-bio">Producteur passionné par l'artisanat marocain et la qualité authentique.</div>
                 <div class="badge-list">
                   <span class="badge">✓ Vérifié</span>
                   <span class="badge">🏆 Artisan</span>
                 </div>
-                <a href="profil-producteur.html?id=${shop.producerId}" class="btn-profil">👤 Voir le profil complet →</a>
                 ${isOwner ? `<a href="dashboard-producteur.html" class="btn-profil btn-dashboard">📊 Accéder à mon tableau de bord</a>` : ''}
               </div>
             </div>
@@ -1136,27 +1407,30 @@ currentUser.role === 'admin'
           <input type="number" id="productStock" placeholder="Stock">
           
           <div class="image-option-group">
-            <label><input type="radio" name="productImageType" value="url" checked> 🌐 URL d'image</label>
-            <label><input type="radio" name="productImageType" value="file"> 📁 Télécharger un fichier</label>
+            <label><input type="radio" name="productImageType" value="file" checked> 📸 Depuis ma galerie</label>
+            <label><input type="radio" name="productImageType" value="url"> 🌐 URL d'image</label>
           </div>
-          <div id="productUrlContainer">
+          <div id="productFileContainer" style="display: block;">
+            <div id="imagePreview" class="image-preview" style="cursor: pointer;">
+              <div class="preview-placeholder">📸 Haz clic aquí para seleccionar una imagen de tu galerie</div>
+            </div>
+            <input type="file" id="productImageFile" accept="image/*" style="display: none;">
+          </div>
+          <div id="productUrlContainer" style="display: none;">
             <input type="text" id="productImageUrl" placeholder="https://images.unsplash.com/...">
-          </div>
-          <div id="productFileContainer" style="display: none;">
-            <input type="file" id="productImageFile" accept="image/*">
-            <div id="imagePreview" class="image-preview"><div class="preview-placeholder">Aucune image</div></div>
           </div>
           
           <textarea id="productDesc" placeholder="Description" rows="2"></textarea>
           <div class="modal-actions">
-            <button class="btn-save" id="saveProductBtn">Enregistrer</button>
+            <button class="btn-save" id="saveProductBtn">💾 Enregistrer</button>
             <button class="btn-cancel" id="cancelProductBtn">Annuler</button>
           </div>
         </div>
       </div>
     `;
 
-    document.getElementById('content').innerHTML = html;
+    const content = document.getElementById('content');
+    if(content) content.innerHTML = html;
 
     setupProductModalEvents();
     
@@ -1177,16 +1451,20 @@ currentUser.role === 'admin'
     };
   }
 
-  // Exponer funciones globales
   window.openProductModal = openProductModal;
   window.deleteProductConfirm = deleteProductConfirm;
   window.closeProductModal = closeProductModal;
   window.ajouterAuPanier = ajouterAuPanier;
   window.acheterMaintenant = acheterMaintenant;
+  window.clearImagePreview = clearImagePreview;
 
-  // Inicializar
+  function initAuth() {
+    updateAuthUI();
+    setupAuthModal();
+  }
+
   mettreAJourCompteurPanier();
-  loadShop();
+  loadHeaderAndInit();
 </script>
 </body>
 </html>

@@ -2,9 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
 <title>GreenMarket – Mon Panier</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="header.css">
 <style>
 :root{
   --cream:#fff9eb;
@@ -19,39 +20,17 @@
   --shadow:rgba(93,13,24,.12);
 }
 
-*{
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+body{ 
+  font-family:'Lato', sans-serif; 
+  background:var(--cream); 
+  color:var(--text); 
   margin:0;
   padding:0;
-  box-sizing:border-box;
 }
 
-body{
-  font-family:'Jost',sans-serif;
-  background:var(--cream);
-  color:var(--text);
-}
-
-nav{
-  background:var(--white);
-  height:70px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 2rem;
-  border-bottom:1px solid var(--border);
-}
-
-.nav-logo{
-  font-family:'Cormorant Garamond',serif;
-  font-size:1.8rem;
-  font-weight:700;
-  color:var(--wine);
-}
-
-.nav-logo span{
-  color:var(--sage-dark);
-  font-style:italic;
-}
+#header-placeholder { width: 100%; }
 
 .btn-back{
   background:var(--wine);
@@ -61,6 +40,8 @@ nav{
   text-decoration:none;
   font-size:.8rem;
   font-weight:600;
+  display: inline-block;
+  margin-top: 10px;
 }
 
 .page-header{
@@ -70,7 +51,7 @@ nav{
 }
 
 .page-header h1{
-  font-family:'Cormorant Garamond',serif;
+  font-family:'Playfair Display', serif;
   font-size:3rem;
 }
 
@@ -107,53 +88,24 @@ nav{
   border-radius:8px;
 }
 
-.item-info{
-  flex:1;
-}
+.item-info{ flex:1; }
 
-.item-name{
-  font-weight:700;
-  color:var(--wine);
-  font-size:1rem;
-}
+.item-name{ font-weight:700; color:var(--wine); font-size:1rem; }
 
-.item-shop{
-  font-size:.8rem;
-  color:var(--text-muted);
-  margin:.3rem 0;
-}
+.item-shop{ font-size:.8rem; color:var(--text-muted); margin:.3rem 0; }
 
-.item-price{
-  font-size:1rem;
-  font-weight:700;
-  color:var(--sage-dark);
-}
+.item-price{ font-size:1rem; font-weight:700; color:var(--sage-dark); }
 
-.quantity-controls{
-  display:flex;
-  align-items:center;
-  gap:.5rem;
-  margin-top:.7rem;
-}
+.quantity-controls{ display:flex; align-items:center; gap:.5rem; margin-top:.7rem; }
 
 .quantity-controls button{
-  width:30px;
-  height:30px;
-  border:none;
-  background:var(--wine);
-  color:white;
-  border-radius:4px;
-  cursor:pointer;
+  width:30px; height:30px; border:none; background:var(--wine);
+  color:white; border-radius:4px; cursor:pointer;
 }
 
 .btn-delete{
-  background:#eee;
-  color:var(--wine);
-  border:none;
-  padding:.5rem .8rem;
-  border-radius:4px;
-  cursor:pointer;
-  margin-top:.8rem;
+  background:#eee; color:var(--wine); border:none;
+  padding:.5rem .8rem; border-radius:4px; cursor:pointer; margin-top:.8rem;
 }
 
 .summary{
@@ -164,81 +116,41 @@ nav{
   box-shadow:0 10px 30px var(--shadow);
 }
 
-.summary h2{
-  font-family:'Cormorant Garamond',serif;
-  margin-bottom:1rem;
-}
+.summary h2{ font-family:'Playfair Display', serif; margin-bottom:1rem; }
 
-.summary-line{
-  display:flex;
-  justify-content:space-between;
-  margin:.8rem 0;
-}
+.summary-line{ display:flex; justify-content:space-between; margin:.8rem 0; }
 
 .total{
-  font-size:1.3rem;
-  font-weight:700;
-  color:var(--wine);
-  border-top:1px solid var(--border);
-  padding-top:1rem;
+  font-size:1.3rem; font-weight:700; color:var(--wine);
+  border-top:1px solid var(--border); padding-top:1rem;
 }
 
 .btn-checkout{
-  width:100%;
-  margin-top:1.5rem;
-  background:var(--wine);
-  color:white;
-  border:none;
-  padding:1rem;
-  border-radius:6px;
-  font-weight:700;
-  cursor:pointer;
-  font-size:1rem;
+  width:100%; margin-top:1.5rem; background:var(--wine);
+  color:white; border:none; padding:1rem; border-radius:6px;
+  font-weight:700; cursor:pointer; font-size:1rem;
 }
 
-.btn-checkout:hover{
-  background:var(--wine-dark);
-}
+.btn-checkout:hover{ background:var(--wine-dark); }
 
 .btn-clear{
-  width:100%;
-  margin-top:1rem;
-  background:var(--sage);
-  color:white;
-  border:none;
-  padding:.8rem;
-  border-radius:6px;
-  cursor:pointer;
+  width:100%; margin-top:1rem; background:var(--sage);
+  color:white; border:none; padding:.8rem; border-radius:6px; cursor:pointer;
 }
 
-.empty{
-  text-align:center;
-  padding:4rem;
-  background:var(--white);
-  border-radius:10px;
-}
+.empty{ text-align:center; padding:4rem; background:var(--white); border-radius:10px; }
 
 @media(max-width:850px){
-  .cart-layout{
-    grid-template-columns:1fr;
-  }
-  .cart-item{
-    flex-direction:column;
-  }
-  .cart-item img{
-    width:100%;
-    height:220px;
-  }
+  .cart-layout{ grid-template-columns:1fr; }
+  .cart-item{ flex-direction:column; }
+  .cart-item img{ width:100%; height:220px; }
 }
 </style>
 </head>
 
 <body>
 
-<nav>
-  <div class="nav-logo">🌿 Green<span>Market</span></div>
-  <a href="store.html" class="btn-back">← Continuer les achats</a>
-</nav>
+<div id="header-placeholder"></div>
 
 <div class="page-header">
   <h1>🛒 Mon Panier</h1>
@@ -250,127 +162,202 @@ nav{
 </div>
 
 <script>
-
-function getPanier(){
-  const saved = localStorage.getItem('greenmarket_panier');
-  return saved ? JSON.parse(saved) : [];
-}
-
-function savePanier(panier){
-  localStorage.setItem('greenmarket_panier', JSON.stringify(panier));
-  renderCart();
-}
-
-function removeItem(id){
-  let panier = getPanier();
-  panier = panier.filter(item => item.id !== id);
-  savePanier(panier);
-}
-
-function changeQuantity(id, delta){
-  let panier = getPanier();
-  panier = panier.map(item => {
-    if(item.id === id){
-      item.quantite += delta;
-      if(item.quantite < 1){
-        item.quantite = 1;
-      }
+  // ========== FUNCIONES GLOBALES ==========
+  function showToast(msg, bg = 'var(--wine)') {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+      const t = document.createElement('div');
+      t.id = 'toast';
+      t.style.cssText = `
+        position: fixed; bottom: 28px; right: 28px;
+        background: var(--wine); color: #fff;
+        padding: 14px 22px; border-radius: 12px;
+        font-family: 'Lato', sans-serif; font-weight: 700;
+        font-size: 14px; box-shadow: 0 8px 24px rgba(93,13,24,0.3);
+        z-index: 9999; transform: translateY(80px);
+        opacity: 0; transition: transform 0.35s, opacity 0.3s;
+        pointer-events: none;
+      `;
+      document.body.appendChild(t);
     }
-    return item;
-  });
-  savePanier(panier);
-}
+    toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.background = bg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2800);
+  }
 
-function clearCart(){
-  if(confirm("Vider le panier ?")){
-    localStorage.removeItem('greenmarket_panier');
+  function updateCartCount() {
+    const panier = getPanier();
+    const total = panier.reduce((sum, item) => sum + (item.quantite || 1), 0);
+    const badge = document.getElementById('cart-count');
+    if (badge) badge.textContent = total;
+  }
+
+  // ========== FUNCIONES DEL PANIER ==========
+  function getPanier(){
+    const saved = localStorage.getItem('greenmarket_panier');
+    return saved ? JSON.parse(saved) : [];
+  }
+
+  function savePanier(panier){
+    localStorage.setItem('greenmarket_panier', JSON.stringify(panier));
+    updateCartCount();
     renderCart();
   }
-}
 
-function getTotal(panier){
-  return panier.reduce((sum,item)=>{
-    return sum + (item.prixNumerique * item.quantite);
-  },0);
-}
-
-function goCheckout(){
-  const panier = getPanier();
-  if(panier.length === 0){
-    alert("Panier vide");
-    return;
-  }
-  
-  // Convertir los productos al formato esperado por checkout.html
-  const productosParaCheckout = panier.map(item => ({
-    id: item.id,
-    name: item.nom,
-    price: item.prix,
-    image: item.image,
-    quantity: item.quantite,
-    boutiqueId: item.boutiqueId,
-    boutiqueNom: item.boutiqueNom
-  }));
-  
-  const encoded = encodeURIComponent(JSON.stringify(productosParaCheckout));
-  window.location.href = `checkout.html?products=${encoded}`;
-}
-
-function renderCart(){
-  const panier = getPanier();
-  const container = document.getElementById('cartContent');
-
-  if(panier.length === 0){
-    container.innerHTML = `
-      <div class="empty">
-        <h2>🛒 Votre panier est vide</h2>
-        <p style="margin-top:1rem;">Ajoutez des produits depuis les boutiques.</p>
-      </div>
-    `;
-    return;
+  function removeItem(id){
+    let panier = getPanier();
+    panier = panier.filter(item => item.id !== id);
+    savePanier(panier);
+    showToast("🗑️ Produit supprimé du panier");
   }
 
-  const total = getTotal(panier);
+  function changeQuantity(id, delta){
+    let panier = getPanier();
+    panier = panier.map(item => {
+      if(item.id === id){
+        item.quantite = Math.max(1, item.quantite + delta);
+      }
+      return item;
+    });
+    savePanier(panier);
+  }
 
-  container.innerHTML = `
-    <div class="cart-layout">
-      <div class="cart-items">
-        ${panier.map(item => `
-          <div class="cart-item">
-            <img src="${item.image}" alt="${item.nom}">
-            <div class="item-info">
-              <div class="item-name">${item.nom}</div>
-              <div class="item-shop">Boutique : ${item.boutiqueNom}</div>
-              <div class="item-price">${item.prix}</div>
-              <div class="quantity-controls">
-                <button onclick="changeQuantity(${item.id}, -1)">-</button>
-                <span>${item.quantite}</span>
-                <button onclick="changeQuantity(${item.id}, 1)">+</button>
-              </div>
-              <button class="btn-delete" onclick="removeItem(${item.id})">🗑️ Supprimer</button>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-      <div class="summary">
-        <h2>Résumé</h2>
-        <div class="summary-line">
-          <span>Produits</span>
-          <span>${panier.length}</span>
-        </div>
-        <div class="summary-line total">
-          <span>Total</span>
-          <span>${total.toFixed(2)} €</span>
-        </div>
-        <button class="btn-checkout" onclick="goCheckout()">✅ Passer la commande</button>
-        <button class="btn-clear" onclick="clearCart()">🗑️ Vider le panier</button>
+  function clearCart(){
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position:fixed; inset:0; background:rgba(0,0,0,.5);
+    z-index:9999; display:flex; align-items:center; justify-content:center;
+  `;
+  modal.innerHTML = `
+    <div style="background:#fff; border-radius:16px; padding:2rem; text-align:center; max-width:300px; width:90%;">
+      <div style="font-size:2rem; margin-bottom:1rem;">🗑️</div>
+      <p style="font-weight:700; margin-bottom:1.5rem;">Vider le panier ?</p>
+      <div style="display:flex; gap:1rem; justify-content:center;">
+        <button onclick="this.closest('div[style]').remove()" 
+          style="padding:.6rem 1.5rem; border-radius:8px; border:2px solid #ccc; background:white; cursor:pointer;">
+          Annuler
+        </button>
+        <button id="confirmClear"
+          style="padding:.6rem 1.5rem; border-radius:8px; border:none; background:#5d0d18; color:white; cursor:pointer; font-weight:700;">
+          Vider
+        </button>
       </div>
     </div>
   `;
+  document.body.appendChild(modal);
+  document.getElementById('confirmClear').addEventListener('click', () => {
+    modal.remove();
+    localStorage.removeItem('greenmarket_panier');
+    updateCartCount();
+    renderCart();
+    showToast("🛒 Panier vidé");
+  });
 }
 
-renderCart();
+  function getTotal(panier){
+    return panier.reduce((sum,item) => sum + (item.prixNumerique * item.quantite), 0);
+  }
 
+  function goCheckout(){
+    const panier = getPanier();
+    if(panier.length === 0){
+      showToast("🛒 Votre panier est vide", "#9a4a00");
+      return;
+    }
+    const productosParaCheckout = panier.map(item => ({
+      id: item.id,
+      name: item.nom,
+      price: item.prix,
+      image: item.image,
+      quantity: item.quantite,
+      boutiqueId: item.boutiqueId,
+      boutiqueNom: item.boutiqueNom
+    }));
+    
+    const encoded = encodeURIComponent(JSON.stringify(productosParaCheckout));
+    window.location.href = `checkout.html?products=${encoded}`;
+  }
+
+  function renderCart(){
+    const panier = getPanier();
+    const container = document.getElementById('cartContent');
+
+    if(panier.length === 0){
+      container.innerHTML = `
+        <div class="empty">
+          <h2>🛒 Votre panier est vide</h2>
+          <a href="store.html" class="btn-back">← Continuer les achats</a>
+        </div>
+      `;
+      return;
+    }
+
+    const total = getTotal(panier);
+
+    container.innerHTML = `
+      <div class="cart-layout">
+        <div class="cart-items">
+          ${panier.map(item => `
+            <div class="cart-item">
+              <img src="${item.image}" alt="${item.nom}" onerror="this.src='https://placehold.co/110x110?text=Produit'">
+              <div class="item-info">
+                <div class="item-name">${escapeHtml(item.nom)}</div>
+                <div class="item-shop">Boutique : ${escapeHtml(item.boutiqueNom)}</div>
+                <div class="item-price">${item.prix}</div>
+                <div class="quantity-controls">
+                  <button onclick="changeQuantity(${item.id}, -1)">-</button>
+                  <span>${item.quantite}</span>
+                  <button onclick="changeQuantity(${item.id}, 1)">+</button>
+                </div>
+                <button class="btn-delete" onclick="removeItem(${item.id})">🗑️ Supprimer</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="summary">
+          <h2>Résumé</h2>
+          <div class="summary-line">
+            <span>Produits</span>
+            <span>${panier.length}</span>
+          </div>
+          <div class="summary-line total">
+            <span>Total</span>
+            <span>${total.toFixed(2)} €</span>
+          </div>
+          <button class="btn-checkout" onclick="goCheckout()">✅ Passer la commande</button>
+          <button class="btn-clear" onclick="clearCart()">🗑️ Vider le panier</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
+  }
+
+  // ========== CARGAR HEADER ==========
+  async function loadHeaderAndInit() {
+    try {
+      const response = await fetch('header.html');
+      if (!response.ok) throw new Error('Error cargando header');
+      const headerHtml = await response.text();
+      document.getElementById('header-placeholder').innerHTML = headerHtml;
+      
+      setTimeout(() => {
+        updateCartCount();
+        renderCart();
+      }, 100);
+    } catch (error) {
+      console.error('Error:', error);
+      renderCart();
+    }
+  }
+
+  // Iniciar
+  loadHeaderAndInit();
 </script>
 </body>
 </html>

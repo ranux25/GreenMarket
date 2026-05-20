@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GreenMarket – Mon Espace Client</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:      #fff9eb;
+    --sage:       #9fb2ac;
+    --sage-dark:  #7a9490;
+    --sage-light: #c8d8d4;
+    --wine:       #5d0d18;
+    --wine-dark:  #3e0910;
+    --wine-light: #8c2030;
+    --wine-pale:  #f5e6e8;
+    --text:       #2a1a1c;
+    --text-muted: #6b5055;
+    --border:     #e8ddd0;
+    --white:      #fffdf7;
+    --shadow:     rgba(93,13,24,.10);
+    --shadow-md:  rgba(93,13,24,.18);
+    --primary:    #5D0D18;
+    --secondary:  #9FB2AC;
+    --bg:         #FFF9EB;
+    --text-dark:  #2C2C2C;
+    --success:    #27ae60;
+    --danger:     #c0392b;
+    --warning:    #f39c12;
+    --info:       #2980b9;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Jost',sans-serif; background:var(--cream); color:var(--text); min-height:100vh; }
+
+  .nav-link {
+    font-family:'Lato',sans-serif; font-weight:700; font-size:14px;
+    color:var(--text-dark); text-decoration:none; letter-spacing:.5px;
+    padding:4px 0; transition:color .2s;
+  }
+  .nav-link:hover { color:var(--primary); }
+  .nav-link.active { color:var(--primary); border-bottom:2px solid var(--primary); }
+  .user-badge {
+    background:var(--wine-pale); padding:.4rem 1rem; border-radius:30px;
+    display:flex; align-items:center; gap:10px;
+    color:var(--wine); font-weight:600; font-size:.85rem;
+  }
+
+  .page-header {
+    background:var(--wine);
+    padding:3rem 2.5rem 2rem;
+    position:relative; overflow:hidden;
+  }
+  .page-header::before {
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(ellipse at 80% 50%, rgba(255,255,255,0.06) 0%, transparent 70%);
+  }
+  .header-inner { position:relative; z-index:1; display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+  .page-header h1 { font-family:'Cormorant Garamond',serif; font-size:3rem; font-weight:700; color:var(--cream); }
+  .page-header p  { color:var(--sage-light); margin-top:.4rem; font-size:.95rem; }
+
+  .notif-btn {
+    position:relative; background:rgba(255,255,255,.15); border:none; border-radius:50%;
+    width:44px; height:44px; cursor:pointer; font-size:1.3rem;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .2s;
+  }
+  .notif-btn:hover { background:rgba(255,255,255,.25); }
+  .notif-dot {
+    position:absolute; top:6px; right:6px; width:10px; height:10px;
+    background:#f39c12; border-radius:50%; border:2px solid var(--wine);
+  }
+  .notif-panel {
+    position:absolute; top:60px; right:2.5rem; width:340px;
+    background:var(--white); border:1.5px solid var(--border);
+    border-radius:8px; box-shadow:0 12px 40px var(--shadow-md);
+    z-index:200; display:none;
+  }
+  .notif-panel.open { display:block; animation:fadeIn .2s ease; }
+  .notif-header { padding:.9rem 1.2rem; background:var(--wine); color:var(--cream); font-family:'Cormorant Garamond',serif; font-size:1.1rem; border-radius:6px 6px 0 0; display:flex; justify-content:space-between; align-items:center; }
+  .notif-item { padding:.9rem 1.2rem; border-bottom:1px solid var(--border); font-size:.85rem; display:flex; gap:.8rem; align-items:flex-start; }
+  .notif-item:last-child { border-bottom:none; }
+  .notif-item.unread { background:#fffbf2; }
+  .notif-icon { font-size:1.1rem; flex-shrink:0; margin-top:2px; }
+  .notif-text  { color:var(--text); line-height:1.4; }
+  .notif-time  { font-size:.73rem; color:var(--text-muted); margin-top:3px; }
+
+  .dashboard-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:1.5rem; padding:2rem 2.5rem;
+    max-width:1400px; margin:0 auto;
+  }
+  .stat-card {
+    background:var(--white); border:1.5px solid var(--border);
+    border-radius:8px; padding:1.5rem;
+    box-shadow:0 2px 12px var(--shadow);
+    display:flex; flex-direction:column; gap:.5rem;
+    transition:transform .2s, box-shadow .2s;
+  }
+  .stat-card:hover { transform:translateY(-3px); box-shadow:0 6px 20px var(--shadow-md); }
+  .stat-icon  { font-size:1.6rem; }
+  .stat-val   { font-family:'Cormorant Garamond',serif; font-size:2.4rem; font-weight:700; color:var(--wine); line-height:1; }
+  .stat-label { font-size:.78rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+
+  .tabs-container { max-width:1400px; margin:0 auto; padding:0 2.5rem; }
+  .tabs {
+    display:flex; gap:0; border-bottom:2px solid var(--border);
+    overflow-x:auto; scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar { display:none; }
+  .tab-btn {
+    padding:.75rem 1.3rem; border:none; background:none; cursor:pointer;
+    font-family:'Jost',sans-serif; font-size:.88rem; font-weight:500;
+    color:var(--text-muted); white-space:nowrap; border-bottom:3px solid transparent;
+    margin-bottom:-2px; transition:all .2s;
+  }
+  .tab-btn:hover  { color:var(--wine); }
+  .tab-btn.active { color:var(--wine); border-bottom-color:var(--wine); font-weight:600; }
+
+  .main-content { max-width:1400px; margin:0 auto; padding:2rem 2.5rem 3rem; }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; animation:fadeIn .25s ease; }
+
+  .section-card {
+    background:var(--white); border:1.5px solid var(--border);
+    border-radius:8px; box-shadow:0 2px 12px var(--shadow);
+    overflow:hidden; margin-bottom:2rem;
+  }
+  .section-card:last-child { margin-bottom:0; }
+  .section-header {
+    background:var(--wine); color:var(--cream);
+    padding:1rem 1.5rem;
+    font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:600;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .section-header .badge-count {
+    background:rgba(255,255,255,.2); border-radius:20px;
+    padding:2px 10px; font-size:.8rem; font-family:'Jost',sans-serif;
+  }
+
+  .table-wrapper { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:.88rem; text-align:left; }
+  th { background:var(--cream); font-weight:600; padding:.9rem 1rem; border-bottom:1.5px solid var(--border); white-space:nowrap; }
+  td { padding:.9rem 1rem; border-bottom:1px solid var(--border); color:var(--text-dark); vertical-align:middle; }
+  tr:last-child td { border-bottom:none; }
+  tbody tr:hover { background:#fdf8f0; }
+  .empty-state { padding:3rem; text-align:center; color:var(--text-muted); font-style:italic; }
+
+  .badge { padding:.25rem .65rem; border-radius:4px; font-size:.73rem; font-weight:600; text-transform:uppercase; letter-spacing:.03em; white-space:nowrap; }
+  .badge-success { background:#e2f7e7; color:var(--success); }
+  .badge-danger  { background:#fce8e6; color:var(--danger);  }
+  .badge-warning { background:#fef3e6; color:var(--warning); }
+  .badge-info    { background:#e3f1fb; color:var(--info);    }
+  .badge-neutral { background:#e8ddd0; color:var(--text-muted); }
+
+  .btn { padding:.45rem .9rem; border-radius:4px; font-size:.8rem; font-weight:500; cursor:pointer; border:none; transition:background .2s; font-family:'Jost',sans-serif; }
+  .btn-wine    { background:var(--wine);    color:#fff; }
+  .btn-wine:hover    { background:var(--wine-dark); }
+  .btn-success { background:var(--success); color:#fff; }
+  .btn-success:hover { background:#219653; }
+  .btn-danger  { background:var(--danger);  color:#fff; }
+  .btn-danger:hover  { background:#a93226; }
+  .btn-info    { background:var(--info);    color:#fff; }
+  .btn-info:hover    { background:#1e6fa0; }
+  .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--text-muted); }
+  .btn-outline:hover { border-color:var(--wine); color:var(--wine); }
+  .action-group { display:flex; gap:.4rem; flex-wrap:wrap; }
+
+  .cart-item {
+    display:grid; grid-template-columns:60px 1fr auto auto;
+    gap:1rem; align-items:center; padding:1rem 1.5rem;
+    border-bottom:1px solid var(--border);
+  }
+  .cart-item:last-child { border-bottom:none; }
+  .cart-img { width:60px; height:60px; border-radius:6px; object-fit:cover; background:var(--cream); display:flex; align-items:center; justify-content:center; font-size:1.8rem; }
+  .cart-info .cart-name  { font-weight:600; font-size:.92rem; }
+  .cart-info .cart-shop  { font-size:.78rem; color:var(--text-muted); margin-top:2px; }
+  .cart-info .cart-price { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:700; color:var(--wine); margin-top:4px; }
+  .qty-control { display:flex; align-items:center; gap:.4rem; }
+  .qty-btn { width:28px; height:28px; border-radius:4px; border:1.5px solid var(--border); background:var(--white); cursor:pointer; font-size:1rem; line-height:1; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+  .qty-btn:hover { border-color:var(--wine); color:var(--wine); }
+  .qty-val { font-weight:600; min-width:24px; text-align:center; }
+  .cart-footer { padding:1.2rem 1.5rem; background:var(--cream); border-top:1.5px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; }
+  .cart-total { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:700; color:var(--wine); }
+  .cart-total-label { font-size:.78rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; }
+
+  .payment-modes { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; padding:1.5rem; }
+  .payment-option {
+    border:2px solid var(--border); border-radius:8px; padding:1.2rem;
+    cursor:pointer; text-align:center; transition:all .2s;
+  }
+  .payment-option:hover  { border-color:var(--wine); }
+  .payment-option.selected { border-color:var(--wine); background:var(--wine-pale); }
+  .payment-option .pay-icon { font-size:2rem; margin-bottom:.5rem; }
+  .payment-option .pay-name { font-weight:600; font-size:.9rem; color:var(--text); }
+  .payment-option .pay-desc { font-size:.75rem; color:var(--text-muted); margin-top:3px; }
+
+  .favorites-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1.2rem; padding:1.5rem; }
+  .fav-card {
+    border:1.5px solid var(--border); border-radius:8px; overflow:hidden;
+    background:var(--white); transition:transform .2s, box-shadow .2s;
+  }
+  .fav-card:hover { transform:translateY(-3px); box-shadow:0 6px 20px var(--shadow); }
+  .fav-img { height:120px; background:var(--cream); display:flex; align-items:center; justify-content:center; font-size:3rem; }
+  .fav-body { padding:.9rem; }
+  .fav-name  { font-weight:600; font-size:.88rem; }
+  .fav-shop  { font-size:.75rem; color:var(--text-muted); margin-top:2px; }
+  .fav-price { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:700; color:var(--wine); margin-top:.4rem; }
+  .fav-actions { display:flex; gap:.4rem; margin-top:.7rem; }
+
+  .stars { color:#f39c12; font-size:1.1rem; letter-spacing:2px; cursor:pointer; }
+  .stars span { transition:opacity .15s; }
+  .stars span:hover,
+  .stars span:hover ~ span { opacity:.4; }
+  .review-card { padding:1.2rem 1.5rem; border-bottom:1px solid var(--border); }
+  .review-card:last-child { border-bottom:none; }
+  .review-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:.5rem; }
+  .review-product { font-weight:600; font-size:.92rem; }
+  .review-shop    { font-size:.78rem; color:var(--text-muted); }
+  .review-text    { font-size:.88rem; color:var(--text); margin-top:.4rem; line-height:1.5; }
+  .review-form    { padding:1.5rem; background:var(--cream); border-top:1px solid var(--border); }
+  .form-group     { display:flex; flex-direction:column; gap:.35rem; margin-bottom:1rem; }
+  .form-group label { font-size:.73rem; font-weight:600; text-transform:uppercase; color:var(--text-muted); letter-spacing:.04em; }
+  .form-group input, .form-group select, .form-group textarea {
+    padding:.55rem .8rem; border:1.5px solid var(--border); border-radius:4px;
+    background:var(--white); font-family:'Jost',sans-serif; font-size:.88rem; outline:none;
+    transition:border-color .2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--wine); }
+  .form-group textarea { resize:vertical; min-height:80px; }
+
+  .tracking-stepper { display:flex; justify-content:space-between; padding:1.5rem 2rem; position:relative; }
+  .tracking-stepper::before {
+    content:''; position:absolute; top:2.2rem; left:2rem; right:2rem; height:3px; background:var(--border); z-index:0;
+  }
+  .tracking-step { display:flex; flex-direction:column; align-items:center; gap:.5rem; position:relative; z-index:1; flex:1; }
+  .step-dot {
+    width:36px; height:36px; border-radius:50%; background:var(--border);
+    display:flex; align-items:center; justify-content:center; font-size:.9rem;
+    transition:background .3s;
+  }
+  .step-dot.done    { background:var(--success); color:#fff; }
+  .step-dot.current { background:var(--wine);    color:#fff; box-shadow:0 0 0 4px var(--wine-pale); }
+  .step-label { font-size:.72rem; color:var(--text-muted); text-align:center; font-weight:500; max-width:70px; }
+  .step-label.done    { color:var(--success); }
+  .step-label.current { color:var(--wine); font-weight:700; }
+
+  .invoice-actions { padding:1.2rem 1.5rem; background:var(--cream); border-top:1px solid var(--border); display:flex; gap:.5rem; flex-wrap:wrap; }
+
+  .profile-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; padding:1.5rem; }
+  .profile-avatar-area { display:flex; flex-direction:column; align-items:center; gap:1rem; padding:1.5rem; border-right:1px solid var(--border); }
+  .avatar-circle { width:90px; height:90px; border-radius:50%; background:var(--wine); display:flex; align-items:center; justify-content:center; font-size:2.4rem; color:var(--cream); }
+  .profile-name  { font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:700; }
+  .profile-email { font-size:.82rem; color:var(--text-muted); }
+  .profile-form  { padding:1.5rem; }
+
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  .toast {
+    position:fixed; bottom:2rem; right:2rem;
+    background:var(--wine); color:var(--cream);
+    padding:.85rem 1.5rem; border-radius:5px; font-size:.86rem; font-weight:500;
+    box-shadow:0 8px 28px var(--shadow-md); z-index:9999;
+    transform:translateY(80px); opacity:0;
+    transition:all .35s cubic-bezier(.34,1.4,.64,1); max-width:320px;
+  }
+  .toast.show { transform:translateY(0); opacity:1; }
+
+  @media(max-width:768px) {
+    .dashboard-grid { padding:1.5rem 1rem; }
+    .tabs-container { padding:0 1rem; }
+    .main-content  { padding:1.5rem 1rem 2rem; }
+    .page-header   { padding:2rem 1rem 1.5rem; }
+    .page-header h1{ font-size:2rem; }
+    .cart-item     { grid-template-columns:50px 1fr; }
+    .profile-grid  { grid-template-columns:1fr; }
+    .profile-avatar-area { border-right:none; border-bottom:1px solid var(--border); }
+    .tracking-stepper    { padding:1.5rem 1rem; }
+    .notif-panel   { right:1rem; width:calc(100vw - 2rem); }
+  }
+</style>
+</head>
+<body>
+
+<div id="header-placeholder"></div>
+
+<div class="page-header" style="position:relative;">
+  <div class="header-inner">
+    <div>
+      <h1>Mon Espace Client</h1>
+      <p>Bienvenue, <strong id="welcomeName" style="color:var(--cream);">Client</strong> — gérez vos commandes, favoris et avis</p>
+    </div>
+    <button class="notif-btn" onclick="toggleNotif()" title="Notifications">
+      🔔
+      <span class="notif-dot" id="notifDot"></span>
+    </button>
+  </div>
+
+  <div class="notif-panel" id="notifPanel">
+    <div class="notif-header">
+      🔔 Notifications
+      <button onclick="markAllRead()" style="background:rgba(255,255,255,.2);border:none;color:var(--cream);font-size:.75rem;padding:3px 10px;border-radius:20px;cursor:pointer;">Tout lire</button>
+    </div>
+    <div id="notifList"></div>
+  </div>
+</div>
+
+<div class="dashboard-grid">
+  <div class="stat-card">
+    <span class="stat-icon">📦</span>
+    <span class="stat-val" id="statCommandes">0</span>
+    <span class="stat-label">Nombre de Commandes</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">💸</span>
+    <span class="stat-val" id="statDepense">0 DH</span>
+    <span class="stat-label">Total Dépensé</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">❤️</span>
+    <span class="stat-val" id="statFavoris">0</span>
+    <span class="stat-label">Produits Favoris</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">🛒</span>
+    <span class="stat-val" id="statPanier">0</span>
+    <span class="stat-label">Articles dans le Panier</span>
+  </div>
+</div>
+
+<div class="tabs-container">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('panier')">🛒 Panier</button>
+    <button class="tab-btn" onclick="switchTab('commandes')">📦 Mes Commandes</button>
+    <button class="tab-btn" onclick="switchTab('paiements')">💳 Paiements</button>
+    <button class="tab-btn" onclick="switchTab('favoris')">❤️ Favoris</button>
+    <button class="tab-btn" onclick="switchTab('avis')">⭐ Mes Avis</button>
+    <button class="tab-btn" onclick="switchTab('profil')">👤 Mon Profil</button>
+  </div>
+</div>
+
+<div class="main-content">
+
+  <div class="tab-panel active" id="tab-panier">
+    <div class="section-card">
+      <div class="section-header">
+        🛒 Mon Panier
+        <span class="badge-count" id="cartCount">0 article(s)</span>
+      </div>
+      <div id="cartItems"></div>
+      <div class="cart-footer" id="cartFooter" style="display:none;">
+        <div>
+          <div class="cart-total-label">Total à payer</div>
+          <div class="cart-total" id="cartTotal">0 DH</div>
+        </div>
+        <div class="action-group">
+          <button class="btn btn-outline" onclick="clearCart()">🗑️ Vider le panier</button>
+          <button class="btn btn-wine" onclick="switchTab('paiements'); showCheckout();">✅ Valider la commande</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-commandes">
+    <div class="section-card">
+      <div class="section-header">
+        📦 Mes Commandes
+        <span class="badge-count" id="ordersCount">0 commande(s)</span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>N° Commande</th>
+              <th>Produits</th>
+              <th>Total</th>
+              <th>Date</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-card" id="trackingSection" style="display:none;">
+      <div class="section-header">🚚 Suivi de la Commande <span id="trackingOrderId"></span></div>
+      <div class="tracking-stepper" id="trackingStepper"></div>
+      <div style="padding:1rem 1.5rem;background:var(--cream);border-top:1px solid var(--border);">
+        <div style="font-size:.85rem;color:var(--text-muted);">Dernière mise à jour : <strong id="trackingDate"></strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-paiements">
+
+    <div class="section-card" id="checkoutBlock" style="display:none;">
+      <div class="section-header">💳 Finaliser la Commande</div>
+      <div style="padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);">
+        <div style="font-size:.9rem;color:var(--text-muted);margin-bottom:.8rem;">Choisissez votre mode de paiement :</div>
+        <div class="payment-modes">
+          <div class="payment-option selected" onclick="selectPayment(this,'card')">
+            <div class="pay-icon">💳</div>
+            <div class="pay-name">Carte Bancaire</div>
+            <div class="pay-desc">Paiement sécurisé en ligne</div>
+          </div>
+          <div class="payment-option" onclick="selectPayment(this,'cash')">
+            <div class="pay-icon">💵</div>
+            <div class="pay-name">Paiement à la Livraison</div>
+            <div class="pay-desc">Payez à la réception</div>
+          </div>
+          <div class="payment-option" onclick="selectPayment(this,'transfer')">
+            <div class="pay-icon">🏦</div>
+            <div class="pay-name">Virement Bancaire</div>
+            <div class="pay-desc">Virement sécurisé</div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:1.2rem 1.5rem;background:var(--cream);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <div style="font-size:.78rem;color:var(--text-muted);text-transform:uppercase;">Total à régler</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:var(--wine);" id="checkoutTotal">0 DH</div>
+        </div>
+        <button class="btn btn-success" onclick="confirmOrder()" style="padding:.6rem 1.5rem;font-size:.95rem;">✅ Confirmer le Paiement</button>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">🧾 Historique des Paiements</div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>N° Facture</th>
+              <th>Commande</th>
+              <th>Montant</th>
+              <th>Mode</th>
+              <th>Date</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="paymentsTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-favoris">
+    <div class="section-card">
+      <div class="section-header">
+        ❤️ Mes Produits Favoris
+        <span class="badge-count" id="favsCount">0 favori(s)</span>
+      </div>
+      <div class="favorites-grid" id="favoritesGrid"></div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-avis">
+
+    <div class="section-card">
+      <div class="section-header">⭐ Laisser un Avis</div>
+      <div class="review-form">
+        <div class="form-group">
+          <label>Produit concerné</label>
+          <select id="reviewProduct">
+            <option value="">— Sélectionner un produit acheté —</option>
+            <option value="Caftan Brodé en Soie">Caftan Brodé en Soie – Maison du Caftan</option>
+            <option value="Tapis Berbère Azrou">Tapis Berbère Azrou – Tapis Berbère d'Atlas</option>
+            <option value="Huile d'Argan BIO">Huile d'Argan BIO 250ml – Coopérative Taliouine</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Note</label>
+          <div class="stars" id="starRating">
+            <span onclick="setRating(1)" title="1 étoile">★</span>
+            <span onclick="setRating(2)" title="2 étoiles">★</span>
+            <span onclick="setRating(3)" title="3 étoiles">★</span>
+            <span onclick="setRating(4)" title="4 étoiles">★</span>
+            <span onclick="setRating(5)" title="5 étoiles">★</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Votre commentaire</label>
+          <textarea id="reviewText" placeholder="Partagez votre expérience avec ce produit…"></textarea>
+        </div>
+        <button class="btn btn-wine" onclick="submitReview()">Publier mon avis</button>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">📝 Mes Avis Publiés</div>
+      <div id="myReviews"></div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-profil">
+    <div class="section-card">
+      <div class="section-header">👤 Mon Profil</div>
+      <div style="display:grid;grid-template-columns:220px 1fr;gap:0;">
+        <div class="profile-avatar-area">
+          <div class="avatar-circle" id="avatarCircle">👤</div>
+          <div class="profile-name" id="profileNameDisplay">Sara Idrissi</div>
+          <div class="profile-email" id="profileEmailDisplay">sara@client.com</div>
+          <span class="badge badge-info" style="margin-top:.3rem;">Client</span>
+        </div>
+        <div class="profile-form">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label>Prénom</label>
+              <input type="text" id="profileFirstName" value="Sara">
+            </div>
+            <div class="form-group">
+              <label>Nom</label>
+              <input type="text" id="profileLastName" value="Idrissi">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="profileEmail" value="sara@client.com">
+            </div>
+            <div class="form-group">
+              <label>Téléphone</label>
+              <input type="tel" id="profilePhone" placeholder="+212 6XX XX XX XX">
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+              <label>Adresse de livraison</label>
+              <input type="text" id="profileAddress" placeholder="Rue, ville, code postal…">
+            </div>
+          </div>
+          <button class="btn btn-wine" onclick="saveProfile()" style="margin-top:1rem;">💾 Enregistrer les modifications</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">🔒 Changer le Mot de Passe</div>
+      <div class="profile-form">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+          <div class="form-group">
+            <label>Mot de passe actuel</label>
+            <input type="password" id="pwdOld" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label>Nouveau mot de passe</label>
+            <input type="password" id="pwdNew" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label>Confirmer</label>
+            <input type="password" id="pwdConfirm" placeholder="••••••••">
+          </div>
+        </div>
+        <button class="btn btn-success" onclick="changePassword()" style="margin-top:1rem;">✅ Mettre à jour le mot de passe</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let cart, orders, payments, favorites, myReviewsList, notifications;
+let currentRating = 0;
+let selectedPaymentMode = 'card';
+
+function loadHeader() {
+  fetch('header.html')
+    .then(response => {
+      if (!response.ok) throw new Error("Erreur");
+      return response.text();
+    })
+    .then(data => {
+      document.getElementById('header-placeholder').innerHTML = data;
+      showClientUI();
+    })
+    .catch(error => {
+      console.error(error);
+    });
+}
+
+function initData() {
+  cart = [
+    { id:1, name:'Caftan Brodé en Soie',  shop:'Maison du Caftan',      price:850, qty:1, icon:'👘' },
+    { id:2, name:'Tapis Berbère Azrou',   shop:"Tapis Berbère d'Atlas", price:1200, qty:1, icon:'🪑' },
+    { id:3, name:'Savon Beldi 200g',      shop:'Cosmétiques du Souss',  price:45,  qty:3, icon:'🧴' },
+  ];
+  orders = [
+    { id:'CMD-0041', items:'Huile d\'Argan BIO × 2', total:560, date:'12/05/2026', status:'livré',       statusClass:'success' },
+    { id:'CMD-0038', items:'Plateau en Marqueterie',  total:780, date:'04/05/2026', status:'en transit',  statusClass:'info'    },
+    { id:'CMD-0032', items:'Bijou Argent × 1',        total:320, date:'18/04/2026', status:'en préparation', statusClass:'warning' },
+    { id:'CMD-0025', items:'Poterie de Safi × 2',    total:440, date:'02/04/2026', status:'annulé',      statusClass:'danger'  },
+  ];
+  payments = [
+    { id:'FAC-2026-041', order:'CMD-0041', amount:560,  mode:'💳 Carte',    date:'12/05/2026', status:'payé',    statusClass:'success' },
+    { id:'FAC-2026-038', order:'CMD-0038', amount:780,  mode:'💵 Livraison', date:'04/05/2026', status:'en attente', statusClass:'warning' },
+    { id:'FAC-2026-032', order:'CMD-0032', amount:320,  mode:'🏦 Virement', date:'18/04/2026', status:'payé',    statusClass:'success' },
+  ];
+  favorites = [
+    { id:1, name:'Miel d\'Argan Pur',     shop:'Coopérative Taliouine', price:280, icon:'🍯' },
+    { id:2, name:'Collier Berbère Argent', shop:"Bijoux de l'Atlas",    price:320, icon:'💍' },
+    { id:3, name:'Lampe en Fer Forgé',    shop:'Artisan du Fer',        price:650, icon:'🕯️' },
+  ];
+  myReviewsList = [
+    { id:1, product:'Huile d\'Argan BIO', shop:'Coopérative Taliouine', rating:5, text:'Excellent produit, très pur et authentique !', date:'13/05/2026' },
+    { id:2, product:'Tapis Berbère',      shop:"Tapis Berbère d'Atlas", rating:4, text:'Très beau tapis, couleurs vives et fidèles aux photos.', date:'05/05/2026' },
+  ];
+  notifications = [
+    { id:1, icon:'📦', text:'Votre commande CMD-0038 est en transit.',         time:'Il y a 2h',  read:false },
+    { id:2, icon:'✅', text:'Commande CMD-0041 livrée avec succès !',           time:'Il y a 1j',  read:false },
+    { id:3, icon:'🆕', text:'Nouveau produit dans votre catégorie favorite.',   time:'Il y a 2j',  read:true  },
+    { id:4, icon:'⭐', text:'Votre avis a été publié.',                          time:'Il y a 3j',  read:true  },
+  ];
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.innerHTML = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  const idx = ['panier','commandes','paiements','favoris','avis','profil'].indexOf(name);
+  document.querySelectorAll('.tab-btn')[idx]?.classList.add('active');
+}
+
+function updateStats() {
+  const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
+  const spent  = payments.filter(p => p.status === 'payé').reduce((s,p) => s + p.amount, 0);
+  document.getElementById('statCommandes').textContent = orders.length;
+  document.getElementById('statDepense').textContent   = spent + ' DH';
+  document.getElementById('statFavoris').textContent   = favorites.length;
+  document.getElementById('statPanier').textContent    = cart.reduce((s,i) => s + i.qty, 0);
+}
+
+function showClientUI() {
+  const s = sessionStorage.getItem('greenmarket_current_user');
+  let name = 'Sara Idrissi';
+  if (s) name = JSON.parse(s).name;
+  document.getElementById('welcomeName').textContent = name;
+  const authWidget = document.getElementById('authWidget');
+  if(authWidget) {
+      authWidget.innerHTML =
+        `<div class="user-badge">👋 ${name}
+           <button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;font-size:1rem;">Sortir 🚪</button>
+         </div>`;
+      document.getElementById('logoutBtn')?.addEventListener('click', () => {
+        sessionStorage.removeItem('greenmarket_current_user');
+        window.location.href = 'newstore.html';
+      });
+  }
+}
+
+function renderNotifications() {
+  const list = document.getElementById('notifList');
+  const unread = notifications.filter(n => !n.read).length;
+  document.getElementById('notifDot').style.display = unread ? 'block' : 'none';
+  list.innerHTML = '';
+  if (!notifications.length) {
+    list.innerHTML = '<div style="padding:1.2rem;text-align:center;color:var(--text-muted);font-size:.85rem;">Aucune notification.</div>'; return;
+  }
+  notifications.forEach(n => {
+    list.innerHTML += `
+      <div class="notif-item ${n.read ? '' : 'unread'}">
+        <div class="notif-icon">${n.icon}</div>
+        <div>
+          <div class="notif-text">${n.text}</div>
+          <div class="notif-time">${n.time}</div>
+        </div>
+      </div>`;
+  });
+}
+
+function toggleNotif() {
+  document.getElementById('notifPanel').classList.toggle('open');
+}
+
+function markAllRead() {
+  notifications = notifications.map(n => ({ ...n, read:true }));
+  renderNotifications();
+  showToast('✅ Toutes les notifications marquées comme lues.');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.notif-btn') && !e.target.closest('.notif-panel')) {
+    const notifPanel = document.getElementById('notifPanel');
+    if(notifPanel) notifPanel.classList.remove('open');
+  }
+});
+
+function renderCart() {
+  const container = document.getElementById('cartItems');
+  const footer    = document.getElementById('cartFooter');
+  const total     = cart.reduce((s,i) => s + i.price * i.qty, 0);
+
+  document.getElementById('cartCount').textContent = cart.reduce((s,i) => s + i.qty, 0) + ' article(s)';
+
+  if (!cart.length) {
+    container.innerHTML = '<div class="empty-state">🛒 Votre panier est vide.<br><small>Parcourez nos boutiques pour découvrir nos produits.</small></div>';
+    footer.style.display = 'none';
+    return;
+  }
+
+  container.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div class="cart-img">${item.icon}</div>
+      <div class="cart-info">
+        <div class="cart-name">${item.name}</div>
+        <div class="cart-shop">${item.shop}</div>
+        <div class="cart-price">${(item.price * item.qty).toLocaleString()} DH</div>
+      </div>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="changeQty(${item.id}, -1)">−</button>
+        <span class="qty-val">${item.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${item.id}, +1)">+</button>
+      </div>
+      <button class="btn btn-danger" onclick="removeFromCart(${item.id})">🗑️</button>
+    </div>
+  `).join('');
+
+  footer.style.display = 'flex';
+  document.getElementById('cartTotal').textContent = total.toLocaleString() + ' DH';
+  updateStats();
+}
+
+function changeQty(id, delta) {
+  cart = cart.map(i => {
+    if (i.id === id) i.qty = Math.max(1, i.qty + delta);
+    return i;
+  });
+  renderCart();
+}
+
+function removeFromCart(id) {
+  const item = cart.find(i => i.id === id);
+  cart = cart.filter(i => i.id !== id);
+  showToast(`🗑️ "${item?.name}" retiré du panier.`);
+  renderCart();
+}
+
+function clearCart() {
+  if (!cart.length) return;
+  if (!confirm('Vider tout le panier ?')) return;
+  cart = [];
+  showToast('🗑️ Panier vidé.');
+  renderCart();
+}
+
+function renderOrders() {
+  const tbody = document.getElementById('ordersTable');
+  document.getElementById('ordersCount').textContent = orders.length + ' commande(s)';
+  tbody.innerHTML = '';
+  if (!orders.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Aucune commande pour le moment.</td></tr>'; return;
+  }
+  orders.forEach(o => {
+    const canCancel = ['en préparation','en attente'].includes(o.status);
+    tbody.innerHTML += `
+      <tr>
+        <td><strong>${o.id}</strong></td>
+        <td>${o.items}</td>
+        <td><strong>${o.total.toLocaleString()} DH</strong></td>
+        <td>${o.date}</td>
+        <td><span class="badge badge-${o.statusClass}">${o.status}</span></td>
+        <td>
+          <div class="action-group">
+            <button class="btn btn-info" onclick="showTracking('${o.id}')">📍 Suivi</button>
+            <button class="btn btn-wine" onclick="generateInvoice('${o.id}')">🧾 Facture</button>
+            ${canCancel ? `<button class="btn btn-danger" onclick="cancelOrder('${o.id}')">✘ Annuler</button>` : ''}
+            <button class="btn btn-outline" onclick="reportIssue('${o.id}')">⚠️ Signaler</button>
+          </div>
+        </td>
+      </tr>`;
+  });
+}
+
+function cancelOrder(id) {
+  if (!confirm(`Annuler la commande ${id} ?`)) return;
+  orders = orders.map(o => o.id === id ? { ...o, status:'annulé', statusClass:'danger' } : o);
+  showToast(`⛔ Commande ${id} annulée.`);
+  renderOrders();
+}
+
+function reportIssue(id) {
+  showToast(`⚠️ Problème signalé pour ${id}. Notre équipe vous contactera sous 48h.`);
+}
+
+function generateInvoice(id) {
+  showToast(`🧾 Facture ${id} générée — téléchargement PDF en cours…`);
+}
+
+const trackingSteps = {
+  'en préparation': 1, 'en transit': 2, 'livré': 3, 'annulé': -1
+};
+
+function showTracking(id) {
+  const order = orders.find(o => o.id === id);
+  if (!order) return;
+  const section = document.getElementById('trackingSection');
+  section.style.display = 'block';
+  document.getElementById('trackingOrderId').textContent = id;
+  document.getElementById('trackingDate').textContent = order.date;
+  const current = trackingSteps[order.status] ?? 0;
+  const steps = [
+    { label:'Commande\nreçue',  icon:'✅' },
+    { label:'En\nPréparation',  icon:'📦' },
+    { label:'En\nTransit',      icon:'🚚' },
+    { label:'Livrée',           icon:'🏠' },
+  ];
+  document.getElementById('trackingStepper').innerHTML = steps.map((s, i) => {
+    const n = i + 1;
+    const cls = n < current ? 'done' : n === current ? 'current' : '';
+    return `
+      <div class="tracking-step">
+        <div class="step-dot ${cls}">${n <= current ? s.icon : n}</div>
+        <div class="step-label ${cls}">${s.label.replace('\n','<br>')}</div>
+      </div>`;
+  }).join('');
+  section.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function selectPayment(el, mode) {
+  document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedPaymentMode = mode;
+}
+
+function showCheckout() {
+  const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
+  document.getElementById('checkoutTotal').textContent = total.toLocaleString() + ' DH';
+  document.getElementById('checkoutBlock').style.display = 'block';
+  document.getElementById('checkoutBlock').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function confirmOrder() {
+  if (!cart.length) { showToast('⚠️ Votre panier est vide.'); return; }
+  const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
+  const newId = 'CMD-' + String(Math.floor(Math.random()*9000)+1000);
+  const modeLabel = { card:'💳 Carte', cash:'💵 Livraison', transfer:'🏦 Virement' }[selectedPaymentMode];
+  orders.unshift({ id:newId, items:cart.map(i=>i.name).join(', '), total, date:new Date().toLocaleDateString('fr-FR'), status:'en préparation', statusClass:'warning' });
+  payments.unshift({ id:'FAC-2026-'+newId.slice(-3), order:newId, amount:total, mode:modeLabel, date:new Date().toLocaleDateString('fr-FR'), status:'payé', statusClass:'success' });
+  notifications.unshift({ id:Date.now(), icon:'✅', text:`Commande ${newId} confirmée ! Montant : ${total.toLocaleString()} DH`, time:'À l\'instant', read:false });
+  cart = [];
+  showToast(`✅ Commande ${newId} confirmée ! Merci pour votre achat.`);
+  document.getElementById('checkoutBlock').style.display = 'none';
+  renderCart(); renderOrders(); renderPayments(); renderNotifications(); updateStats();
+  switchTab('commandes');
+}
+
+function renderPayments() {
+  const tbody = document.getElementById('paymentsTable');
+  tbody.innerHTML = '';
+  if (!payments.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Aucun paiement enregistré.</td></tr>'; return;
+  }
+  payments.forEach(p => {
+    tbody.innerHTML += `
+      <tr>
+        <td><strong>${p.id}</strong></td>
+        <td>${p.order}</td>
+        <td><strong>${p.amount.toLocaleString()} DH</strong></td>
+        <td>${p.mode}</td>
+        <td>${p.date}</td>
+        <td><span class="badge badge-${p.statusClass}">${p.status}</span></td>
+        <td>
+          <button class="btn btn-wine" onclick="downloadInvoice('${p.id}')">⬇️ Facture PDF</button>
+        </td>
+      </tr>`;
+  });
+}
+
+function downloadInvoice(id) {
+  showToast(`📄 Téléchargement de la facture ${id} en cours…`);
+}
+
+function renderFavorites() {
+  const grid = document.getElementById('favoritesGrid');
+  document.getElementById('favsCount').textContent = favorites.length + ' favori(s)';
+  if (!favorites.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">❤️ Aucun produit favori.<br><small>Ajoutez des produits à vos favoris depuis la boutique.</small></div>'; return;
+  }
+  grid.innerHTML = favorites.map(f => `
+    <div class="fav-card">
+      <div class="fav-img">${f.icon}</div>
+      <div class="fav-body">
+        <div class="fav-name">${f.name}</div>
+        <div class="fav-shop">${f.shop}</div>
+        <div class="fav-price">${f.price.toLocaleString()} DH</div>
+        <div class="fav-actions">
+          <button class="btn btn-wine" onclick="addFavToCart(${f.id})" style="flex:1;">🛒 Ajouter au panier</button>
+          <button class="btn btn-danger" onclick="removeFav(${f.id})">🗑️</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function addFavToCart(id) {
+  const fav = favorites.find(f => f.id === id);
+  if (!fav) return;
+  const exists = cart.find(c => c.name === fav.name);
+  if (exists) { exists.qty++; }
+  else cart.push({ id: Date.now(), name:fav.name, shop:fav.shop, price:fav.price, qty:1, icon:fav.icon });
+  showToast(`🛒 "${fav.name}" ajouté au panier !`);
+  renderCart(); updateStats();
+}
+
+function removeFav(id) {
+  const fav = favorites.find(f => f.id === id);
+  favorites = favorites.filter(f => f.id !== id);
+  showToast(`💔 "${fav?.name}" retiré des favoris.`);
+  renderFavorites(); updateStats();
+}
+
+function setRating(n) {
+  currentRating = n;
+  const spans = document.querySelectorAll('#starRating span');
+  spans.forEach((s, i) => { s.style.color = i < n ? '#f39c12' : '#ddd'; });
+}
+
+function submitReview() {
+  const product = document.getElementById('reviewProduct').value;
+  const text    = document.getElementById('reviewText').value.trim();
+  if (!product) { showToast('⚠️ Sélectionnez un produit.'); return; }
+  if (!currentRating) { showToast('⚠️ Donnez une note de 1 à 5 étoiles.'); return; }
+  if (!text) { showToast('⚠️ Écrivez un commentaire.'); return; }
+  const shop = product.includes('Caftan') ? 'Maison du Caftan' : product.includes('Tapis') ? "Tapis Berbère d'Atlas" : 'Coopérative Taliouine';
+  myReviewsList.unshift({ id:Date.now(), product, shop, rating:currentRating, text, date:new Date().toLocaleDateString('fr-FR') });
+  notifications.unshift({ id:Date.now()+1, icon:'⭐', text:`Votre avis sur "${product}" a été publié.`, time:"À l'instant", read:false });
+  document.getElementById('reviewProduct').value = '';
+  document.getElementById('reviewText').value    = '';
+  setRating(0);
+  showToast('✅ Avis publié avec succès !');
+  renderReviews(); renderNotifications();
+}
+
+function renderReviews() {
+  const container = document.getElementById('myReviews');
+  if (!myReviewsList.length) {
+    container.innerHTML = '<div class="empty-state">Vous n\'avez pas encore laissé d\'avis.</div>'; return;
+  }
+  container.innerHTML = myReviewsList.map(r => `
+    <div class="review-card">
+      <div class="review-header">
+        <div>
+          <div class="review-product">${r.product}</div>
+          <div class="review-shop">${r.shop} · ${r.date}</div>
+        </div>
+        <div class="action-group">
+          <button class="btn btn-wine" onclick="editReview(${r.id})">✏️ Modifier</button>
+          <button class="btn btn-danger" onclick="deleteReview(${r.id})">🗑️ Supprimer</button>
+        </div>
+      </div>
+      <div style="color:#f39c12;font-size:1rem;margin:.3rem 0;">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+      <div class="review-text">${r.text}</div>
+    </div>`).join('');
+}
+
+function editReview(id) {
+  const r = myReviewsList.find(x => x.id === id);
+  if (!r) return;
+  const newText = prompt('Modifier votre commentaire :', r.text);
+  if (newText && newText.trim()) {
+    r.text = newText.trim();
+    showToast('✅ Avis modifié !');
+    renderReviews();
+  }
+}
+
+function deleteReview(id) {
+  if (!confirm('Supprimer cet avis définitivement ?')) return;
+  myReviewsList = myReviewsList.filter(r => r.id !== id);
+  showToast('🗑️ Avis supprimé.');
+  renderReviews();
+}
+
+function saveProfile() {
+  const first = document.getElementById('profileFirstName').value.trim();
+  const last  = document.getElementById('profileLastName').value.trim();
+  const email = document.getElementById('profileEmail').value.trim();
+  if (!first || !last || !email) { showToast('⚠️ Remplissez tous les champs obligatoires.'); return; }
+  document.getElementById('profileNameDisplay').textContent  = first + ' ' + last;
+  document.getElementById('profileEmailDisplay').textContent = email;
+  document.getElementById('welcomeName').textContent = first + ' ' + last;
+  document.getElementById('avatarCircle').textContent = first[0].toUpperCase();
+  showToast('✅ Profil mis à jour avec succès !');
+}
+
+function changePassword() {
+  const old  = document.getElementById('pwdOld').value;
+  const neo  = document.getElementById('pwdNew').value;
+  const conf = document.getElementById('pwdConfirm').value;
+  if (!old || !neo || !conf) { showToast('⚠️ Remplissez tous les champs.'); return; }
+  if (neo !== conf) { showToast('❌ Les mots de passe ne correspondent pas.'); return; }
+  if (neo.length < 6) { showToast('⚠️ Le mot de passe doit contenir au moins 6 caractères.'); return; }
+  document.getElementById('pwdOld').value = document.getElementById('pwdNew').value = document.getElementById('pwdConfirm').value = '';
+  showToast('✅ Mot de passe mis à jour avec succès !');
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadHeader();
+  initData();
+  updateStats();
+  renderNotifications();
+  renderCart();
+  renderOrders();
+  renderPayments();
+  renderFavorites();
+  renderReviews();
+});
+</script>
+</body>
+</html>

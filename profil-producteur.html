@@ -25,482 +25,103 @@
 
   * { margin:0; padding:0; box-sizing:border-box; }
 
-  body {
-    font-family: 'Jost', sans-serif;
-    background: var(--cream);
-    color: var(--text);
-    min-height: 100vh;
-  }
+  body { font-family: 'Jost', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
 
-  nav {
-    background: var(--white);
-    border-bottom: 1.5px solid var(--border);
-    padding: 0 2.5rem;
-    display: flex; align-items: center; justify-content: space-between;
-    height: 68px;
-    position: sticky; top: 0; z-index: 100;
-  }
-  .nav-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.7rem; font-weight: 700;
-    color: var(--wine);
-    display: flex; align-items: center; gap: .4rem;
-  }
-  .nav-logo span { color: var(--sage-dark); font-weight: 400; font-style: italic; }
-  .nav-links { display: flex; gap: 2rem; }
-  .nav-links a {
-    text-decoration: none;
-    color: var(--text-muted);
-    font-size: .82rem;
-    font-weight: 500;
-    letter-spacing: .09em;
-    text-transform: uppercase;
-    transition: color .2s;
-  }
-  .nav-links a:hover, .nav-links a.active { color: var(--wine); }
+  #header-placeholder { width: 100%; }
+
   .btn-back {
-    background: var(--wine-pale);
-    color: var(--wine);
-    padding: 0.5rem 1.3rem;
-    border-radius: 3px;
-    text-decoration: none;
-    font-size: .78rem;
-    font-weight: 600;
-    letter-spacing: .07em;
-    text-transform: uppercase;
-    transition: all .2s;
+    background: var(--wine-pale); color: var(--wine); padding: 0.5rem 1.3rem;
+    border-radius: 3px; text-decoration: none; font-size: .78rem;
+    font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+    transition: all .2s; display: inline-block; margin-top: 10px;
   }
-  .btn-back:hover {
-    background: var(--wine);
-    color: var(--cream);
-  }
+  .btn-back:hover { background: var(--wine); color: var(--cream); }
 
-  .page-header {
-    background: var(--wine);
-    padding: 2rem 2.5rem;
-    position: relative;
-    overflow: hidden;
-  }
+  .page-header { background: var(--wine); padding: 2rem 2.5rem; position: relative; overflow: hidden; }
   .page-header::before {
-    content: '';
-    position: absolute;
-    right: -80px;
-    top: -80px;
-    width: 420px;
-    height: 420px;
-    border: 55px solid rgba(255,249,235,.05);
-    border-radius: 50%;
+    content: ''; position: absolute; right: -80px; top: -80px;
+    width: 420px; height: 420px; border: 55px solid rgba(255,249,235,.05); border-radius: 50%;
   }
   .page-header::after {
-    content: '';
-    position: absolute;
-    left: 4%;
-    bottom: -70px;
-    width: 240px;
-    height: 240px;
-    border: 40px solid rgba(159,178,172,.10);
-    border-radius: 50%;
+    content: ''; position: absolute; left: 4%; bottom: -70px;
+    width: 240px; height: 240px; border: 40px solid rgba(159,178,172,.10); border-radius: 50%;
   }
-  .header-inner {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
+  .header-inner { position: relative; z-index: 1; }
   .header-left .header-eyebrow {
-    font-size: .72rem;
-    font-weight: 600;
-    letter-spacing: .2em;
-    text-transform: uppercase;
-    color: var(--sage-light);
-    margin-bottom: .9rem;
+    font-size: .72rem; font-weight: 600; letter-spacing: .2em;
+    text-transform: uppercase; color: var(--sage-light); margin-bottom: .9rem;
   }
-  .header-left h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--cream);
-  }
-  .header-left p {
-    color: rgba(255,249,235,.62);
-    font-size: .9rem;
-  }
+  .header-left h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 700; color: var(--cream); }
+  .header-left p { color: rgba(255,249,235,.62); font-size: .9rem; }
 
-  .container {
-    max-width: 1100px;
-    margin: 2rem auto;
-    padding: 0 1.5rem;
-  }
+  .container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
 
-  .profile-card {
-    background: var(--white);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 20px 40px var(--shadow);
-    border: 1.5px solid var(--border);
-  }
+  .profile-card { background: var(--white); border-radius: 8px; overflow: hidden; box-shadow: 0 20px 40px var(--shadow); border: 1.5px solid var(--border); }
+  .profile-header { background: linear-gradient(135deg, var(--wine), var(--wine-dark)); padding: 2rem; text-align: center; }
+  .profile-avatar { width: 120px; height: 120px; border-radius: 50%; background: var(--sage-light); display: flex; align-items: center; justify-content: center; font-size: 4rem; margin: 0 auto 1rem; border: 4px solid var(--white); box-shadow: 0 4px 20px var(--shadow); overflow: hidden; }
+  .profile-name { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 700; color: var(--cream); margin-bottom: 0.5rem; }
+  .profile-location { color: var(--sage-light); font-size: 0.9rem; }
+  .profile-body { padding: 2rem; }
 
-  .profile-header {
-    background: linear-gradient(135deg, var(--wine), var(--wine-dark));
-    padding: 2rem;
-    text-align: center;
-  }
-  .profile-avatar {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background: var(--sage-light);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 4rem;
-    margin: 0 auto 1rem;
-    border: 4px solid var(--white);
-    box-shadow: 0 4px 20px var(--shadow);
-    overflow: hidden;
-  }
-  .profile-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .profile-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: var(--cream);
-    margin-bottom: 0.5rem;
-  }
-  .profile-location {
-    color: var(--sage-light);
-    font-size: 0.9rem;
-  }
+  .info-section { margin-bottom: 2rem; }
+  .info-section h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 0.8rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--border); display: inline-block; }
+  .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem; }
+  .info-item { background: var(--cream); padding: 1rem; border-radius: 6px; border: 1.5px solid var(--border); }
+  .info-label { font-size: 0.7rem; color: var(--sage-dark); text-transform: uppercase; font-weight: 600; letter-spacing: .07em; }
+  .info-value { font-size: 0.9rem; color: var(--text); margin-top: 0.3rem; }
+  
+  .bio-text { background: var(--cream); padding: 1rem; border-radius: 6px; line-height: 1.6; color: var(--text-muted); border: 1.5px solid var(--border); }
+  .specialties-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+  .specialty-tag { background: var(--sage-light); color: var(--sage-dark); padding: 0.3rem 0.8rem; border-radius: 3px; font-size: 0.75rem; font-weight: 600; }
+  .badge-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+  .badge { background: var(--wine-pale); color: var(--wine); padding: 0.3rem 0.8rem; border-radius: 3px; font-size: 0.7rem; font-weight: 600; }
+  
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; }
+  .stat-card { background: var(--cream); text-align: center; padding: 1rem; border-radius: 6px; border: 1.5px solid var(--border); }
+  .stat-number { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; color: var(--wine); display: block; }
+  .stat-label { font-size: 0.7rem; color: var(--text-muted); letter-spacing: .07em; text-transform: uppercase; }
 
-  .profile-body {
-    padding: 2rem;
-  }
+  .shops-section h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 0.8rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--border); display: inline-block; }
+  .shops-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.2rem; margin-top: 1rem; }
+  .shop-card { background: var(--white); border-radius: 6px; overflow: hidden; border: 1.5px solid var(--border); transition: all 0.25s ease; cursor: pointer; text-decoration: none; display: block; color: inherit; }
+  .shop-card:hover { transform: translateY(-3px); border-color: var(--sage); box-shadow: 0 8px 20px var(--shadow); }
+  .shop-card-image { height: 120px; background: var(--sage-light); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .shop-card-image img { width: 100%; height: 100%; object-fit: cover; }
+  .shop-card-info { padding: 0.8rem; }
+  .shop-card-name { font-weight: 700; color: var(--wine); font-size: 0.9rem; }
+  .shop-card-category { font-size: 0.7rem; color: var(--sage-dark); margin-top: 0.2rem; text-transform: uppercase; letter-spacing: .05em; }
+  .shop-card-desc { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.4; }
+  .empty-shops { text-align: center; padding: 2rem; background: var(--cream); border-radius: 6px; color: var(--text-muted); }
 
-  .info-section {
-    margin-bottom: 2rem;
-  }
-  .info-section h3 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 0.8rem;
-    padding-bottom: 0.4rem;
-    border-bottom: 2px solid var(--border);
-    display: inline-block;
-  }
-  .info-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-  .info-item {
-    background: var(--cream);
-    padding: 1rem;
-    border-radius: 6px;
-    border: 1.5px solid var(--border);
-  }
-  .info-label {
-    font-size: 0.7rem;
-    color: var(--sage-dark);
-    text-transform: uppercase;
-    font-weight: 600;
-    letter-spacing: .07em;
-  }
-  .info-value {
-    font-size: 0.9rem;
-    color: var(--text);
-    margin-top: 0.3rem;
-  }
-  .bio-text {
-    background: var(--cream);
-    padding: 1rem;
-    border-radius: 6px;
-    line-height: 1.6;
-    color: var(--text-muted);
-    border: 1.5px solid var(--border);
-  }
-  .specialties-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-  }
-  .specialty-tag {
-    background: var(--sage-light);
-    color: var(--sage-dark);
-    padding: 0.3rem 0.8rem;
-    border-radius: 3px;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-  .badge-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-  }
-  .badge {
-    background: var(--wine-pale);
-    color: var(--wine);
-    padding: 0.3rem 0.8rem;
-    border-radius: 3px;
-    font-size: 0.7rem;
-    font-weight: 600;
-  }
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-  .stat-card {
-    background: var(--cream);
-    text-align: center;
-    padding: 1rem;
-    border-radius: 6px;
-    border: 1.5px solid var(--border);
-  }
-  .stat-number {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--wine);
-    display: block;
-  }
-  .stat-label {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    letter-spacing: .07em;
-    text-transform: uppercase;
-  }
-
-  .shops-section {
-    margin-bottom: 2rem;
-  }
-  .shops-section h3 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 0.8rem;
-    padding-bottom: 0.4rem;
-    border-bottom: 2px solid var(--border);
-    display: inline-block;
-  }
-  .shops-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.2rem;
-    margin-top: 1rem;
-  }
-  .shop-card {
-    background: var(--white);
-    border-radius: 6px;
-    overflow: hidden;
-    border: 1.5px solid var(--border);
-    transition: all 0.25s ease;
-    cursor: pointer;
-    text-decoration: none;
-    display: block;
-    color: inherit;
-  }
-  .shop-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--sage);
-    box-shadow: 0 8px 20px var(--shadow);
-  }
-  .shop-card-image {
-    height: 120px;
-    background: var(--sage-light);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-  .shop-card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .shop-card-info {
-    padding: 0.8rem;
-  }
-  .shop-card-name {
-    font-weight: 700;
-    color: var(--wine);
-    font-size: 0.9rem;
-  }
-  .shop-card-category {
-    font-size: 0.7rem;
-    color: var(--sage-dark);
-    margin-top: 0.2rem;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-  }
-  .shop-card-desc {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-top: 0.5rem;
-    line-height: 1.4;
-  }
-  .empty-shops {
-    text-align: center;
-    padding: 2rem;
-    background: var(--cream);
-    border-radius: 6px;
-    color: var(--text-muted);
-  }
-
-  .messaging-section {
-    margin-bottom: 2rem;
-  }
-  .messaging-section h3 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 0.8rem;
-    padding-bottom: 0.4rem;
-    border-bottom: 2px solid var(--border);
-    display: inline-block;
-  }
-  .chat-container {
-    background: var(--cream);
-    border-radius: 6px;
-    border: 1.5px solid var(--border);
-    overflow: hidden;
-  }
-  .chat-messages {
-    max-height: 300px;
-    overflow-y: auto;
-    padding: 1rem;
-    background: var(--white);
-  }
-  .message {
-    margin-bottom: 1rem;
-    display: flex;
-    flex-direction: column;
-  }
+  .messaging-section h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 0.8rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--border); display: inline-block; }
+  .chat-container { background: var(--cream); border-radius: 6px; border: 1.5px solid var(--border); overflow: hidden; }
+  .chat-messages { max-height: 300px; overflow-y: auto; padding: 1rem; background: var(--white); }
+  .message { margin-bottom: 1rem; display: flex; flex-direction: column; }
   .message.sent { align-items: flex-end; }
   .message.received { align-items: flex-start; }
-  .message-bubble {
-    max-width: 75%;
-    padding: 0.6rem 1rem;
-    border-radius: 12px;
-  }
-  .message.sent .message-bubble {
-    background: var(--wine);
-    color: white;
-    border-bottom-right-radius: 4px;
-  }
-  .message.received .message-bubble {
-    background: var(--cream);
-    color: var(--text);
-    border: 1.5px solid var(--border);
-    border-bottom-left-radius: 4px;
-  }
-  .message-info {
-    font-size: 0.65rem;
-    color: var(--text-muted);
-    margin-top: 0.2rem;
-    padding: 0 0.3rem;
-  }
-  .chat-input-area {
-    display: flex;
-    padding: 1rem;
-    gap: 0.8rem;
-    background: var(--white);
-    border-top: 1.5px solid var(--border);
-  }
-  .chat-input {
-    flex: 1;
-    padding: 0.7rem 1rem;
-    border: 1.5px solid var(--border);
-    border-radius: 3px;
-    font-family: 'Jost', sans-serif;
-    font-size: 0.85rem;
-    background: var(--cream);
-    outline: none;
-  }
+  .message-bubble { max-width: 75%; padding: 0.6rem 1rem; border-radius: 12px; }
+  .message.sent .message-bubble { background: var(--wine); color: white; border-bottom-right-radius: 4px; }
+  .message.received .message-bubble { background: var(--cream); color: var(--text); border: 1.5px solid var(--border); border-bottom-left-radius: 4px; }
+  .message-info { font-size: 0.65rem; color: var(--text-muted); margin-top: 0.2rem; padding: 0 0.3rem; }
+  .chat-input-area { display: flex; padding: 1rem; gap: 0.8rem; background: var(--white); border-top: 1.5px solid var(--border); }
+  .chat-input { flex: 1; padding: 0.7rem 1rem; border: 1.5px solid var(--border); border-radius: 3px; font-family: 'Jost', sans-serif; font-size: 0.85rem; background: var(--cream); outline: none; }
   .chat-input:focus { border-color: var(--wine); }
-  .btn-send {
-    background: var(--wine);
-    color: white;
-    border: none;
-    padding: 0.7rem 1.5rem;
-    border-radius: 3px;
-    font-weight: 600;
-    cursor: pointer;
-  }
+  .btn-send { background: var(--wine); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 3px; font-weight: 600; cursor: pointer; }
   .btn-send:hover { background: var(--wine-dark); }
-  .user-info-chat {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1rem;
-    background: var(--wine-pale);
-    font-size: 0.8rem;
-    color: var(--wine);
-    border-bottom: 1.5px solid var(--border);
-  }
+  .user-info-chat { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; background: var(--wine-pale); font-size: 0.8rem; color: var(--wine); border-bottom: 1.5px solid var(--border); }
 
-  .loading, .error {
-    text-align: center;
-    padding: 3rem;
-  }
-  .error {
-    background: var(--wine-pale);
-    border-radius: 8px;
-    color: var(--wine);
-  }
-  .footer-note {
-    text-align: center;
-    margin-top: 3rem;
-    padding: 1.5rem;
-    color: var(--text-muted);
-    border-top: 1px solid var(--border);
-  }
-
-  @media (max-width: 700px) {
-    nav { padding: 0 1rem; }
-    .nav-links { display: none; }
-    .container { padding: 0 1rem; }
-    .profile-body { padding: 1rem; }
-    .info-grid { grid-template-columns: 1fr; }
-    .stats-grid { grid-template-columns: 1fr; }
-    .profile-name { font-size: 1.5rem; }
-    .shops-grid { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 700px) { .container { padding: 0 1rem; } .profile-body { padding: 1rem; } .info-grid { grid-template-columns: 1fr; } .stats-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-logo">🌿 Green<span>Market</span></div>
-  <div class="nav-links">
-    <a href="store.html">Accueil</a>
-    <a href="store.html">Boutiques</a>
-    <a href="#">Produits</a>
-    <a href="#">À propos</a>
-  </div>
-  <a href="store.html" class="btn-back">← Retour</a>
-</nav>
+<div id="header-placeholder"></div>
 
 <div class="page-header">
   <div class="header-inner">
     <div class="header-left">
       <div class="header-eyebrow">🌱 DÉCOUVREZ LE PRODUCTEUR</div>
       <h1>Profil du<br>producteur</h1>
-      <p>Toutes les informations, boutiques et produits d'un artisan local</p>
     </div>
   </div>
 </div>
@@ -511,12 +132,23 @@
   </div>
 </div>
 
-<div class="footer-note">
+<div class="footer-note" style="text-align:center; margin-top:3rem; padding:1.5rem; color:var(--text-muted); border-top:1px solid var(--border);">
   🌿 GreenMarket – Mettre en valeur les producteurs locaux
 </div>
 
 <script>
-  // ========== UTILITAIRES ==========
+  function loadHeader() {
+    fetch('header.html')
+      .then(response => {
+        if (!response.ok) throw new Error("Erreur");
+        return response.text();
+      })
+      .then(data => {
+        document.getElementById('header-placeholder').innerHTML = data;
+      })
+      .catch(error => console.error(error));
+  }
+
   function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/[&<>]/g, function(m) {
@@ -532,30 +164,11 @@
     return params.get('id');
   }
 
-  function showToast(msg, bg = 'var(--wine)') {
-    let toast = document.getElementById('toast');
-    if (!toast) {
-      toast = document.createElement('div');
-      toast.id = 'toast';
-      toast.className = 'toast';
-      toast.style.cssText = 'position:fixed;bottom:2rem;right:2rem;background:var(--wine);color:var(--cream);padding:.85rem 1.5rem;border-radius:5px;z-index:500;transform:translateY(80px);opacity:0;transition:all .35s';
-      document.body.appendChild(toast);
-    }
-    toast.innerHTML = msg;
-    toast.style.background = bg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3200);
-  }
-
-  // ========== UTILISATEUR ACTUEL ==========
-  let currentUser = null;
-
   function getCurrentUser() {
     const userJson = sessionStorage.getItem('greenmarket_current_user');
     return userJson ? JSON.parse(userJson) : null;
   }
 
-  // ========== MESSAGERIE ==========
   function loadMessages(producerId) {
     const user = getCurrentUser();
     const userId = user ? user.id : 'guest';
@@ -583,24 +196,14 @@
     return messages;
   }
 
-  // ========== CHARGEMENT DES DONNÉES ==========
   function loadStores() {
     const saved = localStorage.getItem('greenmarket_stores');
-    if (saved) return JSON.parse(saved);
-    return [];
+    return saved ? JSON.parse(saved) : [];
   }
 
   function loadCategories() {
     const saved = localStorage.getItem('greenmarket_categories');
-    if (saved) return JSON.parse(saved);
-    return [
-      { id: 1, name: 'Fruits et légumes' },
-      { id: 2, name: 'Produits laitiers' },
-      { id: 3, name: 'Boulangerie artisanale' },
-      { id: 4, name: 'Miel et apiculture' },
-      { id: 5, name: 'Huiles et conserves' },
-      { id: 6, name: 'Plantes médicinales' }
-    ];
+    return saved ? JSON.parse(saved) : [];
   }
 
   function loadProducers() {
@@ -614,7 +217,7 @@
         tel: "Non renseigné",
         bio: "Producteur passionné par les produits du terroir.",
         avatar: "👨‍🌾",
-        location: "France",
+        location: "Maroc",
         since: "2023",
         specialties: ["Produits locaux"],
         badges: ["Artisan"]
@@ -624,16 +227,12 @@
   }
 
   function renderShopImage(shop) {
-    if (shop.banner) {
-      return `<div class="shop-card-image"><img src="${shop.banner}" alt="${escapeHtml(shop.name)}" onerror="this.src='https://picsum.photos/id/20/300/200'"></div>`;
-    }
-    return `<div class="shop-card-image" style="font-size: 2.5rem;">🏪</div>`;
+    return shop.banner ? `<div class="shop-card-image"><img src="${shop.banner}" alt="${escapeHtml(shop.name)}" onerror="this.src='https://picsum.photos/id/20/300/200'"></div>` : `<div class="shop-card-image" style="font-size: 2.5rem;">🏪</div>`;
   }
 
   function renderChat(producer, messages) {
     const user = getCurrentUser();
     const userName = user ? user.name : "Visiteur";
-    
     const messagesHtml = messages.length === 0 ? 
       '<div style="text-align:center; padding:2rem; color:var(--text-muted);">💬 Aucun message. Commencez la conversation !</div>' :
       messages.map(msg => `
@@ -664,47 +263,27 @@
 
   function loadProducerProfile() {
     const producerId = getProducerIdFromURL();
-
     if (!producerId) {
       document.getElementById('content').innerHTML = `<div class="error"><h2>❌ Producteur non spécifié</h2><a href="store.html" class="btn-back">Retour</a></div>`;
       return;
     }
 
-    // Charger les données
     let stores = loadStores();
     let categories = loadCategories();
     let producers = loadProducers();
-    
-    // Chercher le producteur
     let producer = producers.find(p => p.id == producerId);
     
-    // Si pas trouvé, chercher dans les données par défaut
-    if (!producer) {
-      const defaultProducers = [
-        { id: 101, nom: "Élodie Moreau", email: "elodie@verger.fr", tel: "06 12 34 56 78", bio: "Arboricultrice passionnée depuis 15 ans. Mes fruits sont cultivés sans pesticides.", avatar: "👩‍🌾", location: "Provence, France", since: "2010", specialties: ["Pommes bio", "Poires", "Jus artisanaux"], badges: ["Certifiée Bio", "Commerce équitable"] },
-        { id: 102, nom: "Benoît Girard", email: "benoit@fromagerie.fr", tel: "06 23 45 67 89", bio: "Maître fromager, transmission familiale depuis 3 générations.", avatar: "👨‍🍳", location: "Savoie, France", since: "2005", specialties: ["Camembert", "Livarot", "Pont-l'Évêque"], badges: ["Artisan Maître", "Label Rouge"] },
-        { id: 103, nom: "Marguerite Dufour", email: "marguerite@fournil.fr", tel: "06 34 56 78 90", bio: "Boulangère de père en fille. Passionnée par le pain au levain.", avatar: "👩‍🍳", location: "Bretagne, France", since: "2010", specialties: ["Pain au levain", "Baguette tradition", "Viennoiseries"], badges: ["Artisan Boulanger", "Farine locale"] },
-        { id: 104, nom: "Luc Verdier", email: "luc@ruchers.fr", tel: "06 45 67 89 01", bio: "Apiculteur itinérant depuis 15 ans. Respectueux des abeilles.", avatar: "👨‍🌾", location: "Ardèche, France", since: "2019", specialties: ["Miel de lavande", "Miel de forêt", "Propolis"], badges: ["Bio", "Éco-responsable"] },
-        { id: 105, nom: "Rosa Vivaldi", email: "rosa@olivier.fr", tel: "06 56 78 90 12", bio: "Productrice d'huile d'olive depuis 3 générations.", avatar: "👩‍💼", location: "Nice, France", since: "2016", specialties: ["Huile d'olive AOP", "Tapenade", "Confitures"], badges: ["Artisan", "Éco-responsable"] },
-        { id: 106, nom: "Clémence Sauvage", email: "clemence@herboristerie.fr", tel: "06 67 89 01 23", bio: "Herboriste diplômée. Cueillette raisonnée et respect des cycles naturels.", avatar: "👵", location: "Massif Central, France", since: "2020", specialties: ["Tisanes", "Plantes médicinales", "Romarin"], badges: ["Bio", "Savoir-faire"] }
-      ];
-      producer = defaultProducers.find(p => p.id == producerId);
-    }
-
     if (!producer) {
       document.getElementById('content').innerHTML = `<div class="error"><h2>❌ Producteur introuvable</h2><a href="store.html" class="btn-back">Retour</a></div>`;
       return;
     }
 
-    // Filtrer les boutiques du producteur
     const producerShops = stores.filter(shop => shop.producerId == producerId);
     const messages = loadMessages(producerId);
 
-    let shopsHtml = '';
-    if (producerShops.length === 0) {
-      shopsHtml = `<div class="empty-shops">🏪 Ce producteur n'a pas encore de boutique en ligne.</div>`;
-    } else {
-      shopsHtml = `<div class="shops-grid">` + producerShops.map(shop => {
+    let shopsHtml = producerShops.length === 0 ? 
+      `<div class="empty-shops">🏪 Ce producteur n'a pas encore de boutique en ligne.</div>` :
+      `<div class="shops-grid">` + producerShops.map(shop => {
         const category = categories.find(c => c.id === shop.categoryId);
         return `
           <a href="info-store.html?id=${shop.id}" class="shop-card">
@@ -717,14 +296,13 @@
           </a>
         `;
       }).join('') + `</div>`;
-    }
 
     const html = `
       <div class="profile-card">
         <div class="profile-header">
           <div class="profile-avatar">${producer.avatar || '👨‍🌾'}</div>
           <h1 class="profile-name">${escapeHtml(producer.nom)}</h1>
-          <div class="profile-location">📍 ${escapeHtml(producer.location || 'France')}</div>
+          <div class="profile-location">📍 ${escapeHtml(producer.location || 'Maroc')}</div>
         </div>
         <div class="profile-body">
           <div class="info-section">
@@ -748,14 +326,6 @@
             <h3>🏅 Labels</h3>
             <div class="badge-list">${(producer.badges || ["Artisan local"]).map(b => `<span class="badge">${escapeHtml(b)}</span>`).join('')}</div>
           </div>
-          <div class="info-section">
-            <h3>📊 Statistiques</h3>
-            <div class="stats-grid">
-              <div class="stat-card"><span class="stat-number">${producerShops.reduce((sum, s) => sum + (s.products || 0), 0) || '0'}</span><span class="stat-label">Produits</span></div>
-              <div class="stat-card"><span class="stat-number">${producerShops.reduce((sum, s) => sum + (parseInt(String(s.sales).replace(/\s/g, '')) || 0), 0) || '0'}</span><span class="stat-label">Ventes</span></div>
-              <div class="stat-card"><span class="stat-number">${producerShops.length > 0 ? (producerShops.reduce((sum, s) => sum + s.rating, 0) / producerShops.length).toFixed(1) : '0'}</span><span class="stat-label">Note moyenne</span></div>
-            </div>
-          </div>
           <div class="shops-section">
             <h3>🏪 Ses boutiques</h3>
             ${shopsHtml}
@@ -767,13 +337,13 @@
 
     document.getElementById('content').innerHTML = html;
 
-    // Configurer la messagerie
     const sendBtn = document.getElementById('sendMessageBtn');
     const messageInput = document.getElementById('messageInput');
     
     function refreshChat() {
       const updatedMessages = loadMessages(producerId);
       const container = document.getElementById('chatMessages');
+      if (!container) return;
       if (updatedMessages.length === 0) {
         container.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-muted);">💬 Aucun message. Commencez la conversation !</div>';
         return;
@@ -803,6 +373,7 @@
     }
   }
 
+  loadHeader();
   loadProducerProfile();
 </script>
 </body>

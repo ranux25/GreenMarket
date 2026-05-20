@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>GreenMarket – À propos de notre mission</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="header.css">
+<style>
+  :root {
+    --cream:      #fff9eb;
+    --sage:       #9fb2ac;
+    --sage-dark:  #7a9490;
+    --sage-light: #c8d8d4;
+    --wine:       #5d0d18;
+    --wine-dark:  #3e0910;
+    --wine-light: #8c2030;
+    --wine-pale:  #f5e6e8;
+    --text:       #2a1a1c;
+    --text-muted: #6b5055;
+    --border:     #e8ddd0;
+    --white:      #fffdf7;
+    --shadow:     rgba(93,13,24,.10);
+    --shadow-md:  rgba(93,13,24,.18);
+    --primary: #5D0D18;
+    --secondary: #9FB2AC;
+    --bg: #FFF9EB;
+    --text-dark: #2C2C2C;
+    --text-light: #6B6B6B;
+    --footer-bg: #3A0A10;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body { 
+    font-family: 'Lato', sans-serif; 
+    background: var(--cream); 
+    color: var(--text); 
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+
+  #header-placeholder { width: 100%; }
+
+  /* Page Header */
+  .page-header {
+    background: var(--wine);
+    padding: 4rem 2.5rem 3rem;
+    position: relative; overflow: hidden;
+  }
+  .page-header::before {
+    content: ''; position: absolute; right: -80px; top: -80px;
+    width: 420px; height: 420px;
+    border: 55px solid rgba(255,249,235,.05); border-radius: 50%;
+  }
+  .page-header::after {
+    content: ''; position: absolute; left: 4%; bottom: -70px;
+    width: 240px; height: 240px;
+    border: 40px solid rgba(159,178,172,.10); border-radius: 50%;
+  }
+  .header-inner { position: relative; z-index: 1; }
+  .header-eyebrow {
+    font-size: .72rem; font-weight: 600; letter-spacing: .2em;
+    text-transform: uppercase; color: var(--sage-light); margin-bottom: .9rem;
+  }
+  .page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.6rem; font-weight: 700; line-height: 1.05;
+    color: var(--cream); margin-bottom: .7rem;
+  }
+  .page-header h1 em { font-weight: 400; color: rgba(255,249,235,.6); font-size: 2.6rem; }
+  .page-header p { color: rgba(255,249,235,.62); font-size: .93rem; font-weight: 300; max-width: 500px; }
+
+  /* Container */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+  }
+
+  /* Mission Section */
+  .mission-section {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 3rem;
+    margin-bottom: 4rem;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .mission-text h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--wine);
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: inline-block;
+  }
+  .mission-text h2::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: var(--sage);
+    margin: 0.5rem auto 0;
+  }
+  .mission-text p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .mission-quote {
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--wine);
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Values Section */
+  .values-section {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 3rem;
+    margin-bottom: 4rem;
+    border: 1px solid var(--border);
+  }
+  .values-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--wine);
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+  }
+  .value-card {
+    text-align: center;
+    padding: 1.5rem;
+  }
+  .value-icon {
+    width: 70px;
+    height: 70px;
+    background: var(--wine-pale);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 2rem;
+  }
+  .value-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--wine);
+    margin-bottom: 0.5rem;
+  }
+  .value-card p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* Team Section */
+  .team-section {
+    margin-bottom: 4rem;
+  }
+  .team-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--wine);
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+  }
+  .team-card {
+    text-align: center;
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    transition: transform 0.2s;
+  }
+  .team-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px var(--shadow);
+  }
+  .team-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: var(--sage-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 2.5rem;
+    overflow: hidden;
+  }
+  .team-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .team-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--wine);
+    margin-bottom: 0.25rem;
+  }
+  .team-role {
+    font-size: 0.75rem;
+    color: var(--sage-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  .team-bio {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  /* Impact Section */
+  .impact-section {
+    background: linear-gradient(135deg, var(--wine) 0%, var(--wine-dark) 100%);
+    border-radius: 16px;
+    padding: 3rem;
+    color: white;
+    margin-bottom: 4rem;
+  }
+  .impact-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .impact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    text-align: center;
+  }
+  .impact-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    display: block;
+  }
+  .impact-label {
+    font-size: 0.85rem;
+    opacity: 0.8;
+  }
+
+  /* CTA Section */
+  .cta-section {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 3rem;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .cta-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: var(--wine);
+    margin-bottom: 1rem;
+  }
+  .cta-section p {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+  .btn-cta {
+    background: var(--wine);
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 999px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-cta:hover {
+    background: var(--wine-dark);
+    transform: translateY(-2px);
+  }
+
+  /* Footer */
+  footer {
+    background: var(--footer-bg);
+    color: #d4b8a0;
+    margin-top: 2rem;
+  }
+  footer a {
+    color: #c4a890;
+    text-decoration: none;
+    transition: color 0.2s;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 8px;
+  }
+  footer a:hover { color: #fff; }
+  .footer-heading {
+    font-family: 'Playfair Display', serif;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      padding: 2rem 1rem;
+    }
+    .values-section, .impact-section, .cta-section, .mission-section {
+      padding: 2rem 1.5rem;
+    }
+    .page-header {
+      padding: 2.5rem 1.2rem 2rem;
+    }
+    .page-header h1 {
+      font-size: 2.4rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="header-placeholder"></div>
+
+<div class="page-header">
+  <div class="header-inner">
+    <div class="header-eyebrow">🇲🇦 Notre histoire &amp; mission</div>
+    <h1>À propos de<br><em>GreenMarket</em></h1>
+    <p>Découvrez qui nous sommes et notre engagement pour l'artisanat marocain.</p>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Mission Section -->
+  <div class="mission-section">
+    <div class="mission-text">
+      <h2>Notre mission</h2>
+      <p>GreenMarket est né d'une conviction profonde : les trésors artisanaux du Maroc méritent d'être valorisés et accessibles à tous. Notre mission est de créer un pont entre les artisans marocains, perpétuant des savoir-faire ancestraux, et les amateurs d'authenticité à travers le monde.</p>
+      <p>Nous croyons fermement que chaque pièce artisanale raconte une histoire, celle de ses créateurs, de sa région et de ses traditions. C'est pourquoi nous mettons un point d'honneur à sélectionner des produits de qualité exceptionnelle, tout en garantissant une rémunération équitable aux coopératives et artisans qui nous font confiance.</p>
+      <div class="mission-quote">
+        🌿 "Valoriser l'artisanat marocain, un produit à la fois"
+      </div>
+    </div>
+  </div>
+
+  <!-- Values Section -->
+  <div class="values-section">
+    <h2>Nos valeurs</h2>
+    <div class="values-grid">
+      <div class="value-card">
+        <div class="value-icon">🤝</div>
+        <h3>Commerce équitable</h3>
+        <p>Nous garantissons une rémunération juste et transparente à tous nos artisans partenaires.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">🏺</div>
+        <h3>Authenticité</h3>
+        <p>Chaque produit est authentique, fabriqué selon les méthodes traditionnelles transmises depuis des générations.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">🌿</div>
+        <h3>Durabilité</h3>
+        <p>Nous privilégions les matériaux naturels et les procédés respectueux de l'environnement.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">❤️</div>
+        <h3>Passion</h3>
+        <p>Derrière chaque produit, il y a la passion d'un artisan qui met tout son cœur dans son travail.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Impact Section -->
+  <div class="impact-section">
+    <h2>Notre impact en chiffres</h2>
+    <div class="impact-grid">
+      <div>
+        <span class="impact-number">150+</span>
+        <span class="impact-label">Artisans partenaires</span>
+      </div>
+      <div>
+        <span class="impact-number">10+</span>
+        <span class="impact-label">Coopératives</span>
+      </div>
+      <div>
+        <span class="impact-number">2000+</span>
+        <span class="impact-label">Produits artisanaux</span>
+      </div>
+      <div>
+        <span class="impact-number">12</span>
+        <span class="impact-label">Régions du Maroc</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Section -->
+  <div class="team-section">
+    <h2>L'équipe GreenMarket</h2>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-avatar">
+          <span>👩‍💼</span>
+        </div>
+        <h3>Rania Ellaghmich</h3>
+        <div class="team-role">Fondatrice & Directrice</div>
+        <p class="team-bio">Passionnée par l'artisanat marocain, elle a créé GreenMarket pour valoriser le savoir-faire de sa région natale.</p>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">
+          <span>👨‍💻</span>
+        </div>
+        <h3>Omar El Gazi</h3>
+        <div class="team-role">Directeur Technique</div>
+        <p class="team-bio">Expert en développement web, il assure le bon fonctionnement de la plateforme GreenMarket.</p>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">
+          <span>👨‍🎨</span>
+        </div>
+        <h3>Mohamed Bouchar</h3>
+        <div class="team-role">Directeur Artistique</div>
+        <p class="team-bio">Expert en artisanat traditionnel, il sélectionne chaque produit avec un soin particulier.</p>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">
+          <span>👩‍💼</span>
+        </div>
+        <h3>Rania El Morabit</h3>
+        <div class="team-role">Responsable Logistique</div>
+        <p class="team-bio">Elle assure que chaque commande arrive en parfait état chez nos clients.</p>
+      </div>
+    </div>
+  </div>
+
+
+
+
+<!-- Modal de autenticación -->
+<div class="auth-modal-overlay" id="authModal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:1000;">
+  <div class="auth-modal" style="background: #fffdf7; border-radius: 16px; padding: 2rem; max-width: 450px; width: 90%; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+    <div class="auth-tabs" style="display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e8ddd0;">
+      <button class="auth-tab active" data-tab="login" style="background: none; border: none; padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; color: #6b5055; font-weight: 500;">Connexion</button>
+      <button class="auth-tab" data-tab="register" style="background: none; border: none; padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; color: #6b5055; font-weight: 500;">Inscription Client</button>
+      <button class="auth-tab" data-tab="registerProducer" style="background: none; border: none; padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; color: #6b5055; font-weight: 500;">Inscription Artisan</button>
+    </div>
+    <div id="loginForm" class="auth-form active">
+      <h3 style="color: #5d0d18; margin-bottom: 1rem;">🔐 Se connecter</h3>
+      <input type="email" id="loginEmail" placeholder="Email" style="width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1.5px solid #e8ddd0; border-radius: 8px; background: #fff9eb;">
+      <input type="password" id="loginPassword" placeholder="Mot de passe" style="width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1.5px solid #e8ddd0; border-radius: 8px; background: #fff9eb;">
+      <button class="btn-filled" id="doLoginBtn" style="width:100%; background:#5d0d18; color:#fff9eb; border:none; padding:.5rem 1.3rem; border-radius:3px; cursor:pointer;">Se connecter</button>
+      <p class="auth-error" id="loginError" style="color:#d9534f; font-size:0.8rem; margin-top:0.5rem; text-align:center;"></p>
+    </div>
+    <div id="registerForm" class="auth-form" style="display:none;">
+      <h3 style="color: #5d0d18; margin-bottom: 1rem;">📝 Inscription Client</h3>
+      <input type="text" id="regName" placeholder="Nom complet" style="width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1.5px solid #e8ddd0; border-radius: 8px; background: #fff9eb;">
+      <input type="email" id="regEmail" placeholder="Email" style="width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1.5px solid #e8ddd0; border-radius: 8px; background: #fff9eb;">
+      <input type="password" id="regPassword" placeholder="Mot de passe" style="width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1.5px solid #e8ddd0; border-radius: 8px; background: #fff9eb;">
+      <button class="btn-filled" id="doRegisterBtn" style="width:100%; background:#5d0d18; color:#fff9eb; border:none; padding:.5rem 1.3rem; border-radius:3px; cursor:pointer;">S'inscrire</button>
+      <p class="auth-error" id="registerError" style="color:#d9534f; font-size:0.8rem; margin-top:0.5rem; text-align:center;"></p>
+    </div>
+    <div id="registerProducerForm" class="auth-form" style="display:none;">
+      <h3 style="color: #5d0d18; margin-bottom: 1rem;">🏪 Inscription Artisan</h3>
+      <input type="text" id="regProdName" placeholder="Nom de l'artisan" style="width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1.5px solid #e8ddd0; border-radius: 8px; background: #fff9eb;">
+      <input type="email" id="regProdEmail" placeholder="Email" style="width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1.5px solid #e8ddd0; border-radius: 8px; background: #fff9eb;">
+      <input type="password" id="regProdPassword" placeholder="Mot de passe" style="width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1.5px solid #e8ddd0; border-radius: 8px; background: #fff9eb;">
+      <button class="btn-filled" id="doRegisterProducerBtn" style="width:100%; background:#5d0d18; color:#fff9eb; border:none; padding:.5rem 1.3rem; border-radius:3px; cursor:pointer;">S'inscrire comme artisan</button>
+      <p class="auth-error" id="registerProducerError" style="color:#d9534f; font-size:0.8rem; margin-top:0.5rem; text-align:center;"></p>
+    </div>
+    <button class="auth-close" id="closeAuthModal" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer;">✕</button>
+  </div>
+</div>
+
+<style>
+  .auth-modal-overlay.open { display: flex !important; }
+  .auth-modal-overlay { display: none; }
+  .auth-form { display: none; }
+  .auth-form.active { display: block; }
+  .auth-tab.active { color: #5d0d18 !important; border-bottom: 2px solid #5d0d18 !important; }
+</style>
+
+<script>
+  // ========== FUNCIONES DE AUTENTICACIÓN ==========
+  let currentUser = null;
+
+  function initUsers() {
+    if (!localStorage.getItem('greenmarket_users')) {
+      const defaultUsers = [
+        { id: 1, name: "Jean Dupont", email: "client@test.com", password: "client123", role: "client", producerId: null },
+        { id: 2, name: "Fatima Zahra", email: "fatima@caftan.ma", password: "fatima123", role: "productor", producerId: 101 }
+      ];
+      localStorage.setItem('greenmarket_users', JSON.stringify(defaultUsers));
+    }
+  }
+
+  function getCurrentUser() {
+    const u = sessionStorage.getItem('greenmarket_current_user');
+    return u ? JSON.parse(u) : null;
+  }
+
+  function setCurrentUser(user) {
+    sessionStorage.setItem('greenmarket_current_user', JSON.stringify(user));
+    currentUser = user;
+    updateAuthUI();
+  }
+
+  function logout() {
+    sessionStorage.removeItem('greenmarket_current_user');
+    currentUser = null;
+    updateAuthUI();
+    showToast("👋 Déconnexion réussie");
+  }
+
+  function login(email, password) {
+    const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
+    const user = users.find(u => u.email === email && u.password === password);
+    if (user) {
+      const { password, ...safeUser } = user;
+      setCurrentUser(safeUser);
+      return { success: true, user: safeUser };
+    }
+    return { success: false, error: "Email ou mot de passe incorrect" };
+  }
+
+  function registerClient(name, email, password) {
+    const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
+    if (users.find(u => u.email === email)) {
+      return { success: false, error: "Email déjà utilisé" };
+    }
+    const newUser = {
+      id: Date.now(),
+      name: name,
+      email: email,
+      password: password,
+      role: "client",
+      producerId: null
+    };
+    users.push(newUser);
+    localStorage.setItem('greenmarket_users', JSON.stringify(users));
+    const { password: _, ...safeUser } = newUser;
+    setCurrentUser(safeUser);
+    return { success: true, user: safeUser };
+  }
+
+  function registerProducer(name, email, password) {
+    const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
+    if (users.find(u => u.email === email)) {
+      return { success: false, error: "Email déjà utilisé" };
+    }
+    const newProducerId = Date.now();
+    const newUser = {
+      id: Date.now(),
+      name: name,
+      email: email,
+      password: password,
+      role: "productor",
+      producerId: newProducerId
+    };
+    users.push(newUser);
+    localStorage.setItem('greenmarket_users', JSON.stringify(users));
+    const { password: _, ...safeUser } = newUser;
+    setCurrentUser(safeUser);
+    return { success: true, user: safeUser };
+  }
+
+  function updateAuthUI() {
+    const widget = document.getElementById('authWidget');
+    if (!widget) return;
+    
+    const user = getCurrentUser();
+    if (user) {
+      const roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Artisan' : 'Client');
+      widget.innerHTML = `<div class="user-badge" style="background:#f5e6e8; padding:0.4rem 1rem; border-radius:30px; display:flex; align-items:center; gap:10px; color:#5d0d18; font-weight:600; font-size:0.85rem;">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;">🚪</button></div>`;
+      document.getElementById('logoutBtn')?.addEventListener('click', logout);
+      
+      const dashboardLink = document.getElementById('dashboardLink');
+      if (dashboardLink) {
+        dashboardLink.style.display = (user.role === 'productor' || user.role === 'admin') ? 'inline-block' : 'none';
+      }
+    } else {
+      widget.innerHTML = `<button class="btn-connexion" id="showLoginBtn" style="background:#5D0D18; color:#fff; border:none; border-radius:999px; padding:8px 20px; font-family:'Lato',sans-serif; font-weight:700; font-size:14px; cursor:pointer;">🔑 Connexion</button>`;
+      widget.innerHTML = `<button class="btn-connexion" onclick="window.location.href='signin.html'">🔑 Connexion</button>`;
+    }
+  }
+
+  function showToast(msg) {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+      const t = document.createElement('div');
+      t.id = 'toast';
+      t.style.cssText = 'position:fixed; bottom:28px; right:28px; background:#5d0d18; color:#fff; padding:14px 22px; border-radius:12px; font-family:Lato,sans-serif; font-weight:700; font-size:14px; z-index:9999; transform:translateY(80px); opacity:0; transition:transform 0.35s, opacity 0.3s;';
+      document.body.appendChild(t);
+    }
+    toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2800);
+  }
+
+  function showAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.classList.add('open');
+  }
+
+  function closeAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  function setupAuthModal() {
+    // Tabs
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.dataset.tab;
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+        if (tabName === 'login') document.getElementById('loginForm').classList.add('active');
+        if (tabName === 'register') document.getElementById('registerForm').classList.add('active');
+        if (tabName === 'registerProducer') document.getElementById('registerProducerForm').classList.add('active');
+      });
+    });
+
+    // Login
+    document.getElementById('doLoginBtn')?.addEventListener('click', () => {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const result = login(email, password);
+      if (result.success) {
+        closeAuthModal();
+        updateAuthUI();
+        showToast(`👋 Bonjour ${result.user.name} !`);
+      } else {
+        document.getElementById('loginError').textContent = result.error;
+      }
+    });
+
+    // Register Client
+    document.getElementById('doRegisterBtn')?.addEventListener('click', () => {
+      const name = document.getElementById('regName').value;
+      const email = document.getElementById('regEmail').value;
+      const password = document.getElementById('regPassword').value;
+      if (!name || !email || !password) {
+        document.getElementById('registerError').textContent = "Tous les champs sont requis";
+        return;
+      }
+      const result = registerClient(name, email, password);
+      if (result.success) {
+        closeAuthModal();
+        updateAuthUI();
+        showToast(`✅ Bienvenue ${result.user.name} !`);
+      } else {
+        document.getElementById('registerError').textContent = result.error;
+      }
+    });
+
+    // Register Producer
+    document.getElementById('doRegisterProducerBtn')?.addEventListener('click', () => {
+      const name = document.getElementById('regProdName').value;
+      const email = document.getElementById('regProdEmail').value;
+      const password = document.getElementById('regProdPassword').value;
+      if (!name || !email || !password) {
+        document.getElementById('registerProducerError').textContent = "Tous les champs sont requis";
+        return;
+      }
+      const result = registerProducer(name, email, password);
+      if (result.success) {
+        closeAuthModal();
+        updateAuthUI();
+        showToast(`✅ Bienvenue ${result.user.name} ! Vous pouvez maintenant créer votre boutique.`);
+      } else {
+        document.getElementById('registerProducerError').textContent = result.error;
+      }
+    });
+
+    document.getElementById('closeAuthModal')?.addEventListener('click', closeAuthModal);
+    document.getElementById('authModal')?.addEventListener('click', (e) => {
+      if (e.target === document.getElementById('authModal')) closeAuthModal();
+    });
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
+  }
+
+  function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem('greenmarket_cart') || '[]');
+    const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+    const badge = document.getElementById('cart-count');
+    if (badge) badge.textContent = total;
+  }
+
+  // Cargar header
+  async function loadHeaderAndInit() {
+    try {
+      const response = await fetch('header.html');
+      if (!response.ok) throw new Error('Error cargando header');
+      const headerHtml = await response.text();
+      document.getElementById('header-placeholder').innerHTML = headerHtml;
+      
+      setTimeout(() => {
+        initUsers();
+        updateCartCount();
+        updateAuthUI();
+        setupAuthModal();
+      }, 100);
+    } catch (error) {
+      console.error('Error:', error);
+      initUsers();
+      updateAuthUI();
+      setupAuthModal();
+    }
+  }
+
+  document.getElementById('contactBtn')?.addEventListener('click', () => {
+    showToast("📧 Contactez-nous : contact@greenmarket.ma");
+  });
+
+  loadHeaderAndInit();
+</script>
+</body>
+</html>

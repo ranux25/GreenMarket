@@ -32,39 +32,6 @@
     min-height: 100vh;
   }
 
-  nav {
-    background: var(--white);
-    border-bottom: 1.5px solid var(--border);
-    padding: 0 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 68px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .nav-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.7rem;
-    font-weight: 700;
-    color: var(--wine);
-    display: flex;
-    align-items: center;
-    gap: .4rem;
-  }
-  .nav-logo span { color: var(--sage-dark); font-weight: 400; font-style: italic; }
-  .nav-links { display: flex; gap: 2rem; }
-  .nav-links a {
-    text-decoration: none;
-    color: var(--text-muted);
-    font-size: .82rem;
-    font-weight: 500;
-    letter-spacing: .09em;
-    text-transform: uppercase;
-    transition: color .2s;
-  }
-  .nav-links a:hover { color: var(--wine); }
   .btn-back {
     background: var(--wine-pale);
     color: var(--wine);
@@ -437,12 +404,6 @@
     .container {
       padding: 0 1rem;
     }
-    nav {
-      padding: 0 1rem;
-    }
-    .nav-links {
-      display: none;
-    }
     .form-row {
       grid-template-columns: 1fr;
     }
@@ -451,16 +412,7 @@
 </head>
 <body>
 
-<nav>
-  <div class="nav-logo">🌿 Green<span>Market</span></div>
-  <div class="nav-links">
-    <a href="store.html">Accueil</a>
-    <a href="store.html">Boutiques</a>
-    <a href="panier.html">🛒 Panier</a>
-    <a href="#">À propos</a>
-  </div>
-  <a href="javascript:history.back()" class="btn-back">← Retour</a>
-</nav>
+<div id="header-placeholder"></div>
 
 <div class="page-header">
   <div class="header-inner">
@@ -483,7 +435,20 @@
 </div>
 
 <script>
-  // ========== UTILITAIRES ==========
+  function loadHeader() {
+    fetch('header.html')
+      .then(response => {
+        if (!response.ok) throw new Error("Erreur");
+        return response.text();
+      })
+      .then(data => {
+        document.getElementById('header-placeholder').innerHTML = data;
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }
+
   function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/[&<>]/g, function(m) {
@@ -521,7 +486,6 @@
     return 5;
   }
 
-  // ========== DATOS DE LA URL ==========
   function obtenerDatosCheckout() {
     var params = new URLSearchParams(window.location.search);
     var productos = [];
@@ -536,7 +500,6 @@
       }
     }
     
-    // Si no hay productos en la URL, intentar cargar desde el carrito
     if (productos.length === 0) {
       var carritoRaw = localStorage.getItem('greenmarket_panier');
       if (carritoRaw) {
@@ -546,13 +509,11 @@
       }
     }
     
-    // Normalizar los productos para que tengan la estructura esperada
     var productosNormalizados = [];
     var primeraTienda = null;
     
     for (var i = 0; i < productos.length; i++) {
       var p = productos[i];
-      // Determinar el nombre de la tienda
       var tiendaNombre = p.boutiqueNom || (p.shopName) || 'Boutique';
       var tiendaId = p.boutiqueId || (p.shopId) || 1;
       
@@ -578,7 +539,6 @@
     };
   }
 
-  // ========== ACTUALIZAR TOTALES ==========
   function actualizarTotales(productos, modoEnvio) {
     var subtotal = 0;
     for (var i = 0; i < productos.length; i++) {
@@ -602,7 +562,6 @@
     return { subtotal: subtotal, envio: envio, total: total };
   }
 
-  // ========== CONFIRMAR PEDIDO ==========
   function confirmarPedido(datos) {
     var firstName = document.getElementById('firstName')?.value.trim() || '';
     var lastName = document.getElementById('lastName')?.value.trim() || '';
@@ -616,7 +575,6 @@
     var modoEnvio = document.querySelector('input[name="delivery"]:checked')?.value || 'delivery';
     var modoPago = document.querySelector('input[name="payment"]:checked')?.value || 'card';
     
-    // Validación
     var errores = [];
     if (!firstName) errores.push('firstName');
     if (!lastName) errores.push('lastName');
@@ -647,7 +605,6 @@
       return;
     }
     
-    // Calcular totales finales
     var subtotal = 0;
     for (var k = 0; k < datos.productos.length; k++) {
       var precio = extraerPrecio(datos.productos[k].price);
@@ -657,7 +614,6 @@
     var envio = (modoEnvio === 'pickup') ? 0 : 5;
     var total = subtotal + envio;
     
-    // Crear pedido
     var pedido = {
       id: Date.now(),
       numeroPedido: 'CMD-' + Date.now().toString().slice(-8),
@@ -688,15 +644,12 @@
       estado: 'confirmada'
     };
     
-    // Guardar en localStorage
     var pedidosExistentes = JSON.parse(localStorage.getItem('greenmarket_orders') || '[]');
     pedidosExistentes.push(pedido);
     localStorage.setItem('greenmarket_orders', JSON.stringify(pedidosExistentes));
     
-    // Vaciar el carrito después de la compra
     localStorage.removeItem('greenmarket_panier');
     
-    // Mostrar éxito
     var contenedor = document.getElementById('content');
     contenedor.innerHTML = `
       <div class="success-card">
@@ -716,7 +669,6 @@
     showToast("✅ Commande confirmée !");
   }
 
-  // ========== CARGAR PÁGINA ==========
   function cargarCheckout() {
     var datos = obtenerDatosCheckout();
     
@@ -732,7 +684,6 @@
       return;
     }
     
-    // Generar HTML de productos
     var itemsHtml = '';
     for (var i = 0; i < datos.productos.length; i++) {
       var p = datos.productos[i];
@@ -847,10 +798,8 @@
     
     document.getElementById('content').innerHTML = html;
     
-    // Inicializar totales
     actualizarTotales(datos.productos, 'delivery');
     
-    // Evento cambio modo de envío
     var radiosEnvio = document.querySelectorAll('input[name="delivery"]');
     for (var i = 0; i < radiosEnvio.length; i++) {
       radiosEnvio[i].addEventListener('change', function(e) {
@@ -863,13 +812,15 @@
       });
     }
     
-    // Botón confirmar
     document.getElementById('btnConfirmar').onclick = function() {
       confirmarPedido(datos);
     };
   }
   
-  cargarCheckout();
+  window.addEventListener('DOMContentLoaded', function() {
+      loadHeader();
+      cargarCheckout();
+  });
 </script>
 </body>
 </html>
