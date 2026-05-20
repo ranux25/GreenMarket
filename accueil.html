@@ -424,7 +424,6 @@
  
 <div id="toast">✓ Produit ajouté au panier !</div>
 
-<!-- ========== HEADER COMPLETO (integrado directamente) ========== -->
 <header>
   <div style="max-width: 1280px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
     <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='accueil.html'">
@@ -442,8 +441,9 @@
       <a href="accueil.html" class="nav-link active" id="navAccueil">Accueil</a>
       <a href="store.html" class="nav-link" id="navBoutiques">Boutiques</a>
       <a href="produits.html" class="nav-link" id="navProduits">Produits</a>
+<a href="Apropos.html" class="nav-link">À propos</a>
 
-      <a href="apropos.html" class="nav-link">À propos</a>
+      <a href="#" class="nav-link">À propos</a>
       <a href="dashboard-producteur.html" id="dashboardLink" class="nav-link" style="display: none;">📊 Dashboard</a>
     </nav>
 
@@ -461,7 +461,6 @@
   </div>
 </header>
 
-<!-- ===================== HERO ===================== -->
 <section class="hero-section" style="position: relative; min-height: 75vh; display: flex; align-items: center; overflow: hidden; padding: 0;">
   <div style="position: absolute; inset: 0;">
     <img src="IMAGES/hero2.PNG" alt="Hero image" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=1200&h=800&fit=crop'"/>
@@ -475,7 +474,6 @@
   </div>
 </section>
  
-<!-- ===================== CATEGORIES ===================== -->
 <section class="py-16 px-4 max-w-7xl mx-auto">
   <div class="mb-10">
     <h2 class="section-title">Nos catégories de produits traditionnels</h2>
@@ -492,7 +490,6 @@
   </div>
 </section>
  
-<!-- ===================== FEATURED PRODUCTS ===================== -->
 <section class="py-10 px-4" style="background:linear-gradient(180deg,#fdf8ee 0%,#fff9eb 100%);">
   <div class="max-w-7xl mx-auto">
     <div class="mb-10">
@@ -502,7 +499,6 @@
   </div>
 </section>
 
-<!-- ===================== STORES SECTION ===================== -->
 <section id="stores-section" class="py-16 px-4 max-w-7xl mx-auto">
   <div class="mb-10 flex justify-between items-center flex-wrap gap-4">
     <div>
@@ -515,7 +511,6 @@
 </section>
 
 
-<!-- ===================== PROMO BANNER ===================== -->
 <section class="promo-banner py-12 px-4">
   <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
     <div>
@@ -526,7 +521,6 @@
   </div>
 </section>
  
-<!-- ===================== WHY SECTION ===================== -->
 <section class="py-16 px-4" style="background:linear-gradient(135deg,#fdf5e0 0%,#f5ede0 100%);">
   <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
     <div>
@@ -544,7 +538,6 @@
   </div>
 </section>
  
-<!-- ===================== FOOTER ===================== -->
 <footer class="pt-14 pb-8 px-4">
   <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 mb-10">
     <div><p class="footer-heading">GreenMarket</p><a href="#">À propos</a><a href="#">Nos coopératives</a><a href="#">Devenir partenaire</a></div>
@@ -632,7 +625,7 @@ function renderStars(rating) {
 // ========== PRODUCTOS ==========
 const products = [
   { id: 1, name: "Caftan traditionnel", price: "450 DH", image: "IMAGES/CaftanSoie.jpg", coop: "Coopérative Fès Artisanat", rating: 4.5, reviews: 156, badge: "Artisanal", badgeClass: "secondary" },
-  { id: 2, name: "Huile d'olive extra vierge", price: "120 DH / litre", image: "IMAGES/huile-olive.jpg", coop: "Coopérative Atlas", rating: 5, reviews: 234, badge: "Bio", badgeClass: "bio" },
+  { id: 2, name: "Huile d'olive extra vierge", price: "120 DH / litre", image: "IMAGES/olive.jfif", coop: "Coopérative Atlas", rating: 5, reviews: 234, badge: "Bio", badgeClass: "bio" },
   { id: 3, name: "Tekchita Traditionnelle", price: "650 DH", image: "IMAGES/Tekchita.jpg", coop: "Coopérative Fès Artisanat", rating: 4.8, reviews: 89, badge: "Rare", badgeClass: "rare" },
   { id: 4, name: "Caftan Moderne", price: "750 DH", image: "IMAGES/CaftanModerne.jpg", coop: "Coopérative Marrakech", rating: 4.9, reviews: 67, badge: "Fait main", badgeClass: "fait" }
 ];
@@ -648,28 +641,40 @@ const cooperatives = [
 let cart = [];
 
 function loadCart() {
-  const saved = localStorage.getItem('greenmarket_cart');
+  const saved = localStorage.getItem('greenmarket_panier');
   cart = saved ? JSON.parse(saved) : [];
   updateCartCount();
 }
 
 function saveCart() { 
-  localStorage.setItem('greenmarket_cart', JSON.stringify(cart)); 
+  localStorage.setItem('greenmarket_panier', JSON.stringify(cart)); 
   updateCartCount(); 
 }
 
 function updateCartCount() {
-  const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  const total = cart.reduce((sum, item) => sum + (item.quantite || 1), 0);
   const badge = document.getElementById('cart-count');
   if (badge) badge.textContent = total;
 }
 
 function addToCart(product) {
   const existing = cart.find(item => item.id === product.id);
+  
+  let prixNumerique = parseInt(String(product.price).replace(/\D/g, '')) || 0;
+  
   if (existing) {
-    existing.quantity = (existing.quantity || 1) + 1;
+    existing.quantite = (existing.quantite || 1) + 1;
   } else {
-    cart.push({ ...product, quantity: 1 });
+    cart.push({ 
+      id: product.id, 
+      nom: product.name, 
+      prix: product.price,
+      prixNumerique: prixNumerique,
+      image: product.image,
+      boutiqueId: product.id, 
+      boutiqueNom: product.coop, 
+      quantite: 1 
+    });
   }
   saveCart();
   showToast(`✓ ${product.name} ajouté au panier !`);
