@@ -2,9 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
 <title>GreenMarket – Détail boutique</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="header.css">
 <style>
   :root {
     --cream:      #fff9eb;
@@ -37,109 +38,7 @@
     min-height: 100vh;
   }
 
-  .search-bar input {
-    border: 1.5px solid #e8dfc8;
-    background: #fdf8ee;
-    border-radius: 999px;
-    padding: 10px 20px;
-    width: 100%;
-    max-width: 420px;
-    font-family: 'Lato', sans-serif;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s;
-    color: var(--text-dark);
-  }
-  .search-bar input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(93,13,24,0.08);
-  }
-
-  .nav-link {
-    font-family: 'Lato', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--text-dark);
-    text-decoration: none;
-    letter-spacing: 0.5px;
-    transition: color 0.2s;
-    padding: 4px 0;
-    position: relative;
-  }
-  .nav-link::after {
-    content: '';
-    display: block;
-    height: 2px;
-    background: var(--primary);
-    transform: scaleX(0);
-    transition: transform 0.25s;
-    border-radius: 2px;
-  }
-  .nav-link:hover { color: var(--primary); }
-  .nav-link:hover::after { transform: scaleX(1); }
-
-  .cart-btn {
-    position: relative;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-  }
-  .cart-badge {
-    position: absolute;
-    top: -5px; right: -7px;
-    background: var(--primary);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    border-radius: 999px;
-    min-width: 18px;
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Lato', sans-serif;
-  }
-
-  .desktop-nav {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-  }
-
-  @media (max-width: 640px) {
-    .desktop-nav { display: none; }
-  }
-
-  .btn-connexion {
-    background: var(--primary);
-    color: #fff;
-    border: none;
-    border-radius: 999px;
-    padding: 8px 20px;
-    font-family: 'Lato', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
-    letter-spacing: 0.3px;
-  }
-  .btn-connexion:hover {
-    background: #7a1020;
-    transform: translateY(-1px);
-  }
-
-  .user-badge {
-    background: var(--wine-pale);
-    padding: 0.4rem 1rem;
-    border-radius: 30px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--wine);
-    font-weight: 600;
-    font-size: 0.85rem;
-  }
+  #header-placeholder { width: 100%; }
 
   .btn-back {
     background: var(--wine-pale);
@@ -424,39 +323,6 @@
   .btn-buy-now:hover {
     background: var(--wine-dark);
   }
-  .btn-delete {
-    background: var(--border);
-    color: var(--wine);
-    border: none;
-    padding: 0.5rem 0.8rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    cursor: pointer;
-  }
-  .btn-delete:hover {
-    background: var(--wine);
-    color: white;
-  }
-  .btn-edit {
-    background: var(--sage-light);
-    color: var(--sage-dark);
-    border: none;
-    padding: 0.5rem 0.8rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    cursor: pointer;
-  }
-  .btn-edit:hover {
-    background: var(--sage);
-    color: white;
-  }
-  .empty-products {
-    text-align: center;
-    padding: 2rem;
-    color: var(--text-muted);
-    background: var(--cream);
-    border-radius: 8px;
-  }
 
   .producer-card {
     display: flex;
@@ -513,161 +379,13 @@
     border-radius: 3px;
     font-weight: 600;
   }
-  .btn-profil {
-    margin-top: 1rem;
-    background: var(--sage);
-    color: white;
-    border: none;
-    padding: 0.6rem 1rem;
-    border-radius: 3px;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 0.8rem;
-    transition: background 0.2s;
-  }
-  .btn-profil:hover { background: var(--wine); }
-  .btn-dashboard {
-    background: var(--wine);
-    color: white;
-    margin-top: 0.5rem;
-  }
-  .btn-dashboard:hover { background: var(--wine-dark); }
 
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal-content {
-    background: var(--white);
-    border-radius: 8px;
-    padding: 1.5rem;
-    max-width: 450px;
-    width: 90%;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-  }
-  .modal-content h3 {
-    color: var(--wine);
-    margin-bottom: 1rem;
-    font-family: 'Cormorant Garamond', serif;
-  }
-  .modal-content input, .modal-content textarea, .modal-content select {
-    width: 100%;
-    padding: 0.7rem;
-    margin-bottom: 1rem;
-    border: 1.5px solid var(--border);
-    border-radius: 6px;
-    font-family: inherit;
-    background: var(--cream);
-  }
-  .image-option-group {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-  }
-  .image-option-group label {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-size: 0.8rem;
-    cursor: pointer;
-  }
-  .image-preview {
-    margin-top: 0.5rem;
-    width: 100%;
-    min-height: 120px;
-    background: var(--cream);
-    border: 2px dashed var(--border);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-    transition: all 0.2s;
-  }
-  .image-preview.drag-over {
-    border-color: var(--wine);
-    background: var(--wine-pale);
-  }
-  .image-preview img {
-    max-width: 100%;
-    max-height: 150px;
-    object-fit: contain;
-  }
-  .preview-placeholder {
+  .empty-products {
     text-align: center;
-    padding: 1rem;
+    padding: 2rem;
     color: var(--text-muted);
-    font-size: 0.8rem;
-  }
-  .preview-placeholder::before {
-    content: "🖼️ ";
-    font-size: 1.5rem;
-    display: block;
-    margin-bottom: 0.3rem;
-  }
-  .btn-clear-image {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background: rgba(93,13,24,0.8);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-  }
-  .btn-clear-image:hover {
-    background: var(--wine);
-  }
-  .modal-actions {
-    display: flex;
-    gap: 0.8rem;
-    margin-top: 0.5rem;
-  }
-  .modal-actions button {
-    flex: 1;
-    padding: 0.6rem;
-    border-radius: 3px;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .btn-save { background: var(--wine); color: white; }
-  .btn-cancel { background: var(--border); color: var(--text-muted); }
-
-  .loading, .error {
-    text-align: center;
-    padding: 3rem;
-  }
-  .error {
-    background: var(--wine-pale);
+    background: var(--cream);
     border-radius: 8px;
-    color: var(--wine);
-  }
-  .footer-note {
-    text-align: center;
-    margin-top: 3rem;
-    padding: 1.5rem;
-    color: var(--text-muted);
-    border-top: 1px solid var(--border);
   }
 
   .toast {
@@ -688,87 +406,39 @@
   }
   .toast.show { transform: translateY(0); opacity: 1; }
 
-  .auth-modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-  .auth-modal-overlay.open { display: flex; }
-  .auth-modal {
-    background: var(--white);
-    border-radius: 16px;
-    padding: 2rem;
-    max-width: 450px;
-    width: 90%;
-    position: relative;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-  }
-  .auth-tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
-  .auth-tab {
-    background: none;
+  .btn-connexion {
+    background: var(--primary);
+    color: #fff;
     border: none;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
+    border-radius: 999px;
+    padding: 8px 20px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
     cursor: pointer;
-    color: var(--text-muted);
-    font-weight: 500;
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.3px;
+    text-decoration: none;
+    display: inline-block;
   }
-  .auth-tab.active { color: var(--wine); border-bottom: 2px solid var(--wine); }
-  .auth-form { display: none; }
-  .auth-form.active { display: block; }
-  .auth-form h3 { color: var(--wine); margin-bottom: 1rem; font-family: 'Cormorant Garamond', serif; }
-  .auth-form input {
-    width: 100%; padding: 0.7rem; margin-bottom: 1rem;
-    border: 1.5px solid var(--border); border-radius: 8px;
-    font-family: 'Jost', sans-serif; background: var(--cream);
+  .btn-connexion:hover {
+    background: #7a1020;
+    transform: translateY(-1px);
   }
-  .auth-error { color: #d9534f; font-size: 0.8rem; margin-top: 0.5rem; text-align: center; }
-  .auth-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); }
 
-  .btn-filled {
-    background: var(--wine); color: var(--cream);
-    border: none; padding: .5rem 1.3rem; border-radius: 3px;
-    font-family: 'Jost', sans-serif; font-size: .78rem; font-weight: 600;
-    letter-spacing: .07em; text-transform: uppercase;
-    cursor: pointer; transition: background .2s;
-  }
-  .btn-filled:hover { background: var(--wine-dark); }
-
-  .file-input-wrapper {
-    position: relative;
-    margin-bottom: 1rem;
-  }
-  .file-input-label {
+  .user-badge {
+    background: var(--wine-pale);
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    background: var(--sage-light);
-    color: var(--sage-dark);
-    padding: 0.6rem;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    font-weight: 500;
-    transition: background 0.2s;
-  }
-  .file-input-label:hover {
-    background: var(--sage);
-    color: white;
-  }
-  .file-input-label input {
-    display: none;
+    gap: 10px;
+    color: var(--wine);
+    font-weight: 600;
+    font-size: 0.85rem;
   }
 
   @media (max-width: 700px) {
-    .desktop-nav { display: none; }
     .container { padding: 0 1rem; }
     .shop-body { padding: 1rem; }
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -799,224 +469,173 @@
   </div>
 </div>
 
-<div class="footer-note">
+<div class="footer-note" style="text-align: center; margin-top: 3rem; padding: 1.5rem; color: var(--text-muted); border-top: 1px solid var(--border);">
   🌿 GreenMarket – Mettre en valeur les producteurs locaux
 </div>
 
-<div class="auth-modal-overlay" id="authModal">
-  <div class="auth-modal">
-    <div class="auth-tabs"><button class="auth-tab active" data-tab="login">Connexion</button></div>
-    <div id="loginForm" class="auth-form active">
-      <h3>🔐 Se connecter</h3>
-      <input type="email" id="loginEmail" placeholder="Email"><input type="password" id="loginPassword" placeholder="Mot de passe">
-      <button class="btn-filled" id="doLoginBtn" style="width:100%">Se connecter</button>
-      <p class="auth-error" id="loginError"></p>
-    </div>
-    <button class="auth-close" id="closeAuthModal">✕</button>
-  </div>
-</div>
-
 <script>
-  function loadHeaderAndInit() {
-    fetch('header.html')
-      .then(response => {
-        if (!response.ok) throw new Error("Erreur");
-        return response.text();
-      })
-      .then(data => {
-        document.getElementById('header-placeholder').innerHTML = data;
-        initAuth();
-        loadShop();
-      })
-      .catch(error => {
-        console.error(error);
-        initAuth();
-        loadShop();
-      });
+  // ========== PRODUCTOS GLOBALES (mismos que en produits.html) ==========
+  const allProducts = [
+    { id: 101, name: "Caftan en Soie", price: "500 DH", stock: 5, image: "IMAGES/CaftanSoie.jpg", description: "Caftan en soie naturelle, broderies faites main par des maîtres-artisans de Fès.", shopId: 1, shopName: "Maison du Caftan", category: "Caftans & Vêtements traditionnels" },
+    { id: 102, name: "Takchita Cérémonie", price: "700 DH", stock: 3, image: "IMAGES/Tekchita.jpg", description: "Takchita pour mariage, broderies d'or et d'argent.", shopId: 10, shopName: "Caftans Impériaux", category: "Caftans & Vêtements traditionnels" },
+    { id: 103, name: "Caftan Moderne", price: "600 DH", stock: 8, image: "IMAGES/CaftanModerne.jpg", description: "Caftan à la coupe contemporaine, idéal pour les occasions spéciales.", shopId: 1, shopName: "Maison du Caftan", category: "Caftans & Vêtements traditionnels" },
+    { id: 201, name: "Tapis Berbère Moyen", price: "1 200 DH", stock: 4, image: "IMAGES/img/tapis.jpeg", description: "Tapis en laine naturelle, motifs berbères authentiques.", shopId: 2, shopName: "Tapis Berbère d'Atlas", category: "Tapis & Tissage" },
+    { id: 202, name: "Tapis Azilal", price: "950 DH", stock: 6, image: "IMAGES/img/tapisBerbere.jpeg", description: "Tapis coloré des montagnes d'Azilal, motifs géométriques uniques.", shopId: 9, shopName: "Tissage d'Azilal", category: "Tapis & Tissage" },
+    { id: 301, name: "Tajine Traditionnel", price: "180 DH", stock: 20, image: "IMAGES/img/tajin.jpeg", description: "Tajine en terre cuite, motif peint à la main.", shopId: 3, shopName: "Poterie de Safi", category: "Poterie & Céramique" },
+    { id: 401, name: "Petite Table Marqueterie", price: "850 DH", stock: 4, image: "IMAGES/img/table.webp", description: "Table en cèdre incrusté, marqueterie fine.", shopId: 4, shopName: "Marqueterie de Tetouan", category: "Marqueterie & Bois" },
+    { id: 501, name: "Bracelet Argent Amazigh", price: "450 DH", stock: 10, image: "IMAGES/img/accesorio.jpeg", description: "Bracelet en argent, symbole amazigh.", shopId: 5, shopName: "Bijoux Amaziagh", category: "Bijoux & Joaillerie" },
+    { id: 601, name: "Lanterne Laiton", price: "380 DH", stock: 8, image: "IMAGES/img/luz.jpeg", description: "Lanterne en laiton martelé, ambiance orientale.", shopId: 6, shopName: "Lumières de Marrakech", category: "Lampes & Fer forgé" },
+    { id: 701, name: "Huile d'Argan Bio", price: "120 DH", stock: 50, image: "IMAGES/img/argan.jpg", description: "Huile d'argan 100% pure, certifiée bio.", shopId: 7, shopName: "Argamane Naturel", category: "Cosmétiques naturels" },
+    { id: 801, name: "Huile d'Olive Vierge", price: "85 DH", stock: 40, image: "IMAGES/img/vierge.jpeg", description: "Huile d'olive extra vierge, première pression.", shopId: 8, shopName: "Saveurs du Terroir", category: "Produits du terroir" },
+    { id: 802, name: "Amlou", price: "95 DH", stock: 25, image: "IMAGES/img/amlou.jpeg", description: "Purée d'amandes et miel d'argan, délice marocain.", shopId: 8, shopName: "Saveurs du Terroir", category: "Produits du terroir" }
+  ];
+
+  // ========== TIENDAS ==========
+  let stores = [];
+
+  function loadStores() {
+    const saved = localStorage.getItem('greenmarket_stores');
+    if (saved && JSON.parse(saved).length > 0) {
+      stores = JSON.parse(saved);
+    } else {
+      stores = [
+        { id:1, name:"Maison du Caftan", category:"Caftans & Vêtements traditionnels", badge:"Artisan", banner:"IMAGES/1779140603090.png", desc:"Caftans de luxe en soie et tissus traditionnels, broderies faites main par des maîtres-artisans de Fès.", rating:4.9, reviews:234, products:8, sales:"2 450", producerName:"Fatima Zahra", location:"Fès", since:"2005", producerId:101 },
+        { id:2, name:"Tapis Berbère d'Atlas", category:"Tapis & Tissage", badge:"Tradition", banner:"IMAGES/1779140612922.png", desc:"Tapis berbères authentiques tissés à la main par les femmes de l'Atlas, chaque pièce est unique.", rating:4.8, reviews:189, products:6, sales:"3 200", producerName:"Rachid El Mansouri", location:"Marrakech", since:"2010", producerId:102 },
+        { id:3, name:"Poterie de Safi", category:"Poterie & Céramique", badge:"Fait Main", banner:"IMAGES/1779140622713.png", desc:"Poterie traditionnelle de Safi, plats, tajines et vases peints à la main.", rating:4.7, reviews:156, products:12, sales:"1 890", producerName:"Ahmed Benjelloun", location:"Safi", since:"1998", producerId:103 },
+        { id:4, name:"Marqueterie de Tetouan", category:"Marqueterie & Bois", badge:"Artisan", banner:"IMAGES/1779140702263.png", desc:"Meubles et objets en bois de cèdre incrustés, marqueterie fine.", rating:4.9, reviews:112, products:5, sales:"980", producerName:"Mohamed Alami", location:"Tetouan", since:"2012", producerId:104 },
+        { id:5, name:"Bijoux Amaziagh", category:"Bijoux & Joaillerie", badge:"Tradition", banner:"IMAGES/1779140781327.png", desc:"Bijoux en argent massif inspirés des symboles amazighs.", rating:4.9, reviews:203, products:15, sales:"2 100", producerName:"Malika Oufkir", location:"Agadir", since:"2008", producerId:105 },
+        { id:6, name:"Lumières de Marrakech", category:"Lampes & Fer forgé", badge:"Fait Main", banner:"IMAGES/1779140836694.png", desc:"Lampes en fer forgé, lanternes en laiton traditionnelles.", rating:4.6, reviews:98, products:9, sales:"1 450", producerName:"Karim Tazi", location:"Marrakech", since:"2015", producerId:106 },
+        { id:7, name:"Argamane Naturel", category:"Cosmétiques naturels", badge:"Artisan", banner:"IMAGES/1779140886747.png", desc:"Savons à l'huile d'argan, ghassoul, huiles essentielles.", rating:4.8, reviews:178, products:11, sales:"890", producerName:"Nadia Berrada", location:"Essaouira", since:"2017", producerId:107 },
+        { id:8, name:"Saveurs du Terroir", category:"Produits du terroir", badge:"Tradition", banner:"IMAGES/1779140962074.png", desc:"Huile d'olive, amlou, miel de montagne, épices artisanales.", rating:4.7, reviews:145, products:20, sales:"3 500", producerName:"Hassan El Fassi", location:"Meknès", since:"2000", producerId:108 },
+        { id:9, name:"Tissage d'Azilal", category:"Tapis & Tissage", badge:"Fait Main", banner:"IMAGES/1779141008846.png", desc:"Couvertures, tapis et tissages colorés des montagnes d'Azilal.", rating:4.8, reviews:87, products:7, sales:"670", producerName:"Zineb Ait Ali", location:"Azilal", since:"2019", producerId:109 },
+        { id:10, name:"Caftans Impériaux", category:"Caftans & Vêtements traditionnels", badge:"Artisan", banner:"IMAGES/1779141052204.png", desc:"Caftans de cérémonie, takchitas pour grandes occasions.", rating:4.9, reviews:256, products:10, sales:"4 200", producerName:"Leila Benani", location:"Casablanca", since:"2006", producerId:110 }
+      ];
+    }
+    return stores;
   }
 
-  let currentUser = null;
-  let productsData = {};
-  let currentImageDataUrl = null;
-
+  // ========== FUNCIONES DEL CARRITO ==========
   function getPanier() {
-    const saved = localStorage.getItem('greenmarket_panier');
+    const saved = localStorage.getItem('greenmarket_cart');
     return saved ? JSON.parse(saved) : [];
   }
 
-  function sauvegarderPanier(panier) {
-    localStorage.setItem('greenmarket_panier', JSON.stringify(panier));
-    mettreAJourCompteurPanier();
+  function savePanier(panier) {
+    localStorage.setItem('greenmarket_cart', JSON.stringify(panier));
+    updateCartCount();
   }
 
-  function mettreAJourCompteurPanier() {
+  function updateCartCount() {
     const panier = getPanier();
-    const totalItems = panier.reduce((sum, item) => sum + item.quantite, 0);
-    const cartCountSpan = document.getElementById('cart-count');
-    if (cartCountSpan) {
-      cartCountSpan.textContent = totalItems;
-    }
+    const total = panier.reduce((sum, item) => sum + (item.quantity || 1), 0);
+    const badge = document.getElementById('cart-count');
+    if (badge) badge.textContent = total;
   }
 
-  function ajouterAuPanier(produit, boutiqueId, boutiqueNom) {
+  function addToCart(product, shopId, shopName) {
     let panier = getPanier();
-    const existing = panier.find(p => p.id === produit.id);
+    const existing = panier.find(p => p.id === product.id);
+    
+    let prixNumerique = parseInt(product.price.replace(/\D/g, '')) || 0;
     
     if (existing) {
-      existing.quantite += 1;
+      existing.quantity = (existing.quantity || 1) + 1;
     } else {
-      let prixNumerique = 5;
-      if (produit.price) {
-        const match = String(produit.price).match(/(\d+(?:[.,]\d+)?)/);
-        if (match) {
-          prixNumerique = parseFloat(match[1].replace(',', '.'));
-        }
-      }
-      
       panier.push({
-        id: produit.id,
-        nom: produit.name,
-        prix: produit.price,
+        id: product.id,
+        name: product.name,
+        price: product.price,
         prixNumerique: prixNumerique,
-        image: produit.image,
-        boutiqueId: boutiqueId,
-        boutiqueNom: boutiqueNom,
-        quantite: 1
+        image: product.image,
+        boutiqueId: shopId,
+        boutiqueNom: shopName,
+        quantity: 1
       });
     }
     
-    sauvegarderPanier(panier);
-    showToast(`✅ ${produit.name} ajouté au panier`);
+    savePanier(panier);
+    showToast(`✅ ${product.name} ajouté au panier`);
   }
 
-  function acheterMaintenant(produit, boutiqueId, boutiqueNom) {
+  function buyNow(product, shopId, shopName) {
     let panier = [];
-    let prixNumerique = 5;
-    if (produit.price) {
-      const match = String(produit.price).match(/(\d+(?:[.,]\d+)?)/);
-      if (match) {
-        prixNumerique = parseFloat(match[1].replace(',', '.'));
-      }
-    }
+    let prixNumerique = parseInt(product.price.replace(/\D/g, '')) || 0;
     
     panier.push({
-      id: produit.id,
-      nom: produit.name,
-      prix: produit.price,
+      id: product.id,
+      name: product.name,
+      price: product.price,
       prixNumerique: prixNumerique,
-      image: produit.image,
-      boutiqueId: boutiqueId,
-      boutiqueNom: boutiqueNom,
-      quantite: 1
+      image: product.image,
+      boutiqueId: shopId,
+      boutiqueNom: shopName,
+      quantity: 1
     });
     
-    sauvegarderPanier(panier);
+    savePanier(panier);
     
-    const produitsPourCheckout = panier.map(p => ({
+    const productsForCheckout = panier.map(p => ({
       id: p.id,
-      name: p.nom,
-      price: p.prix,
+      name: p.name,
+      price: p.price,
       image: p.image,
-      quantity: p.quantite,
+      quantity: p.quantity,
       boutiqueId: p.boutiqueId,
       boutiqueNom: p.boutiqueNom
     }));
     
-    const encodedProducts = encodeURIComponent(JSON.stringify(produitsPourCheckout));
-    window.location.href = `checkout.html?shopId=${boutiqueId}&shopName=${encodeURIComponent(boutiqueNom)}&products=${encodedProducts}`;
+    const encoded = encodeURIComponent(JSON.stringify(productsForCheckout));
+    window.location.href = `checkout.html?products=${encoded}`;
   }
+
+  // ========== AUTENTICACIÓN ==========
+  let currentUser = null;
 
   function getCurrentUser() {
-    const userJson = sessionStorage.getItem("greenmarket_current_user");
-    if (!userJson) return null;
-    const user = JSON.parse(userJson);
-    if (user.role === "Producer") user.role = "productor";
-    if (user.role === "Customer") user.role = "client";
-    return user;
-  }
-
-  function updateAuthUI() {
-    const widget = document.getElementById('authWidget');
-    if (!widget) return;
-    const user = getCurrentUser();
-    if (user) {
-      const roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Artisan' : 'Client');
-      widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;">🚪</button></div>`;
-      document.getElementById('logoutBtn')?.addEventListener('click', logout);
-    } else {
-      widget.innerHTML = `<button class="btn-connexion" id="showLoginBtn">🔑 Connexion</button>`;
-      document.getElementById('showLoginBtn')?.addEventListener('click', () => showAuthModal('login'));
-    }
+    const u = sessionStorage.getItem('greenmarket_current_user');
+    return u ? JSON.parse(u) : null;
   }
 
   function logout() {
     sessionStorage.removeItem('greenmarket_current_user');
     currentUser = null;
     updateAuthUI();
-    location.reload();
+    showToast("👋 Déconnexion réussie");
+    setTimeout(() => window.location.reload(), 500);
   }
 
-  function showAuthModal() {
-    const modal = document.getElementById('authModal');
-    if(modal) modal.classList.add('open');
-  }
-
-  function closeAuthModal() {
-    const modal = document.getElementById('authModal');
-    if(modal) modal.classList.remove('open');
-  }
-
-  function setupAuthModal() {
-    const btn = document.getElementById('doLoginBtn');
-    if(btn) {
-      btn.addEventListener('click', () => {
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        const result = login(email, password);
-        if (result.success) {
-          closeAuthModal();
-          updateAuthUI();
-          showToast(`👋 Bonjour ${result.user.name} !`);
-          location.reload();
-        } else {
-          document.getElementById('loginError').textContent = result.error;
-        }
-      });
-    }
-    const closeBtn = document.getElementById('closeAuthModal');
-    if(closeBtn) closeBtn.addEventListener('click', closeAuthModal);
-    const modal = document.getElementById('authModal');
-    if(modal) {
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeAuthModal();
-      });
-    }
-  }
-
-  function login(email, password) {
-    const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
-    const user = users.find(u => u.email === email && u.password === password);
+  function updateAuthUI() {
+    const widget = document.getElementById('authWidget');
+    if (!widget) return;
+    
+    const user = getCurrentUser();
     if (user) {
-      const { password, ...safeUser } = user;
-      sessionStorage.setItem('greenmarket_current_user', JSON.stringify(safeUser));
-      return { success: true, user: safeUser };
+      const roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Artisan' : 'Client');
+      widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;">🚪</button></div>`;
+      document.getElementById('logoutBtn')?.addEventListener('click', logout);
+    } else {
+      widget.innerHTML = `<a href="signin.html"><button class="btn-connexion">🔑 Connexion</button></a>`;
     }
-    return { success: false, error: "Email ou mot de passe incorrect" };
   }
 
   function escapeHtml(str) {
     if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-      if (m === '&') return '&amp;';
-      if (m === '<') return '&lt;';
-      if (m === '>') return '&gt;';
-      return m;
-    });
+    return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
   }
 
-  function getShopIdFromURL() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('id');
+  function showToast(msg, bg = 'var(--wine)') {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+      const t = document.createElement('div');
+      t.id = 'toast';
+      t.className = 'toast';
+      document.body.appendChild(t);
+    }
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.background = bg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3200);
   }
 
   function starsHtml(rating) {
@@ -1029,283 +648,29 @@
     return stars;
   }
 
-  function showToast(msg, bg = 'var(--wine)') {
-    let toast = document.getElementById('toast');
-    if (!toast) {
-      const t = document.createElement('div');
-      t.id = 'toast';
-      t.className = 'toast';
-      document.body.appendChild(t);
-    }
-    const t = document.getElementById('toast');
-    t.innerHTML = msg;
-    t.style.background = bg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3200);
+  function getShopIdFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('id');
   }
 
-  function loadProductsFromStorage(shopId) {
-    const saved = localStorage.getItem(`products_${shopId}`);
-    if (saved) {
-      productsData[shopId] = JSON.parse(saved);
-    } else if (!productsData[shopId]) {
-      productsData[shopId] = [];
-    }
-    return productsData[shopId] || [];
-  }
-
-  function saveProductsToStorage(shopId) {
-    localStorage.setItem(`products_${shopId}`, JSON.stringify(productsData[shopId] || []));
-  }
-
-  function addProduct(shopId, product) {
-    if (!productsData[shopId]) productsData[shopId] = [];
-    const newId = Date.now();
-    productsData[shopId].push({
-      id: newId,
-      name: product.name,
-      price: product.price,
-      stock: product.stock || 0,
-      image: product.image || 'https://images.unsplash.com/-1542838132-92c533f91d2a?w=300&h=200&fit=crop',
-      description: product.description || ''
-    });
-    saveProductsToStorage(shopId);
-    updateShopProductCount(shopId);
-    return newId;
-  }
-
-  function updateProduct(shopId, productId, productData) {
-    if (productsData[shopId]) {
-      const index = productsData[shopId].findIndex(p => p.id == productId);
-      if (index !== -1) {
-        productsData[shopId][index] = { ...productsData[shopId][index], ...productData };
-        saveProductsToStorage(shopId);
-      }
-    }
-  }
-
-  function deleteProduct(shopId, productId) {
-    if (productsData[shopId]) {
-      productsData[shopId] = productsData[shopId].filter(p => p.id != productId);
-      saveProductsToStorage(shopId);
-      updateShopProductCount(shopId);
-    }
-  }
-
-  function updateShopProductCount(shopId) {
-    const savedShops = localStorage.getItem('greenmarket_stores');
-    if (savedShops) {
-      let shops = JSON.parse(savedShops);
-      const shopIndex = shops.findIndex(s => s.id == shopId);
-      if (shopIndex !== -1) {
-        shops[shopIndex].products = productsData[shopId]?.length || 0;
-        localStorage.setItem('greenmarket_stores', JSON.stringify(shops));
-      }
-    }
-  }
-
-  function loadStores() {
-    const saved = localStorage.getItem('greenmarket_stores');
-    if (saved) return JSON.parse(saved);
-    return [];
-  }
-
-  let currentShopId = null;
-  let editingProductId = null;
-
-  function openProductModal(shopId, productId = null) {
-    currentShopId = shopId;
-    editingProductId = productId;
-    const product = productId ? productsData[shopId]?.find(p => p.id == productId) : null;
+  function renderShopDetail() {
+    const shopId = parseInt(getShopIdFromURL());
     
-    document.getElementById('productModalTitle').innerText = product ? '✏️ Modifier le produit' : '➕ Ajouter un produit';
-    document.getElementById('productName').value = product?.name || '';
-    document.getElementById('productPrice').value = product?.price || '';
-    document.getElementById('productStock').value = product?.stock || 0;
-    document.getElementById('productDesc').value = product?.description || '';
-    
-    currentImageDataUrl = null;
-    const previewDiv = document.getElementById('imagePreview');
-    if (product?.image && product.image !== 'https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop') {
-      previewDiv.innerHTML = `<img src="${product.image}" alt="Aperçu"><button class="btn-clear-image" onclick="clearImagePreview()">✕</button>`;
-    } else {
-      previewDiv.innerHTML = '<div class="preview-placeholder">Haz clic para seleccionar una imagen de tu galería</div>';
-    }
-    
-    const fileInput = document.getElementById('productImageFile');
-    if (fileInput) fileInput.value = '';
-    
-    document.querySelector('input[name="productImageType"][value="file"]').checked = true;
-    document.getElementById('productUrlContainer').style.display = 'none';
-    document.getElementById('productFileContainer').style.display = 'block';
-    
-    document.getElementById('productModal').classList.add('open');
-  }
-
-  function clearImagePreview() {
-    const previewDiv = document.getElementById('imagePreview');
-    previewDiv.innerHTML = '<div class="preview-placeholder">Haz clic para seleccionar una imagen de tu galería</div>';
-    currentImageDataUrl = null;
-    const fileInput = document.getElementById('productImageFile');
-    if (fileInput) fileInput.value = '';
-  }
-
-  function closeProductModal() {
-    document.getElementById('productModal').classList.remove('open');
-    editingProductId = null;
-    currentShopId = null;
-    currentImageDataUrl = null;
-  }
-
-  function getProductImage(callback) {
-    const imageType = document.querySelector('input[name="productImageType"]:checked').value;
-    
-    if (currentImageDataUrl) {
-      callback(currentImageDataUrl);
-      return;
-    }
-    
-    if (imageType === 'url') {
-      const url = document.getElementById('productImageUrl').value.trim();
-      callback(url || 'https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop');
-    } else {
-      const file = document.getElementById('productImageFile').files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          currentImageDataUrl = event.target.result;
-          callback(event.target.result);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        const previewImg = document.querySelector('#imagePreview img');
-        if (previewImg && previewImg.src && !previewImg.src.includes('placeholder')) {
-          callback(previewImg.src);
-        } else {
-          callback('https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop');
-        }
-      }
-    }
-  }
-
-  function saveProduct() {
-    const name = document.getElementById('productName').value.trim();
-    const price = document.getElementById('productPrice').value.trim();
-    const stock = parseInt(document.getElementById('productStock').value) || 0;
-    const description = document.getElementById('productDesc').value.trim();
-    
-    if (!name || !price) {
-      showToast("⚠️ Veuillez remplir le nom et le prix", '#9a4a00');
-      return;
-    }
-    
-    getProductImage((image) => {
-      if (editingProductId) {
-        updateProduct(currentShopId, editingProductId, { name, price, stock, image, description });
-        showToast("✅ Produit modifié avec succès");
-      } else {
-        addProduct(currentShopId, { name, price, stock, image, description });
-        showToast("✅ Produit ajouté avec succès");
-      }
-      closeProductModal();
-      loadShop();
-    });
-  }
-
-  function setupProductModalEvents() {
-    const radioUrl = document.querySelector('input[name="productImageType"][value="url"]');
-    const radioFile = document.querySelector('input[name="productImageType"][value="file"]');
-    const urlContainer = document.getElementById('productUrlContainer');
-    const fileContainer = document.getElementById('productFileContainer');
-    const fileInput = document.getElementById('productImageFile');
-    const preview = document.getElementById('imagePreview');
-    
-    if (radioUrl && radioFile) {
-      radioUrl.addEventListener('change', () => {
-        urlContainer.style.display = 'block';
-        fileContainer.style.display = 'none';
-        currentImageDataUrl = null;
-      });
-      radioFile.addEventListener('change', () => {
-        urlContainer.style.display = 'none';
-        fileContainer.style.display = 'block';
-        currentImageDataUrl = null;
-      });
-    }
-    
-    if (fileInput) {
-      if (preview) {
-        preview.style.cursor = 'pointer';
-        preview.addEventListener('click', (e) => {
-          if (e.target.classList && e.target.classList.contains('btn-clear-image')) return;
-          fileInput.click();
-        });
-      }
-      
-      fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          if (!file.type.startsWith('image/')) {
-            showToast("❌ Por favor selecciona una imagen válida (JPG, PNG, GIF)", '#9a4a00');
-            fileInput.value = '';
-            return;
-          }
-          
-          const reader = new FileReader();
-          reader.onload = function(event) {
-            currentImageDataUrl = event.target.result;
-            preview.innerHTML = `<img src="${event.target.result}" alt="Aperçu"><button class="btn-clear-image" onclick="clearImagePreview()">✕</button>`;
-            showToast("📸 Image chargée depuis votre galerie", 'var(--sage)');
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-    }
-    
-    const imageUrlInput = document.getElementById('productImageUrl');
-    if (imageUrlInput) {
-      imageUrlInput.addEventListener('input', (e) => {
-        const url = e.target.value.trim();
-        if (url && (url.startsWith('http') || url.startsWith('https'))) {
-          const preview = document.getElementById('imagePreview');
-          preview.innerHTML = `<img src="${url}" alt="Aperçu"><button class="btn-clear-image" onclick="clearImagePreview()">✕</button>`;
-        }
-      });
-    }
-  }
-
-  function deleteProductConfirm(shopId, productId) {
-    if (confirm("Supprimer ce produit ?")) {
-      deleteProduct(shopId, productId);
-      loadShop();
-      showToast("✅ Produit supprimé");
-    }
-  }
-
-  function loadShop() {
-    currentUser = getCurrentUser();
-    const shopId = getShopIdFromURL();
-
     if (!shopId) {
-      const content = document.getElementById('content');
-      if(content) content.innerHTML = `<div class="error"><h2>❌ Boutique non spécifiée</h2><a href="store.html" class="btn-back">Retour</a></div>`;
+      document.getElementById('content').innerHTML = `<div class="error"><h2>❌ Boutique non spécifiée</h2><a href="store.html" class="btn-back">Retour</a></div>`;
       return;
     }
 
-    let shops = loadStores();
-    const shop = shops.find(s => s.id == shopId);
-
+    const shop = stores.find(s => s.id === shopId);
+    
     if (!shop) {
-      const content = document.getElementById('content');
-      if(content) content.innerHTML = `<div class="error"><h2>❌ Boutique introuvable</h2><a href="store.html" class="btn-back">Retour</a></div>`;
+      document.getElementById('content').innerHTML = `<div class="error"><h2>❌ Boutique introuvable</h2><a href="store.html" class="btn-back">Retour</a></div>`;
       return;
     }
 
-    const shopProducts = loadProductsFromStorage(shopId);
-    const isOwner = (currentUser && currentUser.role === 'productor' && currentUser.producerId == shop.producerId) || (currentUser && currentUser.role === 'admin');
-
-    const bannerImage = shop.banner || 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1000&q=80';
-
+    // Filtrar productos que pertenecen a esta tienda
+    const shopProducts = allProducts.filter(p => p.shopId === shopId);
+    
     let productsHtml = '';
     if (shopProducts.length === 0) {
       productsHtml = `<div class="empty-products">📦 Aucun produit dans cette boutique pour le moment.</div>`;
@@ -1313,23 +678,19 @@
       productsHtml = `<div class="products-grid">` + shopProducts.map(p => `
         <div class="product-card">
           <div class="product-image">
-            <img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop'">
+            <img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.src='https://placehold.co/300x200?text=Produit'">
           </div>
           <div class="product-info">
             <div class="product-name">${escapeHtml(p.name)}</div>
             <div class="product-price">${escapeHtml(p.price)}</div>
-            <div class="product-stock">📦 Stock: ${p.stock || 0}</div>
+            <div class="product-stock">📦 Stock: ${p.stock}</div>
             <div class="product-actions">
-              <button class="btn-add-to-cart" onclick="ajouterAuPanier({id:${p.id}, name:'${escapeHtml(p.name)}', price:'${p.price}', image:'${p.image}'}, ${shop.id}, '${escapeHtml(shop.name)}')">
+              <button class="btn-add-to-cart" onclick="addToCart({id:${p.id}, name:'${escapeHtml(p.name)}', price:'${p.price}', image:'${p.image}'}, ${shop.id}, '${escapeHtml(shop.name)}')">
                 🛒 Ajouter au panier
               </button>
-              <button class="btn-buy-now" onclick="acheterMaintenant({id:${p.id}, name:'${escapeHtml(p.name)}', price:'${p.price}', image:'${p.image}'}, ${shop.id}, '${escapeHtml(shop.name)}')">
+              <button class="btn-buy-now" onclick="buyNow({id:${p.id}, name:'${escapeHtml(p.name)}', price:'${p.price}', image:'${p.image}'}, ${shop.id}, '${escapeHtml(shop.name)}')">
                 Acheter
               </button>
-              ${isOwner ? `
-                <button class="btn-edit" onclick="openProductModal(${shopId}, ${p.id})">✏️</button>
-                <button class="btn-delete" onclick="deleteProductConfirm(${shopId}, ${p.id})">🗑️</button>
-              ` : ''}
             </div>
           </div>
         </div>
@@ -1338,13 +699,16 @@
 
     const html = `
       <div class="shop-detail-card">
-        <div class="shop-banner"><img src="${bannerImage}" alt="${escapeHtml(shop.name)}"></div>
+        <div class="shop-banner">
+          <img src="${shop.banner}" alt="${escapeHtml(shop.name)}" onerror="this.src='https://placehold.co/1000x400?text=Boutique'">
+        </div>
         <div class="shop-body">
           <div class="shop-title">
             <h1 class="shop-name">${escapeHtml(shop.name)}</h1>
             <div class="shop-category">${escapeHtml(shop.category)}</div>
             <div class="shop-tags">
-              ${(shop.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
+              <span class="tag">${escapeHtml(shop.badge || 'Artisan')}</span>
+              <span class="tag">📍 ${escapeHtml(shop.location || 'Maroc')}</span>
             </div>
           </div>
 
@@ -1371,7 +735,6 @@
 
           <div class="section">
             <h3>🛍️ Nos produits</h3>
-            ${isOwner ? `<button class="btn-profil" id="openAddProductBtn" style="margin-bottom:1rem; background:var(--wine);">➕ Ajouter un produit</button>` : ''}
             ${productsHtml}
           </div>
 
@@ -1392,78 +755,42 @@
                   <span class="badge">✓ Vérifié</span>
                   <span class="badge">🏆 Artisan</span>
                 </div>
-                ${isOwner ? `<a href="dashboard-producteur.html" class="btn-profil btn-dashboard">📊 Accéder à mon tableau de bord</a>` : ''}
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      <div class="modal-overlay" id="productModal">
-        <div class="modal-content">
-          <h3 id="productModalTitle">➕ Ajouter un produit</h3>
-          <input type="text" id="productName" placeholder="Nom du produit">
-          <input type="text" id="productPrice" placeholder="Prix (ex: 5.50 €)">
-          <input type="number" id="productStock" placeholder="Stock">
-          
-          <div class="image-option-group">
-            <label><input type="radio" name="productImageType" value="file" checked> 📸 Depuis ma galerie</label>
-            <label><input type="radio" name="productImageType" value="url"> 🌐 URL d'image</label>
-          </div>
-          <div id="productFileContainer" style="display: block;">
-            <div id="imagePreview" class="image-preview" style="cursor: pointer;">
-              <div class="preview-placeholder">📸 Haz clic aquí para seleccionar una imagen de tu galerie</div>
-            </div>
-            <input type="file" id="productImageFile" accept="image/*" style="display: none;">
-          </div>
-          <div id="productUrlContainer" style="display: none;">
-            <input type="text" id="productImageUrl" placeholder="https://images.unsplash.com/...">
-          </div>
-          
-          <textarea id="productDesc" placeholder="Description" rows="2"></textarea>
-          <div class="modal-actions">
-            <button class="btn-save" id="saveProductBtn">💾 Enregistrer</button>
-            <button class="btn-cancel" id="cancelProductBtn">Annuler</button>
-          </div>
-        </div>
-      </div>
     `;
 
-    const content = document.getElementById('content');
-    if(content) content.innerHTML = html;
+    document.getElementById('content').innerHTML = html;
+  }
 
-    setupProductModalEvents();
-    
-    if (isOwner) {
-      const openBtn = document.getElementById('openAddProductBtn');
-      if (openBtn) {
-        openBtn.onclick = () => openProductModal(shopId, null);
-      }
+  // ========== CARGAR HEADER ==========
+  async function loadHeaderAndInit() {
+    try {
+      const response = await fetch('header.html');
+      if (!response.ok) throw new Error('Error cargando header');
+      const headerHtml = await response.text();
+      document.getElementById('header-placeholder').innerHTML = headerHtml;
+      
+      setTimeout(() => {
+        loadStores();
+        updateCartCount();
+        updateAuthUI();
+        renderShopDetail();
+      }, 100);
+    } catch (error) {
+      console.error('Error:', error);
+      loadStores();
+      updateCartCount();
+      updateAuthUI();
+      renderShopDetail();
     }
-    
-    const saveBtn = document.getElementById('saveProductBtn');
-    const cancelBtn = document.getElementById('cancelProductBtn');
-    const productModal = document.getElementById('productModal');
-    if (saveBtn) saveBtn.onclick = saveProduct;
-    if (cancelBtn) cancelBtn.onclick = closeProductModal;
-    if (productModal) productModal.onclick = (e) => {
-      if (e.target === productModal) closeProductModal();
-    };
   }
 
-  window.openProductModal = openProductModal;
-  window.deleteProductConfirm = deleteProductConfirm;
-  window.closeProductModal = closeProductModal;
-  window.ajouterAuPanier = ajouterAuPanier;
-  window.acheterMaintenant = acheterMaintenant;
-  window.clearImagePreview = clearImagePreview;
+  window.addToCart = addToCart;
+  window.buyNow = buyNow;
 
-  function initAuth() {
-    updateAuthUI();
-    setupAuthModal();
-  }
-
-  mettreAJourCompteurPanier();
   loadHeaderAndInit();
 </script>
 </body>
