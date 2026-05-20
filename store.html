@@ -1036,7 +1036,7 @@ function renderStores() {
     const favorited = isFavorite(s.id);
     return `
       <div class="store-card">
-        <div class="store-banner" onclick="window.location.href='store-detail.html?id=${s.id}'">
+        <div class="store-banner" onclick="window.location.href='info-store.html?id=${s.id}'">
           <img src="${escapeHtml(s.banner || fallbackImg)}" alt="${escapeHtml(s.name)}" loading="lazy" onerror="this.src='${fallbackImg}'">
           ${s.badge ? `<span class="store-badge ${escapeHtml(s.badgeClass || '')}">${escapeHtml(s.badge)}</span>` : ''}
           ${canDelete ? `<button class="edit-photo-btn" onclick="openPhotoModal(${s.id}, event)">📷 Changer la photo</button>` : ''}
