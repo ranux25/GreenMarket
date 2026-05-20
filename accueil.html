@@ -377,8 +377,8 @@
     <nav class="desktop-nav hidden md:flex items-center gap-6">
       <a href="accueil.html" class="nav-link" id="navAccueil">Accueil</a>
       <a href="store.html" class="nav-link" id="navBoutiques">Boutiques</a>
-      <a href="#" class="nav-link" onclick="scrollToSection('products')">Produits</a>
-      <a href="#" class="nav-link" onclick="scrollToSection('coops')">Coopératives</a>
+      <a href="produits.html" class="nav-link" >Produits</a>
+      <a href="apropos.html" class="nav-link">A propos</a>
     </nav>
 
     <div class="flex items-center gap-3 ml-auto md:ml-0">
@@ -581,11 +581,12 @@ function renderStars(rating) {
 }
 
 // ========== PRODUCTOS ==========
+// POR ESTO:
 const products = [
-  { id: 1, name: "Caftan traditionnel", price: "450 DH", image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=300&h=200&fit=crop", coop: "Coopérative Fès Artisanat", rating: 4.5, reviews: 156, badge: "Artisanal", badgeClass: "secondary" },
-  { id: 2, name: "Huile d'olive extra vierge", price: "120 DH / litre", image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&h=200&fit=crop", coop: "Coopérative Atlas", rating: 5, reviews: 234, badge: "Bio", badgeClass: "bio" },
-  { id: 3, name: "Mélange plantes médicinales", price: "45 DH", image: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=300&h=200&fit=crop", coop: "Coopérative Ourika", rating: 4.5, reviews: 89, badge: "Rare", badgeClass: "rare" },
-  { id: 4, name: "Tapis berbère", price: "1 200 DH", image: "https://images.unsplash.com/photo-1526721940322-10fb6e3ae94a?w=300&h=200&fit=crop", coop: "Coopérative Haut-Atlas", rating: 5, reviews: 67, badge: "Fait main", badgeClass: "fait" }
+  { id: 101, name: "Caftan en Soie", price: "500 DH", image: "IMAGES/CaftanSoie.jpg", coop: "Maison du Caftan", rating: 4.8, reviews: 212, badge: "Artisanal", badgeClass: "secondary" },
+  { id: 201, name: "Tapis Berbère Moyen", price: "1 200 DH", image: "IMAGES/img/tapis.jpeg", coop: "Tapis Berbère d'Atlas", rating: 5, reviews: 189, badge: "Fait main", badgeClass: "fait" },
+  { id: 701, name: "Huile d'Argan Bio", price: "120 DH", image: "IMAGES/img/argan.jpg", coop: "Argamane Naturel", rating: 5, reviews: 310, badge: "Bio", badgeClass: "bio" },
+  { id: 601, name: "Lanterne Laiton", price: "380 DH", image: "IMAGES/img/luz.jpeg", coop: "Lumières de Marrakech", rating: 4.7, reviews: 98, badge: "Rare", badgeClass: "rare" }
 ];
 
 const cooperatives = [
@@ -686,24 +687,37 @@ function renderProducts() {
   const grid = document.getElementById('productsGrid');
   if (!grid) return;
   
-  function createCard(p) {
-    const badgeClass = p.badgeClass === 'secondary' ? 'badge-secondary' : p.badgeClass === 'bio' ? 'badge-bio' : p.badgeClass === 'rare' ? 'badge-rare' : 'badge-fait';
-    return `
-      <div class="product-card">
-        <img src="${p.image}" class="product-img" alt="${p.name}" onerror="this.src='https://placehold.co/300x200?text=Produit'">
-        <div class="p-4 flex flex-col flex-1 gap-2">
-          <span class="badge ${badgeClass}">${p.badge}</span>
-          <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display', serif;">${p.name}</h3>
-          <p class="text-xs flex items-center gap-1 text-gray-500">👩‍🌾 ${p.coop}</p>
-          <div class="flex items-center gap-1"><span class="stars">${'★'.repeat(Math.floor(p.rating))}${p.rating % 1 ? '½' : ''}${'☆'.repeat(5 - Math.ceil(p.rating))}</span><span class="text-xs text-gray-500">(${p.reviews} avis)</span></div>
-          <p class="font-bold text-lg mt-auto" style="color: var(--primary);">${p.price}</p>
-          <button class="btn-primary w-full mt-1 py-2 text-sm" onclick='addToCart(${JSON.stringify(p).replace(/'/g, "\\'")})'>Ajouter au panier</button>
-          <button class="btn-primary w-full mt-1 py-2 text-sm" style="background:var(--primary); color:white; border-radius:99px; font-weight:bold;" onclick="addToCart(${JSON.stringify(p).replace(/"/g, '&quot;')})">Ajouter au panier
-          </button>
+  // REEMPLAZAR la función createCard dentro de renderProducts():
+function createCard(p) {
+  const badgeClass = p.badgeClass === 'secondary' ? 'badge-secondary' 
+    : p.badgeClass === 'bio' ? 'badge-bio' 
+    : p.badgeClass === 'rare' ? 'badge-rare' 
+    : 'badge-fait';
+  return `
+    <div class="product-card">
+      <img src="${p.image}" class="product-img" alt="${p.name}" 
+           onerror="this.src='https://placehold.co/300x200?text=Produit'">
+      <div class="p-4 flex flex-col flex-1 gap-2">
+        <span class="badge ${badgeClass}">${p.badge}</span>
+        <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display', serif;">${p.name}</h3>
+        <p class="text-xs flex items-center gap-1 text-gray-500">👩‍🌾 ${p.coop}</p>
+        <div class="flex items-center gap-1">
+          <span class="stars">${'★'.repeat(Math.floor(p.rating))}${p.rating % 1 ? '½' : ''}${'☆'.repeat(5 - Math.ceil(p.rating))}</span>
+          <span class="text-xs text-gray-500">(${p.reviews} avis)</span>
         </div>
+        <p class="font-bold text-lg mt-auto" style="color: var(--primary);">${p.price}</p>
+        <button class="btn-primary w-full mt-1 py-2 text-sm" 
+                onclick='addToCart(${JSON.stringify(p)})'>
+          Ajouter au panier
+        </button>
+        <button class="btn-outline w-full mt-1 py-2 text-sm"
+                onclick="window.location.href='produits.html'">
+          Voir tous les produits →
+        </button>
       </div>
-    `;
-  }
+    </div>
+  `;
+}
   grid.innerHTML = products.map(createCard).join('');
 }
 
