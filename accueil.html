@@ -709,7 +709,8 @@ function renderProducts() {
             <span class="text-xs text-gray-500">(${p.reviews} avis)</span>
           </div>
           <p class="font-bold text-lg mt-auto" style="color: var(--primary);">${p.price}</p>
-          <button class="btn-primary w-full mt-1 py-2 text-sm" style="background:var(--primary); color:white; border-radius:99px; font-weight:bold;" onclick='addToCart(${JSON.stringify(p).replace(/'/g, "\\'")})'>Ajouter au panier</button>
+          <button class="btn-primary w-full mt-1 py-2 text-sm" style="background:var(--primary); color:white; border-radius:99px; font-weight:bold;" onclick="addToCart(${JSON.stringify(p).replace(/"/g, '&quot;')})">Ajouter au panier
+          </button>
         </div>
       </div>
     `;
@@ -776,26 +777,24 @@ function login(email, password) {
 
 function updateAuthUI() {
   const widget = document.getElementById('authWidget');
-  if(!widget) return;
+  if (!widget) return;
   const user = getCurrentUser();
   if (user) {
     const roleText = user.role === 'productor' ? 'Artisan' : (user.role === 'admin' ? 'Admin' : 'Client');
     widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:var(--primary);cursor:pointer;margin-left:8px;">🚪</button></div>`;
     document.getElementById('logoutBtn')?.addEventListener('click', logout);
-    
-    // Mostrar dashboard link si es productor o admin
     const dashboardLink = document.getElementById('dashboardLink');
     if (dashboardLink) {
       dashboardLink.style.display = (user.role === 'productor' || user.role === 'admin') ? 'inline-block' : 'none';
     }
   } else {
-    widget.innerHTML = `<button class="btn-connexion" id="showLoginBtn">🔑 Connexion</button>`;
     widget.innerHTML = `<button class="btn-connexion" onclick="window.location.href='signin.html'">🔑 Connexion</button>`;
+  }  
 }
 
-window.showAuthModal = function() {
+window.showAuthModal = function() {  
   const modal = document.getElementById('authModal');
-  if(modal) modal.classList.add('open');
+  if (modal) modal.classList.add('open');
 }
 
 function closeAuthModal() {
