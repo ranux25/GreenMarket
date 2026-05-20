@@ -109,6 +109,20 @@
   </div>
 
   <script>
+    function showToast(msg, type = "success") {
+      const toast = document.createElement("div");
+      toast.textContent = msg;
+      toast.style.cssText = `
+        position: fixed; bottom: 30px; right: 30px;
+        background: ${type === "error" ? "#c0392b" : "#2ecc71"};
+        color: white; padding: 14px 24px; border-radius: 10px;
+        font-size: 15px; z-index: 9999;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      `;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
     function loadHeader() {
       fetch('header.html')
         .then(response => {
@@ -126,20 +140,20 @@
     document.querySelector("form").addEventListener("submit", function(e) {
       e.preventDefault();
 
-      const fullName = document.getElementById("Full-name").value.trim();
+      const name = document.getElementById("Full-name").value.trim();
       const email = document.getElementById("Email").value.trim();
       const password = document.getElementById("Password").value.trim();
       const confirm = document.getElementById("Confirmation").value.trim();
 
       const role = document.querySelector('input[name="role"]:checked').value;
 
-      if (!fullName || !email || !password || !confirm) {
-        alert("Veuillez remplir tous les champs");
+      if (!name || !email || !password || !confirm) {
+        showToast("Veuillez remplir tous les champs", "error");
         return;
       }
 
       if (password !== confirm) {
-        alert("Les mots de passe ne correspondent pas");
+        showToast("Les mots de passe ne correspondent pas", "error");
         return;
       }
 
@@ -148,13 +162,13 @@
       const exists = users.find(u => u.email === email);
 
       if (exists) {
-        alert("Cet email existe déjà");
+        showToast("Cet email existe déjà", "error");
         return;
       }
 
       const user = {
         id: Date.now(),
-        fullName,
+        name,
         email,
         password,
         role: role === "Producer" ? "productor" : "client",
@@ -170,13 +184,15 @@
         JSON.stringify(user)
       );
 
-      alert("Compte créé avec succès ✅");
+      showToast("Compte créé avec succès ✅");
 
-      if (user.role === "productor") {
-        window.location.href = "dashboard-producteur.html";
-      } else {
-        window.location.href = "store.html";
-      }
+      setTimeout(() => {
+        if (user.role === "productor") {
+          window.location.href = "dashboard-producteur.html";
+        } else {
+          window.location.href = "store.html";
+        }
+      }, 1500);
     });
 
     window.addEventListener('DOMContentLoaded', loadHeader);
