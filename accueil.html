@@ -595,7 +595,7 @@ function renderStoresOnAccueil() {
   }
   
   grid.innerHTML = storesToShow.map(store => `
-    <div class="store-card" onclick="window.location.href='store-detail.html?id=${store.id}'">
+    <div class="store-card" onclick="window.location.href='info-store.html?id=${store.id}'">
       <img src="${store.banner}" class="store-banner" alt="${store.name}" onerror="this.src='https://placehold.co/400x200?text=Boutique'">
       <div class="store-info">
         <div class="store-name">${escapeHtml(store.name)}</div>
