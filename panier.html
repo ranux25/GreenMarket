@@ -140,6 +140,95 @@ body{
 
 .empty{ text-align:center; padding:4rem; background:var(--white); border-radius:10px; }
 
+#toast.show {
+  transform: translateY(0) !important;
+  opacity: 1 !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-overlay {
+  position: fixed; 
+  inset: 0; 
+  background: rgba(0,0,0,0.5); 
+  backdrop-filter: blur(5px);
+  z-index: 9999; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.modal-box {
+  background: var(--white); 
+  border-radius: 16px; 
+  padding: 2.5rem 2rem; 
+  text-align: center;
+  max-width: 340px; 
+  width: 90%; 
+  box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+  animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.modal-icon { 
+  font-size: 3rem; 
+  margin-bottom: 1rem; 
+}
+
+.modal-title { 
+  font-weight: 700; 
+  margin-bottom: 1.5rem; 
+  color: var(--wine); 
+  font-size: 1.3rem; 
+  font-family: 'Playfair Display', serif; 
+}
+
+.modal-buttons { 
+  display: flex; 
+  gap: 1rem; 
+  justify-content: center; 
+}
+
+.modal-btn-cancel {
+  padding: 0.7rem 1.5rem; 
+  border-radius: 8px; 
+  border: 1px solid var(--border);
+  background: white; 
+  color: var(--text); 
+  cursor: pointer; 
+  font-weight: 600; 
+  transition: 0.2s;
+}
+
+.modal-btn-cancel:hover { 
+  background: #f5f5f5; 
+}
+
+.modal-btn-confirm {
+  padding: 0.7rem 1.5rem; 
+  border-radius: 8px; 
+  border: none;
+  background: var(--wine); 
+  color: white; 
+  cursor: pointer; 
+  font-weight: 700;
+  box-shadow: 0 4px 15px var(--shadow); 
+  transition: 0.2s;
+}
+
+.modal-btn-confirm:hover { 
+  background: var(--wine-dark); 
+  transform: translateY(-2px); 
+}
+
 @media(max-width:850px){
   .cart-layout{ grid-template-columns:1fr; }
   .cart-item{ flex-direction:column; }
@@ -162,7 +251,6 @@ body{
 </div>
 
 <script>
-  // ========== FUNCIONES GLOBALES ==========
   function showToast(msg, bg = 'var(--wine)') {
     let toast = document.getElementById('toast');
     if (!toast) {
@@ -194,7 +282,6 @@ body{
     if (badge) badge.textContent = total;
   }
 
-  // ========== FUNCIONES DEL PANIER ==========
   function getPanier(){
     const saved = localStorage.getItem('greenmarket_panier');
     return saved ? JSON.parse(saved) : [];
@@ -208,7 +295,7 @@ body{
 
   function removeItem(id){
     let panier = getPanier();
-    panier = panier.filter(item => item.id !== id);
+    panier = panier.filter(item => item.id != id);
     savePanier(panier);
     showToast("🗑️ Produit supprimé du panier");
   }
@@ -216,7 +303,7 @@ body{
   function changeQuantity(id, delta){
     let panier = getPanier();
     panier = panier.map(item => {
-      if(item.id === id){
+      if(item.id == id){
         item.quantite = Math.max(1, item.quantite + delta);
       }
       return item;
@@ -225,36 +312,28 @@ body{
   }
 
   function clearCart(){
-  const modal = document.createElement('div');
-  modal.style.cssText = `
-    position:fixed; inset:0; background:rgba(0,0,0,.5);
-    z-index:9999; display:flex; align-items:center; justify-content:center;
-  `;
-  modal.innerHTML = `
-    <div style="background:#fff; border-radius:16px; padding:2rem; text-align:center; max-width:300px; width:90%;">
-      <div style="font-size:2rem; margin-bottom:1rem;">🗑️</div>
-      <p style="font-weight:700; margin-bottom:1.5rem;">Vider le panier ?</p>
-      <div style="display:flex; gap:1rem; justify-content:center;">
-        <button onclick="this.closest('div[style]').remove()" 
-          style="padding:.6rem 1.5rem; border-radius:8px; border:2px solid #ccc; background:white; cursor:pointer;">
-          Annuler
-        </button>
-        <button id="confirmClear"
-          style="padding:.6rem 1.5rem; border-radius:8px; border:none; background:#5d0d18; color:white; cursor:pointer; font-weight:700;">
-          Vider
-        </button>
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal-box">
+        <div class="modal-icon">🗑️</div>
+        <p class="modal-title">Vider le panier ?</p>
+        <div class="modal-buttons">
+          <button class="modal-btn-cancel" onclick="this.closest('.modal-overlay').remove()">Annuler</button>
+          <button id="confirmClear" class="modal-btn-confirm">Vider</button>
+        </div>
       </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  document.getElementById('confirmClear').addEventListener('click', () => {
-    modal.remove();
-    localStorage.removeItem('greenmarket_panier');
-    updateCartCount();
-    renderCart();
-    showToast("🛒 Panier vidé");
-  });
-}
+    `;
+    document.body.appendChild(modal);
+    
+    document.getElementById('confirmClear').addEventListener('click', () => {
+      modal.remove();
+      localStorage.removeItem('greenmarket_panier');
+      updateCartCount();
+      renderCart();
+      showToast("🛒 Panier vidé");
+    });
+  }
 
   function getTotal(panier){
     return panier.reduce((sum,item) => sum + (item.prixNumerique * item.quantite), 0);
@@ -307,11 +386,11 @@ body{
                 <div class="item-shop">Boutique : ${escapeHtml(item.boutiqueNom)}</div>
                 <div class="item-price">${item.prix}</div>
                 <div class="quantity-controls">
-                  <button onclick="changeQuantity(${item.id}, -1)">-</button>
+                  <button onclick="changeQuantity('${item.id}', -1)">-</button>
                   <span>${item.quantite}</span>
-                  <button onclick="changeQuantity(${item.id}, 1)">+</button>
+                  <button onclick="changeQuantity('${item.id}', 1)">+</button>
                 </div>
-                <button class="btn-delete" onclick="removeItem(${item.id})">🗑️ Supprimer</button>
+                <button class="btn-delete" onclick="removeItem('${item.id}')">🗑️ Supprimer</button>
               </div>
             </div>
           `).join('')}
@@ -338,11 +417,10 @@ body{
     return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
   }
 
-  // ========== CARGAR HEADER ==========
   async function loadHeaderAndInit() {
     try {
       const response = await fetch('header.html');
-      if (!response.ok) throw new Error('Error cargando header');
+      if (!response.ok) throw new Error('Error');
       const headerHtml = await response.text();
       document.getElementById('header-placeholder').innerHTML = headerHtml;
       
@@ -351,12 +429,10 @@ body{
         renderCart();
       }, 100);
     } catch (error) {
-      console.error('Error:', error);
       renderCart();
     }
   }
 
-  // Iniciar
   loadHeaderAndInit();
 </script>
 </body>
