@@ -361,14 +361,18 @@
 <!-- ===================== HEADER (shared with store.html) ===================== -->
 <header>
   <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4 flex-wrap">
-    <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='accueil.html'">
-      <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl">
-        🌿
-      </div>
-      <span style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: 1px;">
-        GreenMarket
-      </span>
-    </div>
+    <!-- POR ESTO: -->
+<div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='accueil.html'">
+  <img src="IMAGES/logo.png" alt="GreenMarket Logo"
+       style="height: 48px; width: auto; object-fit: contain;"
+       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+  <div class="w-12 h-12 bg-white rounded-full items-center justify-center text-2xl" style="display:none;">
+    🌿
+  </div>
+  <span style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: 1px;">
+    GreenMarket
+  </span>
+</div>
 
     <div class="search-bar flex-1 flex justify-center min-w-[180px]">
       <input type="text" id="searchInput" placeholder="Rechercher un produit traditionnel..." />
@@ -430,9 +434,9 @@
       Produits authentiques, savoir-faire traditionnel, commerce équitable
     </p>
 
-    <button class="btn-sage text-base px-8 py-3" style="font-size:15px;">
+    <a href="store.html"><button class="btn-sage text-base px-8 py-3" style="font-size:15px;">
       Découvrir nos coopératives
-    </button>
+    </button></a>
 
   </div>
 
@@ -443,14 +447,17 @@
   <div class="mb-10">
     <h2 class="section-title">Nos catégories de produits traditionnels</h2>
   </div>
-  <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 gap-4">
-    <div class="category-card" onclick="window.location.href='store.html?cat=Fruits%20et%20l%C3%A9gumes'"><span class="category-icon">🥦</span><span class="category-name">Fruits & légumes</span></div>
-    <div class="category-card" onclick="window.location.href='store.html?cat=Produits%20laitiers'"><span class="category-icon">🧀</span><span class="category-name">Produits laitiers</span></div>
-    <div class="category-card" onclick="window.location.href='store.html?cat=Boulangerie%20artisanale'"><span class="category-icon">🍞</span><span class="category-name">Boulangerie</span></div>
-    <div class="category-card" onclick="window.location.href='store.html?cat=Miel%20et%20apiculture'"><span class="category-icon">🍯</span><span class="category-name">Miel</span></div>
-    <div class="category-card" onclick="window.location.href='store.html?cat=Huiles%20et%20conserveries'"><span class="category-icon">🫒</span><span class="category-name">Huiles</span></div>
-    <div class="category-card" onclick="window.location.href='store.html?cat=Plantes%20m%C3%A9dicinales'"><span class="category-icon">🌿</span><span class="category-name">Plantes</span></div>
-  </div>
+  <!-- POR ESTO: -->
+<div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 gap-4">
+  <div class="category-card" onclick="window.location.href='produits.html?cat=Caftans%20%26%20V%C3%AAtements%20traditionnels'"><span class="category-icon">👘</span><span class="category-name">Caftans & Vêtements</span></div>
+  <div class="category-card" onclick="window.location.href='produits.html?cat=Tapis%20%26%20Tissage'"><span class="category-icon">🪑</span><span class="category-name">Tapis & Tissage</span></div>
+  <div class="category-card" onclick="window.location.href='produits.html?cat=Poterie%20%26%20C%C3%A9ramique'"><span class="category-icon">🏺</span><span class="category-name">Poterie & Céramique</span></div>
+  <div class="category-card" onclick="window.location.href='produits.html?cat=Marqueterie%20%26%20Bois'"><span class="category-icon">🪵</span><span class="category-name">Marqueterie & Bois</span></div>
+  <div class="category-card" onclick="window.location.href='produits.html?cat=Bijoux%20%26%20Joaillerie'"><span class="category-icon">💍</span><span class="category-name">Bijoux & Joaillerie</span></div>
+  <div class="category-card" onclick="window.location.href='produits.html?cat=Lampes%20%26%20Fer%20forg%C3%A9'"><span class="category-icon">🕯️</span><span class="category-name">Lampes & Fer forgé</span></div>
+  <div class="category-card" onclick="window.location.href='produits.html?cat=Cosm%C3%A9tiques%20naturels'"><span class="category-icon">🧴</span><span class="category-name">Cosmétiques naturels</span></div>
+  <div class="category-card" onclick="window.location.href='produits.html?cat=Produits%20du%20terroir'"><span class="category-icon">🍯</span><span class="category-name">Produits du terroir</span></div>
+</div>
 </section>
  
 <!-- ===================== STORES SECTION (from store.html) ===================== -->
@@ -501,7 +508,7 @@
       </div>
     </div>
     <div class="flex items-center justify-center">
-      <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&h=500&fit=crop" alt="Produits traditionnels marocains" class="rounded-2xl shadow-xl w-full max-w-sm object-cover" style="aspect-ratio: 1/1;">
+      <img src="IMAGES/logo.png" alt="Produits traditionnels marocains" class="rounded-2xl shadow-xl w-full max-w-sm object-cover" style="aspect-ratio: 1/1;">
     </div>
   </div>
 </section>
