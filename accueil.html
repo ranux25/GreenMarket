@@ -14,9 +14,6 @@
       --text-dark: #2C2C2C;
       --text-light: #6B6B6B;
       --footer-bg: #3A0A10;
-      --border: #e8ddd0;
-      --wine: #5d0d18;
-      --wine-pale: #f5e6e8;
     }
  
     * { box-sizing: border-box; }
@@ -29,7 +26,6 @@
  
     h1, h2, h3, .playfair { font-family: 'Playfair Display', serif; }
  
-    /* ========== HEADER STYLES ========== */
     header {
       background: #9FB2AC;
       border-bottom: 2px solid #f0e8d5;
@@ -79,26 +75,6 @@
     }
     .nav-link:hover { color: var(--primary); }
     .nav-link:hover::after { transform: scaleX(1); }
-    .nav-link.active { color: var(--primary); }
-    .nav-link.active::after { transform: scaleX(1); }
- 
-    .btn-connexion {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 999px;
-      padding: 8px 20px;
-      font-family: 'Lato', sans-serif;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-      letter-spacing: 0.3px;
-    }
-    .btn-connexion:hover {
-      background: #7a1020;
-      transform: translateY(-1px);
-    }
  
     .cart-btn {
       position: relative;
@@ -123,29 +99,25 @@
       font-family: 'Lato', sans-serif;
     }
  
-    .desktop-nav {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 22px;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      letter-spacing: 0.3px;
+    }
+    .btn-primary:hover {
+      background: #7a1020;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(93,13,24,0.25);
     }
  
-    @media (max-width: 640px) {
-      .desktop-nav { display: none; }
-    }
- 
-    .user-badge {
-      background: var(--wine-pale);
-      padding: 0.4rem 1rem;
-      border-radius: 30px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--wine);
-      font-weight: 600;
-      font-size: 0.85rem;
-    }
- 
-    /* ========== RESTO DE ESTILOS ========== */
     .hero-section {
       background: linear-gradient(135deg, #fdf5e0 60%, #f5ede6 100%);
       overflow: hidden;
@@ -237,7 +209,6 @@
       border: 1.5px solid #f0e8d5;
       transition: transform 0.2s, box-shadow 0.2s;
       overflow: hidden;
-      cursor: pointer;
     }
     .coop-card:hover {
       transform: translateY(-4px);
@@ -376,139 +347,136 @@
     .store-info { padding: 1rem; }
     .store-name { font-weight: 700; font-size: 1.1rem; color: var(--primary); margin-bottom: 0.25rem; }
     .store-category { font-size: 0.7rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
-    .store-desc { font-size: 0.8rem; color: #6b5055; line-height: 1.4; }
+    .store-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; }
  
-    .auth-modal-overlay {
-      display: none; position: fixed; top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      align-items: center; justify-content: center;
-      z-index: 1000;
+    @media (max-width: 640px) {
+      .desktop-nav { display: none; }
     }
-    .auth-modal-overlay.open { display: flex; }
-    .auth-modal {
-      background: #fffdf7; border-radius: 16px; padding: 2rem;
-      max-width: 450px; width: 90%; position: relative;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    }
-    .auth-tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e8ddd0; }
-    .auth-tab {
-      background: none; border: none; padding: 0.5rem 1rem;
-      font-size: 1rem; cursor: pointer; color: #6b5055; font-weight: 500;
-    }
-    .auth-tab.active { color: #5d0d18; border-bottom: 2px solid #5d0d18; }
-    .auth-form { display: none; }
-    .auth-form.active { display: block; }
-    .auth-form h3 { color: #5d0d18; margin-bottom: 1rem; font-family: 'Cormorant Garamond', serif; }
-    .auth-form input {
-      width: 100%; padding: 0.7rem; margin-bottom: 1rem;
-      border: 1.5px solid #e8ddd0; border-radius: 8px;
-      font-family: 'Jost', sans-serif; background: #fff9eb;
-    }
-    .auth-error { color: #d9534f; font-size: 0.8rem; margin-top: 0.5rem; text-align: center; }
-    .auth-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #6b5055; }
-    .btn-filled {
-      background: #5d0d18; color: #fff9eb;
-      border: none; padding: .5rem 1.3rem; border-radius: 3px;
-      font-family: 'Jost', sans-serif; font-size: .78rem; font-weight: 600;
-      letter-spacing: .07em; text-transform: uppercase;
-      cursor: pointer; transition: background .2s;
-    }
-    .btn-filled:hover { background: #3e0910; }
- 
-    .empty-state { text-align: center; padding: 3rem; color: var(--text-light); }
-    .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
   </style>
 </head>
 <body>
  
 <div id="toast">✓ Produit ajouté au panier !</div>
-
+ 
+<!-- ===================== HEADER (shared with store.html) ===================== -->
 <header>
-  <div style="max-width: 1280px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-    <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='accueil.html'">
-      <div style="height: 65px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-        <img src="IMAGES/logo.png" alt="GreenMarket Logo" style="height: 100%; width: auto; object-fit: contain;" onerror="this.src='https://placehold.co/65x65?text=GM'"/>
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4 flex-wrap">
+    <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='accueil.html'">
+      <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl">
+        🌿
       </div>
-      <span style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: 1px;">GreenMarket</span>
+      <span style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: 1px;">
+        GreenMarket
+      </span>
     </div>
 
-    <div class="search-bar" style="flex: 1; display: flex; justify-content: center; min-width: 180px;">
-      <input type="text" id="headerSearchInput" placeholder="Rechercher un produit traditionnel..."/>
+    <div class="search-bar flex-1 flex justify-center min-w-[180px]">
+      <input type="text" id="searchInput" placeholder="Rechercher un produit traditionnel..." />
     </div>
 
-    <nav class="desktop-nav">
-      <a href="accueil.html" class="nav-link active" id="navAccueil">Accueil</a>
+    <nav class="desktop-nav hidden md:flex items-center gap-6">
+      <a href="accueil.html" class="nav-link" id="navAccueil">Accueil</a>
       <a href="store.html" class="nav-link" id="navBoutiques">Boutiques</a>
-      <a href="produits.html" class="nav-link" id="navProduits">Produits</a>
-      <a href="apropos.html" class="nav-link">À propos</a>
-      <a href="dashboard-producteur.html" id="dashboardLink" class="nav-link" style="display: none;">📊 Dashboard</a>
+      <a href="#" class="nav-link" onclick="scrollToSection('products')">Produits</a>
+      <a href="#" class="nav-link" onclick="scrollToSection('coops')">Coopératives</a>
     </nav>
 
-    <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
-      <a href="panier.html">
-        <button class="cart-btn" title="Panier">
-          <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#5D0D18" stroke-width="1.8">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 6h14M9 21a1 1 0 1 0 2 0M15 21a1 1 0 1 0 2 0"/>
-          </svg>
-          <span class="cart-badge" id="cart-count">0</span>
-        </button>
-      </a>
+    <div class="flex items-center gap-3 ml-auto md:ml-0">
+      <button class="cart-btn" title="Panier" onclick="goToCart()">
+        <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#5D0D18" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 6h14M9 21a1 1 0 1 0 2 0M15 21a1 1 0 1 0 2 0" />
+        </svg>
+        <span class="cart-badge" id="cart-count">0</span>
+      </button>
       <div id="authWidget"></div>
     </div>
   </div>
 </header>
-
+ 
+<!-- ===================== HERO MODIFIÉE ===================== -->
 <section class="hero-section" style="position: relative; min-height: 75vh; display: flex; align-items: center; overflow: hidden; padding: 0;">
+
+  <!-- FONDO (IMAGEN) -->
   <div style="position: absolute; inset: 0;">
-    <img src="IMAGES/hero2.PNG" alt="Hero image" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=1200&h=800&fit=crop'"/>
+    <img 
+      src="IMAGES/hero2.PNG" 
+      alt="Hero image"
+      style="width: 100%; height: 100%; object-fit: cover;"
+    />
   </div>
-  <div style="position: absolute; inset: 0; background: linear-gradient(to top, var(--bg), rgba(0,0,0,0));"></div>
+
+  <!-- DEGRADADO ABAJO (TRANSPARENTE HACIA ARRIBA) -->
+  <div style="
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top,  var(--bg), rgba(0,0,0,0));
+  "></div>
+
+  <!-- CONTENIDO -->
   <div style="position: relative; z-index: 2; flex: 1; min-width: 250px; padding-left: 20px; max-width: 700px;">
-    <p class="text-sm font-bold tracking-widest uppercase mb-3" style="color:var(--secondary); font-family:'Lato',sans-serif;">🌿 Commerce équitable & authentique</p>
-    <h1 class="playfair font-bold leading-tight mb-5" style="font-size:clamp(30px,5vw,58px); color:var(--primary);">Les trésors de nos coopératives, directement chez vous</h1>
-    <p class="mb-8 text-lg" style="color:var(--text-light); max-width:500px; font-family:'Lato',sans-serif; line-height:1.7;">Produits authentiques, savoir-faire traditionnel, commerce équitable</p>
-    <button class="btn-sage text-base px-8 py-3" style="font-size:15px;" onclick="document.getElementById('stores-section')?.scrollIntoView({behavior:'smooth'})">Découvrir nos boutiques</button>
+
+    <p class="text-sm font-bold tracking-widest uppercase mb-3"
+       style="color:var(--secondary); font-family:'Lato',sans-serif;">
+      🌿 Commerce équitable & authentique
+    </p>
+
+    <h1 class="playfair font-bold leading-tight mb-5"
+        style="font-size:clamp(30px,5vw,58px); color:var(--primary);">
+      Les trésors de nos coopératives, directement chez vous
+    </h1>
+
+    <p class="mb-8 text-lg"
+       style="color:var(--text-light); max-width:500px; font-family:'Lato',sans-serif; line-height:1.7;">
+      Produits authentiques, savoir-faire traditionnel, commerce équitable
+    </p>
+
+    <button class="btn-sage text-base px-8 py-3" style="font-size:15px;">
+      Découvrir nos coopératives
+    </button>
+
   </div>
+
 </section>
  
+<!-- ===================== CATEGORIES ===================== -->
 <section class="py-16 px-4 max-w-7xl mx-auto">
   <div class="mb-10">
     <h2 class="section-title">Nos catégories de produits traditionnels</h2>
   </div>
   <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 gap-4">
-    <div class="category-card" onclick="window.location.href='store.html?category=Vêtements traditionnels'"><span class="category-icon">🧥</span><span class="category-name">Vêtements traditionnels</span></div>
-    <div class="category-card" onclick="window.location.href='store.html?category=Huiles & Condiments'"><span class="category-icon">🫒</span><span class="category-name">Huiles & Condiments</span></div>
-    <div class="category-card" onclick="window.location.href='store.html?category=Plantes & Herbes'"><span class="category-icon">🌿</span><span class="category-name">Plantes & Herbes</span></div>
-    <div class="category-card" onclick="window.location.href='store.html?category=Miel & Douceurs'"><span class="category-icon">🍯</span><span class="category-name">Miel & Douceurs</span></div>
-    <div class="category-card" onclick="window.location.href='store.html?category=Artisanat & Poterie'"><span class="category-icon">🧺</span><span class="category-name">Artisanat & Poterie</span></div>
-    <div class="category-card" onclick="window.location.href='store.html?category=Produits de beauté'"><span class="category-icon">🧴</span><span class="category-name">Produits de beauté</span></div>
-    <div class="category-card" onclick="window.location.href='store.html?category=Épicerie fine'"><span class="category-icon">🌾</span><span class="category-name">Épicerie fine</span></div>
-    <div class="category-card" onclick="window.location.href='store.html?category=Décoration & Mobilier'"><span class="category-icon">🪑</span><span class="category-name">Décoration & Mobilier</span></div>
+    <div class="category-card" onclick="window.location.href='store.html?cat=Fruits%20et%20l%C3%A9gumes'"><span class="category-icon">🥦</span><span class="category-name">Fruits & légumes</span></div>
+    <div class="category-card" onclick="window.location.href='store.html?cat=Produits%20laitiers'"><span class="category-icon">🧀</span><span class="category-name">Produits laitiers</span></div>
+    <div class="category-card" onclick="window.location.href='store.html?cat=Boulangerie%20artisanale'"><span class="category-icon">🍞</span><span class="category-name">Boulangerie</span></div>
+    <div class="category-card" onclick="window.location.href='store.html?cat=Miel%20et%20apiculture'"><span class="category-icon">🍯</span><span class="category-name">Miel</span></div>
+    <div class="category-card" onclick="window.location.href='store.html?cat=Huiles%20et%20conserveries'"><span class="category-icon">🫒</span><span class="category-name">Huiles</span></div>
+    <div class="category-card" onclick="window.location.href='store.html?cat=Plantes%20m%C3%A9dicinales'"><span class="category-icon">🌿</span><span class="category-name">Plantes</span></div>
   </div>
 </section>
  
-<section class="py-10 px-4" style="background:linear-gradient(180deg,#fdf8ee 0%,#fff9eb 100%);">
+<!-- ===================== STORES SECTION (from store.html) ===================== -->
+<section class="py-10 px-4" style="background: linear-gradient(180deg, #fdf8ee 0%, #fff9eb 100%)">
   <div class="max-w-7xl mx-auto">
     <div class="mb-10">
-      <h2 class="section-title">Produits populaires des coopératives</h2>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6" id="productsGrid"></div>
-  </div>
-</section>
-
-<section id="stores-section" class="py-16 px-4 max-w-7xl mx-auto">
-  <div class="mb-10 flex justify-between items-center flex-wrap gap-4">
-    <div>
       <h2 class="section-title">Nos boutiques partenaires</h2>
-      <p class="mt-4 text-base" style="color:var(--text-light); font-family:'Lato',sans-serif;">Découvrez les producteurs et artisans de nos coopératives</p>
+      <p class="mt-2 text-sm text-gray-500">Découvrez nos producteurs locaux et artisans</p>
     </div>
-    <a href="store.html" class="btn-outline">Voir toutes les boutiques →</a>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="storesGrid"></div>
+    <div class="text-center mt-8">
+      <button class="btn-outline" onclick="window.location.href='store.html'">Voir toutes les boutiques →</button>
+    </div>
   </div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="storesGrid"></div>
 </section>
-
-
+ 
+<!-- ===================== COOPERATIVES ===================== -->
+<section id="coops" class="py-16 px-4 max-w-7xl mx-auto">
+  <div class="text-center mb-3">
+    <h2 class="section-title" style="display:block; text-align:center;">Nos coopératives partenaires</h2>
+    <p class="mt-4 text-base" style="color:var(--text-light); font-family:'Lato',sans-serif;">Soutenez l'artisanat et l'agriculture traditionnelle</p>
+  </div>
+  <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6" id="coopsGrid"></div>
+</section>
+ 
+<!-- ===================== PROMO BANNER ===================== -->
 <section class="promo-banner py-12 px-4">
   <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
     <div>
@@ -519,6 +487,17 @@
   </div>
 </section>
  
+<!-- ===================== PRODUCTS ===================== -->
+<section id="products" class="py-14 px-4" style="background:#fff;">
+  <div class="max-w-7xl mx-auto">
+    <div class="mb-10">
+      <h2 class="section-title">Produits populaires</h2>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6" id="productsGrid"></div>
+  </div>
+</section>
+ 
+<!-- ===================== WHY SECTION ===================== -->
 <section class="py-16 px-4" style="background:linear-gradient(135deg,#fdf5e0 0%,#f5ede0 100%);">
   <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
     <div>
@@ -531,11 +510,12 @@
       </div>
     </div>
     <div class="flex items-center justify-center">
-      <img src="IMAGES/pic.jfif" alt="Produits traditionnels marocains" class="rounded-2xl shadow-xl w-full max-w-sm object-cover" style="aspect-ratio: 1/1;" onerror="this.src='https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=400&h=400&fit=crop'">
+      <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&h=500&fit=crop" alt="Produits traditionnels marocains" class="rounded-2xl shadow-xl w-full max-w-sm object-cover" style="aspect-ratio: 1/1;">
     </div>
   </div>
 </section>
  
+<!-- ===================== FOOTER ===================== -->
 <footer class="pt-14 pb-8 px-4">
   <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 mb-10">
     <div><p class="footer-heading">GreenMarket</p><a href="#">À propos</a><a href="#">Nos coopératives</a><a href="#">Devenir partenaire</a></div>
@@ -549,136 +529,100 @@
   </div>
 </footer>
 
-<div class="auth-modal-overlay" id="authModal">
-  <div class="auth-modal">
-    <div class="auth-tabs"><button class="auth-tab active" data-tab="login">Connexion</button></div>
-    <div id="loginForm" class="auth-form active">
-      <h3>🔐 Se connecter</h3>
-      <input type="email" id="loginEmail" placeholder="Email"><input type="password" id="loginPassword" placeholder="Mot de passe">
-      <button class="btn-filled" id="doLoginBtn" style="width:100%">Se connecter</button>
-      <p class="auth-error" id="loginError"></p>
-    </div>
-    <button class="auth-close" id="closeAuthModal">✕</button>
-  </div>
-</div>
-
 <script>
-// ========== DATOS ==========
-let stores = [];
-
-function loadStores() {
-  const saved = localStorage.getItem('greenmarket_stores');
-  if (saved && JSON.parse(saved).length > 0) {
-    stores = JSON.parse(saved);
-  } else {
-    // Datos de ejemplo de tiendas marroquíes
-    stores = [
-      { id:1, name:"Maison du Caftan", category:"Vêtements traditionnels", badge:"Artisan", banner:"IMAGES/1779140603090.png", desc:"Caftans de luxe en soie et tissus traditionnels, broderies faites main par des maîtres-artisans de Fès.", rating:4.9, reviews:234, products:8, sales:"2 450", producerName:"Fatima Zahra", location:"Fès", since:"2005" },
-      { id:2, name:"Tapis Berbère d'Atlas", category:"Tapis & Tissage", badge:"Tradition", banner:"IMAGES/1779140612922.png", desc:"Tapis berbères authentiques tissés à la main par les femmes de l'Atlas, chaque pièce est unique.", rating:4.8, reviews:189, products:6, sales:"3 200", producerName:"Rachid El Mansouri", location:"Marrakech", since:"2010" },
-      { id:3, name:"Poterie de Safi", category:"Poterie & Céramique", badge:"Fait Main", banner:"IMAGES/1779140622713.png", desc:"Poterie traditionnelle de Safi, plats, tajines et vases peints à la main.", rating:4.7, reviews:156, products:12, sales:"1 890", producerName:"Ahmed Benjelloun", location:"Safi", since:"1998" }
-    ];
-    localStorage.setItem('greenmarket_stores', JSON.stringify(stores));
-  }
-  return stores;
-}
-
-function renderStoresOnAccueil() {
-  const grid = document.getElementById('storesGrid');
-  if (!grid) return;
-  
-  loadStores();
-  const storesToShow = stores.slice(0, 3);
-  
-  if (storesToShow.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">🏪</div><p>Aucune boutique pour le moment</p></div>';
-    return;
-  }
-  
-  grid.innerHTML = storesToShow.map(store => `
-    <div class="store-card" onclick="window.location.href='store-detail.html?id=${store.id}'">
-      <img src="${store.banner}" class="store-banner" alt="${store.name}" onerror="this.src='https://placehold.co/400x200?text=Boutique'">
-      <div class="store-info">
-        <div class="store-name">${escapeHtml(store.name)}</div>
-        <div class="store-category">${escapeHtml(store.category)}</div>
-        <div class="store-desc">${escapeHtml(store.desc.substring(0, 80))}${store.desc.length > 80 ? '…' : ''}</div>
-        <div class="flex items-center gap-2 mt-2">
-          <span class="stars">${renderStars(store.rating)}</span>
-          <span class="text-xs" style="color:var(--text-light);">(${store.reviews} avis)</span>
-        </div>
-      </div>
-    </div>
-  `).join('');
-}
-
-function renderStars(rating) {
-  const full = Math.floor(rating);
-  const hasHalf = rating % 1 >= 0.5;
-  let stars = '';
-  for (let i = 0; i < full; i++) stars += '★';
-  if (hasHalf) stars += '½';
-  for (let i = stars.length; i < 5; i++) stars += '☆';
-  return stars;
-}
-
-// ========== PRODUCTOS ==========
+// ========== DONNÉES PRODUITS ==========
 const products = [
-  { id: 1, name: "Caftan traditionnel", price: "450 DH", image: "IMAGES/CaftanSoie.jpg", coop: "Coopérative Fès Artisanat", rating: 4.5, reviews: 156, badge: "Artisanal", badgeClass: "secondary" },
-  { id: 2, name: "Huile d'olive extra vierge", price: "120 DH / litre", image: "IMAGES/olive.jfif", coop: "Coopérative Atlas", rating: 5, reviews: 234, badge: "Bio", badgeClass: "bio" },
-  { id: 3, name: "Tekchita Traditionnelle", price: "650 DH", image: "IMAGES/Tekchita.jpg", coop: "Coopérative Fès Artisanat", rating: 4.8, reviews: 89, badge: "Rare", badgeClass: "rare" },
-  { id: 4, name: "Caftan Moderne", price: "750 DH", image: "IMAGES/CaftanModerne.jpg", coop: "Coopérative Marrakech", rating: 4.9, reviews: 67, badge: "Fait main", badgeClass: "fait" }
+  { id: 1, name: "Caftan traditionnel", price: "450 DH", image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=300&h=200&fit=crop", coop: "Coopérative Fès Artisanat", rating: 4.5, reviews: 156, badge: "Artisanal", badgeClass: "secondary" },
+  { id: 2, name: "Huile d'olive extra vierge", price: "120 DH / litre", image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&h=200&fit=crop", coop: "Coopérative Atlas", rating: 5, reviews: 234, badge: "Bio", badgeClass: "bio" },
+  { id: 3, name: "Mélange plantes médicinales", price: "45 DH", image: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=300&h=200&fit=crop", coop: "Coopérative Ourika", rating: 4.5, reviews: 89, badge: "Rare", badgeClass: "rare" },
+  { id: 4, name: "Tapis berbère", price: "1 200 DH", image: "https://images.unsplash.com/photo-1526721940322-10fb6e3ae94a?w=300&h=200&fit=crop", coop: "Coopérative Haut-Atlas", rating: 5, reviews: 67, badge: "Fait main", badgeClass: "fait" }
 ];
 
-// ========== COOPERATIVAS ==========
 const cooperatives = [
   { name: "Coopérative Atlas", location: "Marrakech", description: "Huiles, produits du terroir et artisanat.", icon: "🏔️" },
   { name: "Coopérative Fès Artisanat", location: "Fès", description: "Artisanat authentique, poterie et vêtements.", icon: "🏺" },
   { name: "Coopérative Ourika", location: "Ourika Valley", description: "Plantes médicinales rares et produits naturels.", icon: "🌿" }
 ];
 
+// ========== STORES DATA ==========
+let storesData = [];
+
+function loadStoresFromStorage() {
+  const saved = localStorage.getItem('greenmarket_stores');
+  if (saved) {
+    storesData = JSON.parse(saved);
+  } else {
+    // Default stores
+    storesData = [
+      { id: 1, name: "Le Verger Céleste", category: "Fruits et légumes", banner: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=400&h=200&fit=crop", desc: "Fruits et légumes bio de Provence", rating: 4.9 },
+      { id: 2, name: "La Crèmerie des Sommets", category: "Produits laitiers", banner: "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=400&h=200&fit=crop", desc: "Fromages artisanaux de montagne", rating: 4.7 },
+      { id: 3, name: "Le Pétrin d'Antan", category: "Boulangerie", banner: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=200&fit=crop", desc: "Pain au levain et viennoiseries", rating: 4.9 }
+    ];
+    localStorage.setItem('greenmarket_stores', JSON.stringify(storesData));
+  }
+}
+
+function renderStoresOnAccueil() {
+  const grid = document.getElementById('storesGrid');
+  if (!grid) return;
+  
+  const storesToShow = storesData.slice(0, 3);
+  grid.innerHTML = storesToShow.map(store => `
+    <div class="store-card" onclick="window.location.href='store.html'">
+      <img src="${store.banner}" class="store-banner" alt="${store.name}" onerror="this.src='https://placehold.co/400x200?text=Boutique'">
+      <div class="store-info">
+        <div class="store-name">${escapeHtml(store.name)}</div>
+        <div class="store-category">${escapeHtml(store.category)}</div>
+        <div class="store-desc">${escapeHtml(store.desc.substring(0, 80))}${store.desc.length > 80 ? '…' : ''}</div>
+        <div class="flex items-center gap-1 mt-2"><span class="stars">${'★'.repeat(Math.floor(store.rating))}${'☆'.repeat(5 - Math.floor(store.rating))}</span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
 // ========== PANIER ==========
 let cart = [];
 
 function loadCart() {
-  const saved = localStorage.getItem('greenmarket_panier');
+  const saved = localStorage.getItem('greenmarket_cart');
   cart = saved ? JSON.parse(saved) : [];
   updateCartCount();
 }
 
-function saveCart() { 
-  localStorage.setItem('greenmarket_panier', JSON.stringify(cart)); 
-  updateCartCount(); 
-}
+function saveCart() { localStorage.setItem('greenmarket_cart', JSON.stringify(cart)); updateCartCount(); }
 
 function updateCartCount() {
-  const total = cart.reduce((sum, item) => sum + (item.quantite || 1), 0);
+  const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
   const badge = document.getElementById('cart-count');
   if (badge) badge.textContent = total;
 }
 
 function addToCart(product) {
   const existing = cart.find(item => item.id === product.id);
-  
-  let prixNumerique = parseInt(String(product.price).replace(/\D/g, '')) || 0;
-  
-  if (existing) {
-    existing.quantite = (existing.quantite || 1) + 1;
-  } else {
-    cart.push({ 
-      id: product.id, 
-      nom: product.name, 
-      prix: product.price,
-      prixNumerique: prixNumerique,
-      image: product.image,
-      boutiqueId: product.id, 
-      boutiqueNom: product.coop, 
-      quantite: 1 
-    });
-  }
+  if (existing) existing.quantity = (existing.quantity || 1) + 1;
+  else cart.push({ ...product, quantity: 1 });
   saveCart();
   showToast(`✓ ${product.name} ajouté au panier !`);
 }
 
-window.addToCart = addToCart;
+function goToCart() {
+  if (cart.length === 0) { showToast("🛒 Votre panier est vide", "#9a4a00"); return; }
+  let summary = "🛒 Votre panier:\n";
+  let total = 0;
+  cart.forEach(item => {
+    const priceNum = parseFloat(item.price.toString().replace(/[^0-9.,]/g, '').replace(',', '.'));
+    const qty = item.quantity || 1;
+    const itemTotal = priceNum * qty;
+    total += itemTotal;
+    summary += `- ${item.name} x${qty} = ${itemTotal.toFixed(2)} DH\n`;
+  });
+  summary += `\nTotal: ${total.toFixed(2)} DH\n\nValider la commande ?`;
+  if (confirm(summary)) {
+    alert("✅ Commande confirmée ! Merci pour votre achat.");
+    cart = [];
+    saveCart();
+  }
+}
 
 function showToast(msg, bg = 'var(--primary)') {
   const toast = document.getElementById('toast');
@@ -692,41 +636,36 @@ function renderProducts() {
   const grid = document.getElementById('productsGrid');
   if (!grid) return;
   
-  grid.innerHTML = products.map(p => {
-    const badgeClass = p.badgeClass === 'secondary' ? 'badge-secondary' : 
-                       p.badgeClass === 'bio' ? 'badge-bio' : 
-                       p.badgeClass === 'rare' ? 'badge-rare' : 'badge-fait';
-    const imgSrc = p.image && !p.image.includes('undefined') ? p.image : `https://placehold.co/300x200?text=${encodeURIComponent(p.name)}`;
+  function createCard(p) {
+    const badgeClass = p.badgeClass === 'secondary' ? 'badge-secondary' : p.badgeClass === 'bio' ? 'badge-bio' : p.badgeClass === 'rare' ? 'badge-rare' : 'badge-fait';
     return `
       <div class="product-card">
-        <img src="${imgSrc}" class="product-img" alt="${p.name}" onerror="this.src='https://placehold.co/300x200?text=Produit'">
+        <img src="${p.image}" class="product-img" alt="${p.name}" onerror="this.src='https://placehold.co/300x200?text=Produit'">
         <div class="p-4 flex flex-col flex-1 gap-2">
           <span class="badge ${badgeClass}">${p.badge}</span>
-          <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display', serif;">${escapeHtml(p.name)}</h3>
+          <h3 class="font-bold text-base mt-1" style="font-family:'Playfair Display', serif;">${p.name}</h3>
           <p class="text-xs flex items-center gap-1 text-gray-500">👩‍🌾 ${p.coop}</p>
-          <div class="flex items-center gap-1">
-            <span class="stars">${renderStars(p.rating)}</span>
-            <span class="text-xs text-gray-500">(${p.reviews} avis)</span>
-          </div>
+          <div class="flex items-center gap-1"><span class="stars">${'★'.repeat(Math.floor(p.rating))}${p.rating % 1 ? '½' : ''}${'☆'.repeat(5 - Math.ceil(p.rating))}</span><span class="text-xs text-gray-500">(${p.reviews} avis)</span></div>
           <p class="font-bold text-lg mt-auto" style="color: var(--primary);">${p.price}</p>
-          <button class="btn-primary w-full mt-1 py-2 text-sm" style="background:var(--primary); color:white; border-radius:99px; font-weight:bold;" onclick='addToCart(${JSON.stringify(p).replace(/'/g, "\\'")})'>Ajouter au panier</button>
+          <button class="btn-primary w-full mt-1 py-2 text-sm" onclick='addToCart(${JSON.stringify(p).replace(/'/g, "\\'")})'>Ajouter au panier</button>
         </div>
       </div>
     `;
-  }).join('');
+  }
+  grid.innerHTML = products.map(createCard).join('');
 }
 
 function renderCooperatives() {
   const coopsGrid = document.getElementById('coopsGrid');
   if (!coopsGrid) return;
   coopsGrid.innerHTML = cooperatives.map(coop => `
-    <div class="coop-card" onclick="window.location.href='store.html'">
+    <div class="coop-card">
       <div class="coop-header">${coop.icon}</div>
       <div class="p-5">
         <h3 class="font-bold text-base mb-1" style="font-family:'Playfair Display',serif;">${coop.name}</h3>
         <p class="text-xs mb-4 flex items-center gap-1 text-gray-500">📍 ${coop.location}</p>
         <p class="text-sm mb-4 text-gray-500">${coop.description}</p>
-        <button class="btn-outline w-full" onclick="event.stopPropagation(); window.location.href='store.html'">Voir la boutique</button>
+        <button class="btn-outline w-full" onclick="window.location.href='store.html'">Voir la boutique</button>
       </div>
     </div>
   `).join('');
@@ -776,50 +715,18 @@ function login(email, password) {
 
 function updateAuthUI() {
   const widget = document.getElementById('authWidget');
-  if(!widget) return;
   const user = getCurrentUser();
   if (user) {
-    const roleText = user.role === 'productor' ? 'Artisan' : (user.role === 'admin' ? 'Admin' : 'Client');
-    widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:var(--primary);cursor:pointer;margin-left:8px;">🚪</button></div>`;
-    document.getElementById('logoutBtn')?.addEventListener('click', logout);
-    
-    // Mostrar dashboard link si es productor o admin
-    const dashboardLink = document.getElementById('dashboardLink');
-    if (dashboardLink) {
-      dashboardLink.style.display = (user.role === 'productor' || user.role === 'admin') ? 'inline-block' : 'none';
-    }
+    const roleText = user.role === 'productor' ? 'Producteur' : 'Client';
+    widget.innerHTML = `<div class="flex items-center gap-2 bg-white rounded-full px-3 py-1"><span>👋 ${user.name}</span><button onclick="logout()" class="text-red-600 ml-2">🚪</button></div>`;
   } else {
-    widget.innerHTML = `<button class="btn-connexion" id="showLoginBtn">🔑 Connexion</button>`;
-    widget.innerHTML = `<button class="btn-connexion" onclick="window.location.href='signin.html'">🔑 Connexion</button>`;
+    widget.innerHTML = `<button class="btn-primary" onclick="window.location.href='signin.html'">Connexion</button>`;
+  }
 }
 
-window.showAuthModal = function() {
-  const modal = document.getElementById('authModal');
-  if(modal) modal.classList.add('open');
-}
-
-function closeAuthModal() {
-  const modal = document.getElementById('authModal');
-  if(modal) modal.classList.remove('open');
-}
-
-function setupAuthModal() {
-  document.getElementById('doLoginBtn')?.addEventListener('click', () => {
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    const result = login(email, password);
-    if (result.success) {
-      closeAuthModal();
-      updateAuthUI();
-      showToast(`👋 Bonjour ${result.user.name} !`);
-    } else {
-      document.getElementById('loginError').textContent = result.error;
-    }
-  });
-  document.getElementById('closeAuthModal')?.addEventListener('click', closeAuthModal);
-  document.getElementById('authModal')?.addEventListener('click', (e) => {
-    if (e.target === document.getElementById('authModal')) closeAuthModal();
-  });
+// AFTER
+function showLoginModal() {
+  window.location.href = 'signin.html';
 }
 
 function escapeHtml(str) {
@@ -827,8 +734,29 @@ function escapeHtml(str) {
   return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
 }
 
-function setupSearch() {
-  const searchInput = document.getElementById('headerSearchInput');
+function scrollToSection(id) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ========== INIT ==========
+function init() {
+  loadCart();
+  renderProducts();
+  renderCooperatives();
+  loadStoresFromStorage();
+  renderStoresOnAccueil();
+  initUsers();
+  updateAuthUI();
+  
+  document.getElementById('becomePartnerBtn')?.addEventListener('click', () => {
+    const user = getCurrentUser();
+    if (user && user.role === 'productor') alert("Vous êtes déjà producteur !");
+    else if (user) alert("Pour devenir partenaire, créez un compte producteur.");
+    else showLoginModal();
+  });
+  
+  // Search functionality
+  const searchInput = document.getElementById('searchInput');
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
       const query = e.target.value.toLowerCase();
@@ -841,28 +769,7 @@ function setupSearch() {
   }
 }
 
-// ========== INIT ==========
-function init() {
-  loadStores();
-  loadCart();
-  renderProducts();
-  renderCooperatives();
-  renderStoresOnAccueil();
-  initUsers();
-  updateAuthUI();
-  setupSearch();
-  setupAuthModal();
-  
-  document.getElementById('becomePartnerBtn')?.addEventListener('click', () => {
-    const user = getCurrentUser();
-    if (user && user.role === 'productor') alert("Vous êtes déjà producteur !");
-    else if (user) alert("Pour devenir partenaire, créez un compte producteur.");
-    else showAuthModal();
-  });
-}
-
-// Iniciar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', init);
+init();
 </script>
 </body>
 </html>
