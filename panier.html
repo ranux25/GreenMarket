@@ -225,13 +225,36 @@ body{
   }
 
   function clearCart(){
-    if(confirm("Vider le panier ?")){
-      localStorage.removeItem('greenmarket_panier');
-      updateCartCount();
-      renderCart();
-      showToast("🛒 Panier vidé");
-    }
-  }
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position:fixed; inset:0; background:rgba(0,0,0,.5);
+    z-index:9999; display:flex; align-items:center; justify-content:center;
+  `;
+  modal.innerHTML = `
+    <div style="background:#fff; border-radius:16px; padding:2rem; text-align:center; max-width:300px; width:90%;">
+      <div style="font-size:2rem; margin-bottom:1rem;">🗑️</div>
+      <p style="font-weight:700; margin-bottom:1.5rem;">Vider le panier ?</p>
+      <div style="display:flex; gap:1rem; justify-content:center;">
+        <button onclick="this.closest('div[style]').remove()" 
+          style="padding:.6rem 1.5rem; border-radius:8px; border:2px solid #ccc; background:white; cursor:pointer;">
+          Annuler
+        </button>
+        <button id="confirmClear"
+          style="padding:.6rem 1.5rem; border-radius:8px; border:none; background:#5d0d18; color:white; cursor:pointer; font-weight:700;">
+          Vider
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  document.getElementById('confirmClear').addEventListener('click', () => {
+    modal.remove();
+    localStorage.removeItem('greenmarket_panier');
+    updateCartCount();
+    renderCart();
+    showToast("🛒 Panier vidé");
+  });
+}
 
   function getTotal(panier){
     return panier.reduce((sum,item) => sum + (item.prixNumerique * item.quantite), 0);
