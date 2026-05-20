@@ -531,6 +531,65 @@
 
 <script>
 // ========== DONNÉES PRODUITS ==========
+
+// ========== DATOS ==========
+let stores = [];
+
+function loadStores() {
+  const saved = localStorage.getItem('greenmarket_stores');
+  if (saved && JSON.parse(saved).length > 0) {
+    stores = JSON.parse(saved);
+  } else {
+    // Datos de ejemplo de tiendas marroquíes
+    stores = [
+      { id:1, name:"Maison du Caftan", category:"Vêtements traditionnels", badge:"Artisan", banner:"IMAGES/1779140603090.png", desc:"Caftans de luxe en soie et tissus traditionnels, broderies faites main par des maîtres-artisans de Fès.", rating:4.9, reviews:234, products:8, sales:"2 450", producerName:"Fatima Zahra", location:"Fès", since:"2005" },
+      { id:2, name:"Tapis Berbère d'Atlas", category:"Tapis & Tissage", badge:"Tradition", banner:"IMAGES/1779140612922.png", desc:"Tapis berbères authentiques tissés à la main par les femmes de l'Atlas, chaque pièce est unique.", rating:4.8, reviews:189, products:6, sales:"3 200", producerName:"Rachid El Mansouri", location:"Marrakech", since:"2010" },
+      { id:3, name:"Poterie de Safi", category:"Poterie & Céramique", badge:"Fait Main", banner:"IMAGES/1779140622713.png", desc:"Poterie traditionnelle de Safi, plats, tajines et vases peints à la main.", rating:4.7, reviews:156, products:12, sales:"1 890", producerName:"Ahmed Benjelloun", location:"Safi", since:"1998" }
+    ];
+    localStorage.setItem('greenmarket_stores', JSON.stringify(stores));
+  }
+  return stores;
+}
+
+function renderStoresOnAccueil() {
+  const grid = document.getElementById('storesGrid');
+  if (!grid) return;
+  
+  loadStores();
+  const storesToShow = stores.slice(0, 3);
+  
+  if (storesToShow.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">🏪</div><p>Aucune boutique pour le moment</p></div>';
+    return;
+  }
+  
+  grid.innerHTML = storesToShow.map(store => `
+    <div class="store-card" onclick="window.location.href='info-store.html?id=${store.id}'">
+      <img src="${store.banner}" class="store-banner" alt="${store.name}" onerror="this.src='https://placehold.co/400x200?text=Boutique'">
+      <div class="store-info">
+        <div class="store-name">${escapeHtml(store.name)}</div>
+        <div class="store-category">${escapeHtml(store.category)}</div>
+        <div class="store-desc">${escapeHtml(store.desc.substring(0, 80))}${store.desc.length > 80 ? '…' : ''}</div>
+        <div class="flex items-center gap-2 mt-2">
+          <span class="stars">${renderStars(store.rating)}</span>
+          <span class="text-xs" style="color:var(--text-light);">(${store.reviews} avis)</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderStars(rating) {
+  const full = Math.floor(rating);
+  const hasHalf = rating % 1 >= 0.5;
+  let stars = '';
+  for (let i = 0; i < full; i++) stars += '★';
+  if (hasHalf) stars += '½';
+  for (let i = stars.length; i < 5; i++) stars += '☆';
+  return stars;
+}
+
+// ========== PRODUCTOS ==========
 const products = [
   { id: 1, name: "Caftan traditionnel", price: "450 DH", image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=300&h=200&fit=crop", coop: "Coopérative Fès Artisanat", rating: 4.5, reviews: 156, badge: "Artisanal", badgeClass: "secondary" },
   { id: 2, name: "Huile d'olive extra vierge", price: "120 DH / litre", image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&h=200&fit=crop", coop: "Coopérative Atlas", rating: 5, reviews: 234, badge: "Bio", badgeClass: "bio" },
@@ -648,6 +707,8 @@ function renderProducts() {
           <div class="flex items-center gap-1"><span class="stars">${'★'.repeat(Math.floor(p.rating))}${p.rating % 1 ? '½' : ''}${'☆'.repeat(5 - Math.ceil(p.rating))}</span><span class="text-xs text-gray-500">(${p.reviews} avis)</span></div>
           <p class="font-bold text-lg mt-auto" style="color: var(--primary);">${p.price}</p>
           <button class="btn-primary w-full mt-1 py-2 text-sm" onclick='addToCart(${JSON.stringify(p).replace(/'/g, "\\'")})'>Ajouter au panier</button>
+          <button class="btn-primary w-full mt-1 py-2 text-sm" style="background:var(--primary); color:white; border-radius:99px; font-weight:bold;" onclick="addToCart(${JSON.stringify(p).replace(/"/g, '&quot;')})">Ajouter au panier
+          </button>
         </div>
       </div>
     `;
@@ -715,6 +776,7 @@ function login(email, password) {
 
 function updateAuthUI() {
   const widget = document.getElementById('authWidget');
+
   const user = getCurrentUser();
   if (user) {
     const roleText = user.role === 'productor' ? 'Producteur' : 'Client';
@@ -727,6 +789,49 @@ function updateAuthUI() {
 // AFTER
 function showLoginModal() {
   window.location.href = 'signin.html';
+
+  if (!widget) return;
+  const user = getCurrentUser();
+  if (user) {
+    const roleText = user.role === 'productor' ? 'Artisan' : (user.role === 'admin' ? 'Admin' : 'Client');
+    widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:var(--primary);cursor:pointer;margin-left:8px;">🚪</button></div>`;
+    document.getElementById('logoutBtn')?.addEventListener('click', logout);
+    const dashboardLink = document.getElementById('dashboardLink');
+    if (dashboardLink) {
+      dashboardLink.style.display = (user.role === 'productor' || user.role === 'admin') ? 'inline-block' : 'none';
+    }
+  } else {
+    widget.innerHTML = `<button class="btn-connexion" onclick="window.location.href='signin.html'">🔑 Connexion</button>`;
+  }  
+}
+
+window.showAuthModal = function() {  
+  const modal = document.getElementById('authModal');
+  if (modal) modal.classList.add('open');
+}
+
+function closeAuthModal() {
+  const modal = document.getElementById('authModal');
+  if(modal) modal.classList.remove('open');
+}
+
+function setupAuthModal() {
+  document.getElementById('doLoginBtn')?.addEventListener('click', () => {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const result = login(email, password);
+    if (result.success) {
+      closeAuthModal();
+      updateAuthUI();
+      showToast(`👋 Bonjour ${result.user.name} !`);
+    } else {
+      document.getElementById('loginError').textContent = result.error;
+    }
+  });
+  document.getElementById('closeAuthModal')?.addEventListener('click', closeAuthModal);
+  document.getElementById('authModal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('authModal')) closeAuthModal();
+  });
 }
 
 function escapeHtml(str) {

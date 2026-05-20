@@ -145,8 +145,6 @@
     cursor: pointer;
     transition: background 0.2s, transform 0.15s;
     letter-spacing: 0.3px;
-    text-decoration: none;
-    display: inline-block;
   }
   .btn-connexion:hover {
     background: #7a1020;
@@ -171,14 +169,18 @@
     position: relative; overflow: hidden;
   }
   .page-header::before {
-    content: ''; position: absolute; right: -80px; top: -80px;
+    content: '';
+    position: absolute; right: -80px; top: -80px;
     width: 420px; height: 420px;
-    border: 55px solid rgba(255,249,235,.05); border-radius: 50%;
+    border: 55px solid rgba(255,249,235,.05);
+    border-radius: 50%;
   }
   .page-header::after {
-    content: ''; position: absolute; left: 4%; bottom: -70px;
+    content: '';
+    position: absolute; left: 4%; bottom: -70px;
     width: 240px; height: 240px;
-    border: 40px solid rgba(159,178,172,.10); border-radius: 50%;
+    border: 40px solid rgba(159,178,172,.10);
+    border-radius: 50%;
   }
   .header-inner { position: relative; z-index: 1; }
   .header-eyebrow {
@@ -339,7 +341,9 @@
   .create-shop-header h3 {
     font-family: 'Cormorant Garamond', serif;
     color: white;
-    font-size: 1.12rem; font-weight: 600; letter-spacing: .03em;
+    font-size: 1.12rem;
+    font-weight: 600;
+    letter-spacing: .03em;
   }
   .create-shop-form { padding: 1.2rem; }
   .create-shop-form label {
@@ -563,6 +567,45 @@
   }
   .toast.show { transform: translateY(0); opacity: 1; }
 
+  .auth-modal-overlay {
+    display: none; position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    align-items: center; justify-content: center;
+    z-index: 1000;
+  }
+  .auth-modal-overlay.open { display: flex; }
+  .auth-modal {
+    background: var(--white); border-radius: 16px; padding: 2rem;
+    max-width: 450px; width: 90%; position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  }
+  .auth-tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+  .auth-tab {
+    background: none; border: none; padding: 0.5rem 1rem;
+    font-size: 1rem; cursor: pointer; color: var(--text-muted); font-weight: 500;
+  }
+  .auth-tab.active { color: var(--wine); border-bottom: 2px solid var(--wine); }
+  .auth-form { display: none; }
+  .auth-form.active { display: block; }
+  .auth-form h3 { color: var(--wine); margin-bottom: 1rem; font-family: 'Cormorant Garamond', serif; }
+  .auth-form input {
+    width: 100%; padding: 0.7rem; margin-bottom: 1rem;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    font-family: 'Jost', sans-serif; background: var(--cream);
+  }
+  .auth-error { color: #d9534f; font-size: 0.8rem; margin-top: 0.5rem; text-align: center; }
+  .auth-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); }
+
+  .btn-filled {
+    background: var(--wine); color: var(--cream);
+    border: none; padding: .5rem 1.3rem; border-radius: 3px;
+    font-family: 'Jost', sans-serif; font-size: .78rem; font-weight: 600;
+    letter-spacing: .07em; text-transform: uppercase;
+    cursor: pointer; transition: background .2s;
+  }
+  .btn-filled:hover { background: var(--wine-dark); }
+
   .empty-state { text-align: center; padding: 3rem; color: var(--text-light); }
   .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
 
@@ -583,7 +626,7 @@
 </head>
 <body>
 
-<!-- HEADER COMPLETO (SIN MODAL) -->
+<!-- HEADER COMPLETO (integrado directamente para que funcione) -->
 <header>
   <div>
     <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='accueil.html'">
@@ -731,6 +774,18 @@
     </div>
   </div>
 </div>
+<div class="auth-modal-overlay" id="authModal">
+  <div class="auth-modal">
+    <div class="auth-tabs"><button class="auth-tab active" data-tab="login">Connexion</button></div>
+    <div id="loginForm" class="auth-form active">
+      <h3>🔐 Se connecter</h3>
+      <input type="email" id="loginEmail" placeholder="Email"><input type="password" id="loginPassword" placeholder="Mot de passe">
+      <button class="btn-filled" id="doLoginBtn" style="width:100%">Se connecter</button>
+      <p class="auth-error" id="loginError"></p>
+    </div>
+    <button class="auth-close" id="closeAuthModal">✕</button>
+  </div>
+</div>
 
 <script>
 // ========== DATOS ==========
@@ -796,33 +851,25 @@ function setFilter(filter) {
 }
 
 let currentUser = null;
-
 function initUsers() {
+  const defaultUsers = [
+    { id: 1, name: "Administrateur", email: "admin@greenmarket.com", password: "admin123", role: "admin", producerId: null },
+    { id: 12, name: "Client Test", email: "client@test.com", password: "client123", role: "client", producerId: null }
+  ];
   if (!localStorage.getItem('greenmarket_users')) {
-    const defaultUsers = [
-      { id: 1, name: "Administrateur", email: "admin@greenmarket.com", password: "admin123", role: "admin", producerId: null },
-      { id: 2, name: "Sophie Martin", email: "sophie@test.com", password: "sophie123", role: "client", producerId: null },
-      { id: 3, name: "Jean Dupont", email: "jean@test.com", password: "jean123", role: "client", producerId: null },
-      { id: 4, name: "Leila Benjelloun", email: "leila@test.com", password: "leila123", role: "client", producerId: null },
-      { id: 5, name: "Client Test", email: "client@test.com", password: "client123", role: "client", producerId: null },
-      { id: 6, name: "Fatima Zahra", email: "fatima@artisan.ma", password: "fatima123", role: "productor", producerId: 101 }
-    ];
     localStorage.setItem('greenmarket_users', JSON.stringify(defaultUsers));
   }
 }
-
 function getCurrentUser() {
   const u = sessionStorage.getItem('greenmarket_current_user');
   return u ? JSON.parse(u) : null;
 }
-
 function setCurrentUser(user) {
   sessionStorage.setItem('greenmarket_current_user', JSON.stringify(user));
   currentUser = user;
   updateCreateShopVisibility();
   updateDashboardLink();
 }
-
 function logout() {
   sessionStorage.removeItem('greenmarket_current_user');
   currentUser = null;
@@ -830,6 +877,16 @@ function logout() {
   updateCreateShopVisibility();
   updateDashboardLink();
   showToast("👋 Déconnexion réussie");
+}
+function login(email, password) {
+  const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
+  const user = users.find(u => u.email === email && u.password === password);
+  if (user) {
+    const { password: _, ...safeUser } = user;
+    setCurrentUser(safeUser);
+    return { success: true, user: safeUser };
+  }
+  return { success: false, error: "Email ou mot de passe incorrect" };
 }
 
 function updateAuthUI() {
@@ -840,37 +897,18 @@ function updateAuthUI() {
     const roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Artisan' : 'Client');
     widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;">🚪</button></div>`;
     document.getElementById('logoutBtn')?.addEventListener('click', logout);
-    
-    const dashboardLink = document.getElementById('dashboardLink');
-    if (dashboardLink) {
-      if (user.role === 'productor') {
-        dashboardLink.style.display = 'inline-block';
-        dashboardLink.href = 'dashboard-producteur.html';
-        dashboardLink.textContent = '📊 Dashboard';
-      } else if (user.role === 'admin') {
-        dashboardLink.style.display = 'inline-block';
-        dashboardLink.href = 'dashboard_admin.html';
-        dashboardLink.textContent = '⚙️ Admin';
-      } else {
-        dashboardLink.style.display = 'none';
-      }
-    }
   } else {
-    widget.innerHTML = `<a href="signin.html"><button class="btn-connexion">🔑 Connexion</button></a>`;
+widget.innerHTML = `<button class="btn-connexion" onclick="window.location.href='signin.html'">🔑 Connexion</button>`;
+    document.getElementById('showLoginBtn')?.addEventListener('click', () => showAuthModal());
   }
   updateCategoriesPermissions();
+  updateDashboardLink();
 }
 
 function updateDashboardLink() {
   const user = getCurrentUser();
   const link = document.getElementById('dashboardLink');
-  if (link) {
-    if (user && (user.role === 'productor' || user.role === 'admin')) {
-      link.style.display = 'inline-block';
-    } else {
-      link.style.display = 'none';
-    }
-  }
+  if (link) link.style.display = (user && (user.role === 'productor' || user.role === 'admin')) ? 'inline-block' : 'none';
 }
 
 function updateCreateShopVisibility() {
@@ -914,6 +952,29 @@ function setupImageOptions() {
       }
     });
   }
+}
+
+function showAuthModal() {
+  const modal = document.getElementById('authModal');
+  if (modal) modal.classList.add('open');
+}
+function closeAuthModal() { document.getElementById('authModal')?.classList.remove('open'); }
+
+function setupAuthModal() {
+  document.getElementById('doLoginBtn')?.addEventListener('click', () => {
+    const result = login(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
+    if (result.success) { 
+      closeAuthModal(); 
+      updateAuthUI(); 
+      updateCreateShopVisibility(); 
+      renderStores(); 
+      showToast(`👋 Bonjour ${result.user.name} !`); 
+    } else {
+      document.getElementById('loginError').textContent = result.error;
+    }
+  });
+  document.getElementById('closeAuthModal')?.addEventListener('click', closeAuthModal);
+  document.getElementById('authModal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('authModal')) closeAuthModal(); });
 }
 
 function saveCategories() { localStorage.setItem('greenmarket_categories', JSON.stringify(categories)); }
@@ -982,12 +1043,35 @@ function updateCategoriesPermissions() {
 
 function deleteShop(shopId, event) {
   event.stopPropagation();
-  if (confirm("⚠️ Êtes-vous sûr de vouloir supprimer cette boutique ?")) {
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position:fixed; inset:0; background:rgba(0,0,0,.5);
+    z-index:9999; display:flex; align-items:center; justify-content:center;
+  `;
+  modal.innerHTML = `
+    <div style="background:#fff; border-radius:16px; padding:2rem; text-align:center; max-width:300px; width:90%;">
+      <div style="font-size:2rem; margin-bottom:1rem;">⚠️</div>
+      <p style="font-weight:700; margin-bottom:1.5rem;">Supprimer cette boutique ?</p>
+      <div style="display:flex; gap:1rem; justify-content:center;">
+        <button onclick="this.closest('div[style]').remove()" 
+          style="padding:.6rem 1.5rem; border-radius:8px; border:2px solid #ccc; background:white; cursor:pointer;">
+          Annuler
+        </button>
+        <button id="confirmDelete"
+          style="padding:.6rem 1.5rem; border-radius:8px; border:none; background:#5d0d18; color:white; cursor:pointer; font-weight:700;">
+          Supprimer
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  document.getElementById('confirmDelete').addEventListener('click', () => {
+    modal.remove();
     stores = stores.filter(s => s.id !== shopId);
     favorites = favorites.filter(id => id !== shopId);
     saveStores(); saveFavorites(); renderStores(); renderCategories();
     showToast("✅ Boutique supprimée");
-  }
+  });
 }
 
 function updateStats() {
@@ -1276,6 +1360,7 @@ loadCategories();
 loadFavorites();
 initUsers();
 updateAuthUI();
+setupAuthModal();
 renderCategories();
 renderStores();
 updateCreateShopVisibility();
