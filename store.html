@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GreenMarket – Boutiques Artisanales Marocaines</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="header.css">
 <style>
   :root {
     --cream:      #fff9eb;
@@ -37,132 +38,7 @@
     min-height: 100vh;
   }
 
-  /* ========== HEADER STYLES ========== */
-  header {
-    background: #9FB2AC;
-    border-bottom: 2px solid #f0e8d5;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 16px rgba(93,13,24,0.07);
-  }
-
-  header > div {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-
-  .search-bar input {
-    border: 1.5px solid #e8dfc8;
-    background: #fdf8ee;
-    border-radius: 999px;
-    padding: 10px 20px;
-    width: 100%;
-    max-width: 420px;
-    font-family: 'Lato', sans-serif;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s;
-    color: var(--text-dark);
-  }
-  .search-bar input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(93,13,24,0.08);
-  }
-
-  .nav-link {
-    font-family: 'Lato', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--text-dark);
-    text-decoration: none;
-    letter-spacing: 0.5px;
-    transition: color 0.2s;
-    padding: 4px 0;
-    position: relative;
-  }
-  .nav-link::after {
-    content: '';
-    display: block;
-    height: 2px;
-    background: var(--primary);
-    transform: scaleX(0);
-    transition: transform 0.25s;
-    border-radius: 2px;
-  }
-  .nav-link:hover { color: var(--primary); }
-  .nav-link:hover::after { transform: scaleX(1); }
-  .nav-link.active { color: var(--primary); }
-  .nav-link.active::after { transform: scaleX(1); }
-
-  .cart-btn {
-    position: relative;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-  }
-  .cart-badge {
-    position: absolute;
-    top: -5px; right: -7px;
-    background: var(--primary);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    border-radius: 999px;
-    min-width: 18px;
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Lato', sans-serif;
-  }
-
-  .desktop-nav {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-  }
-
-  @media (max-width: 640px) {
-    .desktop-nav { display: none; }
-  }
-
-  .btn-connexion {
-    background: var(--primary);
-    color: #fff;
-    border: none;
-    border-radius: 999px;
-    padding: 8px 20px;
-    font-family: 'Lato', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
-    letter-spacing: 0.3px;
-  }
-  .btn-connexion:hover {
-    background: #7a1020;
-    transform: translateY(-1px);
-  }
-
-  .user-badge {
-    background: var(--wine-pale);
-    padding: 0.4rem 1rem;
-    border-radius: 30px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--wine);
-    font-weight: 600;
-    font-size: 0.85rem;
-  }
-
+  /* Styles spécifiques à la page store */
   .page-header {
     background: var(--wine);
     padding: 4rem 2.5rem 3rem;
@@ -567,45 +443,6 @@
   }
   .toast.show { transform: translateY(0); opacity: 1; }
 
-  .auth-modal-overlay {
-    display: none; position: fixed; top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    align-items: center; justify-content: center;
-    z-index: 1000;
-  }
-  .auth-modal-overlay.open { display: flex; }
-  .auth-modal {
-    background: var(--white); border-radius: 16px; padding: 2rem;
-    max-width: 450px; width: 90%; position: relative;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-  }
-  .auth-tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
-  .auth-tab {
-    background: none; border: none; padding: 0.5rem 1rem;
-    font-size: 1rem; cursor: pointer; color: var(--text-muted); font-weight: 500;
-  }
-  .auth-tab.active { color: var(--wine); border-bottom: 2px solid var(--wine); }
-  .auth-form { display: none; }
-  .auth-form.active { display: block; }
-  .auth-form h3 { color: var(--wine); margin-bottom: 1rem; font-family: 'Cormorant Garamond', serif; }
-  .auth-form input {
-    width: 100%; padding: 0.7rem; margin-bottom: 1rem;
-    border: 1.5px solid var(--border); border-radius: 8px;
-    font-family: 'Jost', sans-serif; background: var(--cream);
-  }
-  .auth-error { color: #d9534f; font-size: 0.8rem; margin-top: 0.5rem; text-align: center; }
-  .auth-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); }
-
-  .btn-filled {
-    background: var(--wine); color: var(--cream);
-    border: none; padding: .5rem 1.3rem; border-radius: 3px;
-    font-family: 'Jost', sans-serif; font-size: .78rem; font-weight: 600;
-    letter-spacing: .07em; text-transform: uppercase;
-    cursor: pointer; transition: background .2s;
-  }
-  .btn-filled:hover { background: var(--wine-dark); }
-
   .empty-state { text-align: center; padding: 3rem; color: var(--text-light); }
   .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
 
@@ -624,41 +461,10 @@
   }
 </style>
 </head>
-<body>
+<body data-active-page="store">
 
-<!-- HEADER COMPLETO (integrado directamente para que funcione) -->
-<header>
-  <div>
-    <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.href='accueil.html'">
-      <div style="height: 65px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-        <img src="IMAGES/logo.png" alt="GreenMarket Logo" style="height: 100%; width: auto; object-fit: contain;" onerror="this.src='https://placehold.co/65x65?text=GM'"/>
-      </div>
-      <span style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: 1px;">GreenMarket</span>
-    </div>
-
-    <div class="search-bar" style="flex: 1; display: flex; justify-content: center; min-width: 180px;">
-      <input type="text" id="headerSearchInput" placeholder="Rechercher une boutique artisanale..."/>
-    </div>
-
-    <nav class="desktop-nav">
-      <a href="accueil.html" class="nav-link">Accueil</a>
-      <a href="store.html" class="nav-link active">Boutiques</a>
-      <a href="produits.html" class="nav-link">Produits</a>
-      <a href="apropos.html" class="nav-link">À propos</a>
-      <a href="dashboard-producteur.html" id="dashboardLink" class="nav-link" style="display: none;">📊 Dashboard</a>
-    </nav>
-
-    <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
-      <a href="panier.html"><button class="cart-btn" title="Panier">
-        <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#5D0D18" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 6h14M9 21a1 1 0 1 0 2 0M15 21a1 1 0 1 0 2 0"/>
-        </svg>
-        <span class="cart-badge" id="cart-count">0</span>
-      </button></a>
-      <div id="authWidget"></div>
-    </div>
-  </div>
-</header>
+<!-- Le header sera chargé ici -->
+<div id="header-placeholder"></div>
 
 <div class="page-header">
   <div class="header-inner">
@@ -774,21 +580,10 @@
     </div>
   </div>
 </div>
-<div class="auth-modal-overlay" id="authModal">
-  <div class="auth-modal">
-    <div class="auth-tabs"><button class="auth-tab active" data-tab="login">Connexion</button></div>
-    <div id="loginForm" class="auth-form active">
-      <h3>🔐 Se connecter</h3>
-      <input type="email" id="loginEmail" placeholder="Email"><input type="password" id="loginPassword" placeholder="Mot de passe">
-      <button class="btn-filled" id="doLoginBtn" style="width:100%">Se connecter</button>
-      <p class="auth-error" id="loginError"></p>
-    </div>
-    <button class="auth-close" id="closeAuthModal">✕</button>
-  </div>
-</div>
 
+<script src="header-loader.js"></script>
 <script>
-// ========== DATOS ==========
+// ========== DONNÉES SPÉCIFIQUES À LA PAGE STORE ==========
 let categories = [
   { id:1, icon:'👘', name:'Caftans & Vêtements traditionnels' },
   { id:2, icon:'🪑', name:'Tapis & Tissage' },
@@ -850,155 +645,18 @@ function setFilter(filter) {
   renderStores();
 }
 
-let currentUser = null;
-function initUsers() {
-  const defaultUsers = [
-    { id: 1, name: "Administrateur", email: "admin@greenmarket.com", password: "admin123", role: "admin", producerId: null },
-    { id: 12, name: "Client Test", email: "client@test.com", password: "client123", role: "client", producerId: null }
-  ];
-  if (!localStorage.getItem('greenmarket_users')) {
-    localStorage.setItem('greenmarket_users', JSON.stringify(defaultUsers));
-  }
-}
 function getCurrentUser() {
   const u = sessionStorage.getItem('greenmarket_current_user');
   return u ? JSON.parse(u) : null;
 }
-function setCurrentUser(user) {
-  sessionStorage.setItem('greenmarket_current_user', JSON.stringify(user));
-  currentUser = user;
-  updateCreateShopVisibility();
-  updateDashboardLink();
-}
-function logout() {
-  sessionStorage.removeItem('greenmarket_current_user');
-  currentUser = null;
-  updateAuthUI();
-  updateCreateShopVisibility();
-  updateDashboardLink();
-  showToast("👋 Déconnexion réussie");
-}
-function login(email, password) {
-  const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
-  const user = users.find(u => u.email === email && u.password === password);
-  if (user) {
-    const { password: _, ...safeUser } = user;
-    setCurrentUser(safeUser);
-    return { success: true, user: safeUser };
-  }
-  return { success: false, error: "Email ou mot de passe incorrect" };
-}
 
-function updateAuthUI() {
-  const widget = document.getElementById('authWidget');
-  if (!widget) return;
-  const user = getCurrentUser();
-  if (user) {
-    const roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Artisan' : 'Client');
-    widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;">🚪</button></div>`;
-    document.getElementById('logoutBtn')?.addEventListener('click', logout);
-  } else {
-widget.innerHTML = `<button class="btn-connexion" onclick="window.location.href='signin.html'">🔑 Connexion</button>`;
-    document.getElementById('showLoginBtn')?.addEventListener('click', () => showAuthModal());
-  }
-  updateCategoriesPermissions();
-  updateDashboardLink();
-}
-
-function updateDashboardLink() {
-  const user = getCurrentUser();
-  const link = document.getElementById('dashboardLink');
-  if (link) link.style.display = (user && (user.role === 'productor' || user.role === 'admin')) ? 'inline-block' : 'none';
-}
-
-function updateCreateShopVisibility() {
-  const user = getCurrentUser();
-  const section = document.getElementById('createShopSection');
-  if (section) {
-    if (user && (user.role === 'productor' || user.role === 'admin')) {
-      section.style.display = 'block';
-      updateCategorySelect();
-      setupImageOptions();
-    } else {
-      section.style.display = 'none';
-    }
-  }
-}
-
-function updateCategorySelect() {
-  const sel = document.getElementById('shopCategory');
-  if (sel) sel.innerHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-}
-
-function setupImageOptions() {
-  const radioUrl = document.querySelector('input[name="imageType"][value="url"]');
-  const radioFile = document.querySelector('input[name="imageType"][value="file"]');
-  const urlContainer = document.getElementById('urlImageContainer');
-  const fileContainer = document.getElementById('fileImageContainer');
-  const fileInput = document.getElementById('shopBannerFile');
-  const preview = document.getElementById('imagePreview');
-  if (!radioUrl || !radioFile) return;
-  radioUrl.addEventListener('change', () => { urlContainer.style.display = 'block'; fileContainer.style.display = 'none'; });
-  radioFile.addEventListener('change', () => { urlContainer.style.display = 'none'; fileContainer.style.display = 'block'; });
-  if (fileInput) {
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (ev) => { preview.innerHTML = `<img src="${ev.target.result}" alt="Aperçu">`; };
-        reader.readAsDataURL(file);
-      } else {
-        preview.innerHTML = '<div class="preview-placeholder">Aucune image sélectionnée</div>';
-      }
-    });
-  }
-}
-
-function showAuthModal() {
-  const modal = document.getElementById('authModal');
-  if (modal) modal.classList.add('open');
-}
-function closeAuthModal() { document.getElementById('authModal')?.classList.remove('open'); }
-
-function setupAuthModal() {
-  document.getElementById('doLoginBtn')?.addEventListener('click', () => {
-    const result = login(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
-    if (result.success) { 
-      closeAuthModal(); 
-      updateAuthUI(); 
-      updateCreateShopVisibility(); 
-      renderStores(); 
-      showToast(`👋 Bonjour ${result.user.name} !`); 
-    } else {
-      document.getElementById('loginError').textContent = result.error;
-    }
-  });
-  document.getElementById('closeAuthModal')?.addEventListener('click', closeAuthModal);
-  document.getElementById('authModal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('authModal')) closeAuthModal(); });
-}
-
-function saveCategories() { localStorage.setItem('greenmarket_categories', JSON.stringify(categories)); }
-function loadCategories() {
-  const s = localStorage.getItem('greenmarket_categories');
-  if (s) {
-    try {
-      categories = JSON.parse(s);
-    } catch(e) {
-      localStorage.removeItem('greenmarket_categories');
-    }
-  }
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
-}
 function showToast(msg, bg = 'var(--wine)') {
   const t = document.getElementById('toast');
   t.innerHTML = msg; t.style.background = bg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3200);
 }
+
 function stars(r) {
   return Array.from({ length: 5 }, (_, i) => `<span class="star${i < Math.round(r) ? '' : ' empty'}">★</span>`).join('');
 }
@@ -1026,51 +684,6 @@ function renderCategories() {
       document.getElementById('catFilter').value = activeCategory || '';
       renderCategories(); renderStores();
     });
-  });
-}
-
-function updateCategoriesPermissions() {
-  const btn = document.getElementById('toggleAddCat');
-  const user = getCurrentUser();
-  if (btn) {
-    if (user && user.role === 'admin') {
-      btn.style.display = 'flex';
-    } else {
-      btn.style.display = 'none';
-    }
-  }
-}
-
-function deleteShop(shopId, event) {
-  event.stopPropagation();
-  const modal = document.createElement('div');
-  modal.style.cssText = `
-    position:fixed; inset:0; background:rgba(0,0,0,.5);
-    z-index:9999; display:flex; align-items:center; justify-content:center;
-  `;
-  modal.innerHTML = `
-    <div style="background:#fff; border-radius:16px; padding:2rem; text-align:center; max-width:300px; width:90%;">
-      <div style="font-size:2rem; margin-bottom:1rem;">⚠️</div>
-      <p style="font-weight:700; margin-bottom:1.5rem;">Supprimer cette boutique ?</p>
-      <div style="display:flex; gap:1rem; justify-content:center;">
-        <button onclick="this.closest('div[style]').remove()" 
-          style="padding:.6rem 1.5rem; border-radius:8px; border:2px solid #ccc; background:white; cursor:pointer;">
-          Annuler
-        </button>
-        <button id="confirmDelete"
-          style="padding:.6rem 1.5rem; border-radius:8px; border:none; background:#5d0d18; color:white; cursor:pointer; font-weight:700;">
-          Supprimer
-        </button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  document.getElementById('confirmDelete').addEventListener('click', () => {
-    modal.remove();
-    stores = stores.filter(s => s.id !== shopId);
-    favorites = favorites.filter(id => id !== shopId);
-    saveStores(); saveFavorites(); renderStores(); renderCategories();
-    showToast("✅ Boutique supprimée");
   });
 }
 
@@ -1155,119 +768,22 @@ function renderStores() {
   }).join('');
 }
 
-// Event listeners
-document.getElementById('toggleAddCat')?.addEventListener('click', () => document.getElementById('addCatForm')?.classList.toggle('open'));
-document.getElementById('cancelCat')?.addEventListener('click', () => {
-  document.getElementById('addCatForm')?.classList.remove('open');
-  document.getElementById('catNameInput').value = '';
-  document.getElementById('catIconInput').value = '';
-});
-document.getElementById('saveCat')?.addEventListener('click', () => {
-  const name = document.getElementById('catNameInput').value.trim();
-  const icon = document.getElementById('catIconInput').value.trim() || '📦';
-  if (!name) { showToast('⚠️ Veuillez saisir un nom', '#9a4a00'); return; }
-  if (categories.find(c => c.name.toLowerCase() === name.toLowerCase())) { showToast('⚠️ Catégorie existe déjà', '#9a4a00'); return; }
-  const newId = Math.max(...categories.map(c => c.id), 0) + 1;
-  categories.push({ id: newId, icon, name });
-  saveCategories(); 
-  updateCategorySelect();
-  document.getElementById('addCatForm')?.classList.remove('open');
-  document.getElementById('catNameInput').value = '';
-  document.getElementById('catIconInput').value = '';
-  renderCategories();
-  showToast(`✅ Catégorie « ${name} » ajoutée`);
-});
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+}
 
-document.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', () => setFilter(btn.dataset.filter)));
-document.getElementById('addNewCategoryBtn')?.addEventListener('click', () => {
-  const newName = document.getElementById('newCategoryName').value.trim();
-  if (!newName) { showToast("⚠️ Veuillez saisir un nom", '#9a4a00'); return; }
-  if (categories.find(c => c.name.toLowerCase() === newName.toLowerCase())) { showToast("⚠️ Catégorie existe déjà", '#9a4a00'); return; }
-  const newId = Math.max(...categories.map(c => c.id), 0) + 1;
-  categories.push({ id: newId, icon: '📦', name: newName });
-  saveCategories();
-  updateCategorySelect();
-  document.getElementById('newCategoryName').value = '';
-  showToast(`✅ Catégorie "${newName}" ajoutée !`);
-});
-document.getElementById('createShopBtn')?.addEventListener('click', () => {
-  const user = getCurrentUser();
-  if (!user || (user.role !== 'productor' && user.role !== 'admin')) { showToast("🔒 Vous devez être connecté en tant qu'artisan", '#9a4a00'); return; }
-  const name = document.getElementById('shopName').value.trim();
-  const catId = parseInt(document.getElementById('shopCategory').value);
-  const desc = document.getElementById('shopDesc').value.trim();
-  const badge = document.getElementById('shopBadge').value;
-  if (!name) { showToast("⚠️ Veuillez saisir un nom", '#9a4a00'); return; }
-  if (!catId) { showToast("⚠️ Veuillez sélectionner une catégorie", '#9a4a00'); return; }
-  const cat = categories.find(c => c.id === catId);
-  const newId = Math.max(...stores.map(s => s.id), 0) + 1;
-  let badgeClass = '';
-  if (badge === 'Artisan') badgeClass = 'artisan';
-  if (badge === 'Tradition') badgeClass = 'tradition';
-  if (badge === 'Fait Main') badgeClass = 'fait-main';
-  
-  const imageType = document.querySelector('input[name="imageType"]:checked').value;
-  let bannerImage = 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=700&q=80';
-  if (imageType === 'url') {
-    bannerImage = document.getElementById('shopBannerUrl').value.trim() || bannerImage;
-  } else {
-    const file = document.getElementById('shopBannerFile').files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const newShop = {
-          id: newId, name, category: cat ? cat.name : 'Non catégorisé', categoryId: catId,
-          badge, badgeClass, banner: ev.target.result,
-          desc: desc || "Nouvelle boutique artisanale marocaine",
-          rating: 0, reviews: 0, products: 0, sales: '0',
-          tags: ['Nouveau'], producerId: user.producerId || user.id,
-          producerName: user.name, location: 'Maroc', since: new Date().getFullYear().toString()
-        };
-        stores.push(newShop);
-        saveStores();
-        renderStores();
-        renderCategories();
-        showToast(`✅ Boutique "${name}" créée !`);
-      };
-      reader.readAsDataURL(file);
-      return;
-    }
+function deleteShop(shopId, event) {
+  event.stopPropagation();
+  if (confirm('Êtes-vous sûr de vouloir supprimer cette boutique ?')) {
+    stores = stores.filter(s => s.id !== shopId);
+    favorites = favorites.filter(id => id !== shopId);
+    saveStores(); saveFavorites(); renderStores(); renderCategories();
+    showToast("✅ Boutique supprimée");
   }
-  
-  const newShop = {
-    id: newId, name, category: cat ? cat.name : 'Non catégorisé', categoryId: catId,
-    badge, badgeClass, banner: bannerImage,
-    desc: desc || "Nouvelle boutique artisanale marocaine",
-    rating: 0, reviews: 0, products: 0, sales: '0',
-    tags: ['Nouveau'], producerId: user.producerId || user.id,
-    producerName: user.name, location: 'Maroc', since: new Date().getFullYear().toString()
-  };
-  stores.push(newShop);
-  saveStores();
-  document.getElementById('shopName').value = '';
-  document.getElementById('shopDesc').value = '';
-  document.getElementById('shopBannerUrl').value = '';
-  document.getElementById('shopBannerFile').value = '';
-  document.getElementById('imagePreview').innerHTML = '<div class="preview-placeholder">Aucune image sélectionnée</div>';
-  renderStores();
-  renderCategories();
-  showToast(`✅ Boutique "${name}" créée !`);
-});
-document.getElementById('searchInput')?.addEventListener('input', renderStores);
-document.getElementById('sortFilter')?.addEventListener('change', renderStores);
-document.getElementById('catFilter')?.addEventListener('change', e => {
-  activeCategory = e.target.value || null;
-  renderCategories(); renderStores();
-});
+}
 
-// Llenar catFilter
-categories.forEach(c => {
-  const opt = document.createElement('option');
-  opt.value = c.name; opt.textContent = c.name;
-  document.getElementById('catFilter')?.appendChild(opt);
-});
-
-// Photo modal functions
+// Photo modal
 let photoModalShopId = null;
 let pendingPhotoData = null;
 
@@ -1331,6 +847,7 @@ function savePhoto() {
   showToast('✅ Photo mise à jour !');
 }
 
+// Event listeners
 document.getElementById('closePhotoModal')?.addEventListener('click', closePhotoModal);
 document.getElementById('cancelPhotoBtn')?.addEventListener('click', closePhotoModal);
 document.getElementById('savePhotoBtn')?.addEventListener('click', savePhoto);
@@ -1354,19 +871,177 @@ if (dropZone) {
   });
 }
 
-// Inicialización
+function saveCategories() { localStorage.setItem('greenmarket_categories', JSON.stringify(categories)); }
+function loadCategories() {
+  const s = localStorage.getItem('greenmarket_categories');
+  if (s) {
+    try {
+      categories = JSON.parse(s);
+    } catch(e) {
+      localStorage.removeItem('greenmarket_categories');
+    }
+  }
+}
+
+function updateCategorySelect() {
+  const sel = document.getElementById('shopCategory');
+  if (sel) sel.innerHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+}
+
+function setupImageOptions() {
+  const radioUrl = document.querySelector('input[name="imageType"][value="url"]');
+  const radioFile = document.querySelector('input[name="imageType"][value="file"]');
+  const urlContainer = document.getElementById('urlImageContainer');
+  const fileContainer = document.getElementById('fileImageContainer');
+  const fileInput = document.getElementById('shopBannerFile');
+  const preview = document.getElementById('imagePreview');
+  if (!radioUrl || !radioFile) return;
+  radioUrl.addEventListener('change', () => { urlContainer.style.display = 'block'; fileContainer.style.display = 'none'; });
+  radioFile.addEventListener('change', () => { urlContainer.style.display = 'none'; fileContainer.style.display = 'block'; });
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => { preview.innerHTML = `<img src="${ev.target.result}" alt="Aperçu">`; };
+        reader.readAsDataURL(file);
+      } else {
+        preview.innerHTML = '<div class="preview-placeholder">Aucune image sélectionnée</div>';
+      }
+    });
+  }
+}
+
+function updateCreateShopVisibility() {
+  const user = getCurrentUser();
+  const section = document.getElementById('createShopSection');
+  if (section) {
+    if (user && (user.role === 'productor' || user.role === 'admin')) {
+      section.style.display = 'block';
+      updateCategorySelect();
+      setupImageOptions();
+    } else {
+      section.style.display = 'none';
+    }
+  }
+}
+
+// Initialisation
 loadStoresFromStorage();
 loadCategories();
 loadFavorites();
-initUsers();
-updateAuthUI();
-setupAuthModal();
 renderCategories();
 renderStores();
 updateCreateShopVisibility();
 
+// Event listeners pour la création de boutique
+document.getElementById('toggleAddCat')?.addEventListener('click', () => document.getElementById('addCatForm')?.classList.toggle('open'));
+document.getElementById('cancelCat')?.addEventListener('click', () => {
+  document.getElementById('addCatForm')?.classList.remove('open');
+  document.getElementById('catNameInput').value = '';
+  document.getElementById('catIconInput').value = '';
+});
+document.getElementById('saveCat')?.addEventListener('click', () => {
+  const name = document.getElementById('catNameInput').value.trim();
+  const icon = document.getElementById('catIconInput').value.trim() || '📦';
+  if (!name) { showToast('⚠️ Veuillez saisir un nom', '#9a4a00'); return; }
+  if (categories.find(c => c.name.toLowerCase() === name.toLowerCase())) { showToast('⚠️ Catégorie existe déjà', '#9a4a00'); return; }
+  const newId = Math.max(...categories.map(c => c.id), 0) + 1;
+  categories.push({ id: newId, icon, name });
+  saveCategories(); 
+  updateCategorySelect();
+  document.getElementById('addCatForm')?.classList.remove('open');
+  document.getElementById('catNameInput').value = '';
+  document.getElementById('catIconInput').value = '';
+  renderCategories();
+  showToast(`✅ Catégorie « ${name} » ajoutée`);
+});
+
+document.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', () => setFilter(btn.dataset.filter)));
+document.getElementById('addNewCategoryBtn')?.addEventListener('click', () => {
+  const newName = document.getElementById('newCategoryName').value.trim();
+  if (!newName) { showToast("⚠️ Veuillez saisir un nom", '#9a4a00'); return; }
+  if (categories.find(c => c.name.toLowerCase() === newName.toLowerCase())) { showToast("⚠️ Catégorie existe déjà", '#9a4a00'); return; }
+  const newId = Math.max(...categories.map(c => c.id), 0) + 1;
+  categories.push({ id: newId, icon: '📦', name: newName });
+  saveCategories();
+  updateCategorySelect();
+  document.getElementById('newCategoryName').value = '';
+  showToast(`✅ Catégorie "${newName}" ajoutée !`);
+});
+document.getElementById('createShopBtn')?.addEventListener('click', () => {
+  const user = getCurrentUser();
+  if (!user || (user.role !== 'productor' && user.role !== 'admin')) { showToast("🔒 Vous devez être connecté en tant qu'artisan", '#9a4a00'); return; }
+  const name = document.getElementById('shopName').value.trim();
+  const catId = parseInt(document.getElementById('shopCategory').value);
+  const desc = document.getElementById('shopDesc').value.trim();
+  const badge = document.getElementById('shopBadge').value;
+  if (!name) { showToast("⚠️ Veuillez saisir un nom", '#9a4a00'); return; }
+  if (!catId) { showToast("⚠️ Veuillez sélectionner une catégorie", '#9a4a00'); return; }
+  const cat = categories.find(c => c.id === catId);
+  const newId = Math.max(...stores.map(s => s.id), 0) + 1;
+  let badgeClass = '';
+  if (badge === 'Artisan') badgeClass = 'artisan';
+  if (badge === 'Tradition') badgeClass = 'tradition';
+  if (badge === 'Fait Main') badgeClass = 'fait-main';
+  
+  const imageType = document.querySelector('input[name="imageType"]:checked').value;
+  let bannerImage = 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=700&q=80';
+  if (imageType === 'url') {
+    bannerImage = document.getElementById('shopBannerUrl').value.trim() || bannerImage;
+    finishCreate();
+  } else {
+    const file = document.getElementById('shopBannerFile').files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        bannerImage = ev.target.result;
+        finishCreate();
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+    finishCreate();
+  }
+  
+  function finishCreate() {
+    const newShop = {
+      id: newId, name, category: cat ? cat.name : 'Non catégorisé', categoryId: catId,
+      badge, badgeClass, banner: bannerImage,
+      desc: desc || "Nouvelle boutique artisanale marocaine",
+      rating: 0, reviews: 0, products: 0, sales: '0',
+      tags: ['Nouveau'], producerId: user.producerId || user.id,
+      producerName: user.name, location: 'Maroc', since: new Date().getFullYear().toString()
+    };
+    stores.push(newShop);
+    saveStores();
+    document.getElementById('shopName').value = '';
+    document.getElementById('shopDesc').value = '';
+    document.getElementById('shopBannerUrl').value = '';
+    document.getElementById('shopBannerFile').value = '';
+    document.getElementById('imagePreview').innerHTML = '<div class="preview-placeholder">Aucune image sélectionnée</div>';
+    renderStores();
+    renderCategories();
+    showToast(`✅ Boutique "${name}" créée !`);
+  }
+});
+document.getElementById('searchInput')?.addEventListener('input', renderStores);
+document.getElementById('sortFilter')?.addEventListener('change', renderStores);
+document.getElementById('catFilter')?.addEventListener('change', e => {
+  activeCategory = e.target.value || null;
+  renderCategories(); renderStores();
+});
+
+// Remplir catFilter
+categories.forEach(c => {
+  const opt = document.createElement('option');
+  opt.value = c.name; opt.textContent = c.name;
+  document.getElementById('catFilter')?.appendChild(opt);
+});
+
 window.deleteShop = deleteShop;
 window.toggleFavorite = toggleFavorite;
+window.openPhotoModal = openPhotoModal;
 </script>
 </body>
 </html>

@@ -599,7 +599,7 @@
         <button type="submit" class="btn-submit">Connexion</button>
         
         <p class="terms-text">
-          En vous connectant, vous acceptez nos <a href="terms.html" target="_blank">CGU</a> et notre <a href="#">Politique de confidentialité</a>.
+          En vous connectant, vous acceptez nos <a href="terms.html" target="_blank">CGU</a> et notre <a href="privacy.html">Politique de confidentialité</a>.
         </p>
       </form>
 
@@ -807,10 +807,12 @@
       showToast("Connexion réussie ✅");
 
       setTimeout(() => {
-        if (user.role === "productor") {
+        if (user.role === "admin") {
+          window.location.href = "dashboard_admin.html";
+        } else if (user.role === "productor") {
           window.location.href = "dashboard-producteur.html";
         } else {
-          window.location.href = "store.html";
+          window.location.href = "dashboard_client.html";
         }
       }, 1500);
     });
@@ -852,10 +854,12 @@
       showToast("Compte créé avec succès ✅");
 
       setTimeout(() => {
-        if (user.role === "productor") {
+        if (user.role === "admin") {
+          window.location.href = "dashboard_admin.html";
+        } else if (user.role === "productor") {
           window.location.href = "dashboard-producteur.html";
         } else {
-          window.location.href = "store.html";
+          window.location.href = "dashboard_client.html";
         }
       }, 1500);
     });
@@ -865,5 +869,5 @@
       showToast("Lien envoyé à " + document.getElementById('forgotEmail').value);
     });
   </script>
-</body>
+ </body>
 </html>

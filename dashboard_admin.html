@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GreenMarket – Dashboard Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="header.css">
 <style>
   :root {
     --cream:      #fff9eb;
@@ -35,29 +36,10 @@
   * { margin:0; padding:0; box-sizing:border-box; }
 
   body {
-    font-family: 'Jost', sans-serif;
+    font-family: 'Lato', sans-serif;
     background: var(--cream);
     color: var(--text);
     min-height: 100vh;
-  }
-
-  .nav-link {
-    font-family: 'Lato', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--text-dark);
-    text-decoration: none;
-    letter-spacing: 0.5px;
-    padding: 4px 0;
-    transition: color 0.2s;
-  }
-  .nav-link:hover { color: var(--primary); }
-  .nav-link.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
-
-  .user-badge {
-    background: var(--wine-pale); padding: 0.4rem 1rem; border-radius: 30px;
-    display: flex; align-items: center; gap: 10px;
-    color: var(--wine); font-weight: 600; font-size: 0.85rem;
   }
 
   .page-header {
@@ -72,7 +54,7 @@
   }
   .header-inner { position: relative; z-index: 1; }
   .page-header h1 {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Playfair Display', serif;
     font-size: 3rem; font-weight: 700; color: var(--cream);
   }
   .page-header p {
@@ -101,7 +83,7 @@
   .stat-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px var(--shadow-md); }
   .stat-icon { font-size: 1.6rem; }
   .stat-val {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Playfair Display', serif;
     font-size: 2.4rem; font-weight: 700; color: var(--wine); line-height: 1;
   }
   .stat-label {
@@ -129,7 +111,7 @@
     background: var(--wine);
     color: var(--cream);
     padding: 1rem 1.5rem;
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Playfair Display', serif;
     font-size: 1.3rem; font-weight: 600;
     display: flex; justify-content: space-between; align-items: center;
   }
@@ -138,7 +120,7 @@
     border-radius: 20px;
     padding: 2px 10px;
     font-size: 0.8rem;
-    font-family: 'Jost', sans-serif;
+    font-family: 'Lato', sans-serif;
   }
 
   .table-wrapper { overflow-x: auto; }
@@ -178,7 +160,7 @@
     padding: 0.4rem 0.85rem; border-radius: 4px;
     font-size: 0.8rem; font-weight: 500; cursor: pointer;
     border: none; transition: background 0.2s, opacity 0.2s;
-    font-family: 'Jost', sans-serif;
+    font-family: 'Lato', sans-serif;
   }
   .btn:disabled { opacity: 0.45; cursor: default; }
   .btn-success { background: var(--success); color: white; }
@@ -208,7 +190,7 @@
     padding: 0.55rem 0.8rem;
     border: 1.5px solid var(--border);
     border-radius: 4px; background: var(--white);
-    outline: none; font-family: 'Jost', sans-serif; font-size: 0.88rem;
+    outline: none; font-family: 'Lato', sans-serif; font-size: 0.88rem;
   }
   .form-group input:focus { border-color: var(--wine); }
 
@@ -235,7 +217,7 @@
   }
   .stat-global-item:nth-child(3n) { border-right: none; }
   .stat-global-label { font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
-  .stat-global-val   { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; color: var(--wine); margin-top: 4px; }
+  .stat-global-val   { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--wine); margin-top: 4px; }
   .stat-global-sub   { font-size: 0.75rem; color: var(--success); margin-top: 2px; }
 
   .popular-list { padding: 0.5rem 0; }
@@ -256,7 +238,7 @@
   .popular-info { flex: 1; }
   .popular-name  { font-weight: 600; font-size: 0.9rem; }
   .popular-shop  { font-size: 0.78rem; color: var(--text-muted); }
-  .popular-sales { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; color: var(--wine); }
+  .popular-sales { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--wine); }
 
   .toast {
     position: fixed; bottom: 2rem; right: 2rem;
@@ -288,8 +270,9 @@
   }
 </style>
 </head>
-<body>
+<body data-active-page="dashboard">
 
+<!-- Placeholder pour le header chargé dynamiquement -->
 <div id="header-placeholder"></div>
 
 <div class="page-header">
@@ -494,401 +477,382 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="header-loader.js"></script>
 <script>
-function loadHeader() {
-  fetch('header.html')
-    .then(response => {
-      if (!response.ok) throw new Error("Erreur");
-      return response.text();
-    })
-    .then(data => {
-      document.getElementById('header-placeholder').innerHTML = data;
-      showAdminUI(); 
-    })
-    .catch(error => {
-      console.error(error);
+  // ========== DONNÉES ADMIN ==========
+  let categories = [], stores = [], users = [], pendingProducts = [], reports = [], currentFilter = 'all';
+
+  const popularProductsData = [
+    { rank:1, name:'Caftan Brodé en Soie',        shop:'Maison du Caftan',       sales:'142 vendus',  rankClass:'gold'   },
+    { rank:2, name:'Tapis Berbère Azrou',          shop:"Tapis Berbère d'Atlas",  sales:'97 vendus',   rankClass:'silver' },
+    { rank:3, name:'Huile d\'Argan BIO 250ml',     shop:'Coopérative Taliouine',  sales:'85 vendus',   rankClass:'bronze' },
+    { rank:4, name:'Plateau en Marqueterie',       shop:'Artisan du Bois',        sales:'63 vendus',   rankClass:''       },
+    { rank:5, name:'Savon Beldi Naturel',          shop:'Cosmétiques du Souss',   sales:'58 vendus',   rankClass:''       },
+  ];
+
+  function initLocalStorageData() {
+    const defaultCategories = [
+      { id:1, icon:'👘', name:'Caftans & Vêtements traditionnels' },
+      { id:2, icon:'🪑', name:'Tapis & Tissage' },
+      { id:3, icon:'🏺', name:'Poterie & Céramique' },
+      { id:4, icon:'🪵', name:'Marqueterie & Bois' },
+      { id:5, icon:'💍', name:'Bijoux & Joaillerie' },
+      { id:6, icon:'🕯️', name:'Lampes & Fer forgé' },
+      { id:7, icon:'🧴', name:'Cosmétiques naturels' },
+      { id:8, icon:'🍯', name:'Produits du terroir' }
+    ];
+    if (!localStorage.getItem('greenmarket_categories')) {
+      localStorage.setItem('greenmarket_categories', JSON.stringify(defaultCategories));
+    }
+
+    const defaultStores = [
+      { id:1,  name:"Maison du Caftan",        category:'Caftans & Vêtements traditionnels', categoryId:1, badge:'Artisan',   banner:'IMAGES/1.png', desc:'Caftans de luxe en soie.',    rating:4.9, reviews:234, products:8, sales:'2 450', producerId:101, producerName:'Fatima Zahra',      location:'Fès',       since:'2005', est_valider:true  },
+      { id:2,  name:"Tapis Berbère d'Atlas",   category:'Tapis & Tissage',                   categoryId:2, badge:'Tradition', banner:'IMAGES/2.png', desc:'Tapis berbères authentiques.', rating:4.8, reviews:189, products:6, sales:'3 200', producerId:102, producerName:'Rachid El Mansouri', location:'Marrakech', since:'2010', est_valider:true  },
+      { id:3,  name:"Poterie de Safi",         category:'Poterie & Céramique',               categoryId:3, badge:'Artisan',   banner:'IMAGES/3.png', desc:'Céramiques de Safi.',          rating:4.7, reviews:110, products:5, sales:'1 800', producerId:103, producerName:'Ahmed Benjelloun',   location:'Safi',      since:'2015', est_valider:true  },
+      { id:11, name:"Coopérative Taliouine",   category:'Produits du terroir',               categoryId:8, badge:'Tradition', banner:'IMAGES/4.png', desc:'Safran pur BIO.',              rating:0,   reviews:0,   products:0, sales:'0',     producerId:111, producerName:'Youssef Ait',        location:'Taliouine', since:'2026', est_valider:false },
+      { id:12, name:"Bijoux de l'Atlas",       category:'Bijoux & Joaillerie',               categoryId:5, badge:'Artisan',   banner:'IMAGES/5.png', desc:'Bijoux berbères en argent.',   rating:0,   reviews:0,   products:0, sales:'0',     producerId:112, producerName:'Aicha Benhaddou',   location:'Ouarzazate',since:'2025', est_valider:false }
+    ];
+    if (!localStorage.getItem('greenmarket_stores')) {
+      localStorage.setItem('greenmarket_stores', JSON.stringify(defaultStores));
+    }
+
+    const defaultUsers = [
+      { id:1, name:'Administrateur',      email:'admin@greenmarket.com',  role:'admin',     producerId:null, suspendu:false },
+      { id:2, name:'Fatima Zahra',        email:'fatima@caftan.ma',       role:'productor', producerId:101,  suspendu:false },
+      { id:3, name:'Rachid El Mansouri',  email:'rachid@tapis.ma',        role:'productor', producerId:102,  suspendu:false },
+      { id:4, name:'Ahmed Benjelloun',    email:'ahmed@poterie.ma',       role:'productor', producerId:103,  suspendu:false },
+      { id:5, name:'Youssef Ait',         email:'youssef@coop.ma',        role:'productor', producerId:111,  suspendu:false },
+      { id:6, name:'Aicha Benhaddou',     email:'aicha@bijoux.ma',        role:'productor', producerId:112,  suspendu:false },
+      { id:7, name:'Karim Alami',         email:'karim@client.com',       role:'client',    producerId:null, suspendu:false },
+      { id:8, name:'Sara Idrissi',        email:'sara@client.com',        role:'client',    producerId:null, suspendu:false },
+      { id:9, name:'Omar Benali',         email:'omar@client.com',        role:'client',    producerId:null, suspendu:true  }
+    ];
+    if (!localStorage.getItem('greenmarket_users')) {
+      localStorage.setItem('greenmarket_users', JSON.stringify(defaultUsers));
+    }
+
+    const defaultProducts = [
+      { id:1, name:'Pouf en cuir brodé',     shop:'Maison du Caftan',       price:'450 DH' },
+      { id:2, name:'Miel d\'Argan Pur 500g', shop:'Coopérative Taliouine',  price:'280 DH' },
+      { id:3, name:'Collier Berbère Argent', shop:"Bijoux de l'Atlas",      price:'320 DH' }
+    ];
+    if (!localStorage.getItem('greenmarket_pending_products')) {
+      localStorage.setItem('greenmarket_pending_products', JSON.stringify(defaultProducts));
+    }
+
+    const defaultReports = [
+      { id:1, type:'avis',     title:'Avis inapproprié signalé',         detail:'Un avis contient des propos offensants sur la boutique "Maison du Caftan".', user:'Karim Alami',   date:'18/05/2026', status:'pending' },
+      { id:2, type:'commande', title:'Problème commande #CMD-0042',      detail:'Le client n\'a pas reçu sa commande après 15 jours.', user:'Sara Idrissi',  date:'17/05/2026', status:'pending' },
+      { id:3, type:'compte',   title:'Compte suspect signalé',           detail:'Activité suspecte détectée sur le compte Omar Benali.', user:'Système',       date:'16/05/2026', status:'resolved'}
+    ];
+    if (!localStorage.getItem('greenmarket_reports')) {
+      localStorage.setItem('greenmarket_reports', JSON.stringify(defaultReports));
+    }
+  }
+
+  function loadData() {
+    if (!localStorage.getItem('greenmarket_users')) initLocalStorageData();
+    categories     = JSON.parse(localStorage.getItem('greenmarket_categories')       || '[]');
+    stores         = JSON.parse(localStorage.getItem('greenmarket_stores')           || '[]');
+    users          = JSON.parse(localStorage.getItem('greenmarket_users')            || '[]');
+    pendingProducts= JSON.parse(localStorage.getItem('greenmarket_pending_products') || '[]');
+    reports        = JSON.parse(localStorage.getItem('greenmarket_reports')          || '[]');
+  }
+
+  function saveAll() {
+    localStorage.setItem('greenmarket_categories',       JSON.stringify(categories));
+    localStorage.setItem('greenmarket_stores',           JSON.stringify(stores));
+    localStorage.setItem('greenmarket_users',            JSON.stringify(users));
+    localStorage.setItem('greenmarket_pending_products', JSON.stringify(pendingProducts));
+    localStorage.setItem('greenmarket_reports',          JSON.stringify(reports));
+  }
+
+  function updateStats() {
+    const activeProducers  = users.filter(u => u.role==='productor' && !u.suspendu).length;
+    const suspendedUsers   = users.filter(u => u.suspendu).length;
+    const pendingReports   = reports.filter(r => r.status==='pending').length;
+
+    document.getElementById('totalUsersCount').textContent    = users.length;
+    document.getElementById('activeProducersCount').textContent = activeProducers;
+    document.getElementById('totalReportsCount').textContent  = pendingReports;
+    document.getElementById('totalProductsCount').textContent = pendingProducts.length;
+    document.getElementById('totalStoresCount').textContent   = stores.length;
+    document.getElementById('catCount').textContent           = categories.length;
+    document.getElementById('suspendedCount').textContent     = suspendedUsers;
+
+    const pending = stores.filter(s => !s.est_valider).length;
+    document.getElementById('pendingStoresCount').textContent = pending + ' en attente';
+    document.getElementById('pendingProductsCount').textContent = pendingProducts.length + ' en attente';
+    document.getElementById('reportsCount').textContent       = pendingReports + ' signalement(s)';
+    document.getElementById('usersCount').textContent         = users.length + ' utilisateur(s)';
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.innerHTML = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3200);
+  }
+
+  function renderPendingStores() {
+    const tbody = document.getElementById('pendingStoresTable');
+    tbody.innerHTML = '';
+    if (!stores.length) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Aucune boutique enregistrée.</td></tr>'; return;
+    }
+    stores.forEach(s => {
+      const badge  = s.est_valider
+        ? `<span class="badge badge-success">✔ Validé</span>`
+        : `<span class="badge badge-warning">⏳ En attente</span>`;
+      const action = s.est_valider
+        ? `<button class="btn btn-danger"  onclick="toggleStoreStatus(${s.id})">Désactiver</button>`
+        : `<button class="btn btn-success" onclick="toggleStoreStatus(${s.id})">Valider</button>`;
+      tbody.innerHTML += `
+        <tr>
+          <td><strong>${s.name}</strong></td>
+          <td>${s.producerName}</td>
+          <td>${s.category}</td>
+          <td>📍 ${s.location}</td>
+          <td>${s.since}</td>
+          <td>${badge}</td>
+          <td><div class="action-group">${action}</div></td>
+        </tr>`;
     });
-}
-
-let categories = [], stores = [], users = [], pendingProducts = [], reports = [], currentFilter = 'all';
-
-const popularProductsData = [
-  { rank:1, name:'Caftan Brodé en Soie',        shop:'Maison du Caftan',       sales:'142 vendus',  rankClass:'gold'   },
-  { rank:2, name:'Tapis Berbère Azrou',          shop:"Tapis Berbère d'Atlas",  sales:'97 vendus',   rankClass:'silver' },
-  { rank:3, name:'Huile d\'Argan BIO 250ml',     shop:'Coopérative Taliouine',  sales:'85 vendus',   rankClass:'bronze' },
-  { rank:4, name:'Plateau en Marqueterie',       shop:'Artisan du Bois',        sales:'63 vendus',   rankClass:''       },
-  { rank:5, name:'Savon Beldi Naturel',          shop:'Cosmétiques du Souss',   sales:'58 vendus',   rankClass:''       },
-];
-
-function initLocalStorageData() {
-  const defaultCategories = [
-    { id:1, icon:'👘', name:'Caftans & Vêtements traditionnels' },
-    { id:2, icon:'🪑', name:'Tapis & Tissage' },
-    { id:3, icon:'🏺', name:'Poterie & Céramique' },
-    { id:4, icon:'🪵', name:'Marqueterie & Bois' },
-    { id:5, icon:'💍', name:'Bijoux & Joaillerie' },
-    { id:6, icon:'🕯️', name:'Lampes & Fer forgé' },
-    { id:7, icon:'🧴', name:'Cosmétiques naturels' },
-    { id:8, icon:'🍯', name:'Produits du terroir' }
-  ];
-  localStorage.setItem('greenmarket_categories', JSON.stringify(defaultCategories));
-
-  const defaultStores = [
-    { id:1,  name:"Maison du Caftan",        category:'Caftans & Vêtements traditionnels', categoryId:1, badge:'Artisan',   banner:'IMAGES/1.png', desc:'Caftans de luxe en soie.',    rating:4.9, reviews:234, products:8, sales:'2 450', producerId:101, producerName:'Fatima Zahra',      location:'Fès',       since:'2005', est_valider:true  },
-    { id:2,  name:"Tapis Berbère d'Atlas",   category:'Tapis & Tissage',                   categoryId:2, badge:'Tradition', banner:'IMAGES/2.png', desc:'Tapis berbères authentiques.', rating:4.8, reviews:189, products:6, sales:'3 200', producerId:102, producerName:'Rachid El Mansouri', location:'Marrakech', since:'2010', est_valider:true  },
-    { id:3,  name:"Poterie de Safi",         category:'Poterie & Céramique',               categoryId:3, badge:'Artisan',   banner:'IMAGES/3.png', desc:'Céramiques de Safi.',          rating:4.7, reviews:110, products:5, sales:'1 800', producerId:103, producerName:'Ahmed Benjelloun',   location:'Safi',      since:'2015', est_valider:true  },
-    { id:11, name:"Coopérative Taliouine",   category:'Produits du terroir',               categoryId:8, badge:'Tradition', banner:'IMAGES/4.png', desc:'Safran pur BIO.',              rating:0,   reviews:0,   products:0, sales:'0',     producerId:111, producerName:'Youssef Ait',        location:'Taliouine', since:'2026', est_valider:false },
-    { id:12, name:"Bijoux de l'Atlas",       category:'Bijoux & Joaillerie',               categoryId:5, badge:'Artisan',   banner:'IMAGES/5.png', desc:'Bijoux berbères en argent.',   rating:0,   reviews:0,   products:0, sales:'0',     producerId:112, producerName:'Aicha Benhaddou',   location:'Ouarzazate',since:'2025', est_valider:false }
-  ];
-  localStorage.setItem('greenmarket_stores', JSON.stringify(defaultStores));
-
-  const defaultUsers = [
-    { id:1, name:'Administrateur',      email:'admin@greenmarket.com',  role:'admin',     producerId:null, suspendu:false },
-    { id:2, name:'Fatima Zahra',        email:'fatima@caftan.ma',       role:'productor', producerId:101,  suspendu:false },
-    { id:3, name:'Rachid El Mansouri',  email:'rachid@tapis.ma',        role:'productor', producerId:102,  suspendu:false },
-    { id:4, name:'Ahmed Benjelloun',    email:'ahmed@poterie.ma',       role:'productor', producerId:103,  suspendu:false },
-    { id:5, name:'Youssef Ait',         email:'youssef@coop.ma',        role:'productor', producerId:111,  suspendu:false },
-    { id:6, name:'Aicha Benhaddou',     email:'aicha@bijoux.ma',        role:'productor', producerId:112,  suspendu:false },
-    { id:7, name:'Karim Alami',         email:'karim@client.com',       role:'client',    producerId:null, suspendu:false },
-    { id:8, name:'Sara Idrissi',        email:'sara@client.com',        role:'client',    producerId:null, suspendu:false },
-    { id:9, name:'Omar Benali',         email:'omar@client.com',        role:'client',    producerId:null, suspendu:true  }
-  ];
-  localStorage.setItem('greenmarket_users', JSON.stringify(defaultUsers));
-
-  const defaultProducts = [
-    { id:1, name:'Pouf en cuir brodé',     shop:'Maison du Caftan',       price:'450 DH' },
-    { id:2, name:'Miel d\'Argan Pur 500g', shop:'Coopérative Taliouine',  price:'280 DH' },
-    { id:3, name:'Collier Berbère Argent', shop:"Bijoux de l'Atlas",      price:'320 DH' }
-  ];
-  localStorage.setItem('greenmarket_pending_products', JSON.stringify(defaultProducts));
-
-  const defaultReports = [
-    { id:1, type:'avis',     title:'Avis inapproprié signalé',         detail:'Un avis contient des propos offensants sur la boutique "Maison du Caftan".', user:'Karim Alami',   date:'18/05/2026', status:'pending' },
-    { id:2, type:'commande', title:'Problème commande #CMD-0042',      detail:'Le client n\'a pas reçu sa commande après 15 jours.', user:'Sara Idrissi',  date:'17/05/2026', status:'pending' },
-    { id:3, type:'compte',   title:'Compte suspect signalé',           detail:'Activité suspecte détectée sur le compte Omar Benali.', user:'Système',       date:'16/05/2026', status:'resolved'}
-  ];
-  localStorage.setItem('greenmarket_reports', JSON.stringify(defaultReports));
-}
-
-function loadData() {
-  if (!localStorage.getItem('greenmarket_users')) initLocalStorageData();
-  categories     = JSON.parse(localStorage.getItem('greenmarket_categories')       || '[]');
-  stores         = JSON.parse(localStorage.getItem('greenmarket_stores')           || '[]');
-  users          = JSON.parse(localStorage.getItem('greenmarket_users')            || '[]');
-  pendingProducts= JSON.parse(localStorage.getItem('greenmarket_pending_products') || '[]');
-  reports        = JSON.parse(localStorage.getItem('greenmarket_reports')          || '[]');
-}
-
-function saveAll() {
-  localStorage.setItem('greenmarket_categories',       JSON.stringify(categories));
-  localStorage.setItem('greenmarket_stores',           JSON.stringify(stores));
-  localStorage.setItem('greenmarket_users',            JSON.stringify(users));
-  localStorage.setItem('greenmarket_pending_products', JSON.stringify(pendingProducts));
-  localStorage.setItem('greenmarket_reports',          JSON.stringify(reports));
-}
-
-function updateStats() {
-  const activeProducers  = users.filter(u => u.role==='productor' && !u.suspendu).length;
-  const suspendedUsers   = users.filter(u => u.suspendu).length;
-  const pendingReports   = reports.filter(r => r.status==='pending').length;
-
-  document.getElementById('totalUsersCount').textContent    = users.length;
-  document.getElementById('activeProducersCount').textContent = activeProducers;
-  document.getElementById('totalReportsCount').textContent  = pendingReports;
-  document.getElementById('totalProductsCount').textContent = pendingProducts.length;
-  document.getElementById('totalStoresCount').textContent   = stores.length;
-  document.getElementById('catCount').textContent           = categories.length;
-  document.getElementById('suspendedCount').textContent     = suspendedUsers;
-
-  const pending = stores.filter(s => !s.est_valider).length;
-  document.getElementById('pendingStoresCount').textContent = pending + ' en attente';
-  document.getElementById('pendingProductsCount').textContent = pendingProducts.length + ' en attente';
-  document.getElementById('reportsCount').textContent       = pendingReports + ' signalement(s)';
-  document.getElementById('usersCount').textContent         = users.length + ' utilisateur(s)';
-}
-
-function showAdminUI() {
-  let name = 'Administrateur';
-  const s = sessionStorage.getItem('greenmarket_current_user');
-  if (s) name = JSON.parse(s).name;
-  
-  const authWidget = document.getElementById('authWidget');
-  if(authWidget) {
-      authWidget.innerHTML =
-        `<div class="user-badge">👋 Admin: ${name}
-           <button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;font-size:1rem;">Sortir 🚪</button>
-         </div>`;
-      document.getElementById('logoutBtn')?.addEventListener('click', () => {
-        sessionStorage.removeItem('greenmarket_current_user');
-        window.location.href = 'newstore.html';
-      });
-  }
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.innerHTML = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3200);
-}
-
-function renderPendingStores() {
-  const tbody = document.getElementById('pendingStoresTable');
-  tbody.innerHTML = '';
-  if (!stores.length) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Aucune boutique enregistrée.</td></tr>'; return;
-  }
-  stores.forEach(s => {
-    const badge  = s.est_valider
-      ? `<span class="badge badge-success">✔ Validé</span>`
-      : `<span class="badge badge-warning">⏳ En attente</span>`;
-    const action = s.est_valider
-      ? `<button class="btn btn-danger"  onclick="toggleStoreStatus(${s.id})">Désactiver</button>`
-      : `<button class="btn btn-success" onclick="toggleStoreStatus(${s.id})">Valider</button>`;
-    tbody.innerHTML += `
-      <tr>
-        <td><strong>${s.name}</strong></td>
-        <td>${s.producerName}</td>
-        <td>${s.category}</td>
-        <td>📍 ${s.location}</td>
-        <td>${s.since}</td>
-        <td>${badge}</td>
-        <td><div class="action-group">${action}</div></td>
-      </tr>`;
-  });
-}
-
-function toggleStoreStatus(id) {
-  stores = stores.map(s => {
-    if (s.id === id) {
-      s.est_valider = !s.est_valider;
-      showToast(s.est_valider ? `✅ Boutique "${s.name}" validée !` : `⛔ Boutique "${s.name}" désactivée.`);
-    }
-    return s;
-  });
-  saveAll(); renderPendingStores(); updateStats();
-}
-
-function renderPendingProducts() {
-  const tbody = document.getElementById('pendingProductsTable');
-  tbody.innerHTML = '';
-  if (!pendingProducts.length) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Aucun produit en attente de validation.</td></tr>'; return;
-  }
-  pendingProducts.forEach(p => {
-    tbody.innerHTML += `
-      <tr>
-        <td><strong>${p.name}</strong></td>
-        <td>${p.shop}</td>
-        <td>${p.price}</td>
-        <td><span class="badge badge-warning">⏳ En attente</span></td>
-        <td>
-          <div class="action-group">
-            <button class="btn btn-success" onclick="approveProduct(${p.id})">✔ Approuver</button>
-            <button class="btn btn-danger"  onclick="rejectProduct(${p.id})">✘ Rejeter</button>
-          </div>
-        </td>
-      </tr>`;
-  });
-}
-
-function approveProduct(id) {
-  const p = pendingProducts.find(x => x.id === id);
-  pendingProducts = pendingProducts.filter(x => x.id !== id);
-  saveAll(); showToast(`✅ Produit "${p?.name}" approuvé et publié !`); renderPendingProducts(); updateStats();
-}
-function rejectProduct(id) {
-  const p = pendingProducts.find(x => x.id === id);
-  pendingProducts = pendingProducts.filter(x => x.id !== id);
-  saveAll(); showToast(`❌ Produit "${p?.name}" rejeté.`); renderPendingProducts(); updateStats();
-}
-
-function renderReports() {
-  const container = document.getElementById('reportsList');
-  container.innerHTML = '';
-  if (!reports.length) {
-    container.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-muted);font-style:italic;">Aucun signalement en cours.</div>'; return;
-  }
-  const icons = { avis:'💬', commande:'📦', compte:'👤' };
-  reports.forEach(r => {
-    const statusBadge = r.status === 'resolved'
-      ? `<span class="badge badge-success">Résolu</span>`
-      : `<span class="badge badge-danger">En attente</span>`;
-    const actionBtn = r.status !== 'resolved'
-      ? `<button class="btn btn-success" onclick="resolveReport(${r.id})">Marquer résolu</button>
-         <button class="btn btn-danger"  onclick="deleteReport(${r.id})">Supprimer</button>`
-      : `<button class="btn btn-danger"  onclick="deleteReport(${r.id})">Supprimer</button>`;
-    container.innerHTML += `
-      <div class="report-item">
-        <div class="report-icon">${icons[r.type] || '⚠️'}</div>
-        <div class="report-body">
-          <div class="report-title">${r.title} ${statusBadge}</div>
-          <div class="report-meta">Signalé par <strong>${r.user}</strong> · ${r.date}</div>
-          <div class="report-meta" style="margin-top:4px;color:var(--text);">${r.detail}</div>
-          <div class="report-actions">${actionBtn}</div>
-        </div>
-      </div>`;
-  });
-}
-
-function resolveReport(id) {
-  reports = reports.map(r => r.id === id ? { ...r, status:'resolved' } : r);
-  saveAll(); showToast('✅ Signalement marqué comme résolu.'); renderReports(); updateStats();
-}
-function deleteReport(id) {
-  if (!confirm('Supprimer ce signalement définitivement ?')) return;
-  reports = reports.filter(r => r.id !== id);
-  saveAll(); showToast('🗑️ Signalement supprimé.'); renderReports(); updateStats();
-}
-
-function renderCategories() {
-  const tbody = document.getElementById('categoriesTable');
-  tbody.innerHTML = '';
-  if (!categories.length) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Aucune catégorie définie.</td></tr>'; return;
-  }
-  categories.forEach(c => {
-    const linked = stores.filter(s => s.categoryId === c.id).length;
-    tbody.innerHTML += `
-      <tr>
-        <td style="color:var(--text-muted);font-size:0.8rem;">#${c.id}</td>
-        <td style="font-size:1.4rem;">${c.icon}</td>
-        <td><strong>${c.name}</strong></td>
-        <td><span class="badge badge-neutral">${linked} boutique(s)</span></td>
-        <td>
-          <div class="action-group">
-            <button class="btn btn-wine"   onclick="editCategory(${c.id})">✏️ Modifier</button>
-            <button class="btn btn-danger" onclick="deleteCategory(${c.id})">🗑️ Supprimer</button>
-          </div>
-        </td>
-      </tr>`;
-  });
-  document.getElementById('catCount').textContent = categories.length;
-}
-
-document.getElementById('addCategoryBtn').addEventListener('click', () => {
-  const name = document.getElementById('newCatName').value.trim();
-  const icon = document.getElementById('newCatIcon').value.trim();
-  if (!name || !icon) { showToast('⚠️ Veuillez remplir le nom et l\'icône.'); return; }
-  const newId = Math.max(0, ...categories.map(c => c.id)) + 1;
-  categories.push({ id: newId, icon, name });
-  document.getElementById('newCatName').value = '';
-  document.getElementById('newCatIcon').value = '';
-  saveAll(); showToast(`✅ Catégorie "${name}" ajoutée !`); renderCategories(); updateStats();
-});
-
-function editCategory(id) {
-  const cat = categories.find(c => c.id === id);
-  if (!cat) return;
-  const newName = prompt('Modifier le nom de la catégorie :', cat.name);
-  const newIcon = prompt("Modifier l'icône / emoji :", cat.icon);
-  if (newName && newIcon) {
-    cat.name = newName.trim(); cat.icon = newIcon.trim();
-    saveAll(); showToast('✅ Catégorie modifiée !'); renderCategories();
-  }
-}
-
-function deleteCategory(id) {
-  const cat = categories.find(c => c.id === id);
-  const linked = stores.filter(s => s.categoryId === id).length;
-  if (linked > 0 && !confirm(`Cette catégorie est liée à ${linked} boutique(s). Supprimer quand même ?`)) return;
-  if (!confirm(`Supprimer la catégorie "${cat?.name}" ?`)) return;
-  categories = categories.filter(c => c.id !== id);
-  saveAll(); showToast('🗑️ Catégorie supprimée.'); renderCategories(); updateStats();
-}
-
-function filterUsers(filter) {
-  currentFilter = filter;
-  ['all','client','productor','suspended'].forEach(f => {
-    const btn = document.getElementById('filter' + f.charAt(0).toUpperCase() + f.slice(1));
-    if (btn) btn.style.opacity = f === filter ? '1' : '0.55';
-  });
-  renderUsers();
-}
-
-function renderUsers() {
-  const tbody = document.getElementById('usersTable');
-  tbody.innerHTML = '';
-  let filtered = users;
-  if (currentFilter === 'client')    filtered = users.filter(u => u.role === 'client');
-  if (currentFilter === 'productor') filtered = users.filter(u => u.role === 'productor');
-  if (currentFilter === 'suspended') filtered = users.filter(u => u.suspendu);
-
-  if (!filtered.length) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Aucun utilisateur dans cette catégorie.</td></tr>'; return;
   }
 
-  filtered.forEach(u => {
-    const store = stores.find(s => s.producerId === u.producerId);
-    const linkedStore = store ? `<a href="#" style="color:var(--wine);font-size:0.82rem;">${store.name}</a>` : `<span style="color:var(--text-muted);font-size:0.82rem;">—</span>`;
-    const roleBadge = u.role === 'admin'
-      ? `<span class="badge badge-info">Admin</span>`
-      : u.role === 'productor'
-      ? `<span class="badge badge-success">Producteur</span>`
-      : `<span class="badge badge-neutral">Client</span>`;
-    const stateBadge = u.suspendu
-      ? `<span class="badge badge-danger">Suspendu</span>`
-      : `<span class="badge badge-success">Actif</span>`;
-    const isAdmin = u.role === 'admin';
-    const actionText  = u.suspendu ? 'Activer' : 'Suspendre';
-    const actionClass = u.suspendu ? 'btn-success' : 'btn-danger';
-    tbody.innerHTML += `
-      <tr>
-        <td><strong>${u.name}</strong></td>
-        <td style="font-size:0.85rem;">${u.email}</td>
-        <td>${roleBadge}</td>
-        <td>${linkedStore}</td>
-        <td>${stateBadge}</td>
-        <td>
-          <button class="btn ${actionClass}" ${isAdmin ? 'disabled' : ''} onclick="toggleUserStatus(${u.id})">${actionText}</button>
-        </td>
-      </tr>`;
-  });
-}
-
-function toggleUserStatus(id) {
-  users = users.map(u => {
-    if (u.id === id && u.role !== 'admin') {
-      u.suspendu = !u.suspendu;
-      if (u.suspendu) {
-        stores = stores.map(s => {
-          if (s.producerId === u.producerId) s.est_valider = false;
-          return s;
-        });
+  window.toggleStoreStatus = function(id) {
+    stores = stores.map(s => {
+      if (s.id === id) {
+        s.est_valider = !s.est_valider;
+        showToast(s.est_valider ? `✅ Boutique "${s.name}" validée !` : `⛔ Boutique "${s.name}" désactivée.`);
       }
-      showToast(u.suspendu ? `⛔ Compte de ${u.name} suspendu.` : `✅ Compte de ${u.name} activé.`);
+      return s;
+    });
+    saveAll(); renderPendingStores(); updateStats();
+  }
+
+  function renderPendingProducts() {
+    const tbody = document.getElementById('pendingProductsTable');
+    tbody.innerHTML = '';
+    if (!pendingProducts.length) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Aucun produit en attente de validation.</td></tr>'; return;
     }
-    return u;
-  });
-  saveAll(); renderUsers(); renderPendingStores(); updateStats();
-}
+    pendingProducts.forEach(p => {
+      tbody.innerHTML += `
+        <tr>
+          <td><strong>${p.name}</strong></td>
+          <td>${p.shop}</td>
+          <td>${p.price}</td>
+          <td><span class="badge badge-warning">⏳ En attente</span></td>
+          <td>
+            <div class="action-group">
+              <button class="btn btn-success" onclick="approveProduct(${p.id})">✔ Approuver</button>
+              <button class="btn btn-danger"  onclick="rejectProduct(${p.id})">✘ Rejeter</button>
+            </div>
+          </td>
+        </tr>`;
+    });
+  }
 
-function renderPopularProducts() {
-  const container = document.getElementById('popularProductsList');
-  container.innerHTML = '';
-  popularProductsData.forEach(p => {
-    container.innerHTML += `
-      <div class="popular-item">
-        <div class="popular-rank ${p.rankClass}">${p.rank}</div>
-        <div class="popular-info">
-          <div class="popular-name">${p.name}</div>
-          <div class="popular-shop">${p.shop}</div>
-        </div>
-        <div class="popular-sales">${p.sales}</div>
-      </div>`;
-  });
-}
+  window.approveProduct = function(id) {
+    const p = pendingProducts.find(x => x.id === id);
+    pendingProducts = pendingProducts.filter(x => x.id !== id);
+    saveAll(); showToast(`✅ Produit "${p?.name}" approuvé et publié !`); renderPendingProducts(); updateStats();
+  }
+  window.rejectProduct = function(id) {
+    const p = pendingProducts.find(x => x.id === id);
+    pendingProducts = pendingProducts.filter(x => x.id !== id);
+    saveAll(); showToast(`❌ Produit "${p?.name}" rejeté.`); renderPendingProducts(); updateStats();
+  }
 
-window.addEventListener('DOMContentLoaded', () => {
-  loadHeader();
-  loadData();
-  updateStats();
-  renderPendingStores();
-  renderPendingProducts();
-  renderReports();
-  renderCategories();
-  renderPopularProducts();
-  filterUsers('all');
-});
+  function renderReports() {
+    const container = document.getElementById('reportsList');
+    container.innerHTML = '';
+    if (!reports.length) {
+      container.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-muted);font-style:italic;">Aucun signalement en cours.</div>'; return;
+    }
+    const icons = { avis:'💬', commande:'📦', compte:'👤' };
+    reports.forEach(r => {
+      const statusBadge = r.status === 'resolved'
+        ? `<span class="badge badge-success">Résolu</span>`
+        : `<span class="badge badge-danger">En attente</span>`;
+      const actionBtn = r.status !== 'resolved'
+        ? `<button class="btn btn-success" onclick="resolveReport(${r.id})">Marquer résolu</button>
+           <button class="btn btn-danger"  onclick="deleteReport(${r.id})">Supprimer</button>`
+        : `<button class="btn btn-danger"  onclick="deleteReport(${r.id})">Supprimer</button>`;
+      container.innerHTML += `
+        <div class="report-item">
+          <div class="report-icon">${icons[r.type] || '⚠️'}</div>
+          <div class="report-body">
+            <div class="report-title">${r.title} ${statusBadge}</div>
+            <div class="report-meta">Signalé par <strong>${r.user}</strong> · ${r.date}</div>
+            <div class="report-meta" style="margin-top:4px;color:var(--text);">${r.detail}</div>
+            <div class="report-actions">${actionBtn}</div>
+          </div>
+        </div>`;
+    });
+  }
+
+  window.resolveReport = function(id) {
+    reports = reports.map(r => r.id === id ? { ...r, status:'resolved' } : r);
+    saveAll(); showToast('✅ Signalement marqué comme résolu.'); renderReports(); updateStats();
+  }
+  window.deleteReport = function(id) {
+    if (!confirm('Supprimer ce signalement définitivement ?')) return;
+    reports = reports.filter(r => r.id !== id);
+    saveAll(); showToast('🗑️ Signalement supprimé.'); renderReports(); updateStats();
+  }
+
+  function renderCategories() {
+    const tbody = document.getElementById('categoriesTable');
+    tbody.innerHTML = '';
+    if (!categories.length) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Aucune catégorie définie.<tr></tr>'; return;
+    }
+    categories.forEach(c => {
+      const linked = stores.filter(s => s.categoryId === c.id).length;
+      tbody.innerHTML += `
+        <tr>
+          <td style="color:var(--text-muted);font-size:0.8rem;">#${c.id}</td>
+          <td style="font-size:1.4rem;">${c.icon}</td>
+          <td><strong>${c.name}</strong></td>
+          <td><span class="badge badge-neutral">${linked} boutique(s)</span></td>
+          <td>
+            <div class="action-group">
+              <button class="btn btn-wine"   onclick="editCategory(${c.id})">✏️ Modifier</button>
+              <button class="btn btn-danger" onclick="deleteCategory(${c.id})">🗑️ Supprimer</button>
+            </div>
+          </td>
+        </tr>`;
+    });
+    document.getElementById('catCount').textContent = categories.length;
+  }
+
+  document.getElementById('addCategoryBtn').addEventListener('click', () => {
+    const name = document.getElementById('newCatName').value.trim();
+    const icon = document.getElementById('newCatIcon').value.trim();
+    if (!name || !icon) { showToast('⚠️ Veuillez remplir le nom et l\'icône.'); return; }
+    const newId = Math.max(0, ...categories.map(c => c.id)) + 1;
+    categories.push({ id: newId, icon, name });
+    document.getElementById('newCatName').value = '';
+    document.getElementById('newCatIcon').value = '';
+    saveAll(); showToast(`✅ Catégorie "${name}" ajoutée !`); renderCategories(); updateStats();
+  });
+
+  window.editCategory = function(id) {
+    const cat = categories.find(c => c.id === id);
+    if (!cat) return;
+    const newName = prompt('Modifier le nom de la catégorie :', cat.name);
+    const newIcon = prompt("Modifier l'icône / emoji :", cat.icon);
+    if (newName && newIcon) {
+      cat.name = newName.trim(); cat.icon = newIcon.trim();
+      saveAll(); showToast('✅ Catégorie modifiée !'); renderCategories();
+    }
+  }
+
+  window.deleteCategory = function(id) {
+    const cat = categories.find(c => c.id === id);
+    const linked = stores.filter(s => s.categoryId === id).length;
+    if (linked > 0 && !confirm(`Cette catégorie est liée à ${linked} boutique(s). Supprimer quand même ?`)) return;
+    if (!confirm(`Supprimer la catégorie "${cat?.name}" ?`)) return;
+    categories = categories.filter(c => c.id !== id);
+    saveAll(); showToast('🗑️ Catégorie supprimée.'); renderCategories(); updateStats();
+  }
+
+  window.filterUsers = function(filter) {
+    currentFilter = filter;
+    ['all','client','productor','suspended'].forEach(f => {
+      const btn = document.getElementById('filter' + f.charAt(0).toUpperCase() + f.slice(1));
+      if (btn) btn.style.opacity = f === filter ? '1' : '0.55';
+    });
+    renderUsers();
+  }
+
+  function renderUsers() {
+    const tbody = document.getElementById('usersTable');
+    tbody.innerHTML = '';
+    let filtered = users;
+    if (currentFilter === 'client')    filtered = users.filter(u => u.role === 'client');
+    if (currentFilter === 'productor') filtered = users.filter(u => u.role === 'productor');
+    if (currentFilter === 'suspended') filtered = users.filter(u => u.suspendu);
+
+    if (!filtered.length) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Aucun utilisateur dans cette catégorie.</td></tr>'; return;
+    }
+
+    filtered.forEach(u => {
+      const store = stores.find(s => s.producerId === u.producerId);
+      const linkedStore = store ? `<span style="color:var(--wine);font-size:0.82rem;">${store.name}</span>` : `<span style="color:var(--text-muted);font-size:0.82rem;">—</span>`;
+      const roleBadge = u.role === 'admin'
+        ? `<span class="badge badge-info">Admin</span>`
+        : u.role === 'productor'
+        ? `<span class="badge badge-success">Producteur</span>`
+        : `<span class="badge badge-neutral">Client</span>`;
+      const stateBadge = u.suspendu
+        ? `<span class="badge badge-danger">Suspendu</span>`
+        : `<span class="badge badge-success">Actif</span>`;
+      const isAdmin = u.role === 'admin';
+      const actionText  = u.suspendu ? 'Activer' : 'Suspendre';
+      const actionClass = u.suspendu ? 'btn-success' : 'btn-danger';
+      tbody.innerHTML += `
+        <tr>
+          <td><strong>${u.name}</strong></td>
+          <td style="font-size:0.85rem;">${u.email}</td>
+          <td>${roleBadge}</td>
+          <td>${linkedStore}</td>
+          <td>${stateBadge}</td>
+          <td>
+            <button class="btn ${actionClass}" ${isAdmin ? 'disabled' : ''} onclick="toggleUserStatus(${u.id})">${actionText}</button>
+          </td>
+        </td>`;
+    });
+  }
+
+  window.toggleUserStatus = function(id) {
+    users = users.map(u => {
+      if (u.id === id && u.role !== 'admin') {
+        u.suspendu = !u.suspendu;
+        if (u.suspendu) {
+          stores = stores.map(s => {
+            if (s.producerId === u.producerId) s.est_valider = false;
+            return s;
+          });
+        }
+        showToast(u.suspendu ? `⛔ Compte de ${u.name} suspendu.` : `✅ Compte de ${u.name} activé.`);
+      }
+      return u;
+    });
+    saveAll(); renderUsers(); renderPendingStores(); updateStats();
+  }
+
+  function renderPopularProducts() {
+    const container = document.getElementById('popularProductsList');
+    container.innerHTML = '';
+    popularProductsData.forEach(p => {
+      container.innerHTML += `
+        <div class="popular-item">
+          <div class="popular-rank ${p.rankClass}">${p.rank}</div>
+          <div class="popular-info">
+            <div class="popular-name">${p.name}</div>
+            <div class="popular-shop">${p.shop}</div>
+          </div>
+          <div class="popular-sales">${p.sales}</div>
+        </div>`;
+    });
+  }
+
+  // Initialisation
+  function init() {
+    loadData();
+    updateStats();
+    renderPendingStores();
+    renderPendingProducts();
+    renderReports();
+    renderCategories();
+    renderPopularProducts();
+    filterUsers('all');
+  }
+
+  init();
 </script>
 </body>
 </html>

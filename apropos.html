@@ -41,7 +41,7 @@
     padding: 0;
   }
 
-  #header-placeholder { width: 100%; }
+  
 
   /* Page Header */
   .page-header {
@@ -338,7 +338,7 @@
   }
 </style>
 </head>
-<body>
+<body data-active-page="apropos">
 
 <div id="header-placeholder"></div>
 
@@ -710,33 +710,14 @@
     if (badge) badge.textContent = total;
   }
 
-  // Cargar header
-  async function loadHeaderAndInit() {
-    try {
-      const response = await fetch('header.html');
-      if (!response.ok) throw new Error('Error cargando header');
-      const headerHtml = await response.text();
-      document.getElementById('header-placeholder').innerHTML = headerHtml;
-      
-      setTimeout(() => {
-        initUsers();
-        updateCartCount();
-        updateAuthUI();
-        setupAuthModal();
-      }, 100);
-    } catch (error) {
-      console.error('Error:', error);
-      initUsers();
-      updateAuthUI();
-      setupAuthModal();
-    }
-  }
-
+  
+  
   document.getElementById('contactBtn')?.addEventListener('click', () => {
     showToast("📧 Contactez-nous : contact@greenmarket.ma");
   });
 
   loadHeaderAndInit();
 </script>
+<script src="header-loader.js"></script>
 </body>
 </html>

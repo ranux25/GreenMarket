@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
 <title>GreenMarket – Mon Panier</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="header.css">
 <style>
 :root{
@@ -241,6 +241,97 @@ body{
 
 <div id="header-placeholder"></div>
 
+<script>
+(function() {
+  // ── Mobile menu toggle ──
+  var toggleBtn = document.getElementById('mobileMenuToggle');
+  var mobileMenu = document.getElementById('mobileMenu');
+  if (toggleBtn && mobileMenu) {
+    toggleBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      mobileMenu.classList.toggle('open');
+      var svg = toggleBtn.querySelector('svg');
+      if (mobileMenu.classList.contains('open')) {
+        svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>';
+      } else {
+        svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>';
+      }
+    });
+    mobileMenu.querySelectorAll('a').forEach(function(link) {
+      link.addEventListener('click', function() {
+        mobileMenu.classList.remove('open');
+        var svg = toggleBtn.querySelector('svg');
+        svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>';
+      });
+    });
+    document.addEventListener('click', function(event) {
+      if (!toggleBtn.contains(event.target) && !mobileMenu.contains(event.target)) {
+        mobileMenu.classList.remove('open');
+        var svg = toggleBtn.querySelector('svg');
+        svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>';
+      }
+    });
+  }
+
+  // ── Active link highlight ──
+  var currentPage = window.location.pathname.split('/').pop() || 'accueil.html';
+  document.querySelectorAll('.desktop-nav .nav-link, .mobile-nav-link').forEach(function(link) {
+    var href = link.getAttribute('href');
+    if (href === currentPage) link.classList.add('active');
+    else link.classList.remove('active');
+  });
+
+  // ── Cart count ──
+  function updateCartCount() {
+    var cart = JSON.parse(localStorage.getItem('greenmarket_cart') || '[]');
+    var total = cart.reduce(function(s, i) { return s + (i.quantity || 1); }, 0);
+    var badge = document.getElementById('cart-count');
+    if (badge) badge.textContent = total;
+  }
+  updateCartCount();
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'greenmarket_cart') updateCartCount();
+  });
+
+  // ── Auth UI ──
+  function escHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) { return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m]; });
+  }
+  function updateAuthUI() {
+    var widget = document.getElementById('authWidget');
+    if (!widget) return;
+    var userJson = sessionStorage.getItem('greenmarket_current_user');
+    var user = userJson ? JSON.parse(userJson) : null;
+    if (user) {
+      var roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Artisan' : 'Client');
+      widget.innerHTML = '<div class="user-badge">👋 ' + escHtml(user.name) + ' (' + roleText + ')<button id="logoutBtn" title="Déconnexion">🚪</button></div>';
+      document.getElementById('logoutBtn').addEventListener('click', function() {
+        sessionStorage.removeItem('greenmarket_current_user');
+        window.location.href = 'accueil.html';
+      });
+      var dashHref = user.role === 'admin' ? 'dashboard_admin.html' : 'dashboard-producteur.html';
+      var showDash = user.role === 'productor' || user.role === 'admin';
+      var dl = document.getElementById('dashboardLink');
+      var mdl = document.getElementById('mobileDashboardLink');
+      if (dl) { dl.style.display = showDash ? 'inline-block' : 'none'; if (showDash) dl.href = dashHref; }
+      if (mdl) { mdl.style.display = showDash ? 'flex' : 'none'; if (showDash) mdl.href = dashHref; }
+    } else {
+      widget.innerHTML = '<button class="btn-connexion" id="showLoginBtn">🔑 Connexion</button>';
+      var btn = document.getElementById('showLoginBtn');
+      if (btn) btn.addEventListener('click', function() {
+        var modal = document.getElementById('authModal');
+        if (modal) modal.classList.add('open');
+        else window.location.href = 'signin.html';
+      });
+    }
+  }
+  updateAuthUI();
+})();
+</script>
+
+
+
 <div class="page-header">
   <h1>🛒 Mon Panier</h1>
   <p>Retrouvez tous vos produits sélectionnés</p>
@@ -277,18 +368,18 @@ body{
 
   function updateCartCount() {
     const panier = getPanier();
-    const total = panier.reduce((sum, item) => sum + (item.quantite || 1), 0);
+    const total = panier.reduce((sum, item) => sum + (item.quantity || 1), 0);
     const badge = document.getElementById('cart-count');
     if (badge) badge.textContent = total;
   }
 
   function getPanier(){
-    const saved = localStorage.getItem('greenmarket_panier');
+    const saved = localStorage.getItem('greenmarket_cart');
     return saved ? JSON.parse(saved) : [];
   }
 
   function savePanier(panier){
-    localStorage.setItem('greenmarket_panier', JSON.stringify(panier));
+    localStorage.setItem('greenmarket_cart', JSON.stringify(panier));
     updateCartCount();
     renderCart();
   }
@@ -304,7 +395,7 @@ body{
     let panier = getPanier();
     panier = panier.map(item => {
       if(item.id == id){
-        item.quantite = Math.max(1, item.quantite + delta);
+        item.quantity = Math.max(1, (item.quantity || 1) + delta);
       }
       return item;
     });
@@ -328,7 +419,7 @@ body{
     
     document.getElementById('confirmClear').addEventListener('click', () => {
       modal.remove();
-      localStorage.removeItem('greenmarket_panier');
+      localStorage.removeItem('greenmarket_cart');
       updateCartCount();
       renderCart();
       showToast("🛒 Panier vidé");
@@ -336,7 +427,7 @@ body{
   }
 
   function getTotal(panier){
-    return panier.reduce((sum,item) => sum + (item.prixNumerique * item.quantite), 0);
+    return panier.reduce((sum,item) => sum + ((item.prixNumerique || parseInt((item.price||'0').replace(/\D/g,''))||0) * (item.quantity || 1)), 0);
   }
 
   function goCheckout(){
@@ -347,10 +438,10 @@ body{
     }
     const productosParaCheckout = panier.map(item => ({
       id: item.id,
-      name: item.nom,
+      name: item.name,
       price: item.prix,
       image: item.image,
-      quantity: item.quantite,
+      quantity: item.quantity,
       boutiqueId: item.boutiqueId,
       boutiqueNom: item.boutiqueNom
     }));
@@ -380,14 +471,14 @@ body{
         <div class="cart-items">
           ${panier.map(item => `
             <div class="cart-item">
-              <img src="${item.image}" alt="${item.nom}" onerror="this.src='https://placehold.co/110x110?text=Produit'">
+              <img src="${item.image}" alt="${item.name}" onerror="this.src='https://placehold.co/110x110?text=Produit'">
               <div class="item-info">
-                <div class="item-name">${escapeHtml(item.nom)}</div>
-                <div class="item-shop">Boutique : ${escapeHtml(item.boutiqueNom)}</div>
+                <div class="item-name">${escapeHtml(item.name)}</div>
+                <div class="item-shop">Boutique : ${escapeHtml(item.boutiqueNom || 'GreenMarket')}</div>
                 <div class="item-price">${item.prix}</div>
                 <div class="quantity-controls">
                   <button onclick="changeQuantity('${item.id}', -1)">-</button>
-                  <span>${item.quantite}</span>
+                  <span>${item.quantity}</span>
                   <button onclick="changeQuantity('${item.id}', 1)">+</button>
                 </div>
                 <button class="btn-delete" onclick="removeItem('${item.id}')">🗑️ Supprimer</button>
@@ -403,7 +494,7 @@ body{
           </div>
           <div class="summary-line total">
             <span>Total</span>
-            <span>${total.toFixed(2)} €</span>
+            <span>${Math.round(total)} DH</span>
           </div>
           <button class="btn-checkout" onclick="goCheckout()">✅ Passer la commande</button>
           <button class="btn-clear" onclick="clearCart()">🗑️ Vider le panier</button>
@@ -417,23 +508,12 @@ body{
     return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
   }
 
-  async function loadHeaderAndInit() {
-    try {
-      const response = await fetch('header.html');
-      if (!response.ok) throw new Error('Error');
-      const headerHtml = await response.text();
-      document.getElementById('header-placeholder').innerHTML = headerHtml;
-      
-      setTimeout(() => {
-        updateCartCount();
-        renderCart();
-      }, 100);
-    } catch (error) {
-      renderCart();
-    }
-  }
-
-  loadHeaderAndInit();
+  // DÉCLENCHEMENT ICI : Exécute la fonction qui affiche le panier lorsque le contenu HTML a fini de charger
+  document.addEventListener("DOMContentLoaded", () => {
+    renderCart();
+  });
+  
 </script>
+<script src="header-loader.js"></script>
 </body>
 </html>

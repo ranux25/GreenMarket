@@ -1,39 +1,25 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-  <title>GreenMarket Header</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="header.css">
-</head>
-<body>
-
 <header>
   <div class="header-container">
-    <!-- Logo -->
     <div class="logo" onclick="window.location.href='accueil.html'">
       <div class="logo-img">
-        <img src="IMAGES/logo.png" alt="GreenMarket Logo" onerror="this.src='https://placehold.co/65x65?text=GM'"/>
+        <img src="IMAGES/logo.png" alt="GreenMarket Logo" onerror="this.src='https://placehold.co/65x65/9FB2AC/5D0D18?text=GM'"/>
       </div>
       <span class="logo-text">GreenMarket</span>
     </div>
 
-    <!-- Barra de búsqueda -->
     <div class="search-bar">
-      <input type="text" id="headerSearchInput" placeholder="Rechercher une boutique artisanale..."/>
+      <input type="text" id="headerSearchInput" placeholder="Rechercher une boutique artisanale..." 
+        onkeydown="if(event.key==='Enter' && this.value.trim()) window.location.href='produits.html?search='+encodeURIComponent(this.value.trim())"/>
     </div>
 
-    <!-- Navegación desktop -->
     <nav class="desktop-nav">
-      <a href="accueil.html" class="nav-link" id="navAccueil">Accueil</a>
-      <a href="store.html" class="nav-link" id="navBoutiques">Boutiques</a>
-      <a href="produits.html" class="nav-link" id="navProduits">Produits</a>
-      <a href="apropos.html" class="nav-link">À propos</a>
-      <a href="dashboard-producteur.html" id="dashboardLink" class="nav-link" style="display: none;">📊 Dashboard</a>
+      <a href="accueil.html" class="nav-link" data-nav="accueil">Accueil</a>
+      <a href="store.html" class="nav-link" data-nav="store">Boutiques</a>
+      <a href="produits.html" class="nav-link" data-nav="produits">Produits</a>
+      <a href="apropos.html" class="nav-link" data-nav="apropos">À propos</a>
+      <a href="dashboard-producteur.html" id="dashboardLink" class="nav-link" style="display: none;" data-nav="dashboard">📊 Dashboard</a>
     </nav>
 
-    <!-- Acciones (carrito + auth + móvil) -->
     <div class="actions">
       <button class="cart-btn" title="Panier" onclick="window.location.href='panier.html'">
         <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#5D0D18" stroke-width="1.8">
@@ -42,160 +28,20 @@
         <span class="cart-badge" id="cart-count">0</span>
       </button>
       <div id="authWidget"></div>
-      <button class="mobile-menu-btn" id="mobileMenuToggle" type="button" aria-label="Menu">
+      <button class="mobile-menu-btn" id="mobileMenuToggle" aria-label="Menu">
         <svg width="24" height="24" fill="none" stroke="#5D0D18" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
       </button>
     </div>
 
-    <!-- Menú móvil (desplegable) -->
     <div class="mobile-menu" id="mobileMenu">
-      <a href="accueil.html" class="mobile-nav-link" id="mobileNavAccueil">
-        <span>🏠</span> Accueil
-      </a>
-      <a href="store.html" class="mobile-nav-link" id="mobileNavBoutiques">
-        <span>🏪</span> Boutiques
-      </a>
-      <a href="produits.html" class="mobile-nav-link" id="mobileNavProduits">
-        <span>📦</span> Produits
-      </a>
-      <a href="#" class="mobile-nav-link">
-        <span>ℹ️</span> À propos
-      </a>
-      <a href="dashboard-producteur.html" id="mobileDashboardLink" class="mobile-nav-link" style="display: none;">
-        <span>📊</span> Dashboard
-      </a>
+      <a href="accueil.html" class="mobile-nav-link" data-nav="accueil"><span>🏠</span> Accueil</a>
+      <a href="store.html" class="mobile-nav-link" data-nav="store"><span>🏪</span> Boutiques</a>
+      <a href="produits.html" class="mobile-nav-link" data-nav="produits"><span>📦</span> Produits</a>
+      <a href="apropos.html" class="mobile-nav-link" data-nav="apropos"><span>ℹ️</span> À propos</a>
+      <a href="dashboard-producteur.html" id="mobileDashboardLink" class="mobile-nav-link" style="display: none;" data-nav="dashboard"><span>📊</span> Dashboard</a>
+      <a href="dashboard_client.html" id="clientDashboardLink" class="nav-link" style="display: none;" data-nav="panier">👤 Mon Compte</a>
     </div>
   </div>
 </header>
-
-<script>
-  // ========== TOGGLE MENÚ MÓVIL ==========
-  const toggleBtn = document.getElementById('mobileMenuToggle');
-  const mobileMenu = document.getElementById('mobileMenu');
-  
-  if (toggleBtn && mobileMenu) {
-    toggleBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      mobileMenu.classList.toggle('open');
-      // Cambiar icono del menú (opcional)
-      const svg = toggleBtn.querySelector('svg');
-      if (mobileMenu.classList.contains('open')) {
-        svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>';
-      } else {
-        svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>';
-      }
-    });
-    
-    // Cerrar menú al hacer clic en un enlace
-    mobileMenu.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        mobileMenu.classList.remove('open');
-        // Restaurar icono
-        const svg = toggleBtn.querySelector('svg');
-        svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>';
-      });
-    });
-    
-    // Cerrar menú al hacer clic fuera (opcional)
-    document.addEventListener('click', function(event) {
-      if (!toggleBtn.contains(event.target) && !mobileMenu.contains(event.target)) {
-        mobileMenu.classList.remove('open');
-        const svg = toggleBtn.querySelector('svg');
-        svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>';
-      }
-    });
-  }
-
-  // ========== RESALTAR ENLACE ACTIVO ==========
-  function highlightActiveNav() {
-    const currentPage = window.location.pathname.split('/').pop() || 'accueil.html';
-    
-    // Desktop nav
-    document.querySelectorAll('.desktop-nav .nav-link').forEach(link => {
-      const href = link.getAttribute('href');
-      if (href === currentPage) {
-        link.classList.add('active');
-      } else {
-        link.classList.remove('active');
-      }
-    });
-    
-    // Mobile nav
-    document.querySelectorAll('.mobile-nav-link').forEach(link => {
-      const href = link.getAttribute('href');
-      if (href === currentPage) {
-        link.classList.add('active');
-      } else {
-        link.classList.remove('active');
-      }
-    });
-  }
-
-  // ========== ACTUALIZAR CONTADOR DEL CARRITO ==========
-  function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('greenmarket_cart') || '[]');
-    const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-    const badge = document.getElementById('cart-count');
-    if (badge) badge.textContent = total;
-  }
-
-  // ========== ACTUALIZAR UI DE AUTENTICACIÓN ==========
-  function updateAuthUI() {
-    const widget = document.getElementById('authWidget');
-    if (!widget) return;
-    
-    const userJson = sessionStorage.getItem('greenmarket_current_user');
-    const user = userJson ? JSON.parse(userJson) : null;
-    
-    if (user) {
-      const roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Artisan' : 'Client');
-      widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" title="Déconnexion">🚪</button></div>`;
-      
-      document.getElementById('logoutBtn')?.addEventListener('click', () => {
-        sessionStorage.removeItem('greenmarket_current_user');
-        window.location.reload();
-      });
-      
-      // Mostrar dashboard link en desktop y móvil
-      const dashboardLink = document.getElementById('dashboardLink');
-      const mobileDashboardLink = document.getElementById('mobileDashboardLink');
-      if (dashboardLink) {
-        dashboardLink.style.display = (user.role === 'productor' || user.role === 'admin') ? 'inline-block' : 'none';
-      }
-      if (mobileDashboardLink) {
-        mobileDashboardLink.style.display = (user.role === 'productor' || user.role === 'admin') ? 'flex' : 'none';
-      }
-    } else {
-      widget.innerHTML = `<button class="btn-connexion" id="showLoginBtn">🔑 Connexion</button>`;
-      document.getElementById('showLoginBtn')?.addEventListener('click', () => {
-        const modal = document.getElementById('authModal');
-        if (modal) modal.classList.add('open');
-        else alert('Veuillez vous connecter');
-      });
-    }
-  }
-
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
-  }
-
-  // ========== INICIALIZAR ==========
-  document.addEventListener('DOMContentLoaded', () => {
-    highlightActiveNav();
-    updateCartCount();
-    updateAuthUI();
-    
-    // Escuchar cambios en localStorage para actualizar contador
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'greenmarket_cart') {
-        updateCartCount();
-      }
-    });
-  });
-</script>
-
-</body>
-</html>

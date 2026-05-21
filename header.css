@@ -4,46 +4,28 @@
   --bg: #FFF9EB;
   --text-dark: #2C2C2C;
   --text-light: #6B6B6B;
-  --wine-pale: #f5e6e8;
-  --wine-dark: #3e0910;
-  --border: #e8ddd0;
-  --cream: #fff9eb;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Lato', sans-serif;
-  background-color: var(--bg);
-  color: var(--text-dark);
-  margin: 0;
-  padding: 0;
-}
-
-/* ========== HEADER PRINCIPAL ========== */
 header {
   background: #9FB2AC;
   border-bottom: 2px solid #f0e8d5;
   position: sticky;
   top: 0;
-  z-index: 1000;
-  box-shadow: 0 2px 16px rgba(93, 13, 24, 0.07);
+  z-index: 100;
+  box-shadow: 0 2px 16px rgba(93,13,24,0.07);
 }
 
 .header-container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 12px 16px;
+  padding: 12px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
   flex-wrap: wrap;
+  gap: 16px;
 }
 
-/* ========== LOGO ========== */
 .logo {
   display: flex;
   align-items: center;
@@ -73,7 +55,6 @@ header {
   letter-spacing: 1px;
 }
 
-/* ========== BARRA DE BÚSQUEDA ========== */
 .search-bar {
   flex: 1;
   display: flex;
@@ -88,23 +69,19 @@ header {
   padding: 10px 20px;
   width: 100%;
   max-width: 420px;
-  font-family: 'Lato', sans-serif;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  color: var(--text-dark);
+  transition: all 0.2s;
 }
 
 .search-bar input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(93, 13, 24, 0.08);
+  box-shadow: 0 0 0 3px rgba(93,13,24,0.08);
 }
 
-/* ========== NAVEGACIÓN DESKTOP ========== */
 .desktop-nav {
   display: flex;
-  align-items: center;
-  gap: 1.5rem;
+  gap: 28px;
 }
 
 .nav-link {
@@ -113,15 +90,17 @@ header {
   font-size: 14px;
   color: var(--text-dark);
   text-decoration: none;
-  letter-spacing: 0.5px;
-  transition: color 0.2s;
   padding: 4px 0;
   position: relative;
+  transition: color 0.2s;
 }
 
 .nav-link::after {
   content: '';
-  display: block;
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
   height: 2px;
   background: var(--primary);
   transform: scaleX(0);
@@ -139,13 +118,13 @@ header {
 
 .nav-link.active {
   color: var(--primary);
+  font-weight: 800;
 }
 
 .nav-link.active::after {
   transform: scaleX(1);
 }
 
-/* ========== BOTONES DE ACCIÓN ========== */
 .actions {
   display: flex;
   align-items: center;
@@ -158,11 +137,6 @@ header {
   border: none;
   cursor: pointer;
   padding: 4px;
-  transition: transform 0.2s;
-}
-
-.cart-btn:hover {
-  transform: scale(1.05);
 }
 
 .cart-badge {
@@ -179,21 +153,18 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Lato', sans-serif;
 }
 
 .btn-connexion {
   background: var(--primary);
-  color: #fff;
   border: none;
-  border-radius: 999px;
-  padding: 8px 20px;
-  font-family: 'Lato', sans-serif;
+  color: white;
+  padding: 8px 18px;
+  border-radius: 40px;
   font-weight: 700;
-  font-size: 14px;
+  font-family: 'Lato', sans-serif;
   cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
-  letter-spacing: 0.3px;
+  transition: all 0.2s;
 }
 
 .btn-connexion:hover {
@@ -202,60 +173,41 @@ header {
 }
 
 .user-badge {
-  background: var(--wine-pale);
-  padding: 0.4rem 1rem;
-  border-radius: 30px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  color: var(--primary);
+  gap: 8px;
+  background: white;
+  padding: 6px 14px;
+  border-radius: 40px;
+  font-size: 14px;
   font-weight: 600;
-  font-size: 0.85rem;
+  color: var(--primary);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 
 .user-badge button {
   background: none;
   border: none;
-  color: var(--primary);
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 16px;
 }
 
-/* ========== MENÚ MÓVIL ========== */
 .mobile-menu-btn {
   display: none;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
-  transition: background 0.2s;
-}
-
-.mobile-menu-btn:hover {
-  background: rgba(93, 13, 24, 0.1);
+  padding: 4px;
 }
 
 .mobile-menu {
   display: none;
-  width: 100%;
   flex-direction: column;
   background: #9FB2AC;
-  border-radius: 12px;
-  margin-top: 12px;
-  overflow: hidden;
-  animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  width: 100%;
+  padding: 20px;
+  gap: 18px;
+  border-top: 1px solid #e0d4bd;
 }
 
 .mobile-menu.open {
@@ -263,153 +215,27 @@ header {
 }
 
 .mobile-nav-link {
-  padding: 14px 20px;
   font-family: 'Lato', sans-serif;
   font-weight: 600;
-  font-size: 16px;
   color: var(--text-dark);
   text-decoration: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  transition: background 0.2s, padding-left 0.2s;
+  font-size: 1rem;
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-.mobile-nav-link:last-child {
-  border-bottom: none;
-}
-
-.mobile-nav-link:hover {
-  background: rgba(93, 13, 24, 0.08);
-  padding-left: 28px;
+  gap: 10px;
+  padding: 8px 0;
 }
 
 .mobile-nav-link.active {
   color: var(--primary);
-  background: rgba(93, 13, 24, 0.05);
-  font-weight: 700;
+  font-weight: 800;
 }
 
-/* ========== RESPONSIVE (MÓVIL Y TABLET) ========== */
-@media (max-width: 768px) {
-  .header-container {
-    padding: 10px 12px;
-    gap: 10px;
-  }
-
-  /* Logo más pequeño en móvil */
-  .logo-img {
-    height: 45px;
-  }
-
-  .logo-text {
-    font-size: 18px;
-  }
-
-  /* Barra de búsqueda ocupa toda la anchura en móvil */
-  .search-bar {
-    order: 3;
-    width: 100%;
-    min-width: 100%;
-    margin-top: 8px;
-  }
-
-  .search-bar input {
-    max-width: 100%;
-    padding: 8px 16px;
-    font-size: 13px;
-  }
-
-  /* Ocultar navegación desktop en móvil */
-  .desktop-nav {
-    display: none;
-  }
-
-  /* Mostrar botón de menú móvil */
-  .mobile-menu-btn {
-    display: block;
-  }
-
-  /* Ajustar acciones */
-  .actions {
-    gap: 8px;
-  }
-
-  .btn-connexion {
-    padding: 6px 14px;
-    font-size: 12px;
-  }
-
-  .user-badge {
-    padding: 0.3rem 0.8rem;
-    font-size: 0.75rem;
-  }
-
-  .cart-btn svg {
-    width: 22px;
-    height: 22px;
-  }
-
-  .cart-badge {
-    min-width: 16px;
-    height: 16px;
-    font-size: 9px;
-    top: -4px;
-    right: -6px;
-  }
-}
-
-/* ========== TABLET (entre 769px y 1024px) ========== */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .logo-text {
-    font-size: 22px;
-  }
-
-  .logo-img {
-    height: 50px;
-  }
-
-  .desktop-nav {
-    gap: 1rem;
-  }
-
-  .nav-link {
-    font-size: 12px;
-  }
-
-  .search-bar input {
-    max-width: 280px;
-  }
-}
-
-/* ========== PANTALLAS MUY PEQUEÑAS (menos de 480px) ========== */
-@media (max-width: 480px) {
-  .header-container {
-    padding: 8px 10px;
-  }
-
-  .logo-img {
-    height: 35px;
-  }
-
-  .logo-text {
-    font-size: 14px;
-  }
-
-  .btn-connexion {
-    padding: 5px 10px;
-    font-size: 11px;
-  }
-
-  .user-badge {
-    padding: 0.25rem 0.6rem;
-    font-size: 0.7rem;
-    gap: 5px;
-  }
-
-  .mobile-nav-link {
-    padding: 12px 16px;
-    font-size: 14px;
-  }
+@media (max-width: 780px) {
+  .desktop-nav { display: none; }
+  .mobile-menu-btn { display: block; }
+  .logo-text { font-size: 20px; }
+  .header-container { padding: 12px 16px; }
+  .search-bar { order: 3; width: 100%; margin-top: 8px; }
+  .search-bar input { max-width: 100%; }
 }

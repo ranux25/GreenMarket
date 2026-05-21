@@ -40,8 +40,6 @@
     padding: 0;
   }
 
-  #header-placeholder { width: 100%; }
-
   .page-header {
     background: var(--wine);
     padding: 4rem 2.5rem 3rem;
@@ -203,38 +201,6 @@
   }
   .toast.show { transform: translateY(0); opacity: 1; }
 
-  .btn-connexion {
-    background: var(--primary);
-    color: #fff;
-    border: none;
-    border-radius: 999px;
-    padding: 8px 20px;
-    font-family: 'Lato', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
-    letter-spacing: 0.3px;
-    text-decoration: none;
-    display: inline-block;
-  }
-  .btn-connexion:hover {
-    background: #7a1020;
-    transform: translateY(-1px);
-  }
-
-  .user-badge {
-    background: var(--wine-pale);
-    padding: 0.4rem 1rem;
-    border-radius: 30px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--wine);
-    font-weight: 600;
-    font-size: 0.85rem;
-  }
-
   @media(max-width:900px){ .main-layout { grid-template-columns: 1fr; } .sidebar { position: static; } }
   @media(max-width:600px){
     .page-header { padding: 2.5rem 1.2rem 2rem; }
@@ -244,8 +210,9 @@
   }
 </style>
 </head>
-<body>
+<body data-active-page="produits">
 
+<!-- Placeholder pour le header chargé dynamiquement -->
 <div id="header-placeholder"></div>
 
 <div class="page-header">
@@ -295,42 +262,8 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="header-loader.js"></script>
 <script>
-  // ========== FUNCIONES DE AUTENTICACIÓN ==========
-  let currentUser = null;
-
-  function getCurrentUser() {
-    const u = sessionStorage.getItem('greenmarket_current_user');
-    return u ? JSON.parse(u) : null;
-  }
-
-  function logout() {
-    sessionStorage.removeItem('greenmarket_current_user');
-    currentUser = null;
-    updateAuthUI();
-    showToast("👋 Déconnexion réussie");
-    setTimeout(() => window.location.reload(), 500);
-  }
-
-  function updateAuthUI() {
-    const widget = document.getElementById('authWidget');
-    if (!widget) return;
-    
-    const user = getCurrentUser();
-    if (user) {
-      const roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Artisan' : 'Client');
-      widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;">🚪</button></div>`;
-      document.getElementById('logoutBtn')?.addEventListener('click', logout);
-      
-      const dashboardLink = document.getElementById('dashboardLink');
-      if (dashboardLink) {
-        dashboardLink.style.display = (user.role === 'productor' || user.role === 'admin') ? 'inline-block' : 'none';
-      }
-    } else {
-      widget.innerHTML = `<a href="signin.html"><button class="btn-connexion">🔑 Connexion</button></a>`;
-    }
-  }
-
   // ========== FUNCIONES DEL CARRITO ==========
   function showToast(msg, bg = 'var(--wine)') {
     const toast = document.getElementById('toast');
@@ -425,6 +358,21 @@
 
   let activeCategory = null;
 
+  // Lire les paramètres URL (?cat= et ?search=)
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const catParam = params.get('cat');
+    const searchParam = params.get('search');
+    if (catParam) activeCategory = catParam;
+    if (searchParam) {
+      setTimeout(() => {
+        const si = document.getElementById('searchInput');
+        if (si) { si.value = searchParam; }
+        renderProducts();
+      }, 300);
+    }
+  })();
+
   function renderCategories() {
     const list = document.getElementById('categoryList');
     if (!list) return;
@@ -484,13 +432,13 @@
     
     grid.innerHTML = list.map(p => `
       <div class="product-card">
-        <div class="product-banner" onclick="window.location.href='store-detail.html?id=${p.shopId}'">
+        <div class="product-banner" onclick="window.location.href='info-store.html?id=${p.shopId}'">
           <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.src='https://placehold.co/500x400?text=Produit'">
           <span class="product-price-badge">${escapeHtml(p.price)}</span>
         </div>
         <div class="product-body">
           <div class="product-name">${escapeHtml(p.name)}</div>
-          <span class="product-shop-tag" onclick="window.location.href='store-detail.html?id=${p.shopId}'">🏪 ${escapeHtml(p.shopName)}</span>
+          <span class="product-shop-tag" onclick="window.location.href='info-store.html?id=${p.shopId}'">🏪 ${escapeHtml(p.shopName)}</span>
           <p class="product-desc">${escapeHtml(p.description)}</p>
           <div class="product-stats">
             <div>
@@ -504,29 +452,21 @@
     `).join('');
   }
 
-  // ========== CARGAR HEADER E INICIALIZAR ==========
-  async function loadHeaderAndInit() {
-    try {
-      const response = await fetch('header.html');
-      if (!response.ok) throw new Error('Error cargando header');
-      const headerHtml = await response.text();
-      document.getElementById('header-placeholder').innerHTML = headerHtml;
-      
-      setTimeout(() => {
-        updateCartCount();
-        updateAuthUI();
-        loadAllProducts();
-        renderCategories();
-        renderProducts();
-      }, 100);
-    } catch (error) {
-      console.error('Error:', error);
-      updateAuthUI();
-      loadAllProducts();
-      renderCategories();
-      renderProducts();
-    }
+  // ========== INITIALISATION ==========
+  function init() {
+    loadAllProducts();
+    renderCategories();
+    renderProducts();
+    updateCartCount();
   }
+
+  // Remplir catFilter
+  categories.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.name;
+    opt.textContent = c.name;
+    document.getElementById('catFilter')?.appendChild(opt);
+  });
 
   // Event listeners
   document.getElementById('searchInput')?.addEventListener('input', renderProducts);
@@ -537,15 +477,12 @@
     renderProducts();
   });
 
-  // Llenar catFilter
-  categories.forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c.name;
-    opt.textContent = c.name;
-    document.getElementById('catFilter')?.appendChild(opt);
-  });
-
-  loadHeaderAndInit();
+  // Attendre que le header soit chargé
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 </script>
 </body>
 </html>

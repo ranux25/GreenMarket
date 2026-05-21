@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GreenMarket – Validation de commande</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="header.css">
 <style>
   :root {
     --cream:      #fff9eb;
@@ -410,8 +411,7 @@
   }
 </style>
 </head>
-<body>
-
+<body date-active-page="checkout"> 
 <div id="header-placeholder"></div>
 
 <div class="page-header">
@@ -435,19 +435,7 @@
 </div>
 
 <script>
-  function loadHeader() {
-    fetch('header.html')
-      .then(response => {
-        if (!response.ok) throw new Error("Erreur");
-        return response.text();
-      })
-      .then(data => {
-        document.getElementById('header-placeholder').innerHTML = data;
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  }
+
 
   function escapeHtml(str) {
     if (!str) return '';
@@ -476,16 +464,19 @@
     }, 3200);
   }
 
+  // --- CORRECTION 1 : Nettoyage strict des espaces pour éviter les prix à 0 ---
   function extraerPrecio(precioStr) {
     if (typeof precioStr === 'number') return precioStr;
-    if (!precioStr) return 5;
-    var match = String(precioStr).match(/(\d+(?:[.,]\d+)?)/);
+    if (!precioStr) return 0;
+    var strClean = String(precioStr).replace(/\s/g, ''); // Enlève " 500" pour que ça devienne "500"
+    var match = strClean.match(/(\d+(?:[.,]\d+)?)/);
     if (match) {
       return parseFloat(match[1].replace(',', '.'));
     }
-    return 5;
+    return 0;
   }
 
+  // --- CORRECTION 2 : Récupération intelligente des prix depuis le LocalStorage ---
   function obtenerDatosCheckout() {
     var params = new URLSearchParams(window.location.search);
     var productos = [];
@@ -500,13 +491,17 @@
       }
     }
     
-    if (productos.length === 0) {
-      var carritoRaw = localStorage.getItem('greenmarket_panier');
-      if (carritoRaw) {
-        try {
-          productos = JSON.parse(carritoRaw);
-        } catch(e) {}
+    // Pour combler les pertes du nom de variable (price vs prix), on fait un double contrôle en lisant directement le panier local.
+    var carritoLocal = [];
+    try {
+      var rawLocal = localStorage.getItem('greenmarket_cart');
+      if (rawLocal) {
+        carritoLocal = JSON.parse(rawLocal);
       }
+    } catch(e) {}
+    
+    if (productos.length === 0) {
+      productos = carritoLocal;
     }
     
     var productosNormalizados = [];
@@ -514,19 +509,24 @@
     
     for (var i = 0; i < productos.length; i++) {
       var p = productos[i];
-      var tiendaNombre = p.boutiqueNom || (p.shopName) || 'Boutique';
-      var tiendaId = p.boutiqueId || (p.shopId) || 1;
+      var pLocal = carritoLocal.find(function(item) { return item.id == (p.id || p.productId); }) || {};
+      
+      var tiendaNombre = p.boutiqueNom || p.shopName || pLocal.boutiqueNom || 'Boutique';
+      var tiendaId = p.boutiqueId || p.shopId || pLocal.boutiqueId || 1;
       
       if (!primeraTienda) {
         primeraTienda = { id: tiendaId, nombre: tiendaNombre };
       }
       
+      // On teste toutes les combinaisons de mots possibles pour retrouver le montant :
+      var precioFinal = p.price || p.prix || pLocal.price || pLocal.prix || pLocal.prixNumerique || 0;
+      
       productosNormalizados.push({
-        id: p.id || (p.productId),
-        name: p.nom || p.name,
-        price: p.prix || p.price,
-        image: p.image,
-        quantity: p.quantite || 1,
+        id: p.id || p.productId || pLocal.id,
+        name: p.nom || p.name || pLocal.name,
+        price: precioFinal,
+        image: p.image || pLocal.image,
+        quantity: p.quantite || p.quantity || pLocal.quantity || 1,
         boutiqueId: tiendaId,
         boutiqueNom: tiendaNombre
       });
@@ -546,7 +546,7 @@
       var cantidad = productos[i].quantity || 1;
       subtotal += precio * cantidad;
     }
-    var envio = (modoEnvio === 'pickup') ? 0 : 5;
+    var envio = (modoEnvio === 'pickup') ? 0 : 250;
     var total = subtotal + envio;
     
     var subtotalEl = document.getElementById('subtotalAmount');
@@ -554,9 +554,9 @@
     var totalEl = document.getElementById('totalAmount');
     var envioLabel = document.getElementById('deliveryLabel');
     
-    if (subtotalEl) subtotalEl.textContent = subtotal.toFixed(2) + ' €';
-    if (envioEl) envioEl.textContent = envio.toFixed(2) + ' €';
-    if (totalEl) totalEl.textContent = total.toFixed(2) + ' €';
+    if (subtotalEl) subtotalEl.textContent = Math.round(subtotal) + ' DH';
+    if (envioEl) envioEl.textContent = Math.round(envio) + ' DH';
+    if (totalEl) totalEl.textContent = Math.round(total) + ' DH';
     if (envioLabel) envioLabel.textContent = (modoEnvio === 'pickup') ? 'Retrait (gratuit)' : 'Livraison';
     
     return { subtotal: subtotal, envio: envio, total: total };
@@ -611,7 +611,7 @@
       var cantidad = datos.productos[k].quantity || 1;
       subtotal += precio * cantidad;
     }
-    var envio = (modoEnvio === 'pickup') ? 0 : 5;
+    var envio = (modoEnvio === 'pickup') ? 0 : 250;
     var total = subtotal + envio;
     
     var pedido = {
@@ -648,7 +648,7 @@
     pedidosExistentes.push(pedido);
     localStorage.setItem('greenmarket_orders', JSON.stringify(pedidosExistentes));
     
-    localStorage.removeItem('greenmarket_panier');
+    localStorage.removeItem('greenmarket_cart');
     
     var contenedor = document.getElementById('content');
     contenedor.innerHTML = `
@@ -658,7 +658,7 @@
         <p>Merci pour votre commande, <strong>${escapeHtml(firstName)} ${escapeHtml(lastName)}</strong>.</p>
         <div class="order-number">N° ${pedido.numeroPedido}</div>
         <p>Un email de confirmation a été envoyé à <strong>${escapeHtml(email)}</strong>.</p>
-        <p><strong>Total payé :</strong> ${total.toFixed(2)} €</p>
+        <p><strong>Total payé :</strong> ${Math.round(total)} DH</p>
         <div class="success-actions">
           <a href="store.html" class="btn-filled">🏠 Retour aux boutiques</a>
           <a href="info-store.html?id=${datos.idTienda}" class="btn-back" style="display:inline-block;">← Retour à la boutique</a>
@@ -696,9 +696,9 @@
                onerror="this.src='https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=80&h=80&fit=crop'">
           <div class="order-item-details">
             <div class="order-item-name">${escapeHtml(p.name)}</div>
-            <div class="order-item-price">${escapeHtml(p.price)} × ${cantidad}</div>
+            <div class="order-item-price">${Math.round(precioNum)} DH × ${cantidad}</div>
           </div>
-          <div class="order-item-total">${totalProducto.toFixed(2)} €</div>
+          <div class="order-item-total">${Math.round(totalProducto)} DH</div>
         </div>
       `;
     }
@@ -724,7 +724,7 @@
             </div>
             <div class="form-group">
               <label>Téléphone</label>
-              <input type="tel" id="phone" placeholder="06 12 34 56 78">
+              <input type="tel" id="phone" placeholder="06 00 00 00 00">
             </div>
             <div id="seccionDireccion">
               <div class="form-group">
@@ -734,11 +734,11 @@
               <div class="form-row">
                 <div class="form-group">
                   <label>Code postal *</label>
-                  <input type="text" id="zipcode" placeholder="75001">
+                  <input type="text" id="zipcode" placeholder="93000">
                 </div>
                 <div class="form-group">
                   <label>Ville *</label>
-                  <input type="text" id="city" placeholder="Paris">
+                  <input type="text" id="city" placeholder="Tétouan">
                 </div>
               </div>
             </div>
@@ -747,7 +747,7 @@
           <div class="form-section">
             <h3>🚚 Mode de livraison</h3>
             <div class="radio-group">
-              <label><input type="radio" name="delivery" value="delivery" checked> 📦 Livraison à domicile (+5€)</label>
+              <label><input type="radio" name="delivery" value="delivery" checked> 📦 Livraison à domicile (+250 DH)</label>
               <label><input type="radio" name="delivery" value="pickup"> 🏪 Retrait en boutique (Gratuit)</label>
             </div>
           </div>
@@ -780,15 +780,15 @@
           <div class="order-total">
             <div class="total-row">
               <span class="label">Sous-total</span>
-              <span id="subtotalAmount">0.00 €</span>
+              <span id="subtotalAmount">0 DH</span>
             </div>
             <div class="total-row">
               <span class="label" id="deliveryLabel">Livraison</span>
-              <span id="deliveryAmount">5.00 €</span>
+              <span id="deliveryAmount">250 DH</span>
             </div>
             <div class="total-row grand-total">
               <span>Total</span>
-              <span id="totalAmount">0.00 €</span>
+              <span id="totalAmount">0 DH</span>
             </div>
           </div>
           <button class="btn-confirm" id="btnConfirmar">✅ Confirmer la commande</button>
@@ -818,9 +818,10 @@
   }
   
   window.addEventListener('DOMContentLoaded', function() {
-      loadHeader();
+      
       cargarCheckout();
   });
 </script>
+<script src="header-loader.js"></script>
 </body>
 </html>

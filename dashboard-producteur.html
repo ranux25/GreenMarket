@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GreenMarket – Dashboard Producteur</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="header.css">
 <style>
   :root {
     --cream:      #fff9eb;
@@ -336,7 +336,7 @@
 </style>
 </head>
 <body>
-
+<body data-active-page="dashboard">
 <div id="header-placeholder"></div>
 
 <div class="page-header">
@@ -378,18 +378,7 @@
 let currentUser = null;
 let currentProducerId = null;
 
-function loadHeader() {
-  fetch('header.html')
-    .then(response => {
-      if (!response.ok) throw new Error("Erreur");
-      return response.text();
-    })
-    .then(data => {
-      document.getElementById('header-placeholder').innerHTML = data;
-      updateAuthUI();
-    })
-    .catch(error => console.error(error));
-}
+
 
 function getCurrentUser() {
   const u = sessionStorage.getItem('greenmarket_current_user');
@@ -708,7 +697,6 @@ function deleteProductConfirm(shopId, productId) {
 }
 
 function init() {
-  loadHeader();
   loadDashboard();
   document.getElementById('saveProductBtn').onclick = saveProduct;
   document.getElementById('closeProductModal').onclick = closeProductModal;
@@ -724,5 +712,6 @@ window.closeProductModal = closeProductModal;
 
 init();
 </script>
+<script src="header-loader.js"></script>
 </body>
 </html>

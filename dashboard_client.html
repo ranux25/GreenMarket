@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GreenMarket – Mon Espace Client</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="header.css">
 <style>
   :root {
     --cream:      #fff9eb;
@@ -32,32 +33,19 @@
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Jost',sans-serif; background:var(--cream); color:var(--text); min-height:100vh; }
-
-  .nav-link {
-    font-family:'Lato',sans-serif; font-weight:700; font-size:14px;
-    color:var(--text-dark); text-decoration:none; letter-spacing:.5px;
-    padding:4px 0; transition:color .2s;
-  }
-  .nav-link:hover { color:var(--primary); }
-  .nav-link.active { color:var(--primary); border-bottom:2px solid var(--primary); }
-  .user-badge {
-    background:var(--wine-pale); padding:.4rem 1rem; border-radius:30px;
-    display:flex; align-items:center; gap:10px;
-    color:var(--wine); font-weight:600; font-size:.85rem;
-  }
+  body { font-family:'Lato',sans-serif; background:var(--cream); color:var(--text); min-height:100vh; }
 
   .page-header {
-    background:var(--wine);
-    padding:3rem 2.5rem 2rem;
-    position:relative; overflow:hidden;
+    background: var(--wine);
+    padding: 3rem 2.5rem 2rem;
+    position: relative; overflow: hidden;
   }
   .page-header::before {
     content:''; position:absolute; inset:0;
     background:radial-gradient(ellipse at 80% 50%, rgba(255,255,255,0.06) 0%, transparent 70%);
   }
   .header-inner { position:relative; z-index:1; display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
-  .page-header h1 { font-family:'Cormorant Garamond',serif; font-size:3rem; font-weight:700; color:var(--cream); }
+  .page-header h1 { font-family:'Playfair Display',serif; font-size:3rem; font-weight:700; color:var(--cream); }
   .page-header p  { color:var(--sage-light); margin-top:.4rem; font-size:.95rem; }
 
   .notif-btn {
@@ -78,7 +66,7 @@
     z-index:200; display:none;
   }
   .notif-panel.open { display:block; animation:fadeIn .2s ease; }
-  .notif-header { padding:.9rem 1.2rem; background:var(--wine); color:var(--cream); font-family:'Cormorant Garamond',serif; font-size:1.1rem; border-radius:6px 6px 0 0; display:flex; justify-content:space-between; align-items:center; }
+  .notif-header { padding:.9rem 1.2rem; background:var(--wine); color:var(--cream); font-family:'Playfair Display',serif; font-size:1.1rem; border-radius:6px 6px 0 0; display:flex; justify-content:space-between; align-items:center; }
   .notif-item { padding:.9rem 1.2rem; border-bottom:1px solid var(--border); font-size:.85rem; display:flex; gap:.8rem; align-items:flex-start; }
   .notif-item:last-child { border-bottom:none; }
   .notif-item.unread { background:#fffbf2; }
@@ -101,7 +89,7 @@
   }
   .stat-card:hover { transform:translateY(-3px); box-shadow:0 6px 20px var(--shadow-md); }
   .stat-icon  { font-size:1.6rem; }
-  .stat-val   { font-family:'Cormorant Garamond',serif; font-size:2.4rem; font-weight:700; color:var(--wine); line-height:1; }
+  .stat-val   { font-family:'Playfair Display',serif; font-size:2.4rem; font-weight:700; color:var(--wine); line-height:1; }
   .stat-label { font-size:.78rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
 
   .tabs-container { max-width:1400px; margin:0 auto; padding:0 2.5rem; }
@@ -112,7 +100,7 @@
   .tabs::-webkit-scrollbar { display:none; }
   .tab-btn {
     padding:.75rem 1.3rem; border:none; background:none; cursor:pointer;
-    font-family:'Jost',sans-serif; font-size:.88rem; font-weight:500;
+    font-family:'Lato',sans-serif; font-size:.88rem; font-weight:500;
     color:var(--text-muted); white-space:nowrap; border-bottom:3px solid transparent;
     margin-bottom:-2px; transition:all .2s;
   }
@@ -132,12 +120,12 @@
   .section-header {
     background:var(--wine); color:var(--cream);
     padding:1rem 1.5rem;
-    font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:600;
+    font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:600;
     display:flex; justify-content:space-between; align-items:center;
   }
   .section-header .badge-count {
     background:rgba(255,255,255,.2); border-radius:20px;
-    padding:2px 10px; font-size:.8rem; font-family:'Jost',sans-serif;
+    padding:2px 10px; font-size:.8rem; font-family:'Lato',sans-serif;
   }
 
   .table-wrapper { overflow-x:auto; }
@@ -155,7 +143,7 @@
   .badge-info    { background:#e3f1fb; color:var(--info);    }
   .badge-neutral { background:#e8ddd0; color:var(--text-muted); }
 
-  .btn { padding:.45rem .9rem; border-radius:4px; font-size:.8rem; font-weight:500; cursor:pointer; border:none; transition:background .2s; font-family:'Jost',sans-serif; }
+  .btn { padding:.45rem .9rem; border-radius:4px; font-size:.8rem; font-weight:500; cursor:pointer; border:none; transition:background .2s; font-family:'Lato',sans-serif; }
   .btn-wine    { background:var(--wine);    color:#fff; }
   .btn-wine:hover    { background:var(--wine-dark); }
   .btn-success { background:var(--success); color:#fff; }
@@ -177,13 +165,13 @@
   .cart-img { width:60px; height:60px; border-radius:6px; object-fit:cover; background:var(--cream); display:flex; align-items:center; justify-content:center; font-size:1.8rem; }
   .cart-info .cart-name  { font-weight:600; font-size:.92rem; }
   .cart-info .cart-shop  { font-size:.78rem; color:var(--text-muted); margin-top:2px; }
-  .cart-info .cart-price { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:700; color:var(--wine); margin-top:4px; }
+  .cart-info .cart-price { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; color:var(--wine); margin-top:4px; }
   .qty-control { display:flex; align-items:center; gap:.4rem; }
   .qty-btn { width:28px; height:28px; border-radius:4px; border:1.5px solid var(--border); background:var(--white); cursor:pointer; font-size:1rem; line-height:1; display:flex; align-items:center; justify-content:center; transition:all .2s; }
   .qty-btn:hover { border-color:var(--wine); color:var(--wine); }
   .qty-val { font-weight:600; min-width:24px; text-align:center; }
   .cart-footer { padding:1.2rem 1.5rem; background:var(--cream); border-top:1.5px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; }
-  .cart-total { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:700; color:var(--wine); }
+  .cart-total { font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:700; color:var(--wine); }
   .cart-total-label { font-size:.78rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; }
 
   .payment-modes { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; padding:1.5rem; }
@@ -207,7 +195,7 @@
   .fav-body { padding:.9rem; }
   .fav-name  { font-weight:600; font-size:.88rem; }
   .fav-shop  { font-size:.75rem; color:var(--text-muted); margin-top:2px; }
-  .fav-price { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:700; color:var(--wine); margin-top:.4rem; }
+  .fav-price { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; color:var(--wine); margin-top:.4rem; }
   .fav-actions { display:flex; gap:.4rem; margin-top:.7rem; }
 
   .stars { color:#f39c12; font-size:1.1rem; letter-spacing:2px; cursor:pointer; }
@@ -225,7 +213,7 @@
   .form-group label { font-size:.73rem; font-weight:600; text-transform:uppercase; color:var(--text-muted); letter-spacing:.04em; }
   .form-group input, .form-group select, .form-group textarea {
     padding:.55rem .8rem; border:1.5px solid var(--border); border-radius:4px;
-    background:var(--white); font-family:'Jost',sans-serif; font-size:.88rem; outline:none;
+    background:var(--white); font-family:'Lato',sans-serif; font-size:.88rem; outline:none;
     transition:border-color .2s;
   }
   .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--wine); }
@@ -247,12 +235,10 @@
   .step-label.done    { color:var(--success); }
   .step-label.current { color:var(--wine); font-weight:700; }
 
-  .invoice-actions { padding:1.2rem 1.5rem; background:var(--cream); border-top:1px solid var(--border); display:flex; gap:.5rem; flex-wrap:wrap; }
-
   .profile-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; padding:1.5rem; }
   .profile-avatar-area { display:flex; flex-direction:column; align-items:center; gap:1rem; padding:1.5rem; border-right:1px solid var(--border); }
   .avatar-circle { width:90px; height:90px; border-radius:50%; background:var(--wine); display:flex; align-items:center; justify-content:center; font-size:2.4rem; color:var(--cream); }
-  .profile-name  { font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:700; }
+  .profile-name  { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; }
   .profile-email { font-size:.82rem; color:var(--text-muted); }
   .profile-form  { padding:1.5rem; }
 
@@ -282,8 +268,9 @@
   }
 </style>
 </head>
-<body>
+<body data-active-page="dashboard">
 
+<!-- Placeholder pour le header chargé dynamiquement -->
 <div id="header-placeholder"></div>
 
 <div class="page-header" style="position:relative;">
@@ -422,7 +409,7 @@
       <div style="padding:1.2rem 1.5rem;background:var(--cream);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
         <div>
           <div style="font-size:.78rem;color:var(--text-muted);text-transform:uppercase;">Total à régler</div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:var(--wine);" id="checkoutTotal">0 DH</div>
+          <div style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--wine);" id="checkoutTotal">0 DH</div>
         </div>
         <button class="btn btn-success" onclick="confirmOrder()" style="padding:.6rem 1.5rem;font-size:.95rem;">✅ Confirmer le Paiement</button>
       </div>
@@ -561,25 +548,12 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="header-loader.js"></script>
 <script>
+// ========== DONNÉES CLIENT ==========
 let cart, orders, payments, favorites, myReviewsList, notifications;
 let currentRating = 0;
 let selectedPaymentMode = 'card';
-
-function loadHeader() {
-  fetch('header.html')
-    .then(response => {
-      if (!response.ok) throw new Error("Erreur");
-      return response.text();
-    })
-    .then(data => {
-      document.getElementById('header-placeholder').innerHTML = data;
-      showClientUI();
-    })
-    .catch(error => {
-      console.error(error);
-    });
-}
 
 function initData() {
   cart = [
@@ -636,24 +610,6 @@ function updateStats() {
   document.getElementById('statDepense').textContent   = spent + ' DH';
   document.getElementById('statFavoris').textContent   = favorites.length;
   document.getElementById('statPanier').textContent    = cart.reduce((s,i) => s + i.qty, 0);
-}
-
-function showClientUI() {
-  const s = sessionStorage.getItem('greenmarket_current_user');
-  let name = 'Sara Idrissi';
-  if (s) name = JSON.parse(s).name;
-  document.getElementById('welcomeName').textContent = name;
-  const authWidget = document.getElementById('authWidget');
-  if(authWidget) {
-      authWidget.innerHTML =
-        `<div class="user-badge">👋 ${name}
-           <button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;font-size:1rem;">Sortir 🚪</button>
-         </div>`;
-      document.getElementById('logoutBtn')?.addEventListener('click', () => {
-        sessionStorage.removeItem('greenmarket_current_user');
-        window.location.href = 'newstore.html';
-      });
-  }
 }
 
 function renderNotifications() {
@@ -794,9 +750,7 @@ function generateInvoice(id) {
   showToast(`🧾 Facture ${id} générée — téléchargement PDF en cours…`);
 }
 
-const trackingSteps = {
-  'en préparation': 1, 'en transit': 2, 'livré': 3, 'annulé': -1
-};
+const trackingSteps = { 'en préparation': 1, 'en transit': 2, 'livré': 3, 'annulé': -1 };
 
 function showTracking(id) {
   const order = orders.find(o => o.id === id);
@@ -844,7 +798,7 @@ function confirmOrder() {
   const modeLabel = { card:'💳 Carte', cash:'💵 Livraison', transfer:'🏦 Virement' }[selectedPaymentMode];
   orders.unshift({ id:newId, items:cart.map(i=>i.name).join(', '), total, date:new Date().toLocaleDateString('fr-FR'), status:'en préparation', statusClass:'warning' });
   payments.unshift({ id:'FAC-2026-'+newId.slice(-3), order:newId, amount:total, mode:modeLabel, date:new Date().toLocaleDateString('fr-FR'), status:'payé', statusClass:'success' });
-  notifications.unshift({ id:Date.now(), icon:'✅', text:`Commande ${newId} confirmée ! Montant : ${total.toLocaleString()} DH`, time:'À l\'instant', read:false });
+  notifications.unshift({ id:Date.now(), icon:'✅', text:`Commande ${newId} confirmée ! Montant : ${total.toLocaleString()} DH`, time:"À l'instant", read:false });
   cart = [];
   showToast(`✅ Commande ${newId} confirmée ! Merci pour votre achat.`);
   document.getElementById('checkoutBlock').style.display = 'none';
@@ -867,9 +821,7 @@ function renderPayments() {
         <td>${p.mode}</td>
         <td>${p.date}</td>
         <td><span class="badge badge-${p.statusClass}">${p.status}</span></td>
-        <td>
-          <button class="btn btn-wine" onclick="downloadInvoice('${p.id}')">⬇️ Facture PDF</button>
-        </td>
+        <td><button class="btn btn-wine" onclick="downloadInvoice('${p.id}')">⬇️ Facture PDF</button></td>
       </tr>`;
   });
 }
@@ -1001,8 +953,32 @@ function changePassword() {
   showToast('✅ Mot de passe mis à jour avec succès !');
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  loadHeader();
+// Exposer les fonctions globalement
+window.switchTab = switchTab;
+window.changeQty = changeQty;
+window.removeFromCart = removeFromCart;
+window.clearCart = clearCart;
+window.showCheckout = showCheckout;
+window.showTracking = showTracking;
+window.cancelOrder = cancelOrder;
+window.reportIssue = reportIssue;
+window.generateInvoice = generateInvoice;
+window.selectPayment = selectPayment;
+window.confirmOrder = confirmOrder;
+window.downloadInvoice = downloadInvoice;
+window.addFavToCart = addFavToCart;
+window.removeFav = removeFav;
+window.setRating = setRating;
+window.submitReview = submitReview;
+window.editReview = editReview;
+window.deleteReview = deleteReview;
+window.saveProfile = saveProfile;
+window.changePassword = changePassword;
+window.toggleNotif = toggleNotif;
+window.markAllRead = markAllRead;
+
+// Initialisation
+function init() {
   initData();
   updateStats();
   renderNotifications();
@@ -1011,7 +987,9 @@ window.addEventListener('DOMContentLoaded', () => {
   renderPayments();
   renderFavorites();
   renderReviews();
-});
+}
+
+init();
 </script>
 </body>
 </html>
