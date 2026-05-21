@@ -868,6 +868,8 @@
       e.preventDefault();
       showToast("Lien envoyé à " + document.getElementById('forgotEmail').value);
     });
+
+localStorage.setItem("user", JSON.stringify(admin));
   </script>
  </body>
 </html>

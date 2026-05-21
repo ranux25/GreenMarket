@@ -498,7 +498,7 @@
 <div class="main-layout">
   <aside class="sidebar">
     <div class="sidebar-section">
-      <div class="sidebar-header"><h3>Catégories artisanales</h3><button class="add-btn" id="toggleAddCat"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>Ajouter</button></div>
+      <div class="sidebar-header"><h3>Catégories artisanales</h3></div>
       <div class="category-list" id="categoryList"></div>
       <div class="add-cat-form" id="addCatForm">
         <label for="catNameInput">Nom de la catégorie</label>
@@ -595,7 +595,8 @@ let categories = [
   { id:8, icon:'🍯', name:'Produits du terroir' }
 ];
 
-let stores = [
+// Données originales des 10 boutiques
+const ORIGINAL_STORES = [
   { id:1, name:"Maison du Caftan", category:'Caftans & Vêtements traditionnels', categoryId:1, badge:'Artisan', badgeClass:'artisan', banner:'IMAGES/1779140603090.png', desc:'Caftans de luxe en soie et tissus traditionnels, broderies faites main par des maîtres-artisans de Fès.', rating:4.9, reviews:234, products:8, sales:'2 450', tags:['Caftan','Broderie','Soie'], producerId:101, producerName:'Fatima Zahra', location:'Fès', since:'2005' },
   { id:2, name:"Tapis Berbère d'Atlas", category:'Tapis & Tissage', categoryId:2, badge:'Tradition', badgeClass:'tradition', banner:'IMAGES/1779140612922.png', desc:'Tapis berbères authentiques tissés à la main par les femmes de l\'Atlas, chaque pièce est unique.', rating:4.8, reviews:189, products:6, sales:'3 200', tags:['Tapis','Berbère','Laine'], producerId:102, producerName:'Rachid El Mansouri', location:'Marrakech', since:'2010' },
   { id:3, name:"Poterie de Safi", category:'Poterie & Céramique', categoryId:3, badge:'Fait Main', badgeClass:'fait-main', banner:'IMAGES/1779140622713.png', desc:'Poterie traditionnelle de Safi, plats, tajines et vases peints à la main avec des motifs ancestraux.', rating:4.7, reviews:156, products:12, sales:'1 890', tags:['Poterie','Tajine','Céramique'], producerId:103, producerName:'Ahmed Benjelloun', location:'Safi', since:'1998' },
@@ -608,15 +609,43 @@ let stores = [
   { id:10, name:"Caftans Impériaux", category:'Caftans & Vêtements traditionnels', categoryId:1, badge:'Artisan', badgeClass:'artisan', banner:'IMAGES/1779141052204.png', desc:'Caftans de cérémonie, takchitas et accessoires pour les grandes occasions. Broderies d\'or et d\'argent.', rating:4.9, reviews:256, products:10, sales:'4 200', tags:['Caftan','Takchita','Broderie'], producerId:110, producerName:'Leila Benani', location:'Casablanca', since:'2006' }
 ];
 
+let stores = [];
+
 function saveStores() { localStorage.setItem('greenmarket_stores', JSON.stringify(stores)); }
+
 function loadStoresFromStorage() {
   const saved = localStorage.getItem('greenmarket_stores');
-  if (saved && JSON.parse(saved).length > 0) {
-    stores = JSON.parse(saved);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      // Si le localStorage a au moins 10 boutiques ou a été initialisé avec les 10 originales, on les utilise
+      if (parsed && parsed.length >= 10) {
+        stores = parsed;
+      } else {
+        // Sinon, on restaure les 10 originales
+        stores = JSON.parse(JSON.stringify(ORIGINAL_STORES));
+        saveStores();
+      }
+    } catch(e) {
+      stores = JSON.parse(JSON.stringify(ORIGINAL_STORES));
+      saveStores();
+    }
   } else {
+    stores = JSON.parse(JSON.stringify(ORIGINAL_STORES));
     saveStores();
   }
 }
+
+// Fonction pour réinitialiser complètement les boutiques (utile en cas de problème)
+window.resetAllStores = function() {
+  stores = JSON.parse(JSON.stringify(ORIGINAL_STORES));
+  saveStores();
+  favorites = [];
+  saveFavorites();
+  renderStores();
+  renderCategories();
+  showToast("✅ Toutes les boutiques ont été réinitialisées (10 boutiques)");
+};
 
 let favorites = [];
 function loadFavorites() {
@@ -860,13 +889,13 @@ document.getElementById('photoFileInput')?.addEventListener('change', e => {
 document.getElementById('photoFileInput2')?.addEventListener('change', e => {
   handlePhotoFile(e.target.files[0]);
 });
-const dropZone = document.getElementById('photoDropZone');
-if (dropZone) {
-  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-  dropZone.addEventListener('drop', e => {
+const dropZoneElem = document.getElementById('photoDropZone');
+if (dropZoneElem) {
+  dropZoneElem.addEventListener('dragover', e => { e.preventDefault(); dropZoneElem.classList.add('drag-over'); });
+  dropZoneElem.addEventListener('dragleave', () => dropZoneElem.classList.remove('drag-over'));
+  dropZoneElem.addEventListener('drop', e => {
     e.preventDefault();
-    dropZone.classList.remove('drag-over');
+    dropZoneElem.classList.remove('drag-over');
     handlePhotoFile(e.dataTransfer.files[0]);
   });
 }
@@ -927,7 +956,7 @@ function updateCreateShopVisibility() {
 }
 
 // Initialisation
-loadStoresFromStorage();
+loadStoresFromStorage();  // Maintenant charge correctement les 10 boutiques
 loadCategories();
 loadFavorites();
 renderCategories();
