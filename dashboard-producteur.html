@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GreenMarket – Dashboard Producteur</title>
+<title>GreenMarket – Mon Espace Producteur</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="header.css">
 <style>
@@ -22,696 +22,918 @@
     --white:      #fffdf7;
     --shadow:     rgba(93,13,24,.10);
     --shadow-md:  rgba(93,13,24,.18);
+    --primary:    #5D0D18;
+    --secondary:  #9FB2AC;
+    --bg:         #FFF9EB;
+    --text-dark:  #2C2C2C;
+    --success:    #27ae60;
+    --danger:     #c0392b;
+    --warning:    #f39c12;
+    --info:       #2980b9;
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
-
-  body {
-    font-family: 'Jost', sans-serif;
-    background: var(--cream);
-    color: var(--text);
-    min-height: 100vh;
-  }
-
-  .btn-outline {
-    border: 1.5px solid var(--wine);
-    background: transparent;
-    color: var(--wine);
-    padding: .45rem 1.2rem;
-    border-radius: 3px;
-    font-family: 'Jost', sans-serif;
-    font-size: .78rem;
-    font-weight: 600;
-    letter-spacing: .07em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all .2s;
-  }
-  .btn-outline:hover { background: var(--wine); color: var(--cream); }
-  .btn-filled {
-    background: var(--wine);
-    color: var(--cream);
-    border: none;
-    padding: .5rem 1.3rem;
-    border-radius: 3px;
-    font-family: 'Jost', sans-serif;
-    font-size: .78rem;
-    font-weight: 600;
-    letter-spacing: .07em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background .2s;
-  }
-  .btn-filled:hover { background: var(--wine-dark); }
-
-  .user-badge {
-    background: var(--wine-pale);
-    padding: 0.4rem 1rem;
-    border-radius: 30px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--wine);
-    font-weight: 600;
-    font-size: 0.85rem;
-  }
+  body { font-family:'Lato',sans-serif; background:var(--cream); color:var(--text); min-height:100vh; }
 
   .page-header {
     background: var(--wine);
-    padding: 2rem 2.5rem;
-    position: relative;
-    overflow: hidden;
+    padding: 3rem 2.5rem 2rem;
+    position: relative; overflow: hidden;
   }
   .page-header::before {
-    content: '';
-    position: absolute;
-    right: -80px;
-    top: -80px;
-    width: 420px;
-    height: 420px;
-    border: 55px solid rgba(255,249,235,.05);
-    border-radius: 50%;
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(ellipse at 80% 50%, rgba(255,255,255,0.06) 0%, transparent 70%);
   }
-  .page-header::after {
-    content: '';
-    position: absolute;
-    left: 4%;
-    bottom: -70px;
-    width: 240px;
-    height: 240px;
-    border: 40px solid rgba(159,178,172,.10);
-    border-radius: 50%;
+  .header-inner { position:relative; z-index:1; display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+  .page-header h1 { font-family:'Playfair Display',serif; font-size:3rem; font-weight:700; color:var(--cream); }
+  .page-header p  { color:var(--sage-light); margin-top:.4rem; font-size:.95rem; }
+
+  .notif-btn {
+    position:relative; background:rgba(255,255,255,.15); border:none; border-radius:50%;
+    width:44px; height:44px; cursor:pointer; font-size:1.3rem;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .2s;
   }
-  .header-inner {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
+  .notif-btn:hover { background:rgba(255,255,255,.25); }
+  .notif-dot {
+    position:absolute; top:6px; right:6px; width:10px; height:10px;
+    background:#f39c12; border-radius:50%; border:2px solid var(--wine);
   }
-  .header-left .header-eyebrow {
-    font-size: .72rem;
-    font-weight: 600;
-    letter-spacing: .2em;
-    text-transform: uppercase;
-    color: var(--sage-light);
-    margin-bottom: .9rem;
+  .notif-panel {
+    position:absolute; top:60px; right:2.5rem; width:340px;
+    background:var(--white); border:1.5px solid var(--border);
+    border-radius:8px; box-shadow:0 12px 40px var(--shadow-md);
+    z-index:200; display:none;
   }
-  .header-left h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: var(--cream);
+  .notif-panel.open { display:block; animation:fadeIn .2s ease; }
+  .notif-header { padding:.9rem 1.2rem; background:var(--wine); color:var(--cream); font-family:'Playfair Display',serif; font-size:1.1rem; border-radius:6px 6px 0 0; display:flex; justify-content:space-between; align-items:center; }
+  .notif-item { padding:.9rem 1.2rem; border-bottom:1px solid var(--border); font-size:.85rem; display:flex; gap:.8rem; align-items:flex-start; }
+  .notif-item:last-child { border-bottom:none; }
+  .notif-item.unread { background:#fffbf2; }
+  .notif-icon { font-size:1.1rem; flex-shrink:0; margin-top:2px; }
+  .notif-text  { color:var(--text); line-height:1.4; }
+  .notif-time  { font-size:.73rem; color:var(--text-muted); margin-top:3px; }
+
+  .dashboard-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:1.5rem; padding:2rem 2.5rem;
+    max-width:1400px; margin:0 auto;
   }
-  .header-left p {
-    color: rgba(255,249,235,.62);
-    font-size: .9rem;
+  .stat-card {
+    background:var(--white); border:1.5px solid var(--border);
+    border-radius:8px; padding:1.5rem;
+    box-shadow:0 2px 12px var(--shadow);
+    display:flex; flex-direction:column; gap:.5rem;
+    transition:transform .2s, box-shadow .2s;
+  }
+  .stat-card:hover { transform:translateY(-3px); box-shadow:0 6px 20px var(--shadow-md); }
+  .stat-icon  { font-size:1.6rem; }
+  .stat-val   { font-family:'Playfair Display',serif; font-size:2.4rem; font-weight:700; color:var(--wine); line-height:1; }
+  .stat-label { font-size:.78rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+
+  .tabs-container { max-width:1400px; margin:0 auto; padding:0 2.5rem; }
+  .tabs {
+    display:flex; gap:0; border-bottom:2px solid var(--border);
+    overflow-x:auto; scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar { display:none; }
+  .tab-btn {
+    padding:.75rem 1.3rem; border:none; background:none; cursor:pointer;
+    font-family:'Lato',sans-serif; font-size:.88rem; font-weight:500;
+    color:var(--text-muted); white-space:nowrap; border-bottom:3px solid transparent;
+    margin-bottom:-2px; transition:all .2s;
+  }
+  .tab-btn:hover  { color:var(--wine); }
+  .tab-btn.active { color:var(--wine); border-bottom-color:var(--wine); font-weight:600; }
+
+  .main-content { max-width:1400px; margin:0 auto; padding:2rem 2.5rem 3rem; }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; animation:fadeIn .25s ease; }
+
+  .section-card {
+    background:var(--white); border:1.5px solid var(--border);
+    border-radius:8px; box-shadow:0 2px 12px var(--shadow);
+    overflow:hidden; margin-bottom:2rem;
+  }
+  .section-card:last-child { margin-bottom:0; }
+  .section-header {
+    background:var(--wine); color:var(--cream);
+    padding:1rem 1.5rem;
+    font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:600;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .section-header .badge-count {
+    background:rgba(255,255,255,.2); border-radius:20px;
+    padding:2px 10px; font-size:.8rem; font-family:'Lato',sans-serif;
   }
 
-  .container {
-    max-width: 1400px;
-    margin: 2rem auto;
-    padding: 0 2rem;
-  }
+  .table-wrapper { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:.88rem; text-align:left; }
+  th { background:var(--cream); font-weight:600; padding:.9rem 1rem; border-bottom:1.5px solid var(--border); white-space:nowrap; }
+  td { padding:.9rem 1rem; border-bottom:1px solid var(--border); color:var(--text-dark); vertical-align:middle; }
+  tr:last-child td { border-bottom:none; }
+  tbody tr:hover { background:#fdf8f0; }
+  .empty-state { padding:3rem; text-align:center; color:var(--text-muted); font-style:italic; }
 
-  .stats-dashboard {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-  .stat-card-dash {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 1.2rem;
-    border: 1.5px solid var(--border);
-    box-shadow: 0 2px 12px var(--shadow);
-    transition: transform 0.2s;
-  }
-  .stat-card-dash:hover { transform: translateY(-3px); }
-  .stat-title {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text-muted);
-    margin-bottom: 0.5rem;
-  }
-  .stat-number {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--wine);
-  }
-  .stat-unit { font-size: 0.8rem; color: var(--text-muted); margin-left: 0.2rem; }
-  .stat-icon { float: right; font-size: 2rem; opacity: 0.3; }
+  .badge { padding:.25rem .65rem; border-radius:4px; font-size:.73rem; font-weight:600; text-transform:uppercase; letter-spacing:.03em; white-space:nowrap; }
+  .badge-success { background:#e2f7e7; color:var(--success); }
+  .badge-danger  { background:#fce8e6; color:var(--danger);  }
+  .badge-warning { background:#fef3e6; color:var(--warning); }
+  .badge-info    { background:#e3f1fb; color:var(--info);    }
+  .badge-neutral { background:#e8ddd0; color:var(--text-muted); }
 
-  .charts-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-  .chart-card {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 1.2rem;
-    border: 1.5px solid var(--border);
-  }
-  .chart-card h3 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--border);
-  }
-  canvas { max-height: 250px; width: 100%; }
+  .btn { padding:.45rem .9rem; border-radius:4px; font-size:.8rem; font-weight:500; cursor:pointer; border:none; transition:background .2s; font-family:'Lato',sans-serif; }
+  .btn-wine    { background:var(--wine);    color:#fff; }
+  .btn-wine:hover    { background:var(--wine-dark); }
+  .btn-success { background:var(--success); color:#fff; }
+  .btn-success:hover { background:#219653; }
+  .btn-danger  { background:var(--danger);  color:#fff; }
+  .btn-danger:hover  { background:#a93226; }
+  .btn-info    { background:var(--info);    color:#fff; }
+  .btn-info:hover    { background:#1e6fa0; }
+  .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--text-muted); }
+  .btn-outline:hover { border-color:var(--wine); color:var(--wine); }
+  .action-group { display:flex; gap:.4rem; flex-wrap:wrap; }
 
-  .stores-section {
-    background: var(--white);
-    border-radius: 12px;
-    border: 1.5px solid var(--border);
-    overflow: hidden;
+  .form-group { display:flex; flex-direction:column; gap:.35rem; margin-bottom:1rem; }
+  .form-group label { font-size:.73rem; font-weight:600; text-transform:uppercase; color:var(--text-muted); letter-spacing:.04em; }
+  .form-group input, .form-group select, .form-group textarea {
+    padding:.55rem .8rem; border:1.5px solid var(--border); border-radius:4px;
+    background:var(--white); font-family:'Lato',sans-serif; font-size:.88rem; outline:none;
+    transition:border-color .2s;
   }
-  .stores-section-header {
-    background: var(--wine);
-    padding: 1rem 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .stores-section-header h3 {
-    font-family: 'Cormorant Garamond', serif;
-    color: var(--cream);
-    font-size: 1.2rem;
-    font-weight: 600;
-  }
-  .btn-add-store {
-    background: var(--sage);
-    color: white;
-    border: none;
-    padding: 0.4rem 1rem;
-    border-radius: 3px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .btn-add-store:hover { background: var(--sage-dark); }
-  .stores-table { width: 100%; border-collapse: collapse; }
-  .stores-table th, .stores-table td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
-  .stores-table th {
-    background: var(--cream);
-    font-weight: 600;
-    color: var(--text-muted);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-  .stores-table tr:hover { background: rgba(159,178,172,0.1); }
-  .shop-banner-mini {
-    width: 50px;
-    height: 50px;
-    border-radius: 6px;
-    object-fit: cover;
-  }
-  .btn-action {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.1rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    transition: background 0.2s;
-  }
-  .btn-action.delete:hover { background: var(--wine-pale); color: var(--wine); }
-  .btn-action.edit:hover { background: var(--sage-light); color: var(--sage-dark); }
-  .btn-view {
-    background: var(--sage-light);
-    color: var(--sage-dark);
-    border: none;
-    padding: 0.3rem 0.8rem;
-    border-radius: 3px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-  }
-  .btn-view:hover { background: var(--sage); color: white; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--wine); }
+  .form-group textarea { resize:vertical; min-height:80px; }
 
-  .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
+  .profile-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; padding:1.5rem; }
+  .profile-avatar-area { display:flex; flex-direction:column; align-items:center; gap:1rem; padding:1.5rem; border-right:1px solid var(--border); }
+  .avatar-circle { width:90px; height:90px; border-radius:50%; background:var(--wine); display:flex; align-items:center; justify-content:center; font-size:2.4rem; color:var(--cream); }
+  .profile-name  { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; }
+  .profile-email { font-size:.82rem; color:var(--text-muted); }
+  .profile-form  { padding:1.5rem; }
+
+  .review-card { padding:1.2rem 1.5rem; border-bottom:1px solid var(--border); }
+  .review-card:last-child { border-bottom:none; }
+  .review-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:.5rem; }
+  .review-product { font-weight:600; font-size:.92rem; }
+  .review-shop    { font-size:.78rem; color:var(--text-muted); }
+  .review-text    { font-size:.88rem; color:var(--text); margin-top:.4rem; line-height:1.5; }
+  .reply-box      { background:var(--cream); padding:.8rem; border-left:3px solid var(--wine); margin-top:.8rem; font-size:.85rem; }
+
+  .boutique-img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; background: var(--cream); }
+
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
   .toast {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    background: var(--wine);
-    color: var(--cream);
-    padding: .85rem 1.5rem;
-    border-radius: 5px;
-    font-size: .86rem;
-    font-weight: 500;
-    box-shadow: 0 8px 28px var(--shadow-md);
-    z-index: 500;
-    transform: translateY(80px);
-    opacity: 0;
-    transition: all .35s cubic-bezier(.34,1.4,.64,1);
+    position:fixed; bottom:2rem; right:2rem;
+    background:var(--wine); color:var(--cream);
+    padding:.85rem 1.5rem; border-radius:5px; font-size:.86rem; font-weight:500;
+    box-shadow:0 8px 28px var(--shadow-md); z-index:9999;
+    transform:translateY(80px); opacity:0;
+    transition:all .35s cubic-bezier(.34,1.4,.64,1); max-width:320px;
   }
-  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.show { transform:translateY(0); opacity:1; }
 
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal-content {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 1.5rem;
-    max-width: 500px;
-    width: 90%;
-    max-height: 85vh;
-    overflow-y: auto;
-  }
-  .modal-content h3 { color: var(--wine); margin-bottom: 1rem; }
-  .modal-content input, .modal-content select, .modal-content textarea {
-    width: 100%;
-    padding: 0.7rem;
-    margin-bottom: 1rem;
-    border: 1.5px solid var(--border);
-    border-radius: 6px;
-    background: var(--cream);
-  }
-  .modal-actions { display: flex; gap: 1rem; margin-top: 1rem; }
-  .modal-actions button { flex: 1; padding: 0.6rem; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; }
-  .btn-save { background: var(--wine); color: white; }
-  .btn-cancel { background: var(--border); color: var(--text-muted); }
-
-  @media (max-width: 1000px) {
-    .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
-    .charts-row { grid-template-columns: 1fr; }
-    .container { padding: 0 1rem; }
-  }
-  @media (max-width: 700px) {
-    .stats-dashboard { grid-template-columns: 1fr; }
-    .stores-table { font-size: 0.8rem; }
-    .stores-table th, .stores-table td { padding: 0.5rem; }
+  @media(max-width:768px) {
+    .dashboard-grid { padding:1.5rem 1rem; }
+    .tabs-container { padding:0 1rem; }
+    .main-content  { padding:1.5rem 1rem 2rem; }
+    .page-header   { padding:2rem 1rem 1.5rem; }
+    .page-header h1{ font-size:2rem; }
+    .profile-avatar-area { border-right:none; border-bottom:1px solid var(--border); }
+    .notif-panel   { right:1rem; width:calc(100vw - 2rem); }
   }
 </style>
 </head>
-<body>
 <body data-active-page="dashboard">
+
 <div id="header-placeholder"></div>
 
-<div class="page-header">
+<div class="page-header" style="position:relative;">
   <div class="header-inner">
-    <div class="header-left">
-      <div class="header-eyebrow">📊 ESPACE PRODUCTEUR</div>
-      <h1>Tableau de bord</h1>
-      <p>Gérez vos boutiques, suivez vos ventes et analysez vos performances</p>
+    <div>
+      <h1>Espace Producteur</h1>
+      <p>Bienvenue, <strong id="welcomeName" style="color:var(--cream);">Artisan</strong> — gérez vos boutiques et vos ventes</p>
     </div>
+    <button class="notif-btn" onclick="toggleNotif()" title="Notifications">
+      🔔
+      <span class="notif-dot" id="notifDot"></span>
+    </button>
+  </div>
+
+  <div class="notif-panel" id="notifPanel">
+    <div class="notif-header">
+      🔔 Notifications
+      <button onclick="markAllRead()" style="background:rgba(255,255,255,.2);border:none;color:var(--cream);font-size:.75rem;padding:3px 10px;border-radius:20px;cursor:pointer;">Tout lire</button>
+    </div>
+    <div id="notifList"></div>
   </div>
 </div>
 
-<div class="container">
-  <div id="dashboardContent">
-    <div class="loading" style="text-align:center; padding:3rem;">Chargement de votre tableau de bord...</div>
+<div class="dashboard-grid">
+  <div class="stat-card">
+    <span class="stat-icon">💰</span>
+    <span class="stat-val" id="statCA">0 DH</span>
+    <span class="stat-label">Chiffre d'Affaires</span>
   </div>
+  <div class="stat-card">
+    <span class="stat-icon">📦</span>
+    <span class="stat-val" id="statCommandes">0</span>
+    <span class="stat-label">Commandes Reçues</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">🏪</span>
+    <span class="stat-val" id="statBoutiques">0</span>
+    <span class="stat-label">Més Boutiques</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">⭐</span>
+    <span class="stat-val" id="statNote">0/5</span>
+    <span class="stat-label">Taux de Satisfaction</span>
+  </div>
+</div>
+
+<div class="tabs-container">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('apercu')">📊 Vue d'ensemble</button>
+    <button class="tab-btn" onclick="switchTab('boutiques')">🏪 Mes Boutiques</button>
+    <button class="tab-btn" onclick="switchTab('produits')">📦 Mes Produits</button>
+    <button class="tab-btn" onclick="switchTab('commandes')">🛒 Commandes</button>
+    <button class="tab-btn" onclick="switchTab('avis')">⭐ Avis Clients</button>
+    <button class="tab-btn" onclick="switchTab('profil')">👤 Mon Profil</button>
+  </div>
+</div>
+
+<div class="main-content">
+
+  <div class="tab-panel active" id="tab-apercu">
+    <div class="section-card">
+      <div class="section-header">📈 Produits les plus vendus</div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>Catégorie</th>
+              <th>Ventes</th>
+              <th>Revenus Générés</th>
+            </tr>
+          </thead>
+          <tbody id="topProductsTable"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-header">⚠️ Alertes Stock Critique</div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>Stock Restant</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="criticalStockTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-boutiques">
+    <div class="section-card" id="addBoutiqueForm" style="display:none;">
+      <div class="section-header">➕ Créer / Modifier une Boutique</div>
+      <div class="profile-form">
+        <input type="hidden" id="boutiqueId">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="form-group">
+            <label>Nom de la Boutique</label>
+            <input type="text" id="boutiqueName" placeholder="Ex: Maison du Caftan">
+          </div>
+          <div class="form-group">
+            <label>Catégorie</label>
+            <select id="boutiqueCategory">
+              <option value="Artisanat">Artisanat & Fait-main</option>
+              <option value="Terroir">Produits du Terroir</option>
+              <option value="Cosmétique">Cosmétique & Beauté</option>
+            </select>
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label>Description de la Boutique</label>
+            <textarea id="boutiqueDesc" placeholder="Parlez de votre savoir-faire..."></textarea>
+          </div>
+        </div>
+        <div class="action-group" style="margin-top:1rem;">
+          <button class="btn btn-wine" onclick="saveBoutique()">💾 Enregistrer la boutique</button>
+          <button class="btn btn-outline" onclick="toggleBoutiqueForm(false)">Annuler</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">
+        🏪 Mes Boutiques
+        <button class="btn btn-success" onclick="toggleBoutiqueForm(true)" style="font-size:.75rem;">➕ Créer une Boutique</button>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Icone</th>
+              <th>Nom de la Boutique</th>
+              <th>Catégorie</th>
+              <th>Total Produits</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="boutiquesTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-produits">
+    <div class="section-card" id="addProductForm" style="display:none;">
+      <div class="section-header">➕ Ajouter / Modifier un Produit</div>
+      <div class="profile-form">
+        <input type="hidden" id="prodId">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="form-group">
+            <label>Nom du produit</label>
+            <input type="text" id="prodName" placeholder="Ex: Caftan Artisanal">
+          </div>
+          <div class="form-group">
+            <label>Boutique Associée</label>
+            <select id="prodBoutique">
+              </select>
+          </div>
+          <div class="form-group">
+            <label>Prix (DH)</label>
+            <input type="number" id="prodPrice" placeholder="0.00">
+          </div>
+          <div class="form-group">
+            <label>Quantité en Stock</label>
+            <input type="number" id="prodStock" placeholder="0">
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label>Description</label>
+            <textarea id="prodDesc" placeholder="Description du produit..."></textarea>
+          </div>
+        </div>
+        <div class="action-group" style="margin-top:1rem;">
+          <button class="btn btn-wine" onclick="saveProduct()">💾 Enregistrer le produit</button>
+          <button class="btn btn-outline" onclick="toggleProductForm()">Annuler</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">
+        📦 Catalogue des Produits
+        <button class="btn btn-success" onclick="toggleProductForm(true)" style="font-size:.75rem;">➕ Nouveau Produit</button>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Réf</th>
+              <th>Nom</th>
+              <th>Boutique</th>
+              <th>Prix</th>
+              <th>Stock</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productsTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-commandes">
+    <div class="section-card">
+      <div class="section-header">
+        🛒 Commandes Reçues
+        <span class="badge-count" id="ordersBadge">0</span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>N° Commande</th>
+              <th>Client</th>
+              <th>Produits</th>
+              <th>Total</th>
+              <th>Date</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ordersReceivedTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-avis">
+    <div class="section-card">
+      <div class="section-header">⭐ Avis des Clients</div>
+      <div id="reviewsList"></div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-profil">
+    <div class="section-card">
+      <div class="section-header">👤 Mon Profil Producteur</div>
+      <div style="display:grid;grid-template-columns:220px 1fr;gap:0;">
+        <div class="profile-avatar-area">
+          <div class="avatar-circle" id="avatarCircle">A</div>
+          <div class="profile-name" id="profileNameDisplay">Ahmed</div>
+          <div class="profile-email" id="profileEmailDisplay">contact@producteur.com</div>
+          <span class="badge badge-success" style="margin-top:.3rem;">Producteur Vérifié</span>
+        </div>
+        <div class="profile-form">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label>Nom complet</label>
+              <input type="text" id="profileName" value="Ahmed">
+            </div>
+            <div class="form-group">
+              <label>Email de contact</label>
+              <input type="email" id="profileEmail" value="contact@producteur.com">
+            </div>
+            <div class="form-group">
+              <label>Téléphone</label>
+              <input type="tel" id="profilePhone" placeholder="+212 6XX XX XX XX">
+            </div>
+            <div class="form-group">
+              <label>CIN</label>
+              <input type="text" id="profileCIN" placeholder="Numéro de carte nationale">
+            </div>
+          </div>
+          <button class="btn btn-wine" onclick="saveProfile()" style="margin-top:1rem;">💾 Enregistrer les modifications</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">🔒 Sécurité</div>
+      <div class="profile-form">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+          <div class="form-group">
+            <label>Mot de passe actuel</label>
+            <input type="password" id="pwdOld" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label>Nouveau mot de passe</label>
+            <input type="password" id="pwdNew" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label>Confirmer</label>
+            <input type="password" id="pwdConfirm" placeholder="••••••••">
+          </div>
+        </div>
+        <button class="btn btn-success" onclick="changePassword()" style="margin-top:1rem;">✅ Mettre à jour le mot de passe</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <div class="toast" id="toast"></div>
 
-<div class="modal-overlay" id="productModal">
-  <div class="modal-content">
-    <h3 id="productModalTitle">➕ Ajouter un produit</h3>
-    <input type="text" id="productName" placeholder="Nom du produit">
-    <input type="text" id="productPrice" placeholder="Prix (ex: 5.50 €)">
-    <input type="number" id="productStock" placeholder="Stock">
-    <input type="text" id="productImage" placeholder="URL de l'image">
-    <textarea id="productDesc" placeholder="Description" rows="2"></textarea>
-    <input type="hidden" id="productShopId">
-    <input type="hidden" id="productId">
-    <div class="modal-actions">
-      <button class="btn-save" id="saveProductBtn">Enregistrer</button>
-      <button class="btn-cancel" id="closeProductModal">Annuler</button>
-    </div>
-  </div>
-</div>
-
+<script src="header-loader.js"></script>
 <script>
-let currentUser = null;
-let currentProducerId = null;
+let myBoutiques, myProducts, receivedOrders, reviewsList, notifications;
 
+function initData() {
+  myBoutiques = [
+    { id:1, name:'Maison du Caftan', category:'Artisanat', status:'active', emoji:'👘' },
+    { id:2, name:'Coopérative Taliouine', category:'Terroir', status:'active', emoji:'🍯' }
+  ];
 
-
-function getCurrentUser() {
-  const u = sessionStorage.getItem('greenmarket_current_user');
-  return u ? JSON.parse(u) : null;
+  myProducts = [
+    { id:1, ref:'PRD-001', name:'Caftan Brodé en Soie', boutiqueId:1, price:850, stock:12, sales:45 },
+    { id:2, ref:'PRD-002', name:'Tapis Berbère Azrou', boutiqueId:1, price:1200, stock:3, sales:12 },
+    { id:3, ref:'PRD-003', name:'Huile d\'Argan BIO', boutiqueId:2, price:150, stock:2, sales:89 },
+    { id:4, ref:'PRD-004', name:'Miel de Thym', boutiqueId:2, price:200, stock:50, sales:34 }
+  ];
+  
+  receivedOrders = [
+    { id:'CMD-0041', client:'Sara Idrissi', items:'Huile d\'Argan BIO × 2', total:300, date:'12/05/2026', status:'livré' },
+    { id:'CMD-0042', client:'Karim Benali', items:'Caftan Brodé en Soie × 1', total:850, date:'13/05/2026', status:'en préparation' },
+    { id:'CMD-0043', client:'Mina Tazi', items:'Tapis Berbère Azrou × 1', total:1200, date:'14/05/2026', status:'en attente' }
+  ];
+  
+  reviewsList = [
+    { id:1, client:'Sara Idrissi', product:'Huile d\'Argan BIO', rating:5, text:'Excellent produit, très pur et authentique !', date:'13/05/2026', reply:'' },
+    { id:2, client:'Youssef Alaoui', product:'Tapis Berbère', rating:4, text:'Très beau tapis, livraison un peu lente.', date:'10/05/2026', reply:'Merci Youssef. Nous faisons de notre mieux pour améliorer les délais de livraison.' }
+  ];
+  
+  notifications = [
+    { id:1, icon:'🛒', text:'Nouvelle commande CMD-0043 reçue.', time:'Il y a 1h', read:false },
+    { id:2, icon:'⚠️', text:'Stock critique pour "Huile d\'Argan BIO".', time:'Il y a 3h', read:false }
+  ];
 }
 
-function logout() {
-  sessionStorage.removeItem('greenmarket_current_user');
-  window.location.href = 'store.html';
-}
-
-function updateAuthUI() {
-  const widget = document.getElementById('authWidget');
-  if (!widget) return;
-  const user = getCurrentUser();
-  if (user) {
-    let roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Producteur' : 'Client');
-    widget.innerHTML = `<div class="user-badge">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;">🚪</button></div>`;
-    document.getElementById('logoutBtn')?.addEventListener('click', logout);
-  } else {
-    widget.innerHTML = `<a href="store.html" class="btn-outline" style="text-decoration:none;">Accueil</a>`;
-  }
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
-}
-
-function showToast(msg, bg='var(--wine)') {
+function showToast(msg) {
   const t = document.getElementById('toast');
-  t.innerHTML = msg;
-  t.style.background = bg;
-  t.classList.add('show');
+  t.innerHTML = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3200);
 }
 
-let stores = [];
-let categories = [];
-let products = {};
-
-function loadStores() {
-  const saved = localStorage.getItem('greenmarket_stores');
-  if (saved) stores = JSON.parse(saved);
-  else stores = [];
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  const idx = ['apercu','boutiques','produits','commandes','avis','profil'].indexOf(name);
+  document.querySelectorAll('.tab-btn')[idx]?.classList.add('active');
 }
 
-function saveStores() { localStorage.setItem('greenmarket_stores', JSON.stringify(stores)); }
-
-function loadCategories() {
-  const saved = localStorage.getItem('greenmarket_categories');
-  if (saved) categories = JSON.parse(saved);
-  else categories = [{ id: 1, name: 'Fruits et légumes' }, { id: 2, name: 'Produits laitiers' }, { id: 3, name: 'Boulangerie' }];
-}
-
-function loadProducts() {
-  for (let i = 0; i < stores.length; i++) {
-    const saved = localStorage.getItem(`products_${stores[i].id}`);
-    if (saved) products[stores[i].id] = JSON.parse(saved);
-    else products[stores[i].id] = [];
-  }
-}
-
-function saveProducts(shopId) {
-  localStorage.setItem(`products_${shopId}`, JSON.stringify(products[shopId] || []));
-}
-
-function addProduct(shopId, product) {
-  if (!products[shopId]) products[shopId] = [];
-  const newId = Date.now();
-  products[shopId].push({
-    id: newId,
-    name: product.name,
-    price: product.price,
-    stock: product.stock || 0,
-    image: product.image || 'https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=300&h=200&fit=crop',
-    description: product.description || ''
-  });
-  saveProducts(shopId);
-  updateShopProductCount(shopId);
-}
-
-function updateProduct(shopId, productId, productData) {
-  if (products[shopId]) {
-    const index = products[shopId].findIndex(p => p.id == productId);
-    if (index !== -1) {
-      products[shopId][index] = { ...products[shopId][index], ...productData };
-      saveProducts(shopId);
-    }
-  }
-}
-
-function deleteProduct(shopId, productId) {
-  if (products[shopId]) {
-    products[shopId] = products[shopId].filter(p => p.id != productId);
-    saveProducts(shopId);
-    updateShopProductCount(shopId);
-  }
-}
-
-function updateShopProductCount(shopId) {
-  const shop = stores.find(s => s.id == shopId);
-  if (shop) {
-    shop.products = products[shopId]?.length || 0;
-    saveStores();
-  }
-}
-
-function deleteShop(shopId) {
-  if (confirm("⚠️ Supprimer cette boutique supprimera aussi tous ses produits. Êtes-vous sûr ?")) {
-    stores = stores.filter(s => s.id != shopId);
-    delete products[shopId];
-    localStorage.removeItem(`products_${shopId}`);
-    saveStores();
-    loadDashboard();
-    showToast("✅ Boutique supprimée");
-  }
-}
-
-function loadDashboard() {
-  const user = getCurrentUser();
-  if (!user || (user.role !== 'productor' && user.role !== 'admin')) {
-    document.getElementById('dashboardContent').innerHTML = `
-      <div style="text-align:center; padding:3rem; background:var(--white); border-radius:12px;">
-        <div style="font-size:3rem; margin-bottom:1rem;">🔒</div>
-        <h2>Accès restreint</h2>
-        <p>Vous devez être connecté en tant que producteur pour accéder à ce tableau de bord.</p>
-        <a href="store.html" class="btn-filled" style="display:inline-block; margin-top:1rem;">Retour à l'accueil</a>
-      </div>
-    `;
-    return;
-  }
-
-  currentProducerId = user.producerId || user.id;
+function updateStats() {
+  const ca = myProducts.reduce((s,p) => s + (p.price * p.sales), 0);
+  const critical = myProducts.filter(p => p.stock <= 5).length;
+  const avgNote = reviewsList.length ? (reviewsList.reduce((s,r) => s + r.rating, 0) / reviewsList.length).toFixed(1) : 0;
   
-  loadStores();
-  loadCategories();
-  loadProducts();
-  
-  const myStores = stores.filter(s => s.producerId == currentProducerId);
-  
-  const totalShops = myStores.length;
-  const totalProducts = myStores.reduce((sum, s) => sum + (products[s.id]?.length || 0), 0);
-  const totalSales = myStores.reduce((sum, s) => sum + (parseInt(String(s.sales).replace(/\s/g, '')) || 0), 0);
-  const totalRevenue = totalSales * 15;
-  const avgRating = myStores.length > 0 ? (myStores.reduce((sum, s) => sum + s.rating, 0) / myStores.length).toFixed(1) : 0;
-
-  const storeNames = myStores.map(s => s.name);
-  const storeProducts = myStores.map(s => products[s.id]?.length || 0);
-  const storeSales = myStores.map(s => parseInt(String(s.sales).replace(/\s/g, '')) || 0);
-
-  const html = `
-    <div class="stats-dashboard">
-      <div class="stat-card-dash"><div class="stat-icon">🏪</div><div class="stat-title">Mes boutiques</div><div class="stat-number">${totalShops}</div></div>
-      <div class="stat-card-dash"><div class="stat-icon">🛍️</div><div class="stat-title">Total produits</div><div class="stat-number">${totalProducts}</div></div>
-      <div class="stat-card-dash"><div class="stat-icon">💰</div><div class="stat-title">Chiffre d'affaires</div><div class="stat-number">${totalRevenue.toLocaleString()} <span class="stat-unit">€</span></div></div>
-      <div class="stat-card-dash"><div class="stat-icon">⭐</div><div class="stat-title">Note moyenne</div><div class="stat-number">${avgRating}</div></div>
-    </div>
-    <div class="charts-row">
-      <div class="chart-card"><h3>📊 Produits par boutique</h3><canvas id="productsChart"></canvas></div>
-      <div class="chart-card"><h3>📈 Ventes par boutique</h3><canvas id="salesChart"></canvas></div>
-    </div>
-    <div class="stores-section">
-      <div class="stores-section-header"><h3>🏪 Mes boutiques</h3><button class="btn-add-store" onclick="window.location.href='store.html'">➕ Nouvelle boutique</button></div>
-      <div class="stores-table-container">
-        <table class="stores-table">
-          <thead><tr><th>Boutique</th><th>Catégorie</th><th>Produits</th><th>Ventes</th><th>Note</th><th>Actions</th></tr></thead>
-          <tbody>
-            ${myStores.length === 0 ? '<tr><td colspan="6" class="empty-state">Vous n\'avez pas encore de boutique. <a href="store.html">Créez votre première boutique</a></td></tr>' : 
-              myStores.map(s => `
-                <tr>
-                  <td><img src="${s.banner}" class="shop-banner-mini" onerror="this.src='https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=100&q=80'"> ${escapeHtml(s.name)}</td>
-                  <td>${escapeHtml(s.category)}</td>
-                  <td>${products[s.id]?.length || 0}</td>
-                  <td>${s.sales || 0}</td>
-                  <td>${s.rating} ★</td>
-                  <td>
-                    <button class="btn-action edit" onclick="manageProducts(${s.id}, '${escapeHtml(s.name)}')" title="Gérer les produits">📦</button>
-                    <button class="btn-action delete" onclick="deleteShop(${s.id})" title="Supprimer">🗑️</button>
-                    <a href="info-store.html?id=${s.id}" class="btn-view" target="_blank">👁️ Voir</a>
-                  </td>
-                </tr>
-              `).join('')
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `;
-
-  document.getElementById('dashboardContent').innerHTML = html;
-
-  setTimeout(() => {
-    if (typeof Chart !== 'undefined') {
-      const productsCtx = document.getElementById('productsChart')?.getContext('2d');
-      const salesCtx = document.getElementById('salesChart')?.getContext('2d');
-      if (productsCtx) {
-        new Chart(productsCtx, {
-          type: 'bar',
-          data: { labels: storeNames, datasets: [{ label: 'Nombre de produits', data: storeProducts, backgroundColor: '#9fb2ac', borderRadius: 6 }] },
-          options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
-        });
-      }
-      if (salesCtx) {
-        new Chart(salesCtx, {
-          type: 'line',
-          data: { labels: storeNames, datasets: [{ label: 'Ventes (€)', data: storeSales.map(v => v * 15), borderColor: '#5d0d18', backgroundColor: 'rgba(93,13,24,0.1)', fill: true, tension: 0.3 }] },
-          options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
-        });
-      }
-    }
-  }, 100);
+  document.getElementById('statCA').textContent = ca.toLocaleString() + ' DH';
+  document.getElementById('statCommandes').textContent = receivedOrders.length;
+  document.getElementById('statBoutiques').textContent = myBoutiques.length;
+  document.getElementById('statNote').textContent = avgNote + '/5';
+  document.getElementById('ordersBadge').textContent = receivedOrders.length;
 }
 
-let currentShopId = null;
-
-function manageProducts(shopId, shopName) {
-  currentShopId = shopId;
-  const shopProducts = products[shopId] || [];
-  
-  const modalHtml = `
-    <div class="modal-overlay open" id="productsModal" style="display:flex;">
-      <div class="modal-content" style="max-width: 800px;">
-        <h3>📦 Gestion des produits - ${escapeHtml(shopName)}</h3>
-        <button class="btn-add-store" id="addProductToShopBtn" style="margin-bottom:1rem;">➕ Ajouter un produit</button>
-        <div style="max-height: 400px; overflow-y: auto;">
-          <table style="width:100%; border-collapse: collapse;">
-            <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left; padding:0.5rem;">Image</th><th style="text-align:left; padding:0.5rem;">Nom</th><th style="text-align:left; padding:0.5rem;">Prix</th><th style="text-align:left; padding:0.5rem;">Stock</th><th style="text-align:left; padding:0.5rem;">Actions</th></tr></thead>
-            <tbody>
-              ${shopProducts.length === 0 ? '<tr><td colspan="5" style="text-align:center; padding:2rem;">Aucun produit dans cette boutique</td></tr>' :
-                shopProducts.map(p => `
-                  <tr style="border-bottom:1px solid var(--border);">
-                    <td style="padding:0.5rem;"><img src="${p.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c533f91d2a?w=100&h=100&fit=crop'"></td>
-                    <td style="padding:0.5rem;">${escapeHtml(p.name)}</td>
-                    <td style="padding:0.5rem;">${escapeHtml(p.price)}</td>
-                    <td style="padding:0.5rem;">${p.stock || 0}</td>
-                    <td style="padding:0.5rem;">
-                      <button class="btn-action edit" onclick="editProduct(${shopId}, ${p.id})">✏️</button>
-                      <button class="btn-action delete" onclick="deleteProductConfirm(${shopId}, ${p.id})">🗑️</button>
-                    </td>
-                  </tr>
-                `).join('')
-              }
-            </tbody>
-          </table>
+function renderNotifications() {
+  const list = document.getElementById('notifList');
+  const unread = notifications.filter(n => !n.read).length;
+  document.getElementById('notifDot').style.display = unread ? 'block' : 'none';
+  list.innerHTML = '';
+  if (!notifications.length) {
+    list.innerHTML = '<div style="padding:1.2rem;text-align:center;color:var(--text-muted);font-size:.85rem;">Aucune notification.</div>'; return;
+  }
+  notifications.forEach(n => {
+    list.innerHTML += `
+      <div class="notif-item ${n.read ? '' : 'unread'}">
+        <div class="notif-icon">${n.icon}</div>
+        <div>
+          <div class="notif-text">${n.text}</div>
+          <div class="notif-time">${n.time}</div>
         </div>
-        <div class="modal-actions" style="margin-top:1rem;"><button class="btn-cancel" id="closeProductsModal">Fermer</button></div>
-      </div>
-    </div>
-  `;
-  
-  const existingModal = document.getElementById('productsModal');
-  if (existingModal) existingModal.remove();
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  
-  document.getElementById('addProductToShopBtn').onclick = () => openProductModal(shopId, null);
-  document.getElementById('closeProductsModal').onclick = () => {
-    document.getElementById('productsModal').remove();
-    loadDashboard();
-  };
+      </div>`;
+  });
 }
 
-function openProductModal(shopId, productId = null) {
-  const product = productId ? products[shopId]?.find(p => p.id == productId) : null;
-  document.getElementById('productModalTitle').innerText = product ? '✏️ Modifier le produit' : '➕ Ajouter un produit';
-  document.getElementById('productName').value = product?.name || '';
-  document.getElementById('productPrice').value = product?.price || '';
-  document.getElementById('productStock').value = product?.stock || 0;
-  document.getElementById('productImage').value = product?.image || '';
-  document.getElementById('productDesc').value = product?.description || '';
-  document.getElementById('productShopId').value = shopId;
-  document.getElementById('productId').value = productId || '';
-  document.getElementById('productModal').classList.add('open');
+function toggleNotif() {
+  document.getElementById('notifPanel').classList.toggle('open');
 }
 
-function closeProductModal() { document.getElementById('productModal').classList.remove('open'); }
+function markAllRead() {
+  notifications = notifications.map(n => ({ ...n, read:true }));
+  renderNotifications();
+  showToast('✅ Toutes les notifications marquées comme lues.');
+}
+
+// ==== GESTION DES BOUTIQUES ====
+function renderBoutiques() {
+  const tbody = document.getElementById('boutiquesTable');
+  if(!myBoutiques.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Vous n\'avez pas encore créé de boutique.</td></tr>'; return;
+  }
+  tbody.innerHTML = myBoutiques.map(b => {
+    const prodCount = myProducts.filter(p => p.boutiqueId === b.id).length;
+    return `
+    <tr>
+      <td style="font-size:1.8rem; text-align:center;">${b.emoji}</td>
+      <td><strong>${b.name}</strong></td>
+      <td>${b.category}</td>
+      <td>${prodCount} produit(s)</td>
+      <td><span class="badge badge-success">Active</span></td>
+      <td>
+        <div class="action-group">
+          <button class="btn btn-wine" onclick="editBoutique(${b.id})">✏️ Éditer</button>
+          <button class="btn btn-danger" onclick="deleteBoutique(${b.id})">🗑️</button>
+        </div>
+      </td>
+    </tr>
+  `}).join('');
+  updateBoutiqueSelect();
+}
+
+function toggleBoutiqueForm(show = false) {
+  const form = document.getElementById('addBoutiqueForm');
+  form.style.display = show ? 'block' : 'none';
+  if(!show) {
+    document.getElementById('boutiqueId').value = '';
+    document.getElementById('boutiqueName').value = '';
+    document.getElementById('boutiqueDesc').value = '';
+  }
+}
+
+function editBoutique(id) {
+  const b = myBoutiques.find(x => x.id === id);
+  if(!b) return;
+  document.getElementById('boutiqueId').value = b.id;
+  document.getElementById('boutiqueName').value = b.name;
+  document.getElementById('boutiqueCategory').value = b.category;
+  toggleBoutiqueForm(true);
+  document.getElementById('addBoutiqueForm').scrollIntoView({behavior:'smooth'});
+}
+
+function saveBoutique() {
+  const id = document.getElementById('boutiqueId').value;
+  const name = document.getElementById('boutiqueName').value.trim();
+  const cat = document.getElementById('boutiqueCategory').value;
+  
+  if(!name) { showToast('⚠️ Veuillez entrer un nom de boutique.'); return; }
+
+  if(id) {
+    const b = myBoutiques.find(x => x.id == id);
+    b.name = name; b.category = cat;
+    showToast('✅ Boutique mise à jour.');
+  } else {
+    myBoutiques.push({ id: Date.now(), name, category: cat, status: 'active', emoji: '🏪' });
+    showToast('✅ Nouvelle boutique créée.');
+  }
+  
+  toggleBoutiqueForm(false);
+  renderBoutiques();
+  renderProducts(); // Met à jour les noms dans le tableau produits
+  updateStats();
+}
+
+function deleteBoutique(id) {
+  const prods = myProducts.filter(p => p.boutiqueId === id);
+  if(prods.length > 0) {
+    if(!confirm(`Cette boutique contient ${prods.length} produit(s). Les supprimer aussi ?`)) return;
+    myProducts = myProducts.filter(p => p.boutiqueId !== id);
+  } else {
+    if(!confirm('Supprimer cette boutique définitivement ?')) return;
+  }
+  
+  myBoutiques = myBoutiques.filter(b => b.id !== id);
+  showToast('🗑️ Boutique supprimée.');
+  renderBoutiques();
+  renderProducts();
+  updateStats();
+}
+
+function updateBoutiqueSelect() {
+  const select = document.getElementById('prodBoutique');
+  select.innerHTML = myBoutiques.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+}
+
+
+// ==== GESTION DES PRODUITS ====
+function renderApercu() {
+  const topTable = document.getElementById('topProductsTable');
+  const sorted = [...myProducts].sort((a,b) => b.sales - a.sales).slice(0,3);
+  
+  if(!sorted.length) {
+      topTable.innerHTML = '<tr><td colspan="4" class="empty-state">Aucun produit vendu pour le moment.</td></tr>';
+  } else {
+      topTable.innerHTML = sorted.map(p => {
+        const b = myBoutiques.find(x => x.id === p.boutiqueId);
+        return `
+        <tr>
+          <td><strong>${p.name}</strong><br><small style="color:var(--text-muted)">${b ? b.name : ''}</small></td>
+          <td>${b ? b.category : ''}</td>
+          <td>${p.sales}</td>
+          <td><strong>${(p.price * p.sales).toLocaleString()} DH</strong></td>
+        </tr>
+      `}).join('');
+  }
+
+  const critTable = document.getElementById('criticalStockTable');
+  const critical = myProducts.filter(p => p.stock <= 5);
+  if(!critical.length) {
+    critTable.innerHTML = '<tr><td colspan="3" class="empty-state">Aucun produit en rupture de stock.</td></tr>';
+  } else {
+    critTable.innerHTML = critical.map(p => `
+      <tr>
+        <td><strong>${p.name}</strong></td>
+        <td><span class="badge badge-danger">${p.stock} restant(s)</span></td>
+        <td><button class="btn btn-wine" onclick="switchTab('produits'); editProduct(${p.id})">Mettre à jour</button></td>
+      </tr>
+    `).join('');
+  }
+}
+
+function renderProducts() {
+  const tbody = document.getElementById('productsTable');
+  if(!myProducts.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Aucun produit dans le catalogue.</td></tr>'; return;
+  }
+  tbody.innerHTML = myProducts.map(p => {
+    const b = myBoutiques.find(x => x.id === p.boutiqueId);
+    return `
+    <tr>
+      <td>${p.ref}</td>
+      <td><strong>${p.name}</strong></td>
+      <td>${b ? b.name : '<i>Boutique supprimée</i>'}</td>
+      <td>${p.price.toLocaleString()} DH</td>
+      <td><span class="badge ${p.stock <= 5 ? 'badge-danger' : 'badge-success'}">${p.stock}</span></td>
+      <td>
+        <div class="action-group">
+          <button class="btn btn-wine" onclick="editProduct(${p.id})">✏️</button>
+          <button class="btn btn-danger" onclick="deleteProduct(${p.id})">🗑️</button>
+        </div>
+      </td>
+    </tr>
+  `}).join('');
+}
+
+function toggleProductForm(show = false) {
+  if (show && myBoutiques.length === 0) {
+      showToast('⚠️ Vous devez d\'abord créer une boutique !');
+      switchTab('boutiques');
+      return;
+  }
+  const form = document.getElementById('addProductForm');
+  form.style.display = show ? 'block' : 'none';
+  if(!show) {
+    document.getElementById('prodId').value = '';
+    document.getElementById('prodName').value = '';
+    document.getElementById('prodPrice').value = '';
+    document.getElementById('prodStock').value = '';
+    document.getElementById('prodDesc').value = '';
+  }
+}
+
+function editProduct(id) {
+  const p = myProducts.find(x => x.id === id);
+  if(!p) return;
+  document.getElementById('prodId').value = p.id;
+  document.getElementById('prodName').value = p.name;
+  document.getElementById('prodBoutique').value = p.boutiqueId;
+  document.getElementById('prodPrice').value = p.price;
+  document.getElementById('prodStock').value = p.stock;
+  toggleProductForm(true);
+  document.getElementById('addProductForm').scrollIntoView({behavior:'smooth'});
+}
 
 function saveProduct() {
-  const shopId = parseInt(document.getElementById('productShopId').value);
-  const productId = document.getElementById('productId').value;
-  const name = document.getElementById('productName').value.trim();
-  const price = document.getElementById('productPrice').value.trim();
-  const stock = parseInt(document.getElementById('productStock').value) || 0;
-  const image = document.getElementById('productImage').value.trim();
-  const description = document.getElementById('productDesc').value.trim();
+  const id = document.getElementById('prodId').value;
+  const name = document.getElementById('prodName').value.trim();
+  const bId = parseInt(document.getElementById('prodBoutique').value);
+  const price = parseFloat(document.getElementById('prodPrice').value);
+  const stock = parseInt(document.getElementById('prodStock').value);
   
-  if (!name || !price) { showToast("⚠️ Veuillez remplir le nom et le prix", '#9a4a00'); return; }
-  
-  if (productId) {
-    updateProduct(shopId, productId, { name, price, stock, image, description });
-    showToast("✅ Produit modifié");
+  if(!name || isNaN(price) || isNaN(stock) || isNaN(bId)) {
+    showToast('⚠️ Veuillez remplir tous les champs correctement.'); return;
+  }
+
+  if(id) {
+    const p = myProducts.find(x => x.id == id);
+    p.name = name; p.boutiqueId = bId; p.price = price; p.stock = stock;
+    showToast('✅ Produit mis à jour.');
   } else {
-    addProduct(shopId, { name, price, stock, image, description });
-    showToast("✅ Produit ajouté");
+    myProducts.push({
+      id: Date.now(), ref: 'PRD-'+String(Math.floor(Math.random()*900)+100),
+      name, boutiqueId: bId, price, stock, sales: 0
+    });
+    showToast('✅ Nouveau produit ajouté.');
   }
   
-  closeProductModal();
-  const productsModal = document.getElementById('productsModal');
-  if (productsModal) productsModal.remove();
-  manageProducts(shopId, stores.find(s => s.id == shopId)?.name || 'Boutique');
+  toggleProductForm(false);
+  renderProducts();
+  renderApercu();
+  updateStats();
 }
 
-function editProduct(shopId, productId) {
-  closeProductModal();
-  openProductModal(shopId, productId);
+function deleteProduct(id) {
+  if(!confirm('Supprimer ce produit définitivement ?')) return;
+  myProducts = myProducts.filter(p => p.id !== id);
+  showToast('🗑️ Produit supprimé.');
+  renderProducts();
+  renderApercu();
+  updateStats();
 }
 
-function deleteProductConfirm(shopId, productId) {
-  if (confirm("Supprimer ce produit ?")) {
-    deleteProduct(shopId, productId);
-    const productsModal = document.getElementById('productsModal');
-    if (productsModal) productsModal.remove();
-    manageProducts(shopId, stores.find(s => s.id == shopId)?.name || 'Boutique');
-    showToast("✅ Produit supprimé");
+// ==== COMMANDES ET AVIS ====
+function renderOrders() {
+  const tbody = document.getElementById('ordersReceivedTable');
+  if(!receivedOrders.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Aucune commande reçue.</td></tr>'; return;
+  }
+
+  tbody.innerHTML = receivedOrders.map(o => `
+    <tr>
+      <td><strong>${o.id}</strong></td>
+      <td>${o.client}</td>
+      <td>${o.items}</td>
+      <td><strong>${o.total.toLocaleString()} DH</strong></td>
+      <td>${o.date}</td>
+      <td>
+        <select onchange="updateOrderStatus('${o.id}', this.value)" style="padding:4px; border:1px solid var(--border); border-radius:4px; font-size:.8rem; background:var(--white);">
+          <option value="en attente" ${o.status==='en attente'?'selected':''}>En attente</option>
+          <option value="en préparation" ${o.status==='en préparation'?'selected':''}>En préparation</option>
+          <option value="en transit" ${o.status==='en transit'?'selected':''}>En transit</option>
+          <option value="livré" ${o.status==='livré'?'selected':''}>Livré</option>
+          <option value="annulé" ${o.status==='annulé'?'selected':''}>Annulé</option>
+        </select>
+      </td>
+      <td>
+        <button class="btn btn-wine" onclick="generateInvoice('${o.id}')" style="font-size:.7rem; padding:.3rem .6rem;">📄 Facture</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function updateOrderStatus(id, newStatus) {
+  const o = receivedOrders.find(x => x.id === id);
+  if(o) o.status = newStatus;
+  showToast(`✅ Statut de ${id} mis à jour : ${newStatus}`);
+}
+
+function generateInvoice(id) { showToast(`📄 Facture ${id} générée. Téléchargement...`); }
+
+function renderReviews() {
+  const container = document.getElementById('reviewsList');
+  if (!reviewsList.length) {
+    container.innerHTML = '<div class="empty-state">Aucun avis reçu pour le moment.</div>'; return;
+  }
+  container.innerHTML = reviewsList.map(r => `
+    <div class="review-card">
+      <div class="review-header">
+        <div>
+          <div class="review-product">${r.product} <span style="font-weight:normal; color:var(--text-muted);">par ${r.client}</span></div>
+          <div class="review-shop">${r.date}</div>
+        </div>
+        ${!r.reply ? `<button class="btn btn-outline" onclick="replyReview(${r.id})">💬 Répondre</button>` : ''}
+      </div>
+      <div style="color:#f39c12;font-size:1rem;margin:.3rem 0;">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+      <div class="review-text">${r.text}</div>
+      ${r.reply ? `<div class="reply-box"><strong>Votre réponse :</strong><br>${r.reply}</div>` : ''}
+    </div>`).join('');
+}
+
+function replyReview(id) {
+  const r = reviewsList.find(x => x.id === id);
+  if(!r) return;
+  const reply = prompt(`Répondre à l'avis de ${r.client} :`);
+  if(reply && reply.trim()) {
+    r.reply = reply.trim();
+    showToast('✅ Réponse publiée.');
+    renderReviews();
   }
 }
+
+// ==== PROFIL ====
+function saveProfile() {
+  const name = document.getElementById('profileName').value.trim();
+  const email = document.getElementById('profileEmail').value.trim();
+  if (!name || !email) { showToast('⚠️ Remplissez tous les champs obligatoires.'); return; }
+  document.getElementById('welcomeName').textContent = name;
+  document.getElementById('profileNameDisplay').textContent = name;
+  document.getElementById('profileEmailDisplay').textContent = email;
+  document.getElementById('avatarCircle').textContent = name[0].toUpperCase();
+  showToast('✅ Profil mis à jour avec succès !');
+}
+
+function changePassword() {
+  const old = document.getElementById('pwdOld').value;
+  const neo = document.getElementById('pwdNew').value;
+  const conf = document.getElementById('pwdConfirm').value;
+  if (!old || !neo || !conf) { showToast('⚠️ Remplissez tous les champs.'); return; }
+  if (neo !== conf) { showToast('❌ Les mots de passe ne correspondent pas.'); return; }
+  if (neo.length < 6) { showToast('⚠️ Le mot de passe doit contenir au moins 6 caractères.'); return; }
+  document.getElementById('pwdOld').value = document.getElementById('pwdNew').value = document.getElementById('pwdConfirm').value = '';
+  showToast('✅ Mot de passe mis à jour avec succès !');
+}
+
+window.switchTab = switchTab;
+window.toggleNotif = toggleNotif;
+window.markAllRead = markAllRead;
+
+window.toggleBoutiqueForm = toggleBoutiqueForm;
+window.saveBoutique = saveBoutique;
+window.editBoutique = editBoutique;
+window.deleteBoutique = deleteBoutique;
+
+window.toggleProductForm = toggleProductForm;
+window.saveProduct = saveProduct;
+window.editProduct = editProduct;
+window.deleteProduct = deleteProduct;
+
+window.updateOrderStatus = updateOrderStatus;
+window.generateInvoice = generateInvoice;
+window.replyReview = replyReview;
+window.saveProfile = saveProfile;
+window.changePassword = changePassword;
 
 function init() {
-  loadDashboard();
-  document.getElementById('saveProductBtn').onclick = saveProduct;
-  document.getElementById('closeProductModal').onclick = closeProductModal;
-  document.getElementById('productModal').onclick = (e) => { if (e.target === document.getElementById('productModal')) closeProductModal(); };
+  initData();
+  renderBoutiques(); // Ceci met à jour aussi le Select des produits
+  updateStats();
+  renderNotifications();
+  renderApercu();
+  renderProducts();
+  renderOrders();
+  renderReviews();
 }
-
-window.deleteShop = deleteShop;
-window.manageProducts = manageProducts;
-window.editProduct = editProduct;
-window.deleteProductConfirm = deleteProductConfirm;
-window.openProductModal = openProductModal;
-window.closeProductModal = closeProductModal;
 
 init();
 </script>
-<script src="header-loader.js"></script>
 </body>
 </html>
