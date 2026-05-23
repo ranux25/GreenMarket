@@ -52,7 +52,7 @@
     position: absolute; inset: 0;
     background: radial-gradient(ellipse at 80% 50%, rgba(255,255,255,0.05) 0%, transparent 70%);
   }
-  .header-inner { position: relative; z-index: 1; }
+  .header-inner { position: relative; z-index: 1; display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
   .page-header h1 {
     font-family: 'Playfair Display', serif;
     font-size: 3rem; font-weight: 700; color: var(--cream);
@@ -60,6 +60,32 @@
   .page-header p {
     color: var(--sage-light); margin-top: 0.4rem; font-size: 0.95rem;
   }
+
+  .notif-btn {
+    position:relative; background:rgba(255,255,255,.15); border:none; border-radius:50%;
+    width:44px; height:44px; cursor:pointer; font-size:1.3rem;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .2s;
+  }
+  .notif-btn:hover { background:rgba(255,255,255,.25); }
+  .notif-dot {
+    position:absolute; top:6px; right:6px; width:10px; height:10px;
+    background:#f39c12; border-radius:50%; border:2px solid var(--wine);
+  }
+  .notif-panel {
+    position:absolute; top:60px; right:2.5rem; width:340px;
+    background:var(--white); border:1.5px solid var(--border);
+    border-radius:8px; box-shadow:0 12px 40px var(--shadow-md);
+    z-index:200; display:none;
+  }
+  .notif-panel.open { display:block; animation:fadeIn .2s ease; }
+  .notif-header { padding:.9rem 1.2rem; background:var(--wine); color:var(--cream); font-family:'Playfair Display',serif; font-size:1.1rem; border-radius:6px 6px 0 0; display:flex; justify-content:space-between; align-items:center; }
+  .notif-item { padding:.9rem 1.2rem; border-bottom:1px solid var(--border); font-size:.85rem; display:flex; gap:.8rem; align-items:flex-start; }
+  .notif-item:last-child { border-bottom:none; }
+  .notif-item.unread { background:#fffbf2; }
+  .notif-icon { font-size:1.1rem; flex-shrink:0; margin-top:2px; }
+  .notif-text  { color:var(--text); line-height:1.4; }
+  .notif-time  { font-size:.73rem; color:var(--text-muted); margin-top:3px; }
 
   .dashboard-grid {
     display: grid;
@@ -91,14 +117,24 @@
     text-transform: uppercase; letter-spacing: 0.05em;
   }
 
-  .admin-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 2.5rem 3rem;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
+  .tabs-container { max-width:1400px; margin:0 auto; padding:0 2.5rem; }
+  .tabs {
+    display:flex; gap:0; border-bottom:2px solid var(--border);
+    overflow-x:auto; scrollbar-width:none;
   }
+  .tabs::-webkit-scrollbar { display:none; }
+  .tab-btn {
+    padding:.75rem 1.3rem; border:none; background:none; cursor:pointer;
+    font-family:'Lato',sans-serif; font-size:.88rem; font-weight:500;
+    color:var(--text-muted); white-space:nowrap; border-bottom:3px solid transparent;
+    margin-bottom:-2px; transition:all .2s;
+  }
+  .tab-btn:hover  { color:var(--wine); }
+  .tab-btn.active { color:var(--wine); border-bottom-color:var(--wine); font-weight:600; }
+
+  .main-content { max-width:1400px; margin:0 auto; padding:2rem 2.5rem 3rem; }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; animation:fadeIn .25s ease; }
 
   .admin-section {
     background: var(--white);
@@ -106,7 +142,10 @@
     border-radius: 8px;
     box-shadow: 0 2px 12px var(--shadow);
     overflow: hidden;
+    margin-bottom: 2rem;
   }
+  .admin-section:last-child { margin-bottom: 0; }
+  
   .section-header {
     background: var(--wine);
     color: var(--cream);
@@ -171,6 +210,8 @@
   .btn-wine:hover:not(:disabled)    { background: var(--wine-dark); }
   .btn-info    { background: var(--info);    color: white; }
   .btn-info:hover:not(:disabled)    { background: #1e6fa0; }
+  .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--text-muted); }
+  .btn-outline:hover { border-color:var(--wine); color:var(--wine); }
   .action-group { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 
   .category-form {
@@ -181,18 +222,18 @@
     background: var(--cream);
     border-bottom: 1px solid var(--border);
   }
-  .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom:1rem; }
   .form-group label {
     font-size: 0.73rem; font-weight: 600;
     text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.04em;
   }
-  .form-group input {
+  .form-group input, .form-group select {
     padding: 0.55rem 0.8rem;
     border: 1.5px solid var(--border);
     border-radius: 4px; background: var(--white);
     outline: none; font-family: 'Lato', sans-serif; font-size: 0.88rem;
   }
-  .form-group input:focus { border-color: var(--wine); }
+  .form-group input:focus, .form-group select:focus { border-color: var(--wine); }
 
   .report-item {
     display: flex; align-items: flex-start; gap: 1rem;
@@ -240,6 +281,13 @@
   .popular-shop  { font-size: 0.78rem; color: var(--text-muted); }
   .popular-sales { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--wine); }
 
+  .profile-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; padding:1.5rem; }
+  .profile-avatar-area { display:flex; flex-direction:column; align-items:center; gap:1rem; padding:1.5rem; border-right:1px solid var(--border); }
+  .avatar-circle { width:90px; height:90px; border-radius:50%; background:var(--wine); display:flex; align-items:center; justify-content:center; font-size:2.4rem; color:var(--cream); }
+  .profile-name  { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; }
+  .profile-email { font-size:.82rem; color:var(--text-muted); }
+  .profile-form  { padding:1.5rem; }
+
   .toast {
     position: fixed; bottom: 2rem; right: 2rem;
     background: var(--wine); color: var(--cream);
@@ -251,6 +299,7 @@
     max-width: 320px;
   }
   .toast.show { transform: translateY(0); opacity: 1; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
 
@@ -260,10 +309,12 @@
   }
   @media(max-width: 768px) {
     .dashboard-grid { padding: 1.5rem 1rem; }
-    .admin-container { padding: 0 1rem 2rem; }
+    .tabs-container { padding: 0 1rem; }
+    .main-content { padding: 1.5rem 1rem 2rem; }
     .page-header { padding: 2rem 1rem 1.5rem; }
     .page-header h1 { font-size: 2rem; }
     .stats-global-grid { grid-template-columns: 1fr 1fr; }
+    .profile-avatar-area { border-right:none; border-bottom:1px solid var(--border); }
   }
   @media(max-width: 480px) {
     .stats-global-grid { grid-template-columns: 1fr; }
@@ -272,13 +323,26 @@
 </head>
 <body data-active-page="dashboard">
 
-<!-- Placeholder pour le header chargé dynamiquement -->
 <div id="header-placeholder"></div>
 
 <div class="page-header">
   <div class="header-inner">
-    <h1>Tableau de Bord Administrateur</h1>
-    <p>Supervision globale de la plateforme GreenMarket</p>
+    <div>
+      <h1>Tableau de Bord Administrateur</h1>
+      <p>Supervision globale, modération et validation de la plateforme</p>
+    </div>
+    <button class="notif-btn" onclick="toggleNotif()" title="Notifications">
+      🔔
+      <span class="notif-dot" id="notifDot"></span>
+    </button>
+  </div>
+
+  <div class="notif-panel" id="notifPanel">
+    <div class="notif-header">
+      🔔 Alertes Système
+      <button onclick="markAllRead()" style="background:rgba(255,255,255,.2);border:none;color:var(--cream);font-size:.75rem;padding:3px 10px;border-radius:20px;cursor:pointer;">Tout lire</button>
+    </div>
+    <div id="notifList"></div>
   </div>
 </div>
 
@@ -295,7 +359,7 @@
   </div>
   <div class="stat-card">
     <span class="stat-icon">💰</span>
-    <span class="stat-val" id="totalSalesVolume">19,340 DH</span>
+    <span class="stat-val" id="totalSalesVolume">0 DH</span>
     <span class="stat-label">Volume Total Ventes</span>
   </div>
   <div class="stat-card">
@@ -303,173 +367,272 @@
     <span class="stat-val" id="totalReportsCount">0</span>
     <span class="stat-label">Signalements</span>
   </div>
-  <div class="stat-card">
-    <span class="stat-icon">📦</span>
-    <span class="stat-val" id="totalProductsCount">0</span>
-    <span class="stat-label">Produits en Attente</span>
-  </div>
-  <div class="stat-card">
-    <span class="stat-icon">🏪</span>
-    <span class="stat-val" id="totalStoresCount">0</span>
-    <span class="stat-label">Boutiques Totales</span>
+</div>
+
+<div class="tabs-container">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('apercu')">📊 Aperçu Global</button>
+    <button class="tab-btn" onclick="switchTab('utilisateurs')">👥 Utilisateurs & Boutiques</button>
+    <button class="tab-btn" onclick="switchTab('catalogue')">📦 Produits & Catégories</button>
+    <button class="tab-btn" onclick="switchTab('commandes')">🛒 Commandes</button>
+    <button class="tab-btn" onclick="switchTab('reclamations')">🚨 Réclamations & Avis</button>
+    <button class="tab-btn" onclick="switchTab('profil')">⚙️ Paramètres Admin</button>
   </div>
 </div>
 
-<div class="admin-container">
+<div class="main-content">
 
-  <div class="two-col">
+  <div class="tab-panel active" id="tab-apercu">
+    <div class="two-col">
+      <div class="admin-section">
+        <div class="section-header">📈 Statistiques Globales</div>
+        <div class="stats-global-grid">
+          <div class="stat-global-item">
+            <div class="stat-global-label">CA Total Plateforme</div>
+            <div class="stat-global-val" id="statCATotal">0 DH</div>
+            <div class="stat-global-sub">↑ +12% ce mois</div>
+          </div>
+          <div class="stat-global-item">
+            <div class="stat-global-label">Commandes Totales</div>
+            <div class="stat-global-val" id="statCmdTotal">0</div>
+            <div class="stat-global-sub">↑ +8% ce mois</div>
+          </div>
+          <div class="stat-global-item">
+            <div class="stat-global-label">Taux Satisfaction</div>
+            <div class="stat-global-val">4.7 / 5</div>
+            <div class="stat-global-sub">↑ +0.2 vs mois dernier</div>
+          </div>
+          <div class="stat-global-item">
+            <div class="stat-global-label">Catégories Actives</div>
+            <div class="stat-global-val" id="catCount">0</div>
+            <div class="stat-global-sub">Gestion dans Catalogue</div>
+          </div>
+          <div class="stat-global-item">
+            <div class="stat-global-label">Comptes Suspendus</div>
+            <div class="stat-global-val" id="suspendedCount">0</div>
+            <div class="stat-global-sub">Voir Signalements</div>
+          </div>
+        </div>
+      </div>
+      <div class="admin-section">
+        <div class="section-header">🏆 Produits Populaires</div>
+        <div class="popular-list" id="popularProductsList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-utilisateurs">
+    <div class="admin-section">
+      <div class="section-header">
+        🏪 Validation des Boutiques / Producteurs
+        <span class="badge-count" id="pendingStoresCount">0 en attente</span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Boutique</th>
+              <th>Artisan / Producteur</th>
+              <th>Catégorie</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="pendingStoresTable"></tbody>
+        </table>
+      </div>
+    </div>
 
     <div class="admin-section">
-      <div class="section-header">📈 Statistiques Globales</div>
-      <div class="stats-global-grid">
-        <div class="stat-global-item">
-          <div class="stat-global-label">CA Total Plateforme</div>
-          <div class="stat-global-val">19 340 DH</div>
-          <div class="stat-global-sub">↑ +12% ce mois</div>
+      <div class="section-header">
+        👤 Tous les Utilisateurs
+        <span class="badge-count" id="usersCount">0 utilisateur(s)</span>
+      </div>
+      <div style="padding:1rem 1.5rem;background:var(--cream);border-bottom:1px solid var(--border);display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <button class="btn btn-wine" onclick="filterUsers('all')" id="filterAll">Tous</button>
+        <button class="btn btn-info" onclick="filterUsers('client')" id="filterClient">Clients</button>
+        <button class="btn btn-success" onclick="filterUsers('productor')" id="filterProductor">Producteurs</button>
+        <button class="btn btn-danger" onclick="filterUsers('suspended')" id="filterSuspended">Suspendus</button>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Nom complet</th>
+              <th>Email</th>
+              <th>Rôle</th>
+              <th>État</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-catalogue">
+    <div class="admin-section">
+      <div class="section-header">
+        📦 Validation des Produits
+        <span class="badge-count" id="pendingProductsCount">0 en attente</span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>Boutique</th>
+              <th>Prix</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="pendingProductsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <div class="section-header">🗂️ Gestion des Catégories</div>
+      <div class="category-form">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Nom de la catégorie</label>
+          <input type="text" id="newCatName" placeholder="Ex: Broderie, Maroquinerie…">
         </div>
-        <div class="stat-global-item">
-          <div class="stat-global-label">Commandes Totales</div>
-          <div class="stat-global-val">247</div>
-          <div class="stat-global-sub">↑ +8% ce mois</div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Emoji / Icône</label>
+          <input type="text" id="newCatIcon" placeholder="Ex: 👜" maxlength="2">
         </div>
-        <div class="stat-global-item">
-          <div class="stat-global-label">Panier Moyen</div>
-          <div class="stat-global-val">78 DH</div>
-          <div class="stat-global-sub">Stable</div>
+        <button class="btn btn-wine" onclick="addCategory()">+ Ajouter</button>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Icône</th>
+              <th>Nom de la catégorie</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="categoriesTable"></tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="admin-section">
+      <div class="section-header">📚 Tous les Produits (Catalogue Complet)</div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Réf</th>
+              <th>Produit</th>
+              <th>Boutique</th>
+              <th>Prix</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="allProductsTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-commandes">
+    <div class="admin-section">
+      <div class="section-header">🛒 Toutes les Commandes</div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>N° Commande</th>
+              <th>Client</th>
+              <th>Produits</th>
+              <th>Total</th>
+              <th>Statut</th>
+              <th>Actions Admin</th>
+            </tr>
+          </thead>
+          <tbody id="allOrdersTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-reclamations">
+    <div class="admin-section">
+      <div class="section-header">
+        🚨 Signalements & Réclamations
+        <span class="badge-count" id="reportsCount">0 signalement(s)</span>
+      </div>
+      <div id="reportsList"></div>
+    </div>
+
+    <div class="admin-section">
+      <div class="section-header">⭐ Modération des Avis</div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Produit</th>
+              <th>Note</th>
+              <th>Avis</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="reviewsAdminTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-profil">
+    <div class="admin-section">
+      <div class="section-header">👤 Profil Administrateur</div>
+      <div style="display:grid;grid-template-columns:220px 1fr;gap:0;">
+        <div class="profile-avatar-area">
+          <div class="avatar-circle">A</div>
+          <div class="profile-name">Admin Principal</div>
+          <div class="profile-email">admin@greenmarket.com</div>
+          <span class="badge badge-info" style="margin-top:.3rem;">Super Admin</span>
         </div>
-        <div class="stat-global-item">
-          <div class="stat-global-label">Taux Satisfaction</div>
-          <div class="stat-global-val">4.7 / 5</div>
-          <div class="stat-global-sub">↑ +0.2 vs mois dernier</div>
-        </div>
-        <div class="stat-global-item">
-          <div class="stat-global-label">Catégories Actives</div>
-          <div class="stat-global-val" id="catCount">0</div>
-          <div class="stat-global-sub">Gestion ci-dessous</div>
-        </div>
-        <div class="stat-global-item">
-          <div class="stat-global-label">Comptes Suspendus</div>
-          <div class="stat-global-val" id="suspendedCount">0</div>
-          <div class="stat-global-sub">Voir signalements</div>
+        <div class="profile-form">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label>Nom complet</label>
+              <input type="text" id="adminName" value="Admin Principal">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="adminEmail" value="admin@greenmarket.com">
+            </div>
+          </div>
+          <button class="btn btn-wine" onclick="showToast('✅ Profil Admin mis à jour.')" style="margin-top:1rem;">💾 Enregistrer</button>
         </div>
       </div>
     </div>
 
     <div class="admin-section">
-      <div class="section-header">🏆 Produits Populaires</div>
-      <div class="popular-list" id="popularProductsList">
+      <div class="section-header">🔒 Sécurité</div>
+      <div class="profile-form">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+          <div class="form-group">
+            <label>Mot de passe actuel</label>
+            <input type="password" id="pwdOld" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label>Nouveau mot de passe</label>
+            <input type="password" id="pwdNew" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label>Confirmer</label>
+            <input type="password" id="pwdConfirm" placeholder="••••••••">
+          </div>
+        </div>
+        <button class="btn btn-success" onclick="changePassword()" style="margin-top:1rem;">✅ Mettre à jour le mot de passe</button>
       </div>
-    </div>
-
-  </div>
-
-  <div class="admin-section">
-    <div class="section-header">
-      🏪 Validation des Boutiques / Producteurs
-      <span class="badge-count" id="pendingStoresCount">0 en attente</span>
-    </div>
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Boutique</th>
-            <th>Artisan / Producteur</th>
-            <th>Catégorie</th>
-            <th>Région</th>
-            <th>Depuis</th>
-            <th>Statut</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="pendingStoresTable"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="admin-section">
-    <div class="section-header">
-      📦 Validation des Produits
-      <span class="badge-count" id="pendingProductsCount">0 en attente</span>
-    </div>
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Produit</th>
-            <th>Boutique</th>
-            <th>Prix</th>
-            <th>Statut</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="pendingProductsTable"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="admin-section">
-    <div class="section-header">
-      🚨 Signalements & Réclamations
-      <span class="badge-count" id="reportsCount">0 signalement(s)</span>
-    </div>
-    <div id="reportsList">
-    </div>
-  </div>
-
-  <div class="admin-section">
-    <div class="section-header">🗂️ Gestion des Catégories</div>
-    <div class="category-form">
-      <div class="form-group">
-        <label>Nom de la catégorie</label>
-        <input type="text" id="newCatName" placeholder="Ex: Broderie, Maroquinerie…">
-      </div>
-      <div class="form-group">
-        <label>Emoji / Icône</label>
-        <input type="text" id="newCatIcon" placeholder="Ex: 👜" maxlength="2">
-      </div>
-      <button class="btn btn-wine" id="addCategoryBtn">+ Ajouter</button>
-    </div>
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Icône</th>
-            <th>Nom de la catégorie</th>
-            <th>Boutiques liées</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="categoriesTable"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="admin-section">
-    <div class="section-header">
-      👤 Gestion des Utilisateurs
-      <span class="badge-count" id="usersCount">0 utilisateur(s)</span>
-    </div>
-    <div style="padding:1rem 1.5rem;background:var(--cream);border-bottom:1px solid var(--border);display:flex;gap:0.5rem;flex-wrap:wrap;">
-      <button class="btn btn-wine" onclick="filterUsers('all')" id="filterAll">Tous</button>
-      <button class="btn btn-info" onclick="filterUsers('client')" id="filterClient">Clients</button>
-      <button class="btn btn-success" onclick="filterUsers('productor')" id="filterProductor">Producteurs</button>
-      <button class="btn btn-danger" onclick="filterUsers('suspended')" id="filterSuspended">Suspendus</button>
-    </div>
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Nom complet</th>
-            <th>Email</th>
-            <th>Rôle</th>
-            <th>Boutique liée</th>
-            <th>État</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="usersTable"></tbody>
-      </table>
     </div>
   </div>
 
@@ -479,112 +642,57 @@
 
 <script src="header-loader.js"></script>
 <script>
-  // ========== DONNÉES ADMIN ==========
-  let categories = [], stores = [], users = [], pendingProducts = [], reports = [], currentFilter = 'all';
+  let users = [], stores = [], categories = [], products = [], pendingProducts = [], orders = [], reports = [], reviews = [], notifications = [];
+  let currentFilter = 'all';
 
-  const popularProductsData = [
-    { rank:1, name:'Caftan Brodé en Soie',        shop:'Maison du Caftan',       sales:'142 vendus',  rankClass:'gold'   },
-    { rank:2, name:'Tapis Berbère Azrou',          shop:"Tapis Berbère d'Atlas",  sales:'97 vendus',   rankClass:'silver' },
-    { rank:3, name:'Huile d\'Argan BIO 250ml',     shop:'Coopérative Taliouine',  sales:'85 vendus',   rankClass:'bronze' },
-    { rank:4, name:'Plateau en Marqueterie',       shop:'Artisan du Bois',        sales:'63 vendus',   rankClass:''       },
-    { rank:5, name:'Savon Beldi Naturel',          shop:'Cosmétiques du Souss',   sales:'58 vendus',   rankClass:''       },
-  ];
+  function initData() {
+    users = [
+      { id:1, name:'Admin Principal', email:'admin@greenmarket.com', role:'admin', suspendu:false },
+      { id:2, name:'Fatima Zahra', email:'fatima@caftan.ma', role:'productor', suspendu:false },
+      { id:3, name:'Rachid El Mansouri', email:'rachid@tapis.ma', role:'productor', suspendu:false },
+      { id:4, name:'Sara Idrissi', email:'sara@client.com', role:'client', suspendu:false },
+      { id:5, name:'Omar Benali', email:'omar@client.com', role:'client', suspendu:true }
+    ];
 
-  function initLocalStorageData() {
-    const defaultCategories = [
+    stores = [
+      { id:1, name:"Maison du Caftan", category:'Caftans', producerName:'Fatima Zahra', est_valider:true },
+      { id:2, name:"Tapis Berbère d'Atlas", category:'Tapis', producerName:'Rachid El Mansouri', est_valider:false }
+    ];
+
+    categories = [
       { id:1, icon:'👘', name:'Caftans & Vêtements traditionnels' },
       { id:2, icon:'🪑', name:'Tapis & Tissage' },
-      { id:3, icon:'🏺', name:'Poterie & Céramique' },
-      { id:4, icon:'🪵', name:'Marqueterie & Bois' },
-      { id:5, icon:'💍', name:'Bijoux & Joaillerie' },
-      { id:6, icon:'🕯️', name:'Lampes & Fer forgé' },
-      { id:7, icon:'🧴', name:'Cosmétiques naturels' },
-      { id:8, icon:'🍯', name:'Produits du terroir' }
+      { id:3, icon:'🍯', name:'Produits du terroir' }
     ];
-    if (!localStorage.getItem('greenmarket_categories')) {
-      localStorage.setItem('greenmarket_categories', JSON.stringify(defaultCategories));
-    }
 
-    const defaultStores = [
-      { id:1,  name:"Maison du Caftan",        category:'Caftans & Vêtements traditionnels', categoryId:1, badge:'Artisan',   banner:'IMAGES/1.png', desc:'Caftans de luxe en soie.',    rating:4.9, reviews:234, products:8, sales:'2 450', producerId:101, producerName:'Fatima Zahra',      location:'Fès',       since:'2005', est_valider:true  },
-      { id:2,  name:"Tapis Berbère d'Atlas",   category:'Tapis & Tissage',                   categoryId:2, badge:'Tradition', banner:'IMAGES/2.png', desc:'Tapis berbères authentiques.', rating:4.8, reviews:189, products:6, sales:'3 200', producerId:102, producerName:'Rachid El Mansouri', location:'Marrakech', since:'2010', est_valider:true  },
-      { id:3,  name:"Poterie de Safi",         category:'Poterie & Céramique',               categoryId:3, badge:'Artisan',   banner:'IMAGES/3.png', desc:'Céramiques de Safi.',          rating:4.7, reviews:110, products:5, sales:'1 800', producerId:103, producerName:'Ahmed Benjelloun',   location:'Safi',      since:'2015', est_valider:true  },
-      { id:11, name:"Coopérative Taliouine",   category:'Produits du terroir',               categoryId:8, badge:'Tradition', banner:'IMAGES/4.png', desc:'Safran pur BIO.',              rating:0,   reviews:0,   products:0, sales:'0',     producerId:111, producerName:'Youssef Ait',        location:'Taliouine', since:'2026', est_valider:false },
-      { id:12, name:"Bijoux de l'Atlas",       category:'Bijoux & Joaillerie',               categoryId:5, badge:'Artisan',   banner:'IMAGES/5.png', desc:'Bijoux berbères en argent.',   rating:0,   reviews:0,   products:0, sales:'0',     producerId:112, producerName:'Aicha Benhaddou',   location:'Ouarzazate',since:'2025', est_valider:false }
+    products = [
+      { id:1, ref:'PRD-001', name:'Caftan Brodé', shop:'Maison du Caftan', price:850, sales:142 },
+      { id:2, ref:'PRD-002', name:'Tapis Azrou', shop:"Tapis Berbère d'Atlas", price:1200, sales:97 }
     ];
-    if (!localStorage.getItem('greenmarket_stores')) {
-      localStorage.setItem('greenmarket_stores', JSON.stringify(defaultStores));
-    }
 
-    const defaultUsers = [
-      { id:1, name:'Administrateur',      email:'admin@greenmarket.com',  role:'admin',     producerId:null, suspendu:false },
-      { id:2, name:'Fatima Zahra',        email:'fatima@caftan.ma',       role:'productor', producerId:101,  suspendu:false },
-      { id:3, name:'Rachid El Mansouri',  email:'rachid@tapis.ma',        role:'productor', producerId:102,  suspendu:false },
-      { id:4, name:'Ahmed Benjelloun',    email:'ahmed@poterie.ma',       role:'productor', producerId:103,  suspendu:false },
-      { id:5, name:'Youssef Ait',         email:'youssef@coop.ma',        role:'productor', producerId:111,  suspendu:false },
-      { id:6, name:'Aicha Benhaddou',     email:'aicha@bijoux.ma',        role:'productor', producerId:112,  suspendu:false },
-      { id:7, name:'Karim Alami',         email:'karim@client.com',       role:'client',    producerId:null, suspendu:false },
-      { id:8, name:'Sara Idrissi',        email:'sara@client.com',        role:'client',    producerId:null, suspendu:false },
-      { id:9, name:'Omar Benali',         email:'omar@client.com',        role:'client',    producerId:null, suspendu:true  }
+    pendingProducts = [
+      { id:3, name:'Huile d\'Argan BIO 250ml', shop:'Coopérative Taliouine', price:250 }
     ];
-    if (!localStorage.getItem('greenmarket_users')) {
-      localStorage.setItem('greenmarket_users', JSON.stringify(defaultUsers));
-    }
 
-    const defaultProducts = [
-      { id:1, name:'Pouf en cuir brodé',     shop:'Maison du Caftan',       price:'450 DH' },
-      { id:2, name:'Miel d\'Argan Pur 500g', shop:'Coopérative Taliouine',  price:'280 DH' },
-      { id:3, name:'Collier Berbère Argent', shop:"Bijoux de l'Atlas",      price:'320 DH' }
+    orders = [
+      { id:'CMD-0041', client:'Sara Idrissi', items:'Caftan Brodé × 1', total:850, status:'livré' },
+      { id:'CMD-0042', client:'Omar Benali', items:'Tapis Azrou × 1', total:1200, status:'en attente' }
     ];
-    if (!localStorage.getItem('greenmarket_pending_products')) {
-      localStorage.setItem('greenmarket_pending_products', JSON.stringify(defaultProducts));
-    }
 
-    const defaultReports = [
-      { id:1, type:'avis',     title:'Avis inapproprié signalé',         detail:'Un avis contient des propos offensants sur la boutique "Maison du Caftan".', user:'Karim Alami',   date:'18/05/2026', status:'pending' },
-      { id:2, type:'commande', title:'Problème commande #CMD-0042',      detail:'Le client n\'a pas reçu sa commande après 15 jours.', user:'Sara Idrissi',  date:'17/05/2026', status:'pending' },
-      { id:3, type:'compte',   title:'Compte suspect signalé',           detail:'Activité suspecte détectée sur le compte Omar Benali.', user:'Système',       date:'16/05/2026', status:'resolved'}
+    reports = [
+      { id:1, type:'commande', title:'Problème commande #CMD-0042', detail:'Le client n\'a pas reçu sa commande.', user:'Sara Idrissi', date:'17/05/2026', status:'pending' },
+      { id:2, type:'compte', title:'Compte suspect', detail:'Activité anormale.', user:'Système', date:'16/05/2026', status:'resolved' }
     ];
-    if (!localStorage.getItem('greenmarket_reports')) {
-      localStorage.setItem('greenmarket_reports', JSON.stringify(defaultReports));
-    }
-  }
 
-  function loadData() {
-    if (!localStorage.getItem('greenmarket_users')) initLocalStorageData();
-    categories     = JSON.parse(localStorage.getItem('greenmarket_categories')       || '[]');
-    stores         = JSON.parse(localStorage.getItem('greenmarket_stores')           || '[]');
-    users          = JSON.parse(localStorage.getItem('greenmarket_users')            || '[]');
-    pendingProducts= JSON.parse(localStorage.getItem('greenmarket_pending_products') || '[]');
-    reports        = JSON.parse(localStorage.getItem('greenmarket_reports')          || '[]');
-  }
+    reviews = [
+      { id:1, client:'Sara Idrissi', product:'Caftan Brodé', rating:5, text:'Parfait !' },
+      { id:2, client:'Omar Benali', product:'Tapis Azrou', rating:1, text:'Arnaque, qualité nulle, boutique à fuir !' }
+    ];
 
-  function saveAll() {
-    localStorage.setItem('greenmarket_categories',       JSON.stringify(categories));
-    localStorage.setItem('greenmarket_stores',           JSON.stringify(stores));
-    localStorage.setItem('greenmarket_users',            JSON.stringify(users));
-    localStorage.setItem('greenmarket_pending_products', JSON.stringify(pendingProducts));
-    localStorage.setItem('greenmarket_reports',          JSON.stringify(reports));
-  }
-
-  function updateStats() {
-    const activeProducers  = users.filter(u => u.role==='productor' && !u.suspendu).length;
-    const suspendedUsers   = users.filter(u => u.suspendu).length;
-    const pendingReports   = reports.filter(r => r.status==='pending').length;
-
-    document.getElementById('totalUsersCount').textContent    = users.length;
-    document.getElementById('activeProducersCount').textContent = activeProducers;
-    document.getElementById('totalReportsCount').textContent  = pendingReports;
-    document.getElementById('totalProductsCount').textContent = pendingProducts.length;
-    document.getElementById('totalStoresCount').textContent   = stores.length;
-    document.getElementById('catCount').textContent           = categories.length;
-    document.getElementById('suspendedCount').textContent     = suspendedUsers;
-
-    const pending = stores.filter(s => !s.est_valider).length;
-    document.getElementById('pendingStoresCount').textContent = pending + ' en attente';
-    document.getElementById('pendingProductsCount').textContent = pendingProducts.length + ' en attente';
-    document.getElementById('reportsCount').textContent       = pendingReports + ' signalement(s)';
-    document.getElementById('usersCount').textContent         = users.length + ' utilisateur(s)';
+    notifications = [
+      { id:1, icon:'⚠️', text:'Un nouveau signalement a été créé.', time:'Il y a 10 min', read:false },
+      { id:2, icon:'📦', text:'Nouveau produit en attente de validation.', time:'Il y a 1h', read:false }
+    ];
   }
 
   function showToast(msg) {
@@ -593,176 +701,88 @@
     setTimeout(() => t.classList.remove('show'), 3200);
   }
 
-  function renderPendingStores() {
+  function switchTab(name) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    const idx = ['apercu','utilisateurs','catalogue','commandes','reclamations','profil'].indexOf(name);
+    document.querySelectorAll('.tab-btn')[idx]?.classList.add('active');
+  }
+
+  function toggleNotif() { document.getElementById('notifPanel').classList.toggle('open'); }
+  function markAllRead() {
+    notifications = notifications.map(n => ({ ...n, read:true }));
+    renderNotifications(); showToast('✅ Alertes marquées comme lues.');
+  }
+
+  function renderNotifications() {
+    const list = document.getElementById('notifList');
+    const unread = notifications.filter(n => !n.read).length;
+    document.getElementById('notifDot').style.display = unread ? 'block' : 'none';
+    list.innerHTML = '';
+    if (!notifications.length) {
+      list.innerHTML = '<div style="padding:1.2rem;text-align:center;color:var(--text-muted);font-size:.85rem;">Aucune alerte.</div>'; return;
+    }
+    notifications.forEach(n => {
+      list.innerHTML += `
+        <div class="notif-item ${n.read ? '' : 'unread'}">
+          <div class="notif-icon">${n.icon}</div>
+          <div><div class="notif-text">${n.text}</div><div class="notif-time">${n.time}</div></div>
+        </div>`;
+    });
+  }
+
+  function updateStats() {
+    const activeProducers = users.filter(u => u.role==='productor' && !u.suspendu).length;
+    const suspended = users.filter(u => u.suspendu).length;
+    const pendingReports = reports.filter(r => r.status==='pending').length;
+    const pendingStores = stores.filter(s => !s.est_valider).length;
+    const caTotal = orders.filter(o => o.status!=='annulé').reduce((s, o) => s + o.total, 0);
+
+    document.getElementById('totalUsersCount').textContent = users.length;
+    document.getElementById('activeProducersCount').textContent = activeProducers;
+    document.getElementById('totalSalesVolume').textContent = caTotal.toLocaleString() + ' DH';
+    document.getElementById('statCATotal').textContent = caTotal.toLocaleString() + ' DH';
+    document.getElementById('statCmdTotal').textContent = orders.length;
+    
+    document.getElementById('totalReportsCount').textContent = pendingReports;
+    document.getElementById('catCount').textContent = categories.length;
+    document.getElementById('suspendedCount').textContent = suspended;
+
+    document.getElementById('pendingStoresCount').textContent = pendingStores + ' en attente';
+    document.getElementById('usersCount').textContent = users.length + ' utilisateur(s)';
+    document.getElementById('pendingProductsCount').textContent = pendingProducts.length + ' en attente';
+    document.getElementById('reportsCount').textContent = pendingReports + ' signalement(s)';
+  }
+
+  // ==== UTILISATEURS ET BOUTIQUES ====
+  function renderStores() {
     const tbody = document.getElementById('pendingStoresTable');
     tbody.innerHTML = '';
-    if (!stores.length) {
-      tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Aucune boutique enregistrée.</td></tr>'; return;
-    }
+    if (!stores.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Aucune boutique.</td></tr>'; return; }
     stores.forEach(s => {
-      const badge  = s.est_valider
-        ? `<span class="badge badge-success">✔ Validé</span>`
-        : `<span class="badge badge-warning">⏳ En attente</span>`;
-      const action = s.est_valider
-        ? `<button class="btn btn-danger"  onclick="toggleStoreStatus(${s.id})">Désactiver</button>`
-        : `<button class="btn btn-success" onclick="toggleStoreStatus(${s.id})">Valider</button>`;
+      const badge = s.est_valider ? `<span class="badge badge-success">✔ Validé</span>` : `<span class="badge badge-warning">⏳ En attente</span>`;
+      const action = s.est_valider ? `<button class="btn btn-danger" onclick="toggleStore(${s.id})">Désactiver</button>` : `<button class="btn btn-success" onclick="toggleStore(${s.id})">Valider</button>`;
       tbody.innerHTML += `
         <tr>
           <td><strong>${s.name}</strong></td>
           <td>${s.producerName}</td>
           <td>${s.category}</td>
-          <td>📍 ${s.location}</td>
-          <td>${s.since}</td>
           <td>${badge}</td>
           <td><div class="action-group">${action}</div></td>
         </tr>`;
     });
   }
 
-  window.toggleStoreStatus = function(id) {
-    stores = stores.map(s => {
-      if (s.id === id) {
-        s.est_valider = !s.est_valider;
-        showToast(s.est_valider ? `✅ Boutique "${s.name}" validée !` : `⛔ Boutique "${s.name}" désactivée.`);
-      }
-      return s;
-    });
-    saveAll(); renderPendingStores(); updateStats();
+  function toggleStore(id) {
+    stores = stores.map(s => { if(s.id === id) { s.est_valider = !s.est_valider; showToast(s.est_valider ? '✅ Boutique validée.' : '⛔ Boutique désactivée.'); } return s; });
+    renderStores(); updateStats();
   }
 
-  function renderPendingProducts() {
-    const tbody = document.getElementById('pendingProductsTable');
-    tbody.innerHTML = '';
-    if (!pendingProducts.length) {
-      tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Aucun produit en attente de validation.</td></tr>'; return;
-    }
-    pendingProducts.forEach(p => {
-      tbody.innerHTML += `
-        <tr>
-          <td><strong>${p.name}</strong></td>
-          <td>${p.shop}</td>
-          <td>${p.price}</td>
-          <td><span class="badge badge-warning">⏳ En attente</span></td>
-          <td>
-            <div class="action-group">
-              <button class="btn btn-success" onclick="approveProduct(${p.id})">✔ Approuver</button>
-              <button class="btn btn-danger"  onclick="rejectProduct(${p.id})">✘ Rejeter</button>
-            </div>
-          </td>
-        </tr>`;
-    });
-  }
-
-  window.approveProduct = function(id) {
-    const p = pendingProducts.find(x => x.id === id);
-    pendingProducts = pendingProducts.filter(x => x.id !== id);
-    saveAll(); showToast(`✅ Produit "${p?.name}" approuvé et publié !`); renderPendingProducts(); updateStats();
-  }
-  window.rejectProduct = function(id) {
-    const p = pendingProducts.find(x => x.id === id);
-    pendingProducts = pendingProducts.filter(x => x.id !== id);
-    saveAll(); showToast(`❌ Produit "${p?.name}" rejeté.`); renderPendingProducts(); updateStats();
-  }
-
-  function renderReports() {
-    const container = document.getElementById('reportsList');
-    container.innerHTML = '';
-    if (!reports.length) {
-      container.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-muted);font-style:italic;">Aucun signalement en cours.</div>'; return;
-    }
-    const icons = { avis:'💬', commande:'📦', compte:'👤' };
-    reports.forEach(r => {
-      const statusBadge = r.status === 'resolved'
-        ? `<span class="badge badge-success">Résolu</span>`
-        : `<span class="badge badge-danger">En attente</span>`;
-      const actionBtn = r.status !== 'resolved'
-        ? `<button class="btn btn-success" onclick="resolveReport(${r.id})">Marquer résolu</button>
-           <button class="btn btn-danger"  onclick="deleteReport(${r.id})">Supprimer</button>`
-        : `<button class="btn btn-danger"  onclick="deleteReport(${r.id})">Supprimer</button>`;
-      container.innerHTML += `
-        <div class="report-item">
-          <div class="report-icon">${icons[r.type] || '⚠️'}</div>
-          <div class="report-body">
-            <div class="report-title">${r.title} ${statusBadge}</div>
-            <div class="report-meta">Signalé par <strong>${r.user}</strong> · ${r.date}</div>
-            <div class="report-meta" style="margin-top:4px;color:var(--text);">${r.detail}</div>
-            <div class="report-actions">${actionBtn}</div>
-          </div>
-        </div>`;
-    });
-  }
-
-  window.resolveReport = function(id) {
-    reports = reports.map(r => r.id === id ? { ...r, status:'resolved' } : r);
-    saveAll(); showToast('✅ Signalement marqué comme résolu.'); renderReports(); updateStats();
-  }
-  window.deleteReport = function(id) {
-    if (!confirm('Supprimer ce signalement définitivement ?')) return;
-    reports = reports.filter(r => r.id !== id);
-    saveAll(); showToast('🗑️ Signalement supprimé.'); renderReports(); updateStats();
-  }
-
-  function renderCategories() {
-    const tbody = document.getElementById('categoriesTable');
-    tbody.innerHTML = '';
-    if (!categories.length) {
-      tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Aucune catégorie définie.<tr></tr>'; return;
-    }
-    categories.forEach(c => {
-      const linked = stores.filter(s => s.categoryId === c.id).length;
-      tbody.innerHTML += `
-        <tr>
-          <td style="color:var(--text-muted);font-size:0.8rem;">#${c.id}</td>
-          <td style="font-size:1.4rem;">${c.icon}</td>
-          <td><strong>${c.name}</strong></td>
-          <td><span class="badge badge-neutral">${linked} boutique(s)</span></td>
-          <td>
-            <div class="action-group">
-              <button class="btn btn-wine"   onclick="editCategory(${c.id})">✏️ Modifier</button>
-              <button class="btn btn-danger" onclick="deleteCategory(${c.id})">🗑️ Supprimer</button>
-            </div>
-          </td>
-        </tr>`;
-    });
-    document.getElementById('catCount').textContent = categories.length;
-  }
-
-  document.getElementById('addCategoryBtn').addEventListener('click', () => {
-    const name = document.getElementById('newCatName').value.trim();
-    const icon = document.getElementById('newCatIcon').value.trim();
-    if (!name || !icon) { showToast('⚠️ Veuillez remplir le nom et l\'icône.'); return; }
-    const newId = Math.max(0, ...categories.map(c => c.id)) + 1;
-    categories.push({ id: newId, icon, name });
-    document.getElementById('newCatName').value = '';
-    document.getElementById('newCatIcon').value = '';
-    saveAll(); showToast(`✅ Catégorie "${name}" ajoutée !`); renderCategories(); updateStats();
-  });
-
-  window.editCategory = function(id) {
-    const cat = categories.find(c => c.id === id);
-    if (!cat) return;
-    const newName = prompt('Modifier le nom de la catégorie :', cat.name);
-    const newIcon = prompt("Modifier l'icône / emoji :", cat.icon);
-    if (newName && newIcon) {
-      cat.name = newName.trim(); cat.icon = newIcon.trim();
-      saveAll(); showToast('✅ Catégorie modifiée !'); renderCategories();
-    }
-  }
-
-  window.deleteCategory = function(id) {
-    const cat = categories.find(c => c.id === id);
-    const linked = stores.filter(s => s.categoryId === id).length;
-    if (linked > 0 && !confirm(`Cette catégorie est liée à ${linked} boutique(s). Supprimer quand même ?`)) return;
-    if (!confirm(`Supprimer la catégorie "${cat?.name}" ?`)) return;
-    categories = categories.filter(c => c.id !== id);
-    saveAll(); showToast('🗑️ Catégorie supprimée.'); renderCategories(); updateStats();
-  }
-
-  window.filterUsers = function(filter) {
+  function filterUsers(filter) {
     currentFilter = filter;
     ['all','client','productor','suspended'].forEach(f => {
-      const btn = document.getElementById('filter' + f.charAt(0).toUpperCase() + f.slice(1));
-      if (btn) btn.style.opacity = f === filter ? '1' : '0.55';
+      document.getElementById('filter' + f.charAt(0).toUpperCase() + f.slice(1)).style.opacity = f === filter ? '1' : '0.55';
     });
     renderUsers();
   }
@@ -771,85 +791,255 @@
     const tbody = document.getElementById('usersTable');
     tbody.innerHTML = '';
     let filtered = users;
-    if (currentFilter === 'client')    filtered = users.filter(u => u.role === 'client');
+    if (currentFilter === 'client') filtered = users.filter(u => u.role === 'client');
     if (currentFilter === 'productor') filtered = users.filter(u => u.role === 'productor');
     if (currentFilter === 'suspended') filtered = users.filter(u => u.suspendu);
 
-    if (!filtered.length) {
-      tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Aucun utilisateur dans cette catégorie.</td></tr>'; return;
-    }
+    if (!filtered.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Aucun utilisateur.</td></tr>'; return; }
 
     filtered.forEach(u => {
-      const store = stores.find(s => s.producerId === u.producerId);
-      const linkedStore = store ? `<span style="color:var(--wine);font-size:0.82rem;">${store.name}</span>` : `<span style="color:var(--text-muted);font-size:0.82rem;">—</span>`;
-      const roleBadge = u.role === 'admin'
-        ? `<span class="badge badge-info">Admin</span>`
-        : u.role === 'productor'
-        ? `<span class="badge badge-success">Producteur</span>`
-        : `<span class="badge badge-neutral">Client</span>`;
-      const stateBadge = u.suspendu
-        ? `<span class="badge badge-danger">Suspendu</span>`
-        : `<span class="badge badge-success">Actif</span>`;
-      const isAdmin = u.role === 'admin';
-      const actionText  = u.suspendu ? 'Activer' : 'Suspendre';
-      const actionClass = u.suspendu ? 'btn-success' : 'btn-danger';
+      const roleBadge = u.role === 'admin' ? `<span class="badge badge-info">Admin</span>` : u.role === 'productor' ? `<span class="badge badge-success">Producteur</span>` : `<span class="badge badge-neutral">Client</span>`;
+      const stateBadge = u.suspendu ? `<span class="badge badge-danger">Suspendu</span>` : `<span class="badge badge-success">Actif</span>`;
+      const action = u.suspendu ? `<button class="btn btn-success" onclick="toggleUser(${u.id})">Activer</button>` : `<button class="btn btn-danger" onclick="toggleUser(${u.id})" ${u.role==='admin'?'disabled':''}>Suspendre</button>`;
+      
       tbody.innerHTML += `
         <tr>
           <td><strong>${u.name}</strong></td>
-          <td style="font-size:0.85rem;">${u.email}</td>
+          <td>${u.email}</td>
           <td>${roleBadge}</td>
-          <td>${linkedStore}</td>
           <td>${stateBadge}</td>
+          <td>${action}</td>
+        </tr>`;
+    });
+  }
+
+  function toggleUser(id) {
+    users = users.map(u => { if(u.id === id && u.role !== 'admin') { u.suspendu = !u.suspendu; showToast(u.suspendu ? '⛔ Compte suspendu.' : '✅ Compte activé.'); } return u; });
+    renderUsers(); updateStats();
+  }
+
+  // ==== CATALOGUE (Produits & Catégories) ====
+  function renderPendingProducts() {
+    const tbody = document.getElementById('pendingProductsTable');
+    tbody.innerHTML = '';
+    if (!pendingProducts.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Aucun produit en attente.</td></tr>'; return; }
+    pendingProducts.forEach(p => {
+      tbody.innerHTML += `
+        <tr>
+          <td><strong>${p.name}</strong></td>
+          <td>${p.shop}</td>
+          <td>${p.price} DH</td>
+          <td><span class="badge badge-warning">En attente</span></td>
           <td>
-            <button class="btn ${actionClass}" ${isAdmin ? 'disabled' : ''} onclick="toggleUserStatus(${u.id})">${actionText}</button>
+            <div class="action-group">
+              <button class="btn btn-success" onclick="approveProd(${p.id})">✔ Approuver</button>
+              <button class="btn btn-danger" onclick="rejectProd(${p.id})">✘ Rejeter</button>
+            </div>
           </td>
-        </td>`;
+        </tr>`;
     });
   }
 
-  window.toggleUserStatus = function(id) {
-    users = users.map(u => {
-      if (u.id === id && u.role !== 'admin') {
-        u.suspendu = !u.suspendu;
-        if (u.suspendu) {
-          stores = stores.map(s => {
-            if (s.producerId === u.producerId) s.est_valider = false;
-            return s;
-          });
-        }
-        showToast(u.suspendu ? `⛔ Compte de ${u.name} suspendu.` : `✅ Compte de ${u.name} activé.`);
-      }
-      return u;
-    });
-    saveAll(); renderUsers(); renderPendingStores(); updateStats();
+  function approveProd(id) {
+    const p = pendingProducts.find(x => x.id === id);
+    pendingProducts = pendingProducts.filter(x => x.id !== id);
+    products.push({ id:Date.now(), ref:'PRD-NEW', name:p.name, shop:p.shop, price:p.price, sales:0 });
+    showToast('✅ Produit publié.'); renderPendingProducts(); renderAllProducts(); updateStats();
+  }
+  function rejectProd(id) {
+    pendingProducts = pendingProducts.filter(x => x.id !== id);
+    showToast('❌ Produit rejeté.'); renderPendingProducts(); updateStats();
   }
 
-  function renderPopularProducts() {
-    const container = document.getElementById('popularProductsList');
-    container.innerHTML = '';
-    popularProductsData.forEach(p => {
-      container.innerHTML += `
+  function renderCategories() {
+    const tbody = document.getElementById('categoriesTable');
+    tbody.innerHTML = '';
+    if (!categories.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="3">Aucune catégorie.</td></tr>'; return; }
+    categories.forEach(c => {
+      tbody.innerHTML += `
+        <tr>
+          <td style="font-size:1.4rem;">${c.icon}</td>
+          <td><strong>${c.name}</strong></td>
+          <td>
+            <div class="action-group">
+              <button class="btn btn-wine" onclick="editCat(${c.id})">✏️</button>
+              <button class="btn btn-danger" onclick="deleteCat(${c.id})">🗑️</button>
+            </div>
+          </td>
+        </tr>`;
+    });
+  }
+
+  function addCategory() {
+    const name = document.getElementById('newCatName').value;
+    const icon = document.getElementById('newCatIcon').value;
+    if(!name || !icon) return showToast('⚠️ Remplir nom et icône.');
+    categories.push({ id:Date.now(), name, icon });
+    document.getElementById('newCatName').value = ''; document.getElementById('newCatIcon').value = '';
+    showToast('✅ Catégorie ajoutée.'); renderCategories(); updateStats();
+  }
+
+  function editCat(id) {
+    const c = categories.find(x => x.id === id);
+    if(!c) return;
+    const newName = prompt('Nom :', c.name);
+    if(newName) { c.name = newName.trim(); renderCategories(); showToast('✅ Modifié.'); }
+  }
+
+  function deleteCat(id) {
+    if(!confirm('Supprimer cette catégorie ?')) return;
+    categories = categories.filter(c => c.id !== id);
+    renderCategories(); showToast('🗑️ Supprimée.'); updateStats();
+  }
+
+  function renderAllProducts() {
+    const tbody = document.getElementById('allProductsTable');
+    tbody.innerHTML = '';
+    if (!products.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Catalogue vide.</td></tr>'; return; }
+    products.forEach(p => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${p.ref}</td>
+          <td><strong>${p.name}</strong></td>
+          <td>${p.shop}</td>
+          <td>${p.price} DH</td>
+          <td><button class="btn btn-danger" onclick="deleteProd(${p.id})">🗑️ Supprimer</button></td>
+        </tr>`;
+    });
+    
+    // Update popular
+    const pop = document.getElementById('popularProductsList');
+    pop.innerHTML = '';
+    const sorted = [...products].sort((a,b) => b.sales - a.sales).slice(0,3);
+    sorted.forEach((p, i) => {
+      const rClass = i===0 ? 'gold' : i===1 ? 'silver' : 'bronze';
+      pop.innerHTML += `
         <div class="popular-item">
-          <div class="popular-rank ${p.rankClass}">${p.rank}</div>
-          <div class="popular-info">
-            <div class="popular-name">${p.name}</div>
-            <div class="popular-shop">${p.shop}</div>
-          </div>
-          <div class="popular-sales">${p.sales}</div>
+          <div class="popular-rank ${rClass}">${i+1}</div>
+          <div class="popular-info"><div class="popular-name">${p.name}</div><div class="popular-shop">${p.shop}</div></div>
+          <div class="popular-sales">${p.sales} vendus</div>
         </div>`;
     });
   }
 
-  // Initialisation
+  function deleteProd(id) {
+    if(!confirm('Supprimer ce produit du catalogue ?')) return;
+    products = products.filter(p => p.id !== id);
+    renderAllProducts(); showToast('🗑️ Produit supprimé.');
+  }
+
+  // ==== COMMANDES ====
+  function renderOrders() {
+    const tbody = document.getElementById('allOrdersTable');
+    tbody.innerHTML = '';
+    if (!orders.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Aucune commande.</td></tr>'; return; }
+    orders.forEach(o => {
+      tbody.innerHTML += `
+        <tr>
+          <td><strong>${o.id}</strong></td>
+          <td>${o.client}</td>
+          <td>${o.items}</td>
+          <td>${o.total} DH</td>
+          <td>
+            <select onchange="updateOrder('${o.id}', this.value)" style="padding:4px; border:1px solid var(--border); border-radius:4px;">
+              <option value="en attente" ${o.status==='en attente'?'selected':''}>En attente</option>
+              <option value="en préparation" ${o.status==='en préparation'?'selected':''}>En préparation</option>
+              <option value="livré" ${o.status==='livré'?'selected':''}>Livré</option>
+              <option value="annulé" ${o.status==='annulé'?'selected':''}>Annulé</option>
+            </select>
+          </td>
+          <td>
+            <div class="action-group">
+              <button class="btn btn-danger" onclick="cancelOrder('${o.id}')" ${o.status==='annulé'?'disabled':''}>Annuler</button>
+              <button class="btn btn-wine" onclick="showToast('📄 Facture générée.')">Facture</button>
+            </div>
+          </td>
+        </tr>`;
+    });
+  }
+
+  function updateOrder(id, status) {
+    orders.find(o => o.id === id).status = status;
+    showToast('✅ Statut commande mis à jour.'); updateStats(); renderOrders();
+  }
+  function cancelOrder(id) {
+    if(!confirm('Annuler cette commande de force ?')) return;
+    orders.find(o => o.id === id).status = 'annulé';
+    showToast('⛔ Commande annulée.'); renderOrders(); updateStats();
+  }
+
+  // ==== RECLAMATIONS ET AVIS ====
+  function renderReports() {
+    const container = document.getElementById('reportsList');
+    container.innerHTML = '';
+    if (!reports.length) { container.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-muted);font-style:italic;">Aucun signalement.</div>'; return; }
+    reports.forEach(r => {
+      const badge = r.status === 'resolved' ? `<span class="badge badge-success">Résolu</span>` : `<span class="badge badge-danger">En attente</span>`;
+      const action = r.status !== 'resolved' ? `<button class="btn btn-success" onclick="resolveRep(${r.id})">Résoudre</button>` : '';
+      container.innerHTML += `
+        <div class="report-item">
+          <div class="report-icon">⚠️</div>
+          <div class="report-body">
+            <div class="report-title">${r.title} ${badge}</div>
+            <div class="report-meta">Par <strong>${r.user}</strong> · ${r.date}</div>
+            <div class="report-meta" style="color:var(--text);margin-top:5px;">${r.detail}</div>
+            <div class="report-actions">${action} <button class="btn btn-outline" onclick="deleteRep(${r.id})">Supprimer</button></div>
+          </div>
+        </div>`;
+    });
+  }
+
+  function resolveRep(id) { reports.find(r => r.id === id).status = 'resolved'; showToast('✅ Signalement résolu.'); renderReports(); updateStats(); }
+  function deleteRep(id) { reports = reports.filter(r => r.id !== id); showToast('🗑️ Signalement supprimé.'); renderReports(); updateStats(); }
+
+  function renderReviewsAdmin() {
+    const tbody = document.getElementById('reviewsAdminTable');
+    tbody.innerHTML = '';
+    if (!reviews.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Aucun avis.</td></tr>'; return; }
+    reviews.forEach(r => {
+      tbody.innerHTML += `
+        <tr>
+          <td><strong>${r.client}</strong></td>
+          <td>${r.product}</td>
+          <td style="color:#f39c12;">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</td>
+          <td>${r.text}</td>
+          <td><button class="btn btn-danger" onclick="deleteRev(${r.id})">🗑️ Supprimer</button></td>
+        </tr>`;
+    });
+  }
+
+  function deleteRev(id) {
+    if(!confirm('Supprimer cet avis pour propos inappropriés ?')) return;
+    reviews = reviews.filter(r => r.id !== id); showToast('🗑️ Avis supprimé.'); renderReviewsAdmin();
+  }
+
+  function changePassword() {
+    const o = document.getElementById('pwdOld').value, n = document.getElementById('pwdNew').value, c = document.getElementById('pwdConfirm').value;
+    if(!o||!n||!c) return showToast('⚠️ Remplir les champs.');
+    if(n!==c) return showToast('❌ Les mots de passe ne correspondent pas.');
+    document.getElementById('pwdOld').value = ''; document.getElementById('pwdNew').value = ''; document.getElementById('pwdConfirm').value = '';
+    showToast('✅ Mot de passe changé !');
+  }
+
+  window.toggleNotif = toggleNotif; window.markAllRead = markAllRead; window.switchTab = switchTab;
+  window.filterUsers = filterUsers; window.toggleUser = toggleUser; window.toggleStore = toggleStore;
+  window.approveProd = approveProd; window.rejectProd = rejectProd; window.deleteProd = deleteProd;
+  window.addCategory = addCategory; window.editCat = editCat; window.deleteCat = deleteCat;
+  window.updateOrder = updateOrder; window.cancelOrder = cancelOrder;
+  window.resolveRep = resolveRep; window.deleteRep = deleteRep; window.deleteRev = deleteRev; window.changePassword = changePassword;
+
   function init() {
-    loadData();
+    initData();
     updateStats();
-    renderPendingStores();
+    renderNotifications();
+    renderStores();
+    renderUsers();
     renderPendingProducts();
-    renderReports();
     renderCategories();
-    renderPopularProducts();
-    filterUsers('all');
+    renderAllProducts();
+    renderOrders();
+    renderReports();
+    renderReviewsAdmin();
   }
 
   init();
