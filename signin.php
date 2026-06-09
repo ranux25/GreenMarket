@@ -9,6 +9,16 @@ if (isset($_SESSION['user_role'])) {
     header('Location: ' . ($redirects[$_SESSION['user_role']] ?? 'accueil.php'));
     exit;
 }
+
+// Récupérer les messages d'erreur/succès depuis la session
+$error = $_SESSION['error'] ?? '';
+$success = $_SESSION['success'] ?? '';
+$warning = $_SESSION['warning'] ?? '';
+$form_data = $_SESSION['form_data'] ?? [];
+$active_form = $_SESSION['active_form'] ?? 'login'; // login, signup, forgot
+
+// Effacer les messages après affichage
+unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION['form_data'], $_SESSION['active_form']);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -18,7 +28,6 @@ if (isset($_SESSION['user_role'])) {
   <title>GreenMarket | Authentification</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-
   <style>
     :root {
       --bg-cream: #FFF9EB;
@@ -161,16 +170,11 @@ if (isset($_SESSION['user_role'])) {
     /* Alert messages */
     .alert {
       padding: 10px 14px; border-radius: 10px; font-size: 0.85rem;
-      margin-bottom: 14px; display: none; align-items: center; gap: 8px;
+      margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
     }
-    .alert.show { display: flex; }
     .alert-error   { background: #fdf0f0; border: 1px solid #f5c6cb; color: #c0392b; }
     .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
     .alert-warning { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
-
-    /* Spinner */
-    .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
     @media (max-width: 800px) {
       body { padding: 20px; }
@@ -195,307 +199,199 @@ if (isset($_SESSION['user_role'])) {
 </head>
 <body>
 
-  <a href="accueil.php" class="back-home-btn">
+<a href="accueil.php" class="back-home-btn">
     <i class="bi bi-house-door"></i> Accueil
-  </a>
+</a>
 
-  <div class="auth-container" id="authContainer">
-
+<div class="auth-container" id="authContainer">
     <div class="overlay-panel">
-      <div class="maroccan-grid"></div>
-      <div class="plant-illustration"><i class="bi bi-flower1"></i></div>
-      <h3 class="panel-title" id="panelTitle">Bienvenue !</h3>
-      <p class="panel-desc" id="panelDesc">Rejoignez notre réseau de coopératives et consommez de manière juste, authentique et locale.</p>
+        <div class="maroccan-grid"></div>
+        <div class="plant-illustration"><i class="bi bi-flower1"></i></div>
+        <h3 class="panel-title" id="panelTitle">Bienvenue !</h3>
+        <p class="panel-desc" id="panelDesc">Rejoignez notre réseau de coopératives et consommez de manière juste, authentique et locale.</p>
     </div>
 
     <!-- ═══════════════════ LOGIN ═══════════════════ -->
     <div class="form-box login-box" id="loginBox">
-      <div class="brand">
-        <img src="IMAGES/logo.png" alt="Logo GreenMarket" class="brand-logo" onerror="this.src='https://placehold.co/35x35?text=GM'">
-        <span>GreenMarket</span>
-      </div>
-      <h2>Se connecter</h2>
-      <p class="subtitle">Heureux de vous revoir parmi nos coopératives.</p>
-
-      <div class="alert alert-error" id="loginError"><i class="bi bi-exclamation-circle"></i><span></span></div>
-
-      <form id="loginForm" novalidate>
-        <div class="input-group">
-          <i class="bi bi-envelope"></i>
-          <input type="email" name="email" id="loginEmail" placeholder="Adresse Email" required autocomplete="email">
+        <div class="brand">
+            <img src="IMAGES/logo.png" alt="Logo GreenMarket" class="brand-logo" onerror="this.src='https://placehold.co/35x35?text=GM'">
+            <span>GreenMarket</span>
         </div>
-        <div class="input-group">
-          <i class="bi bi-lock"></i>
-          <input type="password" name="password" id="loginPassword" placeholder="Mot de passe" required autocomplete="current-password">
-        </div>
-        <div class="form-options">
-          <label class="remember-me">
-            <input type="checkbox" id="rememberMe"> Se souvenir de moi
-          </label>
-          <a href="#" class="forgot-link" id="toForgot">Mot de passe oublié ?</a>
-        </div>
-        <button type="submit" class="btn-submit" id="loginBtn">
-          <span class="spinner" id="loginSpinner"></span>
-          <span id="loginBtnText">Connexion</span>
-        </button>
-        <p class="terms-text">En vous connectant, vous acceptez nos <a href="terms.php">CGU</a> et notre <a href="privacy.php">Politique de confidentialité</a>.</p>
-      </form>
+        <h2>Se connecter</h2>
+        <p class="subtitle">Heureux de vous revoir parmi nos coopératives.</p>
 
-      <p class="switch-text">Pas encore membre ? <a href="#" class="switch-link" id="toSignup">Créer un compte</a></p>
+        <?php if ($active_form === 'login' && $error): ?>
+            <div class="alert alert-error"><i class="bi bi-exclamation-circle"></i><?php echo htmlspecialchars($error); ?></div>
+        <?php endif; ?>
+        <?php if ($active_form === 'login' && $success): ?>
+            <div class="alert alert-success"><i class="bi bi-check-circle"></i><?php echo htmlspecialchars($success); ?></div>
+        <?php endif; ?>
+
+        <form action="login.php" method="POST" novalidate>
+            <div class="input-group">
+                <i class="bi bi-envelope"></i>
+                <input type="email" name="email" placeholder="Adresse Email" required autocomplete="email" value="<?php echo htmlspecialchars($form_data['email'] ?? ''); ?>">
+            </div>
+            <div class="input-group">
+                <i class="bi bi-lock"></i>
+                <input type="password" name="password" placeholder="Mot de passe" required autocomplete="current-password">
+            </div>
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox" name="remember_me"> Se souvenir de moi
+                </label>
+                <a href="#" class="forgot-link" id="toForgot">Mot de passe oublié ?</a>
+            </div>
+            <button type="submit" class="btn-submit">Connexion</button>
+            <p class="terms-text">En vous connectant, vous acceptez nos <a href="terms.php">CGU</a> et notre <a href="privacy.php">Politique de confidentialité</a>.</p>
+        </form>
+        <p class="switch-text">Pas encore membre ? <a href="#" class="switch-link" id="toSignup">Créer un compte</a></p>
     </div>
 
     <!-- ═══════════════════ SIGNUP ═══════════════════ -->
     <div class="form-box signup-box" id="signupBox">
-      <div class="brand">
-        <img src="IMAGES/logo.png" alt="Logo GreenMarket" class="brand-logo" onerror="this.src='https://placehold.co/35x35?text=GM'">
-        <span>GreenMarket</span>
-      </div>
-      <h2>Créer un compte</h2>
-      <p class="subtitle">Créez votre profil pour acheter en direct ou proposer vos récoltes.</p>
-
-      <div class="alert alert-error"   id="signupError"><i class="bi bi-exclamation-circle"></i><span></span></div>
-      <div class="alert alert-warning" id="signupWarning"><i class="bi bi-hourglass-split"></i><span></span></div>
-
-      <form id="signupForm" novalidate>
-        <div class="input-group">
-          <i class="bi bi-person"></i>
-          <input type="text" name="nom" id="signupName" placeholder="Nom complet" required>
+        <div class="brand">
+            <img src="IMAGES/logo.png" alt="Logo GreenMarket" class="brand-logo" onerror="this.src='https://placehold.co/35x35?text=GM'">
+            <span>GreenMarket</span>
         </div>
-        <div class="input-group">
-          <i class="bi bi-envelope"></i>
-          <input type="email" name="email" id="signupEmail" placeholder="Adresse Email" required autocomplete="email">
-        </div>
+        <h2>Créer un compte</h2>
+        <p class="subtitle">Créez votre profil pour acheter en direct ou proposer vos récoltes.</p>
 
-        <span class="role-label-title">Vous êtes ?</span>
-        <div class="role-container">
-          <label class="role-option">
-            <input type="radio" name="userRole" value="client" checked>
-            <div class="role-card"><i class="bi bi-basket"></i> Client</div>
-          </label>
-          <label class="role-option">
-            <input type="radio" name="userRole" value="producteur">
-            <div class="role-card"><i class="bi bi-shop"></i> Producteur</div>
-          </label>
-        </div>
+        <?php if ($active_form === 'signup' && $error): ?>
+            <div class="alert alert-error"><i class="bi bi-exclamation-circle"></i><?php echo htmlspecialchars($error); ?></div>
+        <?php endif; ?>
+        <?php if ($active_form === 'signup' && $warning): ?>
+            <div class="alert alert-warning"><i class="bi bi-hourglass-split"></i><?php echo htmlspecialchars($warning); ?></div>
+        <?php endif; ?>
+        <?php if ($active_form === 'signup' && $success): ?>
+            <div class="alert alert-success"><i class="bi bi-check-circle"></i><?php echo htmlspecialchars($success); ?></div>
+        <?php endif; ?>
 
-        <div class="producer-fields" id="producerFields">
-          <div class="producer-fields-row" style="display:flex;gap:12px;">
-            <div class="input-group" style="flex:1;">
-              <i class="bi bi-building"></i>
-              <input type="text" id="nomEntreprise" name="nom_entreprise" placeholder="Nom de l'entreprise">
+        <form action="signup.php" method="POST" novalidate>
+            <div class="input-group">
+                <i class="bi bi-person"></i>
+                <input type="text" name="nom" placeholder="Nom complet" required value="<?php echo htmlspecialchars($form_data['nom'] ?? ''); ?>">
             </div>
-          </div>
-        </div>
+            <div class="input-group">
+                <i class="bi bi-envelope"></i>
+                <input type="email" name="email" placeholder="Adresse Email" required autocomplete="email" value="<?php echo htmlspecialchars($form_data['email'] ?? ''); ?>">
+            </div>
 
-        <div class="input-group">
-          <i class="bi bi-lock"></i>
-          <input type="password" name="password" id="signupPassword" placeholder="Mot de passe" required autocomplete="new-password">
-        </div>
-        <div class="input-group">
-          <i class="bi bi-shield-lock"></i>
-          <input type="password" name="confirm" id="signupConfirmPassword" placeholder="Confirmer le mot de passe" required>
-        </div>
+            <span class="role-label-title">Vous êtes ?</span>
+            <div class="role-container">
+                <label class="role-option">
+                    <input type="radio" name="role" value="client" <?php echo (!isset($form_data['role']) || $form_data['role'] === 'client') ? 'checked' : ''; ?>>
+                    <div class="role-card"><i class="bi bi-basket"></i> Client</div>
+                </label>
+                <label class="role-option">
+                    <input type="radio" name="role" value="producteur" <?php echo (isset($form_data['role']) && $form_data['role'] === 'producteur') ? 'checked' : ''; ?>>
+                    <div class="role-card"><i class="bi bi-shop"></i> Producteur</div>
+                </label>
+            </div>
 
-        <button type="submit" class="btn-submit" id="signupBtn">
-          <span class="spinner" id="signupSpinner"></span>
-          <span id="signupBtnText">S'inscrire</span>
-        </button>
-        <p class="terms-text">En vous inscrivant, vous validez nos <a href="terms.php">CGU</a> et certifiez l'exactitude de vos données.</p>
-      </form>
+            <div class="producer-fields" id="producerFields" style="<?php echo (isset($form_data['role']) && $form_data['role'] === 'producteur') ? 'max-height:200px; opacity:1; margin-bottom:4px;' : ''; ?>">
+                <div class="producer-fields-row" style="display:flex;gap:12px;">
+                    <div class="input-group" style="flex:1;">
+                        <i class="bi bi-building"></i>
+                        <input type="text" id="nomEntreprise" name="nom_entreprise" placeholder="Nom de l'entreprise" value="<?php echo htmlspecialchars($form_data['nom_entreprise'] ?? ''); ?>">
+                    </div>
+                </div>
+            </div>
 
-      <p class="switch-text">Déjà inscrit ? <a href="#" class="switch-link" id="toLoginFromSignup">Se connecter</a></p>
+            <div class="input-group">
+                <i class="bi bi-lock"></i>
+                <input type="password" name="password" placeholder="Mot de passe" required autocomplete="new-password">
+            </div>
+            <div class="input-group">
+                <i class="bi bi-shield-lock"></i>
+                <input type="password" name="confirm" placeholder="Confirmer le mot de passe" required>
+            </div>
+
+            <button type="submit" class="btn-submit">S'inscrire</button>
+            <p class="terms-text">En vous inscrivant, vous validez nos <a href="terms.php">CGU</a> et certifiez l'exactitude de vos données.</p>
+        </form>
+        <p class="switch-text">Déjà inscrit ? <a href="#" class="switch-link" id="toLoginFromSignup">Se connecter</a></p>
     </div>
 
     <!-- ═══════════════════ FORGOT ═══════════════════ -->
     <div class="form-box forgot-box" id="forgotBox">
-      <div class="brand">
-        <img src="IMAGES/logo.png" alt="Logo GreenMarket" class="brand-logo" onerror="this.src='https://placehold.co/35x35?text=GM'">
-        <span>GreenMarket</span>
-      </div>
-      <h2>Mot de passe oublié</h2>
-      <p class="subtitle">Entrez votre adresse e-mail pour recevoir un lien de réinitialisation.</p>
-
-      <div class="alert alert-success" id="forgotSuccess"><i class="bi bi-check-circle"></i><span></span></div>
-      <div class="alert alert-error"   id="forgotError"><i class="bi bi-exclamation-circle"></i><span></span></div>
-
-      <form id="forgotForm" novalidate>
-        <div class="input-group">
-          <i class="bi bi-envelope"></i>
-          <input type="email" id="forgotEmail" placeholder="Votre adresse Email" required>
+        <div class="brand">
+            <img src="IMAGES/logo.png" alt="Logo GreenMarket" class="brand-logo" onerror="this.src='https://placehold.co/35x35?text=GM'">
+            <span>GreenMarket</span>
         </div>
-        <button type="submit" class="btn-submit">Envoyer le lien</button>
-      </form>
+        <h2>Mot de passe oublié</h2>
+        <p class="subtitle">Entrez votre adresse e-mail pour recevoir un lien de réinitialisation.</p>
 
-      <p class="switch-text">Je m'en souviens ! <a href="#" class="switch-link" id="toLoginFromForgot">Retour à la connexion</a></p>
+        <?php if ($active_form === 'forgot' && $error): ?>
+            <div class="alert alert-error"><i class="bi bi-exclamation-circle"></i><?php echo htmlspecialchars($error); ?></div>
+        <?php endif; ?>
+        <?php if ($active_form === 'forgot' && $success): ?>
+            <div class="alert alert-success"><i class="bi bi-check-circle"></i><?php echo htmlspecialchars($success); ?></div>
+        <?php endif; ?>
+
+        <form action="forgot_password.php" method="POST">
+            <div class="input-group">
+                <i class="bi bi-envelope"></i>
+                <input type="email" name="email" placeholder="Votre adresse Email" required value="<?php echo htmlspecialchars($form_data['email'] ?? ''); ?>">
+            </div>
+            <button type="submit" class="btn-submit">Envoyer le lien</button>
+        </form>
+        <p class="switch-text">Je m'en souviens ! <a href="#" class="switch-link" id="toLoginFromForgot">Retour à la connexion</a></p>
     </div>
+</div>
 
-  </div>
-
-  <script>
+<script>
+    // Solo para la animación de transición entre formularios (sin lógica de autenticación)
     const authContainer = document.getElementById('authContainer');
-    const panelTitle    = document.getElementById('panelTitle');
-    const panelDesc     = document.getElementById('panelDesc');
+    const panelTitle = document.getElementById('panelTitle');
+    const panelDesc = document.getElementById('panelDesc');
 
-    // ─── Panel transitions ────────────────────────────────────────────────
-    document.getElementById('toSignup').addEventListener('click', e => {
-      e.preventDefault();
-      authContainer.classList.remove('forgot-panel-active');
-      authContainer.classList.add('right-panel-active');
-      setTimeout(() => {
+    document.getElementById('toSignup').addEventListener('click', (e) => {
+        e.preventDefault();
+        authContainer.classList.remove('forgot-panel-active');
+        authContainer.classList.add('right-panel-active');
         panelTitle.textContent = "Cultivons l'avenir !";
-        panelDesc.textContent  = "Découvrez des produits authentiques en direct de nos petits producteurs régionaux.";
-      }, 200);
+        panelDesc.textContent = "Découvrez des produits authentiques en direct de nos petits producteurs régionaux.";
     });
 
-    document.getElementById('toLoginFromSignup').addEventListener('click', e => {
-      e.preventDefault();
-      authContainer.classList.remove('right-panel-active');
-      setTimeout(() => {
+    document.getElementById('toLoginFromSignup').addEventListener('click', (e) => {
+        e.preventDefault();
+        authContainer.classList.remove('right-panel-active');
         panelTitle.textContent = "Bienvenue !";
-        panelDesc.textContent  = "Rejoignez notre réseau de coopératives et consommez de manière juste, authentique et locale.";
-      }, 200);
+        panelDesc.textContent = "Rejoignez notre réseau de coopératives et consommez de manière juste, authentique et locale.";
     });
 
-    document.getElementById('toForgot').addEventListener('click', e => {
-      e.preventDefault();
-      authContainer.classList.add('forgot-panel-active');
-      setTimeout(() => {
+    document.getElementById('toForgot').addEventListener('click', (e) => {
+        e.preventDefault();
+        authContainer.classList.add('forgot-panel-active');
         panelTitle.textContent = "Sécurité d'abord";
-        panelDesc.textContent  = "Nous protégeons vos accès afin de garantir la sérénité de nos échanges locaux.";
-      }, 200);
+        panelDesc.textContent = "Nous protégeons vos accès afin de garantir la sérénité de nos échanges locaux.";
     });
 
-    document.getElementById('toLoginFromForgot').addEventListener('click', e => {
-      e.preventDefault();
-      authContainer.classList.remove('forgot-panel-active');
-      setTimeout(() => {
+    document.getElementById('toLoginFromForgot').addEventListener('click', (e) => {
+        e.preventDefault();
+        authContainer.classList.remove('forgot-panel-active');
         panelTitle.textContent = "Bienvenue !";
-        panelDesc.textContent  = "Rejoignez notre réseau de coopératives et consommez de manière juste, authentique et locale.";
-      }, 200);
+        panelDesc.textContent = "Rejoignez notre réseau de coopératives et consommez de manière juste, authentique et locale.";
     });
 
-    // ─── Role toggle (signup) ─────────────────────────────────────────────
-    document.querySelectorAll('input[name="userRole"]').forEach(radio => {
-      radio.addEventListener('change', () => {
-        const pf = document.getElementById('producerFields');
-        if (radio.value === 'producteur') {
-          pf.classList.add('active');
-          document.getElementById('nomEntreprise').required = true;
-        } else {
-          pf.classList.remove('active');
-          document.getElementById('nomEntreprise').required = false;
-        }
-      });
-    });
-
-    // ─── Helpers ──────────────────────────────────────────────────────────
-    function showAlert(el, msg) {
-      el.querySelector('span').textContent = msg;
-      el.classList.add('show');
-    }
-    function hideAlert(el) { el.classList.remove('show'); }
-
-    function setLoading(btn, spinner, textEl, loading) {
-      btn.disabled       = loading;
-      spinner.style.display = loading ? 'block' : 'none';
-      textEl.style.opacity  = loading ? '0.6' : '1';
-    }
-
-    async function postForm(url, data) {
-      const body = new URLSearchParams(data);
-      const res  = await fetch(url, { method: 'POST', body });
-      return res.json();
-    }
-
-    // ─── LOGIN ────────────────────────────────────────────────────────────
-    document.getElementById('loginForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const errEl   = document.getElementById('loginError');
-      const btn     = document.getElementById('loginBtn');
-      const spinner = document.getElementById('loginSpinner');
-      const btnText = document.getElementById('loginBtnText');
-
-      hideAlert(errEl);
-      setLoading(btn, spinner, btnText, true);
-
-      try {
-        const data = await postForm('login.php', {
-          email:    document.getElementById('loginEmail').value.trim(),
-          password: document.getElementById('loginPassword').value,
+    // Role toggle para mostrar/ocultar campo de empresa
+    document.querySelectorAll('input[name="role"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            const pf = document.getElementById('producerFields');
+            if (radio.value === 'producteur') {
+                pf.style.maxHeight = '200px';
+                pf.style.opacity = '1';
+                pf.style.marginBottom = '4px';
+                document.getElementById('nomEntreprise').required = true;
+            } else {
+                pf.style.maxHeight = '0';
+                pf.style.opacity = '0';
+                pf.style.marginBottom = '0';
+                document.getElementById('nomEntreprise').required = false;
+            }
         });
-
-        if (data.success) {
-          btnText.textContent = 'Connexion réussie ✓';
-          setTimeout(() => { window.location.href = data.redirect; }, 800);
-        } else {
-          showAlert(errEl, data.message);
-          setLoading(btn, spinner, btnText, false);
-        }
-      } catch {
-        showAlert(errEl, 'Erreur réseau. Veuillez réessayer.');
-        setLoading(btn, spinner, btnText, false);
-      }
     });
-
-    // ─── SIGNUP ───────────────────────────────────────────────────────────
-    document.getElementById('signupForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const errEl     = document.getElementById('signupError');
-      const warnEl    = document.getElementById('signupWarning');
-      const btn       = document.getElementById('signupBtn');
-      const spinner   = document.getElementById('signupSpinner');
-      const btnText   = document.getElementById('signupBtnText');
-
-      hideAlert(errEl);
-      hideAlert(warnEl);
-
-      const password = document.getElementById('signupPassword').value;
-      const confirm  = document.getElementById('signupConfirmPassword').value;
-      if (password !== confirm) {
-        showAlert(errEl, 'Les mots de passe ne correspondent pas.');
-        return;
-      }
-
-      setLoading(btn, spinner, btnText, true);
-
-      try {
-        const data = await postForm('signup.php', {
-          nom:            document.getElementById('signupName').value.trim(),
-          email:          document.getElementById('signupEmail').value.trim(),
-          password,
-          confirm,
-          role:           document.querySelector('input[name="userRole"]:checked').value,
-          nom_entreprise: document.getElementById('nomEntreprise').value.trim(),
-        });
-
-        if (data.success) {
-          if (data.pending) {
-            showAlert(warnEl, data.message);
-            setLoading(btn, spinner, btnText, false);
-          } else {
-            btnText.textContent = 'Compte créé ✓';
-            setTimeout(() => { window.location.href = data.redirect; }, 800);
-          }
-        } else {
-          showAlert(errEl, data.message);
-          setLoading(btn, spinner, btnText, false);
-        }
-      } catch {
-        showAlert(errEl, 'Erreur réseau. Veuillez réessayer.');
-        setLoading(btn, spinner, btnText, false);
-      }
-    });
-
-    // ─── FORGOT PASSWORD (placeholder) ───────────────────────────────────
-    document.getElementById('forgotForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const email   = document.getElementById('forgotEmail').value.trim();
-      const succEl  = document.getElementById('forgotSuccess');
-      const errEl   = document.getElementById('forgotError');
-      hideAlert(errEl);
-      if (!email) { showAlert(errEl, 'Veuillez entrer votre adresse email.'); return; }
-      showAlert(succEl, `Un lien de réinitialisation a été envoyé à ${email}.`);
-    });
-  </script>
+</script>
 </body>
 </html>

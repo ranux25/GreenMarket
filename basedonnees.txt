@@ -1,0 +1,524 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Hôte : localhost:3307
+-- Généré le : mar. 09 juin 2026 à 22:52
+-- Version du serveur : 10.4.32-MariaDB
+-- Version de PHP : 8.0.30
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de données : `greenmarket`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `administrateur`
+--
+
+CREATE TABLE `administrateur` (
+  `id_admin` int(11) NOT NULL,
+  `nom_admin` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `mot_de_passe` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `administrateur`
+--
+
+INSERT INTO `administrateur` (`id_admin`, `nom_admin`, `email`, `mot_de_passe`) VALUES
+(1, 'Administrador Principal', 'admin@greenmarket.com', 'admin123');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `boutique`
+--
+
+CREATE TABLE `boutique` (
+  `id_boutique` int(11) NOT NULL,
+  `id_producteur` int(11) NOT NULL,
+  `nom_boutique` varchar(100) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `date_creation` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `boutique`
+--
+
+INSERT INTO `boutique` (`id_boutique`, `id_producteur`, `nom_boutique`, `description`, `date_creation`) VALUES
+(11, 1, 'Maison de Caftan', 'Création artisanale de caftans marocains traditionnels', '2026-06-09 21:34:20'),
+(12, 2, 'Tapis Berbère d\'Atlas', 'Tapis berbères tissés à la main dans les montagnes de l’Atlas', '2026-06-09 21:34:20'),
+(13, 3, 'Poterie de Safi', 'Poteries artisanales de la ville de Safi', '2026-06-09 21:34:20'),
+(14, 4, 'Marqueterie de Tetouan', 'Objets décoratifs en bois marqueté', '2026-06-09 21:34:20'),
+(15, 5, 'Bijoux Amazigh', 'Bijoux traditionnels amazighs faits à la main', '2026-06-09 21:34:20'),
+(16, 6, 'Lumières de Marrakech', 'Lanternes et luminaires artisanaux marocains', '2026-06-09 21:34:20'),
+(17, 7, 'Argamane Naturel', 'Produits naturels à base d’huile d’argan', '2026-06-09 21:34:20'),
+(18, 8, 'Saveurs du Terroir', 'Produits gastronomiques du terroir marocain', '2026-06-09 21:34:20'),
+(19, 9, 'Tissage d\'Azilal', 'Textiles et couvertures artisanales d’Azilal', '2026-06-09 21:34:20'),
+(20, 10, 'Caftans Impériaux', 'Caftans de luxe inspirés des traditions impériales', '2026-06-09 21:34:20');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `categorie`
+--
+
+CREATE TABLE `categorie` (
+  `id_categorie` int(11) NOT NULL,
+  `nom_categorie` varchar(50) NOT NULL,
+  `description` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `categorie`
+--
+
+INSERT INTO `categorie` (`id_categorie`, `nom_categorie`, `description`) VALUES
+(1, 'Caftans & Vêtements traditionnels', 'Caftans, djellabas et vêtements traditionnels marocains'),
+(2, 'Tapis & Tissage', 'Tapis berbères, couvertures et textiles artisanaux'),
+(3, 'Poterie & Céramique', 'Poteries, assiettes et objets décoratifs en céramique'),
+(4, 'Marqueterie & Bois', 'Objets artisanaux en bois sculpté et marqueté'),
+(5, 'Bijoux & Joaillerie', 'Bijoux traditionnels amazighs et joaillerie artisanale'),
+(6, 'Lampes & Fer forgé', 'Lanternes, lampes et objets décoratifs en fer forgé'),
+(7, 'Cosmétiques naturels', 'Produits naturels à base d’argan, savon noir et huiles essentielles'),
+(8, 'Produits du terroir', 'Miel, épices, huile d’olive et spécialités marocaines');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `client`
+--
+
+CREATE TABLE `client` (
+  `id_client` int(11) NOT NULL,
+  `nom_client` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `mot_de_passe` varchar(255) NOT NULL,
+  `date_inscription` datetime NOT NULL DEFAULT current_timestamp(),
+  `est_actif` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `commande`
+--
+
+CREATE TABLE `commande` (
+  `id_commande` int(11) NOT NULL,
+  `id_client` int(11) NOT NULL,
+  `id_paiement` int(11) DEFAULT NULL,
+  `date_commande` datetime NOT NULL DEFAULT current_timestamp(),
+  `statut_commande` enum('En attente','Confirmée','Expédiée','Livrée','Annulée') NOT NULL DEFAULT 'En attente',
+  `montant_total` decimal(10,2) NOT NULL,
+  `facture` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `contenir`
+--
+
+CREATE TABLE `contenir` (
+  `id_commande` int(11) NOT NULL,
+  `id_produit` int(11) NOT NULL,
+  `quantite` int(11) NOT NULL,
+  `prix_unitaire` decimal(10,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `evaluer`
+--
+
+CREATE TABLE `evaluer` (
+  `id_client` int(11) NOT NULL,
+  `id_produit` int(11) NOT NULL,
+  `note` tinyint(4) NOT NULL,
+  `commentaire` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `favoris`
+--
+
+CREATE TABLE `favoris` (
+  `id_client` int(11) NOT NULL,
+  `id_produit` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `notification`
+--
+
+CREATE TABLE `notification` (
+  `id_notification` int(11) NOT NULL,
+  `id_client` int(11) DEFAULT NULL,
+  `id_producteur` int(11) DEFAULT NULL,
+  `message` varchar(255) NOT NULL,
+  `date_notification` datetime NOT NULL DEFAULT current_timestamp(),
+  `est_lu` tinyint(1) NOT NULL DEFAULT 0,
+  `type_notification` varchar(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `paiement`
+--
+
+CREATE TABLE `paiement` (
+  `id_paiement` int(11) NOT NULL,
+  `montant` decimal(10,2) NOT NULL,
+  `date_paiement` datetime NOT NULL DEFAULT current_timestamp(),
+  `statut_paiement` enum('En attente','Payé','Refusé','Remboursé') NOT NULL,
+  `reference_transaction` varchar(50) DEFAULT NULL,
+  `mode_paiement` varchar(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `panier`
+--
+
+CREATE TABLE `panier` (
+  `id_client` int(11) NOT NULL,
+  `id_produit` int(11) NOT NULL,
+  `quantite` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `producteur`
+--
+
+CREATE TABLE `producteur` (
+  `id_producteur` int(11) NOT NULL,
+  `id_admin` int(11) DEFAULT NULL,
+  `nom_entreprise` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `mot_de_passe` varchar(255) NOT NULL,
+  `est_valide_par_admin` tinyint(1) NOT NULL DEFAULT 0,
+  `date_inscription` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `producteur`
+--
+
+INSERT INTO `producteur` (`id_producteur`, `id_admin`, `nom_entreprise`, `email`, `mot_de_passe`, `est_valide_par_admin`, `date_inscription`) VALUES
+(1, 1, 'Maison de Caftan SARL', 'caftan@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
+(2, 1, 'Atlas Tapis', 'atlas@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
+(3, 1, 'Poterie Safi', 'safi@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
+(4, 1, 'Tetouan Art', 'tetouan@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
+(5, 1, 'Amazigh Bijoux', 'amazigh@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
+(6, 1, 'Marrakech Lumières', 'lumiere@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
+(7, 1, 'Argamane', 'argamane@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
+(8, 1, 'Saveurs Maroc', 'saveurs@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
+(9, 1, 'Azilal Textile', 'azilal@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
+(10, 1, 'Caftans Impériaux', 'imperial@gmail.com', '123456', 1, '2026-06-09 21:32:01');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `produit`
+--
+
+CREATE TABLE `produit` (
+  `id_produit` int(11) NOT NULL,
+  `id_categorie` int(11) NOT NULL,
+  `id_boutique` int(11) NOT NULL,
+  `nom_produit` varchar(100) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `prix_unitaire` decimal(10,2) NOT NULL,
+  `stock_quantite` int(11) NOT NULL,
+  `statut_publie` enum('Brouillon','Publié','Suspendu') DEFAULT 'Brouillon',
+  `est_valide_par_admin` tinyint(1) NOT NULL DEFAULT 0,
+  `date_creation` datetime NOT NULL DEFAULT current_timestamp(),
+  `photo_url` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `reclamation`
+--
+
+CREATE TABLE `reclamation` (
+  `id_reclamation` int(11) NOT NULL,
+  `id_admin` int(11) DEFAULT NULL,
+  `id_client` int(11) NOT NULL,
+  `sujet` varchar(100) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `date_reclamation` datetime NOT NULL DEFAULT current_timestamp(),
+  `statut_traitement` varchar(20) NOT NULL,
+  `reponse_admin` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Index pour les tables déchargées
+--
+
+--
+-- Index pour la table `administrateur`
+--
+ALTER TABLE `administrateur`
+  ADD PRIMARY KEY (`id_admin`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Index pour la table `boutique`
+--
+ALTER TABLE `boutique`
+  ADD PRIMARY KEY (`id_boutique`),
+  ADD KEY `fk_boutique_producteur` (`id_producteur`);
+
+--
+-- Index pour la table `categorie`
+--
+ALTER TABLE `categorie`
+  ADD PRIMARY KEY (`id_categorie`);
+
+--
+-- Index pour la table `client`
+--
+ALTER TABLE `client`
+  ADD PRIMARY KEY (`id_client`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Index pour la table `commande`
+--
+ALTER TABLE `commande`
+  ADD PRIMARY KEY (`id_commande`),
+  ADD KEY `fk_commande_client` (`id_client`),
+  ADD KEY `fk_commande_paiement` (`id_paiement`);
+
+--
+-- Index pour la table `contenir`
+--
+ALTER TABLE `contenir`
+  ADD PRIMARY KEY (`id_commande`,`id_produit`),
+  ADD KEY `fk_contenir_produit` (`id_produit`);
+
+--
+-- Index pour la table `evaluer`
+--
+ALTER TABLE `evaluer`
+  ADD PRIMARY KEY (`id_client`,`id_produit`),
+  ADD KEY `fk_evaluer_produit` (`id_produit`);
+
+--
+-- Index pour la table `favoris`
+--
+ALTER TABLE `favoris`
+  ADD PRIMARY KEY (`id_client`,`id_produit`),
+  ADD KEY `fk_favoris_produit` (`id_produit`);
+
+--
+-- Index pour la table `notification`
+--
+ALTER TABLE `notification`
+  ADD PRIMARY KEY (`id_notification`),
+  ADD KEY `fk_notification_client` (`id_client`),
+  ADD KEY `fk_notification_producteur` (`id_producteur`);
+
+--
+-- Index pour la table `paiement`
+--
+ALTER TABLE `paiement`
+  ADD PRIMARY KEY (`id_paiement`);
+
+--
+-- Index pour la table `panier`
+--
+ALTER TABLE `panier`
+  ADD PRIMARY KEY (`id_client`,`id_produit`),
+  ADD KEY `fk_panier_produit` (`id_produit`);
+
+--
+-- Index pour la table `producteur`
+--
+ALTER TABLE `producteur`
+  ADD PRIMARY KEY (`id_producteur`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD KEY `fk_producteur_admin` (`id_admin`);
+
+--
+-- Index pour la table `produit`
+--
+ALTER TABLE `produit`
+  ADD PRIMARY KEY (`id_produit`),
+  ADD KEY `fk_produit_categorie` (`id_categorie`),
+  ADD KEY `fk_produit_boutique` (`id_boutique`);
+
+--
+-- Index pour la table `reclamation`
+--
+ALTER TABLE `reclamation`
+  ADD PRIMARY KEY (`id_reclamation`),
+  ADD KEY `fk_reclamation_admin` (`id_admin`),
+  ADD KEY `fk_reclamation_client` (`id_client`);
+
+--
+-- AUTO_INCREMENT pour les tables déchargées
+--
+
+--
+-- AUTO_INCREMENT pour la table `administrateur`
+--
+ALTER TABLE `administrateur`
+  MODIFY `id_admin` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT pour la table `boutique`
+--
+ALTER TABLE `boutique`
+  MODIFY `id_boutique` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT pour la table `categorie`
+--
+ALTER TABLE `categorie`
+  MODIFY `id_categorie` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT pour la table `client`
+--
+ALTER TABLE `client`
+  MODIFY `id_client` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT pour la table `commande`
+--
+ALTER TABLE `commande`
+  MODIFY `id_commande` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT pour la table `notification`
+--
+ALTER TABLE `notification`
+  MODIFY `id_notification` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT pour la table `paiement`
+--
+ALTER TABLE `paiement`
+  MODIFY `id_paiement` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT pour la table `producteur`
+--
+ALTER TABLE `producteur`
+  MODIFY `id_producteur` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT pour la table `produit`
+--
+ALTER TABLE `produit`
+  MODIFY `id_produit` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+
+--
+-- AUTO_INCREMENT pour la table `reclamation`
+--
+ALTER TABLE `reclamation`
+  MODIFY `id_reclamation` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Contraintes pour les tables déchargées
+--
+
+--
+-- Contraintes pour la table `boutique`
+--
+ALTER TABLE `boutique`
+  ADD CONSTRAINT `fk_boutique_producteur` FOREIGN KEY (`id_producteur`) REFERENCES `producteur` (`id_producteur`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `commande`
+--
+ALTER TABLE `commande`
+  ADD CONSTRAINT `fk_commande_client` FOREIGN KEY (`id_client`) REFERENCES `client` (`id_client`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_commande_paiement` FOREIGN KEY (`id_paiement`) REFERENCES `paiement` (`id_paiement`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `contenir`
+--
+ALTER TABLE `contenir`
+  ADD CONSTRAINT `fk_contenir_commande` FOREIGN KEY (`id_commande`) REFERENCES `commande` (`id_commande`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_contenir_produit` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `evaluer`
+--
+ALTER TABLE `evaluer`
+  ADD CONSTRAINT `fk_evaluer_client` FOREIGN KEY (`id_client`) REFERENCES `client` (`id_client`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_evaluer_produit` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `favoris`
+--
+ALTER TABLE `favoris`
+  ADD CONSTRAINT `fk_favoris_client` FOREIGN KEY (`id_client`) REFERENCES `client` (`id_client`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_favoris_produit` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `notification`
+--
+ALTER TABLE `notification`
+  ADD CONSTRAINT `fk_notification_client` FOREIGN KEY (`id_client`) REFERENCES `client` (`id_client`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_notification_producteur` FOREIGN KEY (`id_producteur`) REFERENCES `producteur` (`id_producteur`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `panier`
+--
+ALTER TABLE `panier`
+  ADD CONSTRAINT `fk_panier_client` FOREIGN KEY (`id_client`) REFERENCES `client` (`id_client`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_panier_produit` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `producteur`
+--
+ALTER TABLE `producteur`
+  ADD CONSTRAINT `fk_producteur_admin` FOREIGN KEY (`id_admin`) REFERENCES `administrateur` (`id_admin`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `produit`
+--
+ALTER TABLE `produit`
+  ADD CONSTRAINT `fk_produit_boutique` FOREIGN KEY (`id_boutique`) REFERENCES `boutique` (`id_boutique`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_produit_categorie` FOREIGN KEY (`id_categorie`) REFERENCES `categorie` (`id_categorie`) ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `reclamation`
+--
+ALTER TABLE `reclamation`
+  ADD CONSTRAINT `fk_reclamation_admin` FOREIGN KEY (`id_admin`) REFERENCES `administrateur` (`id_admin`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_reclamation_client` FOREIGN KEY (`id_client`) REFERENCES `client` (`id_client`) ON DELETE CASCADE ON UPDATE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
