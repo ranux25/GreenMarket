@@ -7,12 +7,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
 if (isset($_SESSION['user_role']) && $current_page == 'signin.php') {
     $redirects = [
         'admin'      => 'dashboard_admin.php',
-        'producteur' => 'dashboard-producteur.php',
+        'producteur' => 'dashboard_producteur.php',
         'client'     => 'dashboard_client.php',
     ];
     $redirect = $redirects[$_SESSION['user_role']] ?? 'accueil.php';
     
-    // Éviter la boucle infinie en vérifiant qu'on ne redirige pas vers la même page
     if ($redirect != $current_page) {
         header('Location: ' . $redirect);
         exit;
@@ -35,19 +34,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['active_form'] = 'login';
         } else {
             try {
-                // Chercher dans admin d'abord
                 $stmt = $pdo->prepare("SELECT id_admin as id, nom_admin as nom, email, mot_de_passe, 'admin' as role, 1 as valide FROM administrateur WHERE email = ?");
                 $stmt->execute([$email]);
                 $user = $stmt->fetch();
                 
-                // Chercher dans client
                 if (!$user) {
                     $stmt = $pdo->prepare("SELECT id_client as id, nom_client as nom, email, mot_de_passe, 'client' as role, 1 as valide FROM client WHERE email = ? AND est_actif = 1");
                     $stmt->execute([$email]);
                     $user = $stmt->fetch();
                 }
                 
-                // Chercher dans producteur
                 if (!$user) {
                     $stmt = $pdo->prepare("SELECT id_producteur as id, nom_entreprise as nom, email, mot_de_passe, 'producteur' as role, est_valide_par_admin as valide FROM producteur WHERE email = ?");
                     $stmt->execute([$email]);
@@ -70,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     $redirects = [
                         'admin' => 'dashboard_admin.php',
-                        'producteur' => 'dashboard-producteur.php',
+                        'producteur' => 'dashboard_producteur.php',
                         'client' => 'dashboard_client.php'
                     ];
                     header('Location: ' . $redirects[$user['role']]);
@@ -93,8 +89,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $confirm = $_POST['confirm'] ?? '';
         $role = $_POST['role'] ?? 'client';
         $nom_entreprise = trim($_POST['nom_entreprise'] ?? '');
+        $boutique_description = trim($_POST['boutique_description'] ?? '');
         
-        $_SESSION['form_data'] = ['nom' => $nom, 'email' => $email, 'role' => $role, 'nom_entreprise' => $nom_entreprise];
+        // Gestion de l'upload d'image
+        $boutique_image = null;
+        if ($role === 'producteur' && isset($_FILES['boutique_image']) && $_FILES['boutique_image']['error'] === UPLOAD_ERR_OK) {
+            $upload_dir = 'IMAGES/boutiques/';
+            
+            // Créer le dossier s'il n'existe pas
+            if (!file_exists($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
+            }
+            
+            $file_extension = pathinfo($_FILES['boutique_image']['name'], PATHINFO_EXTENSION);
+            $file_name = uniqid('boutique_') . '.' . $file_extension;
+            $file_path = $upload_dir . $file_name;
+            
+            // Types de fichiers autorisés
+            $allowed_types = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+            
+            if (in_array($_FILES['boutique_image']['type'], $allowed_types)) {
+                if (move_uploaded_file($_FILES['boutique_image']['tmp_name'], $file_path)) {
+                    $boutique_image = $file_path;
+                } else {
+                    $_SESSION['error'] = 'Erreur lors de l\'upload de l\'image';
+                    header('Location: signin.php');
+                    exit;
+                }
+            } else {
+                $_SESSION['error'] = 'Format d\'image non supporté. Utilisez JPG, PNG, GIF ou WEBP.';
+                header('Location: signin.php');
+                exit;
+            }
+        }
+        
+        $_SESSION['form_data'] = [
+            'nom' => $nom, 
+            'email' => $email, 
+            'role' => $role, 
+            'nom_entreprise' => $nom_entreprise,
+            'boutique_description' => $boutique_description
+        ];
         $_SESSION['active_form'] = 'signup';
         
         $error = null;
@@ -139,15 +174,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
                 
             } elseif ($role === 'producteur') {
+                // Insertion du producteur
                 $sql = "INSERT INTO producteur (id_admin, nom_entreprise, email, mot_de_passe, est_valide_par_admin, date_inscription) VALUES (NULL, :nom_entreprise, :email, :password, 0, NOW())";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([':nom_entreprise' => $nom_entreprise, ':email' => $email, ':password' => $password]);
+                $stmt->execute([
+                    ':nom_entreprise' => $nom_entreprise, 
+                    ':email' => $email, 
+                    ':password' => $password
+                ]);
                 
                 $user_id = $pdo->lastInsertId();
                 
-                $sql2 = "INSERT INTO boutique (id_producteur, nom_boutique, description, date_creation) VALUES (:id_producteur, :nom_boutique, :description, NOW())";
+                // Insertion de la boutique avec description et image
+                $sql2 = "INSERT INTO boutique (id_producteur, nom_boutique, description, image, date_creation) 
+                         VALUES (:id_producteur, :nom_boutique, :description, :image, NOW())";
                 $stmt2 = $pdo->prepare($sql2);
-                $stmt2->execute([':id_producteur' => $user_id, ':nom_boutique' => $nom_entreprise, ':description' => 'Boutique artisanale marocaine']);
+                $stmt2->execute([
+                    ':id_producteur' => $user_id, 
+                    ':nom_boutique' => $nom_entreprise, 
+                    ':description' => !empty($boutique_description) ? $boutique_description : 'Boutique artisanale marocaine',
+                    ':image' => $boutique_image
+                ]);
                 
                 $_SESSION['user_id'] = $user_id;
                 $_SESSION['user_nom'] = $nom_entreprise;
@@ -157,7 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 unset($_SESSION['form_data'], $_SESSION['error']);
                 $_SESSION['warning'] = '✅ Compte producteur créé ! Un administrateur va valider votre compte.';
-                header('Location: dashboard-producteur.php');
+                header('Location: dashboard_producteur.php');
                 exit;
             }
             
@@ -208,10 +255,8 @@ $warning = $_SESSION['warning'] ?? '';
 $form_data = $_SESSION['form_data'] ?? [];
 $active_form = $_SESSION['active_form'] ?? 'login';
 
-// Effacer les messages
 unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION['form_data'], $_SESSION['active_form']);
 ?>
-<!-- Reste de votre HTML -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -221,7 +266,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    /* Tes styles existants - garde les mêmes */
     :root {
       --bg-cream: #FFF9EB;
       --accent-sage: #9FB2AC;
@@ -250,11 +294,10 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     }
     .back-home-btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
     .auth-container {
-      background: #ffffff; width: 1100px; max-width: 100%; height: 650px;
+      background: #ffffff; width: 1100px; max-width: 100%; min-height: 720px;
       border-radius: 30px; box-shadow: 0 20px 60px rgba(93,13,24,0.1);
       position: relative; overflow: hidden; display: flex; margin: 0 auto;
     }
-    /* Reste de tes styles... */
     .overlay-panel {
       position: absolute; top: 0; left: 0; width: 50%; height: 100%;
       background: linear-gradient(135deg, #8FA39D 0%, var(--accent-sage) 100%);
@@ -299,13 +342,22 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--primary-burgundy); margin-bottom: 6px; }
     .subtitle { color: #70665f; font-size: 0.9rem; margin-bottom: 22px; }
     .input-group { position: relative; margin-bottom: 14px; }
-    .input-group i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #90857d; font-size: 1rem; }
-    .input-group input {
+    .input-group i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #90857d; font-size: 1rem; z-index: 1; }
+    .input-group input, .input-group textarea, .input-group input[type="file"] {
       width: 100%; padding: 12px 15px 12px 42px;
       background-color: #fcfaf5; border: 1px solid rgba(159,178,172,0.4);
       border-radius: 10px; outline: none; font-size: 0.9rem;
+      font-family: 'Jost', sans-serif;
     }
-    .input-group input:focus {
+    .input-group input[type="file"] {
+      padding: 10px 15px 10px 42px;
+    }
+    .input-group textarea {
+      padding: 12px 15px;
+      resize: vertical;
+      min-height: 80px;
+    }
+    .input-group input:focus, .input-group textarea:focus {
       border-color: var(--primary-burgundy);
       box-shadow: 0 0 0 2px rgba(93,13,24,0.08);
     }
@@ -325,7 +377,7 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
       font-weight: 500;
     }
     .producer-fields { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; opacity: 0; }
-    .producer-fields.active { max-height: 200px; opacity: 1; margin-bottom: 4px; }
+    .producer-fields.active { max-height: 400px; opacity: 1; margin-bottom: 4px; }
     .form-options { display: flex; justify-content: space-between; margin-bottom: 18px; font-size: 0.85rem; }
     .btn-submit {
       width: 100%; padding: 12px; background-color: var(--primary-burgundy);
@@ -342,6 +394,20 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     .alert-error { background: #fdf0f0; border: 1px solid #f5c6cb; color: #c0392b; }
     .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
     .alert-warning { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+
+    .help-text {
+      font-size: 0.7rem;
+      color: #90857d;
+      margin-top: 4px;
+      margin-left: 42px;
+    }
+    
+    .file-info {
+      font-size: 0.7rem;
+      color: #6b5055;
+      margin-top: 4px;
+      margin-left: 42px;
+    }
 
     @media (max-width: 800px) {
       .auth-container { flex-direction: column; height: auto; background: transparent; }
@@ -419,7 +485,7 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
       <div class="alert alert-error"><?php echo htmlspecialchars($error); ?></div>
     <?php endif; ?>
 
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
       <input type="hidden" name="action" value="signup">
       <div class="input-group">
         <i class="bi bi-person"></i>
@@ -442,11 +508,26 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
         </label>
       </div>
 
-      <div class="producer-fields" id="producerFields" style="<?php echo (isset($form_data['role']) && $form_data['role'] === 'producteur') ? 'max-height:200px; opacity:1; margin-bottom:4px;' : ''; ?>">
+      <!-- Champs spécifiques au producteur -->
+      <div class="producer-fields" id="producerFields" style="<?php echo (isset($form_data['role']) && $form_data['role'] === 'producteur') ? 'max-height:400px; opacity:1; margin-bottom:4px;' : ''; ?>">
         <div class="input-group">
           <i class="bi bi-building"></i>
           <input type="text" name="nom_entreprise" placeholder="Nom de l'entreprise" value="<?php echo htmlspecialchars($form_data['nom_entreprise'] ?? ''); ?>">
         </div>
+        
+        <!-- Description de la boutique -->
+        <div class="input-group">
+          <i class="bi bi-file-text"></i>
+          <textarea name="boutique_description" placeholder="Description de votre boutique (présentation, savoir-faire...)" rows="3"><?php echo htmlspecialchars($form_data['boutique_description'] ?? ''); ?></textarea>
+        </div>
+        <div class="help-text">Décrivez votre activité, vos produits, votre histoire...</div>
+        
+        <!-- Upload d'image de la boutique -->
+        <div class="input-group">
+          <i class="bi bi-image"></i>
+          <input type="file" name="boutique_image" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp">
+        </div>
+        <div class="file-info">Format acceptés : JPG, PNG, GIF, WEBP (max 5MB)</div>
       </div>
 
       <div class="input-group">
@@ -526,16 +607,16 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     panelDesc.textContent = "Rejoignez notre réseau de coopératives et consommez de manière juste, authentique et locale.";
   });
 
-  // Role toggle
+  // Role toggle pour afficher/masquer les champs producteur
   document.querySelectorAll('input[name="role"]').forEach(radio => {
     radio.addEventListener('change', function() {
       const pf = document.getElementById('producerFields');
       if (this.value === 'producteur') {
         pf.classList.add('active');
-        pf.querySelector('input').required = true;
+        pf.querySelector('input[name="nom_entreprise"]').required = true;
       } else {
         pf.classList.remove('active');
-        pf.querySelector('input').required = false;
+        pf.querySelector('input[name="nom_entreprise"]').required = false;
       }
     });
   });

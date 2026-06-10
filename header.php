@@ -18,23 +18,28 @@
       <a href="store.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'store.php' ? 'active' : ''; ?>">Boutiques</a>
       <a href="produits.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'produits.php' ? 'active' : ''; ?>">Produits</a>
       <a href="apropos.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'apropos.php' ? 'active' : ''; ?>">À propos</a>
-      
-      <?php if (isset($_SESSION['user_role'])): ?>
-        <?php if ($_SESSION['user_role'] === 'producteur'): ?>
-          <a href="dashboard-producteur.php">📊 Dashboard</a>
-        <?php elseif ($_SESSION['user_role'] === 'admin'): ?>
-          <a href="dashboard_admin.php">👑 Administration</a>
-        <?php endif; ?>
-      <?php endif; ?>
     </div>
     
     <div class="user-menu">
-      <?php if (isset($_SESSION['user_role'])): ?>
-        <span class="user-name"><i class="bi bi-person-circle"></i> <?php echo htmlspecialchars($_SESSION['user_nom']); ?></span>
+      <?php if (isset($_SESSION['user_role'])): 
+        // Déterminer la redirection du dashboard selon le rôle
+        $dashboardLink = '';
+        if ($_SESSION['user_role'] === 'client') {
+          $dashboardLink = 'dashboard_client.php';
+        } elseif ($_SESSION['user_role'] === 'producteur') {
+          $dashboardLink = 'dashboard-producteur.php';
+        } elseif ($_SESSION['user_role'] === 'admin') {
+          $dashboardLink = 'dashboard_admin.php';
+        }
+      ?>
+        <a href="<?php echo $dashboardLink; ?>" class="user-name-link">
+          <i class="bi bi-person-circle"></i> 
+          <span><?php echo htmlspecialchars($_SESSION['user_nom']); ?></span>
+        </a>
         <a href="logout.php" class="logout-link"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
       <?php else: ?>
+        <!-- Seulement le bouton Connexion (l'inscription est dans signin.php) -->
         <a href="signin.php" class="login-link"><i class="bi bi-box-arrow-in-right"></i> Connexion</a>
-        <a href="signup.php" class="signup-link">S'inscrire</a>
       <?php endif; ?>
     </div>
     
@@ -58,7 +63,6 @@
       <a href="logout.php" class="mobile-nav-link">🚪 Déconnexion</a>
     <?php else: ?>
       <a href="signin.php" class="mobile-nav-link">🔑 Connexion</a>
-      <a href="signup.php" class="mobile-nav-link">📝 Inscription</a>
     <?php endif; ?>
   </div>
 </header>
@@ -146,14 +150,32 @@
     align-items: center;
     gap: 1rem;
   }
-  .user-name {
-    color: white;
-    font-weight: 500;
+  
+  /* Estilo para el nombre del usuario como enlace */
+  .user-name-link {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    background: rgba(255,255,255,0.1);
   }
-  .logout-link, .login-link, .signup-link {
+  .user-name-link:hover {
+    background: rgba(255,255,255,0.25);
+    transform: translateY(-1px);
+  }
+  .user-name-link i {
+    font-size: 1.1rem;
+  }
+  .user-name-link span {
+    font-size: 0.9rem;
+  }
+  
+  .logout-link, .login-link {
     background: rgba(255,255,255,0.15);
     padding: 0.5rem 1rem;
     border-radius: 50px;
@@ -162,15 +184,8 @@
     font-size: 0.85rem;
     transition: background 0.3s;
   }
-  .logout-link:hover, .login-link:hover, .signup-link:hover {
+  .logout-link:hover, .login-link:hover {
     background: rgba(255,255,255,0.3);
-  }
-  .signup-link {
-    background: #9FB2AC;
-    color: #5D0D18;
-  }
-  .signup-link:hover {
-    background: #8a9f98;
   }
   
   .mobile-menu-btn {
@@ -234,7 +249,13 @@
     .logo-img {
       height: 35px;
     }
-    .user-name span {
+    .user-name-link span {
+      display: none;
+    }
+    .user-name-link {
+      padding: 0.5rem 0.8rem;
+    }
+    .logout-link span, .login-link span {
       display: none;
     }
   }
