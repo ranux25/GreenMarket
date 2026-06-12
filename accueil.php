@@ -59,7 +59,6 @@ try {
       --bg: #FFF9EB;
       --text-dark: #2C2C2C;
       --text-light: #6B6B6B;
-      --footer-bg: #3A0A10;
       --gold: #c07a1a;
     }
 
@@ -440,28 +439,6 @@ try {
     }
     #toast.show { transform: translateY(0); opacity: 1; }
 
-    /* ========== FOOTER ========== */
-    footer { background: var(--footer-bg); color: #d4b8a0; }
-    footer a {
-      color: #c4a890;
-      text-decoration: none;
-      font-size: 14px;
-      display: block;
-      margin-bottom: 8px;
-      transition: color 0.2s;
-    }
-    footer a:hover { color: #fff; }
-    .footer-heading {
-      font-family: 'Playfair Display', serif;
-      color: #fff;
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 16px;
-    }
-
-    @media (max-width: 768px) {
-      .hero-decorative { display: none; }
-    }
   </style>
 </head>
 <body data-active-page="accueil">
@@ -600,19 +577,7 @@ try {
   </div>
 </section>
 
-<!-- FOOTER -->
-<footer class="pt-14 pb-8 px-4">
-  <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 mb-10">
-    <div><p class="footer-heading">GreenMarket</p><a href="apropos.php">À propos</a><a href="store.php">Nos coopératives</a><a href="#">Devenir partenaire</a></div>
-    <div><p class="footer-heading">Aide</p><a href="#">FAQ</a><a href="#">Livraison</a><a href="#">Paiement sécurisé</a></div>
-    <div><p class="footer-heading">Légal</p><a href="#">CGU</a><a href="#">Confidentialité</a></div>
-    <div><p class="footer-heading">Suivez-nous</p><a href="#">📘 Facebook</a><a href="#">📷 Instagram</a></div>
-  </div>
-  <div class="max-w-7xl mx-auto border-t pt-6 flex flex-col md:flex-row items-center justify-between gap-2" style="border-color:#6a2030;">
-    <p class="text-xs">© 2026 GreenMarket – Soutenir nos coopératives</p>
-    <p class="text-xs">🇲🇦 Fait avec ❤️ pour les artisans marocains</p>
-  </div>
-</footer>
+<?php include 'footer.php'; ?>
 
 <script>
 // Produits pour la grille (données statiques ou depuis PHP)
