@@ -219,7 +219,7 @@ body{ font-family:'Lato', sans-serif; background:var(--cream); color:var(--text)
 <?php include 'header.php'; ?>
 
 <div class="page-header">
-  <h1>🛍️ Validation de commande</h1>
+  <h1>Validation de commande</h1>
   <p>Vérifiez vos informations et confirmez votre achat</p>
 </div>
 
@@ -273,7 +273,7 @@ body{ font-family:'Lato', sans-serif; background:var(--cream); color:var(--text)
         </div>
 
         <div class="form-section">
-          <h3>🚚 Mode de livraison</h3>
+          <h3>Mode de livraison</h3>
           <div class="radio-group">
             <label><input type="radio" name="mode_livraison" value="livraison" checked> 📦 Livraison à domicile (+250 DH)</label>
             <label><input type="radio" name="mode_livraison" value="retrait"> 🏪 Retrait en boutique (Gratuit)</label>

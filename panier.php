@@ -99,6 +99,53 @@ foreach ($panier as $item) {
 body{ font-family:'Lato', sans-serif; background:var(--cream); color:var(--text); }
 
 /* ========== ESTILOS DEL HEADER ========== */
+.header-eyebrow {
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: rgba(255,249,235,.7);
+    margin-bottom: 1rem;
+  }
+  .page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 700;
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: 1rem;
+  }
+  .page-header h1 em {
+    font-style: italic;
+    color: var(--gold);
+    display: block;
+  }
+  .page-header p {
+    color: rgba(255,249,235,.7);
+    font-size: 1rem;
+    max-width: 500px;
+  }
+  .header-stats {
+    display: flex;
+    gap: 2.5rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255,249,235,.15);
+  }
+  .h-stat-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    display: block;
+    line-height: 1;
+  }
+  .h-stat-label {
+    font-size: .7rem;
+    color: rgba(255,249,235,.6);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
 .topbar{ 
   background:var(--wine); 
   color:white; 
@@ -198,7 +245,8 @@ body{ font-family:'Lato', sans-serif; background:var(--cream); color:var(--text)
 
 <!-- ========== CONTENIDO DE LA PÁGINA ========== -->
 <div class="page-header">
-  <h1>🛒 Mon Panier</h1>
+  <div class="header-eyebrow">🇲🇦 Artisanat &amp; Traditions marocaines</div>
+  <h1>Mon Panier</h1>
   <p>Retrouvez tous vos produits sélectionnés</p>
 </div>
 
