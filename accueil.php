@@ -565,7 +565,7 @@ try {
       <div class="why-feature"><div class="why-check">✓</div><div><p class="font-bold">Savoir-faire traditionnel</p><p class="text-sm text-gray-500 mt-1">Transmission des techniques ancestrales.</p></div></div>
     </div>
     <div class="flex justify-center reveal-right">
-      <img src="IMAGES/logo.png" alt="Artisanat coopératif" class="rounded-2xl shadow-2xl w-full max-w-sm" style="aspect-ratio:1/1;object-fit:cover;">
+      <img src="IMAGES\imagepage.jpg" alt="Artisanat coopératif" class="rounded-2xl shadow-2xl w-full max-w-sm" style="aspect-ratio:1/1;object-fit:cover;">
     </div>
   </div>
 </section>

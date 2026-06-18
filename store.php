@@ -2,7 +2,23 @@
 session_start();
 include('connexion.php');
 
-// Récupérer les boutiques depuis la base de données avec leur catégorie
+// Función para normalizar URLs de imágenes
+function normalizeImageUrl($url) {
+    if (empty($url)) {
+        return 'IMAGES/default-boutique.jpg';
+    }
+    // Reemplazar backslashes por slashes
+    $url = str_replace('\\', '/', $url);
+    // Codificar espacios
+    $url = str_replace(' ', '%20', $url);
+    // Si no tiene http o /, añadir ./
+    if (strpos($url, 'http') !== 0 && strpos($url, '/') !== 0) {
+        $url = './' . $url;
+    }
+    return $url;
+}
+
+// Récupérer les boutiques desde la base de données avec leur catégorie
 try {
     $stmt = $pdo->prepare("
         SELECT b.*, p.nom_entreprise as producteur_nom, 
@@ -36,9 +52,12 @@ try {
     $total_produits = 0;
 }
 
-// Convertir les données pour le JavaScript
+// Convertir les données pour le JavaScript - CORRECTION DES IMAGES
 $boutiques_json = [];
 foreach ($boutiques_db as $b) {
+    // Normaliser l'URL de l'image
+    $banner_url = normalizeImageUrl($b['image']);
+    
     $boutiques_json[] = [
         'id' => $b['id_boutique'],
         'name' => $b['nom_boutique'],
@@ -47,7 +66,7 @@ foreach ($boutiques_db as $b) {
         'categoryName' => $b['nom_categorie'] ?? 'Non catégorisé',
         'badge' => 'Artisan',
         'badgeClass' => 'artisan',
-        'banner' => !empty($b['image']) ? $b['image'] : 'IMAGES/default-boutique.jpg',
+        'banner' => $banner_url,
         'desc' => $b['description'] ?? 'Boutique artisanale marocaine',
         'rating' => 4.5,
         'reviews' => rand(10, 200),
@@ -504,6 +523,59 @@ foreach ($boutiques_db as $b) {
   .store-stat-label { font-size: 0.65rem; color: var(--text-light); }
   .stars { color: #e0a82e; font-size: 0.7rem; }
 
+  /* ====== PAGINATION STYLES ====== */
+  .pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2rem 0 1rem;
+    flex-wrap: wrap;
+  }
+  .pagination-wrapper button {
+    min-width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    border: 2px solid #e8ddd0;
+    background: #fff;
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pagination-wrapper button:hover:not(:disabled) {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+    transform: translateY(-2px);
+  }
+  .pagination-wrapper button.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+  .pagination-wrapper button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .pagination-wrapper .page-btn {
+    min-width: 44px;
+  }
+  .pagination-wrapper .nav-btn {
+    padding: 0 1.2rem;
+    gap: 0.3rem;
+  }
+  .pagination-info {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    text-align: center;
+    padding: 0.5rem 0;
+  }
+
   /* Empty state */
   .empty-state {
     text-align: center;
@@ -540,6 +612,14 @@ foreach ($boutiques_db as $b) {
     .search-input-wrapper { width: 100%; }
     .filter-select { width: 100%; }
     .main-layout { padding: 1.2rem 1rem; }
+    .pagination-wrapper button {
+      min-width: 38px;
+      height: 38px;
+      font-size: 0.8rem;
+    }
+    .pagination-wrapper .nav-btn {
+      padding: 0 0.8rem;
+    }
   }
 </style>
 </head>
@@ -572,6 +652,13 @@ foreach ($boutiques_db as $b) {
   <select class="filter-select" id="catFilter">
     <option value="">Toutes les catégories</option>
   </select>
+  <select class="filter-select" id="perPageFilter">
+    <option value="6">6 par page</option>
+    <option value="9">9 par page</option>
+    <option value="12" selected>12 par page</option>
+    <option value="18">18 par page</option>
+    <option value="24">24 par page</option>
+  </select>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -600,6 +687,10 @@ foreach ($boutiques_db as $b) {
   
   <section class="stores-area">
     <div class="stores-grid reveal" id="storesGrid"></div>
+    
+    <!-- ====== PAGINATION ====== -->
+    <div class="pagination-info" id="paginationInfo"></div>
+    <div class="pagination-wrapper" id="paginationWrapper"></div>
   </section>
 </div>
 
@@ -610,7 +701,15 @@ foreach ($boutiques_db as $b) {
 const boutiquesFromDB = <?php echo json_encode($boutiques_json); ?>;
 const categoriesFromDB = <?php echo json_encode($categories_db); ?>;
 
+console.log('Boutiques chargées:', boutiquesFromDB.length);
+console.log('Catégories chargées:', categoriesFromDB.length);
+
 let stores = boutiquesFromDB.length > 0 ? boutiquesFromDB : [];
+
+// ====== PAGINATION VARIABLES ======
+let currentPage = 1;
+let perPage = 12; // Valeur par défaut
+let filteredStores = [];
 
 // Initialiser les catégories depuis la base de données
 let categories = [];
@@ -685,6 +784,7 @@ function renderCategories() {
         el.addEventListener('click', () => {
             const catName = el.dataset.name;
             currentCategory = catName || null;
+            currentPage = 1;
             renderCategories();
             renderStores();
             const catFilter = document.getElementById('catFilter');
@@ -693,12 +793,10 @@ function renderCategories() {
     });
 }
 
-function renderStores() {
-    const grid = document.getElementById('storesGrid');
-    if (!grid) return;
-    
+// ====== FONCTION POUR FILTRER LES BOUTIQUES ======
+function filterStores() {
     const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
-    let filteredStores = stores.filter(s => {
+    filteredStores = stores.filter(s => {
         const matchSearch = !searchTerm || 
             s.name.toLowerCase().includes(searchTerm) || 
             (s.producerName || '').toLowerCase().includes(searchTerm);
@@ -706,15 +804,43 @@ function renderStores() {
         return matchSearch && matchCategory;
     });
     
-    if (filteredStores.length === 0) {
+    document.getElementById('statStores').textContent = filteredStores.length;
+    console.log('Total boutiques filtrées:', filteredStores.length);
+}
+
+// ====== RENDU DES BOUTIQUES AVEC PAGINATION ======
+function renderStores() {
+    const grid = document.getElementById('storesGrid');
+    if (!grid) return;
+    
+    filterStores();
+    
+    const totalItems = filteredStores.length;
+    const totalPages = Math.ceil(totalItems / perPage);
+    
+    console.log('Total pages:', totalPages, 'PerPage:', perPage, 'Total items:', totalItems);
+    
+    if (currentPage > totalPages && totalPages > 0) {
+        currentPage = totalPages;
+    }
+    if (currentPage < 1) currentPage = 1;
+    
+    const startIndex = (currentPage - 1) * perPage;
+    const endIndex = Math.min(startIndex + perPage, totalItems);
+    const pageItems = filteredStores.slice(startIndex, endIndex);
+    
+    console.log('Affichage items:', startIndex, 'à', endIndex, 'sur', totalItems, 'pageItems:', pageItems.length);
+    
+    if (pageItems.length === 0) {
         grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🏪</div><p>Aucune boutique trouvée.</p></div>`;
+        renderPagination(0, 0);
         return;
     }
     
     const fallbackImg = 'https://placehold.co/400x200/5D0D18/white?text=GreenMarket';
     
-    grid.innerHTML = filteredStores.map(s => `
-        <div class="store-card">
+    grid.innerHTML = pageItems.map(s => `
+      <div class="store-card">
             <div class="store-banner" onclick="window.location.href='info-store.php?id=${s.id}'">
                 <img src="${escapeHtml(s.banner || fallbackImg)}" alt="${escapeHtml(s.name)}" onerror="this.src='${fallbackImg}'">
                 ${s.badge ? `<span class="store-badge">${escapeHtml(s.badge)}</span>` : ''}
@@ -740,6 +866,72 @@ function renderStores() {
             </div>
         </div>
     `).join('');
+    
+    const infoEl = document.getElementById('paginationInfo');
+    if (infoEl && totalItems > 0) {
+        infoEl.textContent = `Affichage ${startIndex + 1} - ${endIndex} sur ${totalItems} boutique${totalItems > 1 ? 's' : ''}`;
+    } else if (infoEl) {
+        infoEl.textContent = '';
+    }
+    
+    renderPagination(currentPage, totalPages);
+}
+
+// ====== RENDU DE LA PAGINATION ======
+function renderPagination(activePage, totalPages) {
+    const wrapper = document.getElementById('paginationWrapper');
+    if (!wrapper) return;
+
+    if (totalPages <= 1) {
+        wrapper.innerHTML = '';
+        return;
+    }
+
+    let html = '';
+
+    html += `
+        <button class="nav-btn" onclick="goToPage(${activePage - 1})" ${activePage <= 1 ? 'disabled' : ''}>
+            <i class="bi bi-chevron-left"></i> Préc
+        </button>
+    `;
+
+    let startPage = Math.max(1, activePage - 2);
+    let endPage   = Math.min(totalPages, activePage + 2);
+
+    if (endPage - startPage < 4) {
+        if (startPage === 1) endPage = Math.min(5, totalPages);
+        else if (endPage === totalPages) startPage = Math.max(1, totalPages - 4);
+    }
+
+    if (startPage > 1) {
+        html += `<button class="page-btn" onclick="goToPage(1)">1</button>`;
+        if (startPage > 2) html += `<button class="page-btn" disabled>…</button>`;
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<button class="page-btn ${i === activePage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) html += `<button class="page-btn" disabled>…</button>`;
+        html += `<button class="page-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+    }
+
+    html += `
+        <button class="nav-btn" onclick="goToPage(${activePage + 1})" ${activePage >= totalPages ? 'disabled' : ''}>
+            Suiv <i class="bi bi-chevron-right"></i>
+        </button>
+    `;
+
+    wrapper.innerHTML = html;
+}
+
+function goToPage(page) {
+    const totalPages = Math.ceil(filteredStores.length / perPage);
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;   // ← variable globale, pas de let/const ici
+    renderStores();
+    document.querySelector('.stores-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function addCategory() {
@@ -797,19 +989,25 @@ function initReveal() {
     elements.forEach(el => observer.observe(el));
 }
 
-// Événements
-document.getElementById('searchInput')?.addEventListener('input', renderStores);
+// ====== ÉVÉNEMENTS ======
+document.getElementById('searchInput')?.addEventListener('input', () => {
+    currentPage = 1;
+    renderStores();
+});
+
 document.getElementById('toggleAddCat')?.addEventListener('click', () => {
     document.getElementById('addCatForm').classList.toggle('open');
 });
+
 document.getElementById('cancelCat')?.addEventListener('click', () => {
     document.getElementById('addCatForm').classList.remove('open');
     document.getElementById('catNameInput').value = '';
     document.getElementById('catIconInput').value = '';
 });
+
 document.getElementById('saveCat')?.addEventListener('click', addCategory);
 
-// Remplir le filtre catégorie
+// Filtre par catégorie
 const catFilter = document.getElementById('catFilter');
 if (catFilter) {
     categories.forEach(c => {
@@ -820,7 +1018,21 @@ if (catFilter) {
     });
     catFilter.addEventListener('change', (e) => {
         currentCategory = e.target.value || null;
+        currentPage = 1;
         renderCategories();
+        renderStores();
+    });
+}
+
+// Filtre par nombre d'éléments par page
+const perPageFilter = document.getElementById('perPageFilter');
+if (perPageFilter) {
+    // Définir la valeur initiale
+    perPage = parseInt(perPageFilter.value) || 12;
+    
+    perPageFilter.addEventListener('change', function(e) {
+        perPage = parseInt(e.target.value) || 12;
+        currentPage = 1;
         renderStores();
     });
 }
@@ -831,7 +1043,6 @@ renderStores();
 initReveal();
 
 // Mettre à jour les statistiques
-document.getElementById('statStores').textContent = stores.length;
 document.getElementById('statProducts').textContent = stores.reduce((sum, s) => sum + (s.products || 0), 0);
 </script>
 </body>
