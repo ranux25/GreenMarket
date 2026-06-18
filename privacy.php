@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -47,7 +48,7 @@
       <hr class="text-muted my-3 opacity-25">
 
       <div class="text-center">
-        <a href="signin.html" class="btn btn-light border w-100 py-2 fw-medium btn-sm" style="border-radius: 8px;">
+        <a href="signin.php" class="btn btn-light border w-100 py-2 fw-medium btn-sm" style="border-radius: 8px;">
           <i class="bi bi-arrow-left me-1"></i> Retour à l'inscription
         </a>
       </div>

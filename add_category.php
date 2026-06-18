@@ -1,7 +1,7 @@
 <?php
 session_start();
 header('Content-Type: application/json');
-require_once 'connexion.php';
+include('connexion.php');
 
 // Vérifier que l'utilisateur est admin
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {

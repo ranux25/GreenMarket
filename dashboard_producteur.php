@@ -1,19 +1,19 @@
 <?php
 session_start();
 
-// Verificar que el usuario está conectado y es producteur
+#verifier que l'utilisateur est connecte et est producteur
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'producteur') {
     header('Location: signin.php');
     exit;
 }
 
-// Conectar a la base de datos
-require_once 'connexion.php';
+#connexion a la base de donnees
+include('connexion.php');
 
-// Verificar si el productor está validado
+#verifier si le producteur est valide
 $est_valide = $_SESSION['est_valide'] ?? 0;
 
-// Si no está validado, mostrar mensaje de espera
+#si non valide, afficher message d'attente
 if ($est_valide != 1) {
     // Intentar obtener el estado actual desde la BD
     try {
@@ -29,9 +29,9 @@ if ($est_valide != 1) {
     }
 }
 
-// Obtener datos reales del producteur desde la BD
+#recuperer les donnees du producteur depuis la BD
 try {
-    // Obtener información del producteur
+    #recuperer les informations du producteur
     $stmt = $pdo->prepare("SELECT * FROM producteur WHERE id_producteur = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $producteur = $stmt->fetch();
@@ -42,20 +42,20 @@ try {
         exit;
     }
     
-    // Si el estado de validación ha cambiado, actualizar sesión
+    #si l'etat de validation a change, mettre a jour la session
     if ($producteur['est_valide_par_admin'] != $est_valide) {
         $est_valide = $producteur['est_valide_par_admin'];
         $_SESSION['est_valide'] = $est_valide;
     }
     
-    // Solo mostrar datos si está validado
+    #afficher les donnees seulement si valide
     if ($est_valide == 1) {
-        // Obtener boutiques del producteur
+        #recuperer les boutiques du producteur
         $stmt = $pdo->prepare("SELECT * FROM boutique WHERE id_producteur = ?");
         $stmt->execute([$_SESSION['user_id']]);
         $boutiques = $stmt->fetchAll();
         
-        // Obtener productos de las boutiques
+        #recuperer les produits des boutiques
         if (!empty($boutiques)) {
             $boutiqueIds = array_column($boutiques, 'id_boutique');
             $placeholders = implode(',', array_fill(0, count($boutiqueIds), '?'));
@@ -68,7 +68,7 @@ try {
             $produits = [];
         }
         
-        // Obtener comandos de los productos
+        #recuperer les commandes des produits
         $commandes = [];
         if (!empty($produits)) {
             $produitIds = array_column($produits, 'id_produit');
@@ -84,13 +84,13 @@ try {
             $commandes = $stmt->fetchAll();
         }
         
-        // Calcular estadísticas
+        #calculer les statistiques
         $ca_total = array_sum(array_column($commandes, 'montant_total'));
         $nb_commandes = count($commandes);
         $nb_boutiques = count($boutiques);
         $nb_produits = count($produits);
     } else {
-        // Si no está validado, arrays vacíos
+        #si non valide, tableaux vides
         $boutiques = [];
         $produits = [];
         $commandes = [];

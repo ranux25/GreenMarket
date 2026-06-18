@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'connexion.php';
+include('connexion.php');
 
 // Récupérer les produits depuis la base de données
 try {
@@ -29,6 +29,14 @@ try {
     
     $stmt = $pdo->query("SELECT COUNT(DISTINCT id_boutique) as total FROM produit WHERE est_valide_par_admin = 1 AND statut_publie = 'Publié'");
     $total_boutiques = $stmt->fetch()['total'];
+
+    #compter les articles dans le panier du client connecte (pour le badge)
+    $panier_count = 0;
+    if (isset($_SESSION['user_id']) && $_SESSION['user_role'] == 'client') {
+        $stmtP = $pdo->prepare("SELECT SUM(quantite) as total FROM panier WHERE id_client = ?");
+        $stmtP->execute([$_SESSION['user_id']]);
+        $panier_count = $stmtP->fetch()['total'] ?? 0;
+    }
     
 } catch(PDOException $e) {
     error_log("Error produits: " . $e->getMessage());
@@ -36,6 +44,7 @@ try {
     $categories_db = [];
     $total_produits = 0;
     $total_boutiques = 0;
+    $panier_count = 0;
 }
 
 // Formater les produits pour le JavaScript
@@ -564,35 +573,31 @@ function showToast(msg) {
     setTimeout(() => toast.classList.remove('show'), 2800);
 }
 
+let panierCount = <?php echo json_encode($panier_count); ?>;
+
 function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('greenmarket_cart') || '[]');
-    const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
     const badge = document.getElementById('cart-count');
-    if (badge) badge.textContent = total;
+    if (badge) badge.textContent = panierCount;
 }
 
 function addToCart(product) {
-    let cart = JSON.parse(localStorage.getItem('greenmarket_cart') || '[]');
-    const existing = cart.find(item => item.id === product.id);
-    
-    if (existing) {
-        existing.quantity = (existing.quantity || 1) + 1;
-    } else {
-        cart.push({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            prixNumerique: product.prixNumerique,
-            image: product.image,
-            boutiqueId: product.shopId,
-            boutiqueNom: product.shopName,
-            quantity: 1
-        });
-    }
-    
-    localStorage.setItem('greenmarket_cart', JSON.stringify(cart));
-    updateCartCount();
-    showToast(`✓ ${product.name} ajouté au panier !`);
+    fetch('ajouter_panier.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'id_produit=' + encodeURIComponent(product.id) + '&quantite=1'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            panierCount = data.total_panier;
+            const badge = document.getElementById('cart-count');
+            if (badge) badge.textContent = data.total_panier;
+            showToast(`✓ ${product.name} ajouté au panier !`);
+        } else {
+            showToast(data.message || 'Erreur lors de l\'ajout au panier');
+        }
+    })
+    .catch(() => showToast('Erreur de connexion au serveur'));
 }
 
 function escapeHtml(str) {

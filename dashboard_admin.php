@@ -1,19 +1,18 @@
 <?php
 session_start();
-
-// Verificar que el usuario está conectado y es admin
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-    header('Location: signin.php');
+    header("Location: signin.php");
     exit;
 }
 
-// Conectar a la base de datos
-require_once 'connexion.php';
+if (isset($_GET['msgs']))   echo "<div style='color:green;padding:10px;'>" . htmlspecialchars($_GET['msgs']) . "</div>";
+if (isset($_GET['msgerr'])) echo "<div style='color:red;padding:10px;'>"   . htmlspecialchars($_GET['msgerr']) . "</div>";
 
-// Obtener todos los datos de la BD
+include("connexion.php");
+
 try {
-    // === ESTADÍSTICAS ===
-    // Total de utilisateurs
+    #=== STATISTIQUES ===
+    #total utilisateurs
     $stmt = $pdo->query("SELECT COUNT(*) as total FROM client");
     $total_clients = $stmt->fetch()['total'];
     
@@ -22,58 +21,58 @@ try {
     
     $total_users = $total_clients + $total_producteurs;
     
-    // Producteurs actifs (validés)
+    #producteurs valides
     $stmt = $pdo->query("SELECT COUNT(*) as total FROM producteur WHERE est_valide_par_admin = 1");
     $active_producers = $stmt->fetch()['total'];
     
-    // Producteurs en attente
+    #producteurs en attente
     $stmt = $pdo->query("SELECT * FROM producteur WHERE est_valide_par_admin = 0 ORDER BY date_inscription DESC");
     $producteurs_attente = $stmt->fetchAll();
     $nb_attente = count($producteurs_attente);
     
-    // Chiffre d'affaires total
+    #chiffre d'affaires total
     $stmt = $pdo->query("SELECT SUM(montant_total) as total FROM commande WHERE statut_commande = 'Livrée'");
     $ca_total = $stmt->fetch()['total'] ?? 0;
     
-    // Nombre de commandes
+    #nombre de commandes
     $stmt = $pdo->query("SELECT COUNT(*) as total FROM commande");
     $total_commandes = $stmt->fetch()['total'];
     
-    // Nombre de boutiques
+    #nombre de boutiques
     $stmt = $pdo->query("SELECT COUNT(*) as total FROM boutique");
     $total_boutiques = $stmt->fetch()['total'];
     
-    // Nombre de produits
+    #nombre de produits
     $stmt = $pdo->query("SELECT COUNT(*) as total FROM produit");
     $total_produits = $stmt->fetch()['total'];
     
-    // Produits en attente de validation
+    #produits en attente de validation
     $stmt = $pdo->query("SELECT p.*, b.nom_boutique FROM produit p 
                          JOIN boutique b ON p.id_boutique = b.id_boutique 
                          WHERE p.est_valide_par_admin = 0 
                          ORDER BY p.date_creation DESC");
     $produits_attente = $stmt->fetchAll();
     
-    // Tous les clients
+    #tous les clients
     $stmt = $pdo->query("SELECT id_client as id, nom_client as nom, email, 'client' as role, 1 as actif FROM client ORDER BY date_inscription DESC");
     $clients = $stmt->fetchAll();
     
-    // Tous les producteurs
+    #tous les producteurs
     $stmt = $pdo->query("SELECT id_producteur as id, nom_entreprise as nom, email, 'producteur' as role, est_valide_par_admin as actif FROM producteur ORDER BY date_inscription DESC");
     $producteurs = $stmt->fetchAll();
     
-    // Toutes les boutiques
+    #toutes les boutiques
     $stmt = $pdo->query("SELECT b.*, p.nom_entreprise as producteur_nom, p.est_valide_par_admin as producteur_valide 
                          FROM boutique b 
                          JOIN producteur p ON b.id_producteur = p.id_producteur 
                          ORDER BY b.date_creation DESC");
     $boutiques = $stmt->fetchAll();
     
-    // Catégories
+    #categories
     $stmt = $pdo->query("SELECT * FROM categorie ORDER BY nom_categorie");
     $categories = $stmt->fetchAll();
     
-    // Commandes récentes
+    #commandes recentes
     $stmt = $pdo->query("SELECT c.*, cl.nom_client FROM commande c 
                          JOIN client cl ON c.id_client = cl.id_client 
                          ORDER BY c.date_commande DESC LIMIT 20");

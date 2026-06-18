@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'connexion.php';
+include('connexion.php');
 
 // Vérifier que l'utilisateur est connecté et est admin
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {

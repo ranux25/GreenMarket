@@ -1,11 +1,10 @@
 <?php
 session_start();
-require_once 'connexion.php';
+include('connexion.php');
 
-// Récupérer les boutiques depuis la base de données
+#recuperer les boutiques validees depuis la BD
 try {
-    // Récupérer toutes les boutiques avec les infos du producteur
-    $stmt = $pdo->prepare("
+    $req = $pdo->prepare("
         SELECT b.*, p.nom_entreprise as producteur_nom, 
                p.est_valide_par_admin as producteur_valide
         FROM boutique b
@@ -14,31 +13,25 @@ try {
         ORDER BY b.date_creation DESC
         LIMIT 6
     ");
-    $stmt->execute();
-    $boutiques_db = $stmt->fetchAll();
-    
-    // Si pas de boutiques, utiliser des données par défaut
-    if (empty($boutiques_db)) {
-        $boutiques_db = [];
-    }
-    
-    // Récupérer les produits populaires (optionnel)
-    $stmt = $pdo->prepare("
+    $req->execute();
+    $boutiques_db = $req->fetchAll(PDO::FETCH_ASSOC);
+
+    #recuperer les produits valides et publies
+    $req2 = $pdo->prepare("
         SELECT p.*, c.nom_categorie, b.nom_boutique
         FROM produit p
         JOIN boutique b ON p.id_boutique = b.id_boutique
         LEFT JOIN categorie c ON p.id_categorie = c.id_categorie
         WHERE p.est_valide_par_admin = 1
+        AND p.statut_publie = 'Publié'
         ORDER BY p.date_creation DESC
         LIMIT 8
     ");
-    $stmt->execute();
-    $produits_db = $stmt->fetchAll();
-    
+    $req2->execute();
+    $produits_db = $req2->fetchAll(PDO::FETCH_ASSOC);
+
 } catch(PDOException $e) {
-    error_log("Error accueil: " . $e->getMessage());
-    $boutiques_db = [];
-    $produits_db = [];
+    die("Erreur accueil : " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
@@ -638,25 +631,40 @@ function renderProducts() {
 }
 
 let cart = [];
-function loadCart() {
-  try { cart = JSON.parse(localStorage.getItem('greenmarket_cart') || '[]'); } catch { cart = []; }
-  updateCartCount();
-}
-function saveCart() { localStorage.setItem('greenmarket_cart', JSON.stringify(cart)); updateCartCount(); }
-function updateCartCount() {
-  const total = cart.reduce((s,i) => s + (i.quantity||1), 0);
+function updateCartCount(total) {
   const badge = document.getElementById('cart-count');
-  if (badge) badge.textContent = total;
+  if (badge && total !== undefined) badge.textContent = total;
 }
 function addToCart(product) {
-  const existing = cart.find(i => i.id === product.id);
-  if (existing) existing.quantity = (existing.quantity||1) + 1;
-  else cart.push({ ...product, quantity: 1 });
-  saveCart();
-  const toast = document.getElementById('toast');
-  toast.textContent = `✓ ${product.name} ajouté au panier`;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2600);
+  const formData = new FormData();
+  formData.append('id_produit', product.id);
+  formData.append('quantite', 1);
+
+  fetch('ajouter_panier.php', { method: 'POST', body: formData })
+    .then(res => res.json())
+    .then(data => {
+      const toast = document.getElementById('toast');
+      if (data.success) {
+        updateCartCount(data.total_panier);
+        toast.textContent = `✓ ${product.name} ajouté au panier`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2600);
+      } else if (data.message.includes('connecter')) {
+        toast.textContent = '⚠️ Connectez-vous pour ajouter au panier';
+        toast.classList.add('show');
+        setTimeout(() => { window.location.href = 'signin.php'; }, 1500);
+      } else {
+        toast.textContent = '❌ ' + data.message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2600);
+      }
+    })
+    .catch(() => {
+      const toast = document.getElementById('toast');
+      toast.textContent = '❌ Erreur de connexion au serveur';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2600);
+    });
 }
 
 // Scroll reveal
@@ -671,7 +679,6 @@ function initReveal() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  loadCart();
   renderProducts();
   initReveal();
   

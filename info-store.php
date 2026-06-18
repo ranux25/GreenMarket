@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'connexion.php';
+include('connexion.php');
 
 // Vérifier si un ID boutique est fourni
 $id_boutique = isset($_GET['id']) ? intval($_GET['id']) : 0;

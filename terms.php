@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -92,7 +93,7 @@
       <hr class="text-muted my-4 opacity-25">
 
       <div class="text-center">
-        <a href="signin.html" class="btn custom-submit-btn w-100 py-2 fw-medium btn-sm" style="border-radius: 12px;" onclick="if(window.opener) { window.close(); return false; }">
+        <a href="signin.php" class="btn custom-submit-btn w-100 py-2 fw-medium btn-sm" style="border-radius: 12px;" onclick="if(window.opener) { window.close(); return false; }">
           <i class="bi bi-arrow-left me-1"></i> Fermer ou Retourner à l'inscription
         </a>
       </div>

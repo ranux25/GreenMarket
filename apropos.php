@@ -1,3 +1,28 @@
+<?php
+session_start();
+include("connexion.php");
+
+#recuperer les statistiques reelles depuis la BD
+try {
+    $req = $pdo->query("SELECT COUNT(*) as total FROM client");
+    $total_clients = $req->fetch(PDO::FETCH_ASSOC)['total'];
+
+    $req = $pdo->query("SELECT COUNT(*) as total FROM producteur WHERE est_valide_par_admin = 1");
+    $total_producteurs = $req->fetch(PDO::FETCH_ASSOC)['total'];
+
+    $req = $pdo->query("SELECT COUNT(*) as total FROM produit WHERE est_valide_par_admin = 1");
+    $total_produits = $req->fetch(PDO::FETCH_ASSOC)['total'];
+
+    $req = $pdo->query("SELECT COUNT(*) as total FROM boutique");
+    $total_boutiques = $req->fetch(PDO::FETCH_ASSOC)['total'];
+}
+catch(PDOException $e) {
+    $total_clients    = 0;
+    $total_producteurs = 0;
+    $total_produits   = 0;
+    $total_boutiques  = 0;
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -394,21 +419,24 @@
   <div class="impact-section">
     <h2>Notre impact en chiffres</h2>
     <div class="impact-grid">
+  <div class="impact-section">
+    <h2>Notre impact en chiffres</h2>
+    <div class="impact-grid">
       <div>
-        <span class="impact-number">150+</span>
+        <span class="impact-number"><?php echo $total_producteurs; ?>+</span>
         <span class="impact-label">Artisans partenaires</span>
       </div>
       <div>
-        <span class="impact-number">10+</span>
-        <span class="impact-label">Coopératives</span>
+        <span class="impact-number"><?php echo $total_boutiques; ?>+</span>
+        <span class="impact-label">Boutiques</span>
       </div>
       <div>
-        <span class="impact-number">2000+</span>
+        <span class="impact-number"><?php echo $total_produits; ?>+</span>
         <span class="impact-label">Produits artisanaux</span>
       </div>
       <div>
-        <span class="impact-number">12</span>
-        <span class="impact-label">Régions du Maroc</span>
+        <span class="impact-number"><?php echo $total_clients; ?>+</span>
+        <span class="impact-label">Clients satisfaits</span>
       </div>
     </div>
   </div>
@@ -497,227 +525,5 @@
   .auth-form.active { display: block; }
   .auth-tab.active { color: #5d0d18 !important; border-bottom: 2px solid #5d0d18 !important; }
 </style>
-
-<script>
-  // ========== FUNCIONES DE AUTENTICACIÓN ==========
-  let currentUser = null;
-
-  function initUsers() {
-    if (!localStorage.getItem('greenmarket_users')) {
-      const defaultUsers = [
-        { id: 1, name: "Jean Dupont", email: "client@test.com", password: "client123", role: "client", producerId: null },
-        { id: 2, name: "Fatima Zahra", email: "fatima@caftan.ma", password: "fatima123", role: "productor", producerId: 101 }
-      ];
-      localStorage.setItem('greenmarket_users', JSON.stringify(defaultUsers));
-    }
-  }
-
-  function getCurrentUser() {
-    const u = sessionStorage.getItem('greenmarket_current_user');
-    return u ? JSON.parse(u) : null;
-  }
-
-  function setCurrentUser(user) {
-    sessionStorage.setItem('greenmarket_current_user', JSON.stringify(user));
-    currentUser = user;
-    updateAuthUI();
-  }
-
-  function logout() {
-    sessionStorage.removeItem('greenmarket_current_user');
-    currentUser = null;
-    updateAuthUI();
-    showToast("👋 Déconnexion réussie");
-  }
-
-  function login(email, password) {
-    const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
-    const user = users.find(u => u.email === email && u.password === password);
-    if (user) {
-      const { password, ...safeUser } = user;
-      setCurrentUser(safeUser);
-      return { success: true, user: safeUser };
-    }
-    return { success: false, error: "Email ou mot de passe incorrect" };
-  }
-
-  function registerClient(name, email, password) {
-    const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
-    if (users.find(u => u.email === email)) {
-      return { success: false, error: "Email déjà utilisé" };
-    }
-    const newUser = {
-      id: Date.now(),
-      name: name,
-      email: email,
-      password: password,
-      role: "client",
-      producerId: null
-    };
-    users.push(newUser);
-    localStorage.setItem('greenmarket_users', JSON.stringify(users));
-    const { password: _, ...safeUser } = newUser;
-    setCurrentUser(safeUser);
-    return { success: true, user: safeUser };
-  }
-
-  function registerProducer(name, email, password) {
-    const users = JSON.parse(localStorage.getItem('greenmarket_users') || '[]');
-    if (users.find(u => u.email === email)) {
-      return { success: false, error: "Email déjà utilisé" };
-    }
-    const newProducerId = Date.now();
-    const newUser = {
-      id: Date.now(),
-      name: name,
-      email: email,
-      password: password,
-      role: "productor",
-      producerId: newProducerId
-    };
-    users.push(newUser);
-    localStorage.setItem('greenmarket_users', JSON.stringify(users));
-    const { password: _, ...safeUser } = newUser;
-    setCurrentUser(safeUser);
-    return { success: true, user: safeUser };
-  }
-
-  function updateAuthUI() {
-    const widget = document.getElementById('authWidget');
-    if (!widget) return;
-    
-    const user = getCurrentUser();
-    if (user) {
-      const roleText = user.role === 'admin' ? 'Admin' : (user.role === 'productor' ? 'Artisan' : 'Client');
-      widget.innerHTML = `<div class="user-badge" style="background:#f5e6e8; padding:0.4rem 1rem; border-radius:30px; display:flex; align-items:center; gap:10px; color:#5d0d18; font-weight:600; font-size:0.85rem;">👋 ${escapeHtml(user.name)} (${roleText})<button id="logoutBtn" style="background:none;border:none;color:#5d0d18;cursor:pointer;margin-left:8px;">🚪</button></div>`;
-      document.getElementById('logoutBtn')?.addEventListener('click', logout);
-      
-      const dashboardLink = document.getElementById('dashboardLink');
-      if (dashboardLink) {
-        dashboardLink.style.display = (user.role === 'productor' || user.role === 'admin') ? 'inline-block' : 'none';
-      }
-    } else {
-      widget.innerHTML = `<button class="btn-connexion" id="showLoginBtn" style="background:#5D0D18; color:#fff; border:none; border-radius:999px; padding:8px 20px; font-family:'Lato',sans-serif; font-weight:700; font-size:14px; cursor:pointer;">🔑 Connexion</button>`;
-      widget.innerHTML = `<button class="btn-connexion" onclick="window.location.href='signin.html'">🔑 Connexion</button>`;
-    }
-  }
-
-  function showToast(msg) {
-    let toast = document.getElementById('toast');
-    if (!toast) {
-      const t = document.createElement('div');
-      t.id = 'toast';
-      t.style.cssText = 'position:fixed; bottom:28px; right:28px; background:#5d0d18; color:#fff; padding:14px 22px; border-radius:12px; font-family:Lato,sans-serif; font-weight:700; font-size:14px; z-index:9999; transform:translateY(80px); opacity:0; transition:transform 0.35s, opacity 0.3s;';
-      document.body.appendChild(t);
-    }
-    toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2800);
-  }
-
-  function showAuthModal() {
-    const modal = document.getElementById('authModal');
-    if (modal) modal.classList.add('open');
-  }
-
-  function closeAuthModal() {
-    const modal = document.getElementById('authModal');
-    if (modal) modal.classList.remove('open');
-  }
-
-  function setupAuthModal() {
-    // Tabs
-    document.querySelectorAll('.auth-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        const tabName = tab.dataset.tab;
-        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
-        if (tabName === 'login') document.getElementById('loginForm').classList.add('active');
-        if (tabName === 'register') document.getElementById('registerForm').classList.add('active');
-        if (tabName === 'registerProducer') document.getElementById('registerProducerForm').classList.add('active');
-      });
-    });
-
-    // Login
-    document.getElementById('doLoginBtn')?.addEventListener('click', () => {
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      const result = login(email, password);
-      if (result.success) {
-        closeAuthModal();
-        updateAuthUI();
-        showToast(`👋 Bonjour ${result.user.name} !`);
-      } else {
-        document.getElementById('loginError').textContent = result.error;
-      }
-    });
-
-    // Register Client
-    document.getElementById('doRegisterBtn')?.addEventListener('click', () => {
-      const name = document.getElementById('regName').value;
-      const email = document.getElementById('regEmail').value;
-      const password = document.getElementById('regPassword').value;
-      if (!name || !email || !password) {
-        document.getElementById('registerError').textContent = "Tous les champs sont requis";
-        return;
-      }
-      const result = registerClient(name, email, password);
-      if (result.success) {
-        closeAuthModal();
-        updateAuthUI();
-        showToast(`✅ Bienvenue ${result.user.name} !`);
-      } else {
-        document.getElementById('registerError').textContent = result.error;
-      }
-    });
-
-    // Register Producer
-    document.getElementById('doRegisterProducerBtn')?.addEventListener('click', () => {
-      const name = document.getElementById('regProdName').value;
-      const email = document.getElementById('regProdEmail').value;
-      const password = document.getElementById('regProdPassword').value;
-      if (!name || !email || !password) {
-        document.getElementById('registerProducerError').textContent = "Tous les champs sont requis";
-        return;
-      }
-      const result = registerProducer(name, email, password);
-      if (result.success) {
-        closeAuthModal();
-        updateAuthUI();
-        showToast(`✅ Bienvenue ${result.user.name} ! Vous pouvez maintenant créer votre boutique.`);
-      } else {
-        document.getElementById('registerProducerError').textContent = result.error;
-      }
-    });
-
-    document.getElementById('closeAuthModal')?.addEventListener('click', closeAuthModal);
-    document.getElementById('authModal')?.addEventListener('click', (e) => {
-      if (e.target === document.getElementById('authModal')) closeAuthModal();
-    });
-  }
-
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
-  }
-
-  function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('greenmarket_cart') || '[]');
-    const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-    const badge = document.getElementById('cart-count');
-    if (badge) badge.textContent = total;
-  }
-
-  
-  
-  document.getElementById('contactBtn')?.addEventListener('click', () => {
-    showToast("📧 Contactez-nous : contact@greenmarket.ma");
-  });
-
-  loadHeaderAndInit();
-</script>
-<script src="header-loader.js"></script>
 </body>
 </html>

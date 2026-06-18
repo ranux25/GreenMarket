@@ -1,260 +1,233 @@
-<?php 
+<?php
 session_start();
 
-// IMPORTANT: Vérifier si l'utilisateur essaie d'accéder à signin.php alors qu'il est déjà connecté
-$current_page = basename($_SERVER['PHP_SELF']);
-
-if (isset($_SESSION['user_role']) && $current_page == 'signin.php') {
+if (isset($_SESSION['user_role'])) {
     $redirects = [
         'admin'      => 'dashboard_admin.php',
         'producteur' => 'dashboard_producteur.php',
         'client'     => 'dashboard_client.php',
     ];
-    $redirect = $redirects[$_SESSION['user_role']] ?? 'accueil.php';
-    
-    if ($redirect != $current_page) {
-        header('Location: ' . $redirect);
-        exit;
-    }
+    header("Location: " . ($redirects[$_SESSION['user_role']] ?? 'accueil.php'));
+    exit;
 }
 
-// Traitement du formulaire de connexion
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    require_once 'connexion.php';
-    
-    $action = $_POST['action'] ?? '';
-    
-    // ========== LOGIN ==========
-    if ($action === 'login') {
-        $email = trim($_POST['email'] ?? '');
-        $password = $_POST['password'] ?? '';
-        
-        if (empty($email) || empty($password)) {
-            $_SESSION['error'] = 'Email et mot de passe requis';
-            $_SESSION['active_form'] = 'login';
-        } else {
+if (isset($_GET['msgs'])) $_SESSION['success'] = $_GET['msgs'];
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    extract($_POST);
+    $action = $action ?? '';
+
+    #========== LOGIN ==========
+    if ($action == 'login') {
+        $err = [];
+        if (!isset($email) || empty($email)) $err['email'] = "Veuillez entrer votre email";
+        if (!isset($password) || empty($password)) $err['password'] = "Veuillez entrer votre mot de passe";
+
+        if (empty($err)) {
+            $email = trim($email);
+            include("connexion.php");
             try {
-                $stmt = $pdo->prepare("SELECT id_admin as id, nom_admin as nom, email, mot_de_passe, 'admin' as role, 1 as valide FROM administrateur WHERE email = ?");
-                $stmt->execute([$email]);
-                $user = $stmt->fetch();
-                
-                if (!$user) {
-                    $stmt = $pdo->prepare("SELECT id_client as id, nom_client as nom, email, mot_de_passe, 'client' as role, 1 as valide FROM client WHERE email = ? AND est_actif = 1");
-                    $stmt->execute([$email]);
-                    $user = $stmt->fetch();
+                #chercher dans administrateur
+                $req = $pdo->prepare("SELECT id_admin as id, nom_admin as nom, email, mot_de_passe, 'admin' as role, 1 as valide FROM administrateur WHERE email = ?");
+                $req->execute([$email]);
+                $user = $req->fetch(PDO::FETCH_ASSOC);
+
+                #chercher dans client
+                if (empty($user)) {
+                    $req = $pdo->prepare("SELECT id_client as id, nom_client as nom, email, mot_de_passe, 'client' as role, 1 as valide FROM client WHERE email = ? AND est_actif = 1");
+                    $req->execute([$email]);
+                    $user = $req->fetch(PDO::FETCH_ASSOC);
                 }
-                
-                if (!$user) {
-                    $stmt = $pdo->prepare("SELECT id_producteur as id, nom_entreprise as nom, email, mot_de_passe, 'producteur' as role, est_valide_par_admin as valide FROM producteur WHERE email = ?");
-                    $stmt->execute([$email]);
-                    $user = $stmt->fetch();
+
+                #chercher dans producteur
+                if (empty($user)) {
+                    $req = $pdo->prepare("SELECT id_producteur as id, nom_entreprise as nom, email, mot_de_passe, 'producteur' as role, est_valide_par_admin as valide FROM producteur WHERE email = ?");
+                    $req->execute([$email]);
+                    $user = $req->fetch(PDO::FETCH_ASSOC);
                 }
-                
-                if (!$user || $password !== $user['mot_de_passe']) {
-                    $_SESSION['error'] = 'Email ou mot de passe incorrect';
+
+                if (empty($user)) {
+                    $_SESSION['error'] = "Email ou mot de passe incorrect";
                     $_SESSION['active_form'] = 'login';
                     $_SESSION['form_data'] = ['email' => $email];
-                } elseif ($user['role'] === 'producteur' && $user['valide'] != 1) {
-                    $_SESSION['warning'] = '⚠️ Votre compte producteur est en attente de validation par un administrateur.';
+                } elseif (!password_verify($password, $user['mot_de_passe'])) {
+                    $_SESSION['error'] = "Email ou mot de passe incorrect";
+                    $_SESSION['active_form'] = 'login';
+                    $_SESSION['form_data'] = ['email' => $email];
+                } elseif ($user['role'] == 'producteur' && $user['valide'] != 1) {
+                    $_SESSION['warning'] = "⚠️ Votre compte producteur est en attente de validation par un administrateur.";
                     $_SESSION['active_form'] = 'login';
                     $_SESSION['form_data'] = ['email' => $email];
                 } else {
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['user_nom'] = $user['nom'];
+                    $_SESSION['user_id']    = $user['id'];
+                    $_SESSION['user_nom']   = $user['nom'];
                     $_SESSION['user_email'] = $user['email'];
-                    $_SESSION['user_role'] = $user['role'];
-                    
-                    $redirects = [
-                        'admin' => 'dashboard_admin.php',
-                        'producteur' => 'dashboard_producteur.php',
-                        'client' => 'dashboard_client.php'
-                    ];
-                    header('Location: ' . $redirects[$user['role']]);
+                    $_SESSION['user_role']  = $user['role'];
+                    $redirects = ['admin' => 'dashboard_admin.php', 'producteur' => 'dashboard_producteur.php', 'client' => 'dashboard_client.php'];
+                    header("Location: " . $redirects[$user['role']]);
                     exit;
                 }
-            } catch(PDOException $e) {
-                $_SESSION['error'] = 'Erreur technique. Veuillez réessayer.';
-                $_SESSION['active_form'] = 'login';
             }
+            catch(PDOException $e) { die("Erreur authentification : " . $e->getMessage()); }
+        } else {
+            $_SESSION['error'] = reset($err);
+            $_SESSION['active_form'] = 'login';
         }
-        header('Location: signin.php');
+        header("Location: signin.php");
         exit;
     }
-    
-    // ========== SIGNUP ==========
-    elseif ($action === 'signup') {
-        $nom = trim($_POST['nom'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        $password = $_POST['password'] ?? '';
-        $confirm = $_POST['confirm'] ?? '';
-        $role = $_POST['role'] ?? 'client';
-        $nom_entreprise = trim($_POST['nom_entreprise'] ?? '');
-        $boutique_description = trim($_POST['boutique_description'] ?? '');
-        
-        // Gestion de l'upload d'image
+
+    #========== SIGNUP ==========
+    elseif ($action == 'signup') {
+        $err = [];
+        $nom            = trim($nom ?? '');
+        $email          = trim($email ?? '');
+        $password       = $password ?? '';
+        $confirm        = $confirm ?? '';
+        $role           = $role ?? 'client';
+        $nom_entreprise = trim($nom_entreprise ?? '');
+        $boutique_description = trim($boutique_description ?? '');
+
+        $_SESSION['form_data']   = ['nom' => $nom, 'email' => $email, 'role' => $role, 'nom_entreprise' => $nom_entreprise, 'boutique_description' => $boutique_description];
+        $_SESSION['active_form'] = 'signup';
+
+        #verification email
+        if (empty($email)) $err['email'] = "L'email est requis";
+        elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $err['email'] = "Email invalide";
+
+        #verification mot de passe
+        if (empty($password)) $err['password'] = "Le mot de passe est requis";
+        elseif (strlen($password) < 6) $err['password'] = "Le mot de passe doit contenir au moins 6 caractères";
+        elseif ($password !== $confirm) $err['password'] = "Les mots de passe ne correspondent pas";
+
+        #verification nom selon role
+        if ($role == 'client' && empty($nom)) $err['nom'] = "Le nom est requis";
+        if ($role == 'producteur' && empty($nom_entreprise)) $err['nom_entreprise'] = "Le nom de l'entreprise est requis";
+
+        #verification image boutique si producteur
         $boutique_image = null;
-        if ($role === 'producteur' && isset($_FILES['boutique_image']) && $_FILES['boutique_image']['error'] === UPLOAD_ERR_OK) {
-            $upload_dir = 'IMAGES/boutiques/';
-            
-            // Créer le dossier s'il n'existe pas
-            if (!file_exists($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
+        if ($role == 'producteur' && isset($_FILES['boutique_image']) && $_FILES['boutique_image']['error'] === UPLOAD_ERR_OK) {
+            $exts = ["image/jpeg", "image/png", "image/jpg", "image/gif", "image/webp"];
+            if (!in_array($_FILES['boutique_image']['type'], $exts)) {
+                $err['boutique_image'] = "Format image non supporté. Utilisez JPG, PNG, GIF ou WEBP";
+            } elseif ($_FILES['boutique_image']['size'] > 5 * 1024 * 1024) {
+                $err['boutique_image'] = "La taille de l'image ne doit pas dépasser 5MB";
             }
-            
-            $file_extension = pathinfo($_FILES['boutique_image']['name'], PATHINFO_EXTENSION);
-            $file_name = uniqid('boutique_') . '.' . $file_extension;
-            $file_path = $upload_dir . $file_name;
-            
-            // Types de fichiers autorisés
-            $allowed_types = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
-            
-            if (in_array($_FILES['boutique_image']['type'], $allowed_types)) {
-                if (move_uploaded_file($_FILES['boutique_image']['tmp_name'], $file_path)) {
-                    $boutique_image = $file_path;
-                } else {
-                    $_SESSION['error'] = 'Erreur lors de l\'upload de l\'image';
-                    header('Location: signin.php');
+        }
+
+        if (empty($err)) {
+            include("connexion.php");
+            try {
+                #verifier si email existe deja
+                $req = $pdo->prepare("SELECT email FROM client WHERE email = ? UNION SELECT email FROM producteur WHERE email = ? UNION SELECT email FROM administrateur WHERE email = ?");
+                $req->execute([$email, $email, $email]);
+                if ($req->fetch()) {
+                    $_SESSION['error'] = "Cet email est déjà utilisé";
+                    header("Location: signin.php");
                     exit;
                 }
-            } else {
-                $_SESSION['error'] = 'Format d\'image non supporté. Utilisez JPG, PNG, GIF ou WEBP.';
-                header('Location: signin.php');
-                exit;
+
+                #hachage du mot de passe
+                $hash = password_hash($password, PASSWORD_DEFAULT);
+
+                if ($role == 'client') {
+                    $nom = htmlspecialchars(trim($nom));
+                    $ri = $pdo->prepare("INSERT INTO client (nom_client, email, mot_de_passe, date_inscription, est_actif) VALUES (?, ?, ?, NOW(), 1)");
+                    $r = $ri->execute([$nom, $email, $hash]);
+                    if ($r == false) { $_SESSION['error'] = "Echec d'inscription"; header("Location: signin.php"); exit; }
+                    $_SESSION['user_id']    = $pdo->lastInsertId();
+                    $_SESSION['user_nom']   = $nom;
+                    $_SESSION['user_email'] = $email;
+                    $_SESSION['user_role']  = 'client';
+                    unset($_SESSION['form_data'], $_SESSION['error']);
+                    header("Location: dashboard_client.php");
+                    exit;
+
+                } elseif ($role == 'producteur') {
+                    #deplacement de l'image si chargée
+                    if (isset($_FILES['boutique_image']) && $_FILES['boutique_image']['error'] === UPLOAD_ERR_OK) {
+                        $upload_dir = 'IMAGES/boutiques/';
+                        if (!file_exists($upload_dir)) mkdir($upload_dir, 0777, true);
+                        $file_name  = uniqid('boutique_') . '.' . pathinfo($_FILES['boutique_image']['name'], PATHINFO_EXTENSION);
+                        $file_path  = $upload_dir . $file_name;
+                        $ru = move_uploaded_file($_FILES['boutique_image']['tmp_name'], $file_path);
+                        if ($ru == false) { $_SESSION['error'] = "Erreur lors de l'upload de l'image"; header("Location: signin.php"); exit; }
+                        $boutique_image = $file_path;
+                    }
+
+                    $nom_entreprise = htmlspecialchars(trim($nom_entreprise));
+                    $ri = $pdo->prepare("INSERT INTO producteur (id_admin, nom_entreprise, email, mot_de_passe, est_valide_par_admin, date_inscription) VALUES (NULL, ?, ?, ?, 0, NOW())");
+                    $r = $ri->execute([$nom_entreprise, $email, $hash]);
+                    if ($r == false) { $_SESSION['error'] = "Echec d'inscription"; header("Location: signin.php"); exit; }
+
+                    $user_id = $pdo->lastInsertId();
+
+                    #creation automatique de la boutique
+                    $desc = !empty($boutique_description) ? $boutique_description : 'Boutique artisanale marocaine';
+                    $ri2 = $pdo->prepare("INSERT INTO boutique (id_producteur, nom_boutique, description, image, date_creation) VALUES (?, ?, ?, ?, NOW())");
+                    $ri2->execute([$user_id, $nom_entreprise, $desc, $boutique_image]);
+
+                    $_SESSION['user_id']    = $user_id;
+                    $_SESSION['user_nom']   = $nom_entreprise;
+                    $_SESSION['user_email'] = $email;
+                    $_SESSION['user_role']  = 'producteur';
+                    $_SESSION['est_valide'] = 0;
+                    unset($_SESSION['form_data'], $_SESSION['error']);
+                    $_SESSION['warning'] = "✅ Compte producteur créé ! Un administrateur va valider votre compte.";
+                    header("Location: dashboard_producteur.php");
+                    exit;
+                }
             }
-        }
-        
-        $_SESSION['form_data'] = [
-            'nom' => $nom, 
-            'email' => $email, 
-            'role' => $role, 
-            'nom_entreprise' => $nom_entreprise,
-            'boutique_description' => $boutique_description
-        ];
-        $_SESSION['active_form'] = 'signup';
-        
-        $error = null;
-        
-        if (empty($email)) $error = 'L\'email est requis';
-        elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $error = 'Email invalide';
-        elseif (empty($password)) $error = 'Le mot de passe est requis';
-        elseif (strlen($password) < 6) $error = 'Le mot de passe doit contenir au moins 6 caractères';
-        elseif ($password !== $confirm) $error = 'Les mots de passe ne correspondent pas';
-        elseif ($role === 'client' && empty($nom)) $error = 'Le nom est requis';
-        elseif ($role === 'producteur' && empty($nom_entreprise)) $error = 'Le nom de l\'entreprise est requis';
-        
-        if ($error) {
-            $_SESSION['error'] = $error;
-            header('Location: signin.php');
-            exit;
-        }
-        
-        try {
-            $stmt = $pdo->prepare("SELECT email FROM client WHERE email = ? UNION SELECT email FROM producteur WHERE email = ? UNION SELECT email FROM administrateur WHERE email = ?");
-            $stmt->execute([$email, $email, $email]);
-            
-            if ($stmt->fetch()) {
-                $_SESSION['error'] = 'Cet email est déjà utilisé';
-                header('Location: signin.php');
-                exit;
-            }
-            
-            if ($role === 'client') {
-                $sql = "INSERT INTO client (nom_client, email, mot_de_passe, date_inscription, est_actif) VALUES (:nom, :email, :password, NOW(), 1)";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([':nom' => $nom, ':email' => $email, ':password' => $password]);
-                
-                $user_id = $pdo->lastInsertId();
-                $_SESSION['user_id'] = $user_id;
-                $_SESSION['user_nom'] = $nom;
-                $_SESSION['user_email'] = $email;
-                $_SESSION['user_role'] = 'client';
-                
-                unset($_SESSION['form_data'], $_SESSION['error']);
-                header('Location: dashboard_client.php');
-                exit;
-                
-            } elseif ($role === 'producteur') {
-                // Insertion du producteur
-                $sql = "INSERT INTO producteur (id_admin, nom_entreprise, email, mot_de_passe, est_valide_par_admin, date_inscription) VALUES (NULL, :nom_entreprise, :email, :password, 0, NOW())";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([
-                    ':nom_entreprise' => $nom_entreprise, 
-                    ':email' => $email, 
-                    ':password' => $password
-                ]);
-                
-                $user_id = $pdo->lastInsertId();
-                
-                // Insertion de la boutique avec description et image
-                $sql2 = "INSERT INTO boutique (id_producteur, nom_boutique, description, image, date_creation) 
-                         VALUES (:id_producteur, :nom_boutique, :description, :image, NOW())";
-                $stmt2 = $pdo->prepare($sql2);
-                $stmt2->execute([
-                    ':id_producteur' => $user_id, 
-                    ':nom_boutique' => $nom_entreprise, 
-                    ':description' => !empty($boutique_description) ? $boutique_description : 'Boutique artisanale marocaine',
-                    ':image' => $boutique_image
-                ]);
-                
-                $_SESSION['user_id'] = $user_id;
-                $_SESSION['user_nom'] = $nom_entreprise;
-                $_SESSION['user_email'] = $email;
-                $_SESSION['user_role'] = 'producteur';
-                $_SESSION['est_valide'] = 0;
-                
-                unset($_SESSION['form_data'], $_SESSION['error']);
-                $_SESSION['warning'] = '✅ Compte producteur créé ! Un administrateur va valider votre compte.';
-                header('Location: dashboard_producteur.php');
-                exit;
-            }
-            
-        } catch(PDOException $e) {
-            $_SESSION['error'] = 'Erreur lors de l\'inscription: ' . $e->getMessage();
-            header('Location: signin.php');
+            catch(PDOException $e) { die("Erreur inscription : " . $e->getMessage()); }
+        } else {
+            $_SESSION['error'] = reset($err);
+            header("Location: signin.php");
             exit;
         }
     }
-    
-    // ========== FORGOT PASSWORD ==========
-    elseif ($action === 'forgot') {
-        $email = trim($_POST['email'] ?? '');
-        $_SESSION['form_data'] = ['email' => $email];
+
+    #========== FORGOT PASSWORD (depuis le formulaire signin) ==========
+    elseif ($action == 'forgot') {
+        $err = [];
+        $email = trim($email ?? '');
+        $_SESSION['form_data']   = ['email' => $email];
         $_SESSION['active_form'] = 'forgot';
-        
-        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $_SESSION['error'] = 'Email valide requis';
-        } else {
+
+        if (empty($email)) $err['email'] = "Veuillez entrer votre email";
+        elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $err['email'] = "Email invalide";
+
+        if (empty($err)) {
+            include("connexion.php");
             try {
                 $tables = ['client', 'producteur', 'administrateur'];
-                $found = false;
+                $found  = false;
                 foreach ($tables as $table) {
-                    $stmt = $pdo->prepare("SELECT email FROM $table WHERE email = ?");
-                    $stmt->execute([$email]);
-                    if ($stmt->fetch()) { $found = true; break; }
+                    $req = $pdo->prepare("SELECT email FROM $table WHERE email = ?");
+                    $req->execute([$email]);
+                    if ($req->fetch()) { $found = true; break; }
                 }
-                
                 if ($found) {
-                    $_SESSION['success'] = 'Un lien de réinitialisation a été envoyé à votre adresse email';
+                    $_SESSION['success'] = "Un lien de réinitialisation a été envoyé à votre adresse email";
                     unset($_SESSION['form_data']);
                 } else {
-                    $_SESSION['error'] = 'Aucun compte associé à cet email';
+                    $_SESSION['error'] = "Aucun compte associé à cet email";
                 }
-            } catch(PDOException $e) {
-                $_SESSION['error'] = 'Erreur technique';
             }
+            catch(PDOException $e) { die("Erreur forgot password : " . $e->getMessage()); }
+        } else {
+            $_SESSION['error'] = reset($err);
         }
-        header('Location: signin.php');
+        header("Location: signin.php");
         exit;
     }
 }
 
-// Récupérer les messages
-$error = $_SESSION['error'] ?? '';
-$success = $_SESSION['success'] ?? '';
-$warning = $_SESSION['warning'] ?? '';
-$form_data = $_SESSION['form_data'] ?? [];
+#recuperer les messages de session
+$error       = $_SESSION['error']   ?? '';
+$success     = $_SESSION['success'] ?? '';
+$warning     = $_SESSION['warning'] ?? '';
+$form_data   = $_SESSION['form_data']   ?? [];
 $active_form = $_SESSION['active_form'] ?? 'login';
-
 unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION['form_data'], $_SESSION['active_form']);
 ?>
 <!DOCTYPE html>
@@ -622,4 +595,3 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
   });
 </script>
 </body>
-</html>

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'connexion.php';
+include('connexion.php');
 
 // Récupérer les boutiques depuis la base de données avec leur catégorie
 try {

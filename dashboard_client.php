@@ -1,16 +1,16 @@
 <?php
 session_start();
 
-// Verificar que el usuario está conectado y es cliente
+#verifier que l'utilisateur est connecte et est client
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'client') {
     header('Location: signin.php');
     exit;
 }
 
-// Conectar a la base de datos
-require_once 'connexion.php';
+#connexion a la base de donnees
+include('connexion.php');
 
-// Obtener datos reales del cliente desde la BD
+#recuperer les donnees du client depuis la BD
 try {
     $stmt = $pdo->prepare("SELECT * FROM client WHERE id_client = ?");
     $stmt->execute([$_SESSION['user_id']]);
@@ -22,19 +22,19 @@ try {
         exit;
     }
     
-    // Obtener comandos del cliente
+    #recuperer les commandes du client
     $stmt = $pdo->prepare("SELECT * FROM commande WHERE id_client = ? ORDER BY date_commande DESC");
     $stmt->execute([$_SESSION['user_id']]);
     $commandes = $stmt->fetchAll();
     
-    // Obtener favoritos
+    #recuperer les favoris
     $stmt = $pdo->prepare("SELECT p.* FROM produit p 
                            JOIN favoris f ON p.id_produit = f.id_produit 
                            WHERE f.id_client = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $favoris = $stmt->fetchAll();
     
-    // Obtener items del panier
+    #recuperer les articles du panier
     $stmt = $pdo->prepare("SELECT p.*, pa.quantite FROM panier pa 
                            JOIN produit p ON pa.id_produit = p.id_produit 
                            WHERE pa.id_client = ?");

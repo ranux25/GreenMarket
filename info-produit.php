@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'connexion.php';
+include('connexion.php');
 
 // Vérifier si un ID produit est fourni
 $id_produit = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -503,11 +503,9 @@ function showToast(msg) {
     setTimeout(() => toast.classList.remove('show'), 2800);
 }
 
-function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('greenmarket_cart') || '[]');
-    const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+function updateCartCount(total) {
     const badge = document.getElementById('cart-count');
-    if (badge) badge.textContent = total;
+    if (badge && total !== undefined) badge.textContent = total;
 }
 
 function addToCart() {
@@ -515,31 +513,26 @@ function addToCart() {
     showToast('❌ Ce produit n\'est plus disponible');
     return;
     <?php endif; ?>
-    
+
     const quantity = parseInt(qtyInput?.value) || 1;
-    const product = {
-        id: <?php echo $produit['id_produit']; ?>,
-        name: <?php echo json_encode($produit['nom_produit']); ?>,
-        price: <?php echo json_encode(number_format($produit['prix_unitaire'], 0, ',', ' ') . ' DH'); ?>,
-        prixNumerique: <?php echo $produit['prix_unitaire']; ?>,
-        image: <?php echo json_encode(!empty($produit['photo_url']) ? $produit['photo_url'] : 'IMAGES/default-product.jpg'); ?>,
-        boutiqueId: <?php echo $produit['id_boutique']; ?>,
-        boutiqueNom: <?php echo json_encode($produit['nom_boutique']); ?>,
-        quantity: quantity
-    };
-    
-    let cart = JSON.parse(localStorage.getItem('greenmarket_cart') || '[]');
-    const existing = cart.find(item => item.id === product.id);
-    
-    if (existing) {
-        existing.quantity = (existing.quantity || 1) + quantity;
-    } else {
-        cart.push(product);
-    }
-    
-    localStorage.setItem('greenmarket_cart', JSON.stringify(cart));
-    updateCartCount();
-    showToast(`✓ ${product.name} (x${quantity}) ajouté au panier !`);
+    const formData = new FormData();
+    formData.append('id_produit', <?php echo $produit['id_produit']; ?>);
+    formData.append('quantite', quantity);
+
+    fetch('ajouter_panier.php', { method: 'POST', body: formData })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                updateCartCount(data.total_panier);
+                showToast(`✓ <?php echo addslashes($produit['nom_produit']); ?> (x${quantity}) ajouté au panier !`);
+            } else if (data.message.includes('connecter')) {
+                showToast('⚠️ Connectez-vous pour ajouter au panier');
+                setTimeout(() => { window.location.href = 'signin.php'; }, 1500);
+            } else {
+                showToast('❌ ' + data.message);
+            }
+        })
+        .catch(() => showToast('❌ Erreur de connexion au serveur'));
 }
 
 document.getElementById('addToCartBtn')?.addEventListener('click', addToCart);

@@ -1,8 +1,8 @@
 <?php
 try {
-    $pdo = new PDO("mysql:host=localhost;port=3307;dbname=greenmarket","root","");
+    $pdo = new PDO("mysql:host=localhost;port=3307;dbname=greenmarket;charset=utf8mb4", "root", "");
 }
 catch(PDOException $e) {
-    echo "Erreur :",$e->getMessage();
+    die("Erreur de connexion : " . $e->getMessage());
 }
 ?>
