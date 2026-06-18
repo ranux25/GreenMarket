@@ -91,6 +91,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         catch(PDOException $e) { die("Erreur insertion commande : " . $e->getMessage()); }
     }
 }
+
+// Calcular el total de artículos en el carrito para el contador
+$total_items = 0;
+foreach ($panier as $item) {
+    $total_items += $item['quantite'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -98,7 +104,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GreenMarket – Validation de commande</title>
+<!-- ========== LIBRERÍAS NECESARIAS PARA EL HEADER ========== -->
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
 :root{
   --cream:#fff9eb; --sage:#9fb2ac; --sage-dark:#7a9490; --sage-light:#c8d8d4;
@@ -108,9 +116,60 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
 body{ font-family:'Lato', sans-serif; background:var(--cream); color:var(--text); min-height:100vh; }
-.topbar{ background:var(--wine); color:white; padding:.8rem 2rem; display:flex; justify-content:space-between; align-items:center; }
-.topbar a{ color:white; text-decoration:none; font-size:.9rem; }
-.topbar a:hover{ text-decoration:underline; }
+
+/* ========== ESTILOS DEL HEADER (IGUAL QUE LAS DEMÁS PÁGINAS) ========== */
+.topbar{ 
+  background:var(--wine); 
+  color:white; 
+  padding:.8rem 2rem; 
+  display:flex; 
+  justify-content:space-between; 
+  align-items:center; 
+  position:sticky; 
+  top:0; 
+  z-index:100; 
+  flex-wrap:wrap;
+  gap:10px;
+}
+.topbar a{ 
+  color:white; 
+  text-decoration:none; 
+  font-size:.9rem; 
+  transition:opacity 0.2s;
+}
+.topbar a:hover{ 
+  opacity:0.8; 
+  text-decoration:none;
+}
+.topbar-left {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.topbar-right {
+  display:flex;
+  align-items:center;
+  gap:15px;
+  flex-wrap:wrap;
+}
+.cart-link {
+  position:relative;
+}
+.cart-badge {
+  background:#ff6b6b;
+  color:white;
+  font-size:10px;
+  font-weight:700;
+  padding:1px 7px;
+  border-radius:50%;
+  position:absolute;
+  top:-8px;
+  right:-12px;
+  min-width:18px;
+  text-align:center;
+}
+
+/* ========== ESTILOS DE LA PÁGINA ========== */
 .page-header{ background:var(--wine); padding:2rem 2.5rem; color:white; }
 .page-header h1{ font-family:'Playfair Display', serif; font-size:2rem; }
 .page-header p{ color:rgba(255,249,235,.7); font-size:.9rem; margin-top:.4rem; }
@@ -151,19 +210,13 @@ body{ font-family:'Lato', sans-serif; background:var(--cream); color:var(--text)
 .success-actions{ margin-top:1.5rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
 .btn-link{ background:var(--wine); color:white; padding:.7rem 1.5rem; border-radius:4px; text-decoration:none; font-size:.9rem; font-weight:600; }
 .btn-link:hover{ background:var(--wine-dark); }
-@media(max-width:800px){ .checkout-grid{ grid-template-columns:1fr; } .form-row{ grid-template-columns:1fr; } }
+@media(max-width:800px){ .checkout-grid{ grid-template-columns:1fr; } .form-row{ grid-template-columns:1fr; } .topbar{ flex-direction:column; align-items:stretch; padding:0.8rem 1rem; } .topbar-left, .topbar-right{ justify-content:center; flex-wrap:wrap; } }
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <span>👋 <?php echo htmlspecialchars($_SESSION['user_nom']); ?></span>
-  <div>
-    <a href="panier.php">🛒 Mon panier</a> &nbsp;|&nbsp;
-    <a href="dashboard_client.php">Mon espace</a> &nbsp;|&nbsp;
-    <a href="logout.php">Se déconnecter</a>
-  </div>
-</div>
+<!-- ========== INCLUIR EL HEADER ========== -->
+<?php include 'header.php'; ?>
 
 <div class="page-header">
   <h1>🛍️ Validation de commande</h1>
@@ -297,7 +350,7 @@ body{ font-family:'Lato', sans-serif; background:var(--cream); color:var(--text)
   </div>
 
 <script>
-#mise a jour du total selon le mode de livraison choisi
+// Mise à jour du total selon le mode de livraison choisi
 var radios = document.querySelectorAll('input[name="mode_livraison"]');
 var sousTotal = <?= $sous_total; ?>;
 radios.forEach(function(radio) {

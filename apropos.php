@@ -29,9 +29,14 @@ catch(PDOException $e) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
 <title>GreenMarket – À propos de notre mission</title>
+
+<!-- ========== LIBRERÍAS ========== -->
+<script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="header.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 <style>
+  /* ========== STYLES UNIFIÉS AVEC STORE.PHP ========== */
   :root {
     --cream:      #fff9eb;
     --sage:       #9fb2ac;
@@ -53,49 +58,165 @@ catch(PDOException $e) {
     --text-dark: #2C2C2C;
     --text-light: #6B6B6B;
     --footer-bg: #3A0A10;
+    --gold: #c07a1a;
   }
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  body { 
-    font-family: 'Lato', sans-serif; 
-    background: var(--cream); 
-    color: var(--text); 
+  body {
+    background-color: var(--bg);
+    color: var(--text-dark);
+    font-family: 'Lato', sans-serif;
+    overflow-x: hidden;
     min-height: 100vh;
-    margin: 0;
-    padding: 0;
   }
 
-  
+  h1, h2, h3, .playfair { font-family: 'Playfair Display', serif; }
 
-  /* Page Header */
+  /* ========== ESTILOS DEL HEADER ========== */
+  .topbar {
+    background: var(--wine);
+    color: white;
+    padding: .8rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .topbar a {
+    color: white;
+    text-decoration: none;
+    font-size: .9rem;
+    transition: opacity 0.2s;
+  }
+  .topbar a:hover {
+    opacity: 0.8;
+    text-decoration: none;
+  }
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  .cart-link {
+    position: relative;
+  }
+  .cart-badge {
+    background: #ff6b6b;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 50%;
+    position: absolute;
+    top: -8px;
+    right: -12px;
+    min-width: 18px;
+    text-align: center;
+  }
+
+  /* ========== PAGE HEADER (COMME STORE.PHP) ========== */
   .page-header {
     background: var(--wine);
     padding: 4rem 2.5rem 3rem;
-    position: relative; overflow: hidden;
+    position: relative;
+    overflow: hidden;
   }
   .page-header::before {
-    content: ''; position: absolute; right: -80px; top: -80px;
-    width: 420px; height: 420px;
-    border: 55px solid rgba(255,249,235,.05); border-radius: 50%;
+    content: '';
+    position: absolute;
+    right: -80px;
+    top: -80px;
+    width: 420px;
+    height: 420px;
+    border: 55px solid rgba(255,249,235,.05);
+    border-radius: 50%;
   }
   .page-header::after {
-    content: ''; position: absolute; left: 4%; bottom: -70px;
-    width: 240px; height: 240px;
-    border: 40px solid rgba(159,178,172,.10); border-radius: 50%;
+    content: '';
+    position: absolute;
+    left: 4%;
+    bottom: -70px;
+    width: 240px;
+    height: 240px;
+    border: 40px solid rgba(159,178,172,.10);
+    border-radius: 50%;
   }
-  .header-inner { position: relative; z-index: 1; }
+  .header-inner {
+    position: relative;
+    z-index: 1;
+  }
   .header-eyebrow {
-    font-size: .72rem; font-weight: 600; letter-spacing: .2em;
-    text-transform: uppercase; color: var(--sage-light); margin-bottom: .9rem;
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--sage-light);
+    margin-bottom: .9rem;
   }
   .page-header h1 {
     font-family: 'Playfair Display', serif;
-    font-size: 3.6rem; font-weight: 700; line-height: 1.05;
-    color: var(--cream); margin-bottom: .7rem;
+    font-size: 3.6rem;
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--cream);
+    margin-bottom: .7rem;
   }
-  .page-header h1 em { font-weight: 400; color: rgba(255,249,235,.6); font-size: 2.6rem; }
-  .page-header p { color: rgba(255,249,235,.62); font-size: .93rem; font-weight: 300; max-width: 500px; }
+  .page-header h1 em {
+    font-style: italic;
+    color: var(--gold);
+    display: block;
+  }
+  .page-header p {
+    color: rgba(255,249,235,.62);
+    font-size: .93rem;
+    font-weight: 300;
+    max-width: 500px;
+  }
+
+  /* ========== ANIMATIONS ========== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(35px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal-left.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .reveal-right {
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal-right.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
 
   /* Container */
   .container {
@@ -104,13 +225,14 @@ catch(PDOException $e) {
     padding: 3rem 2rem;
   }
 
-  /* Mission Section */
+  /* ========== MISSION SECTION ========== */
   .mission-section {
     background: var(--white);
-    border-radius: 16px;
+    border-radius: 20px;
     padding: 3rem;
-    margin-bottom: 4rem;
-    border: 1px solid var(--border);
+    margin-bottom: 2.5rem;
+    border: 1.5px solid var(--border);
+    box-shadow: 0 4px 16px rgba(93,13,24,0.08);
     text-align: center;
   }
   .mission-text h2 {
@@ -147,13 +269,14 @@ catch(PDOException $e) {
     border-top: 1px solid var(--border);
   }
 
-  /* Values Section */
+  /* ========== VALUES SECTION ========== */
   .values-section {
     background: var(--white);
-    border-radius: 16px;
+    border-radius: 20px;
     padding: 3rem;
-    margin-bottom: 4rem;
-    border: 1px solid var(--border);
+    margin-bottom: 2.5rem;
+    border: 1.5px solid var(--border);
+    box-shadow: 0 4px 16px rgba(93,13,24,0.08);
   }
   .values-section h2 {
     font-family: 'Playfair Display', serif;
@@ -194,9 +317,41 @@ catch(PDOException $e) {
     line-height: 1.5;
   }
 
-  /* Team Section */
+  /* ========== IMPACT SECTION ========== */
+  .impact-section {
+    background: linear-gradient(135deg, var(--wine) 0%, var(--wine-dark) 100%);
+    border-radius: 20px;
+    padding: 3rem;
+    color: white;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 4px 16px rgba(93,13,24,0.15);
+  }
+  .impact-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .impact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    text-align: center;
+  }
+  .impact-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    display: block;
+  }
+  .impact-label {
+    font-size: 0.85rem;
+    opacity: 0.8;
+  }
+
+  /* ========== TEAM SECTION ========== */
   .team-section {
-    margin-bottom: 4rem;
+    margin-bottom: 2.5rem;
   }
   .team-section h2 {
     font-family: 'Playfair Display', serif;
@@ -214,13 +369,14 @@ catch(PDOException $e) {
     text-align: center;
     background: var(--white);
     padding: 1.5rem;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    transition: transform 0.2s;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 16px rgba(93,13,24,0.08);
   }
   .team-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px var(--shadow);
+    transform: translateY(-6px);
+    box-shadow: 0 16px 36px rgba(93,13,24,0.14);
   }
   .team-avatar {
     width: 100px;
@@ -258,44 +414,14 @@ catch(PDOException $e) {
     line-height: 1.4;
   }
 
-  /* Impact Section */
-  .impact-section {
-    background: linear-gradient(135deg, var(--wine) 0%, var(--wine-dark) 100%);
-    border-radius: 16px;
-    padding: 3rem;
-    color: white;
-    margin-bottom: 4rem;
-  }
-  .impact-section h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-  .impact-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 2rem;
-    text-align: center;
-  }
-  .impact-number {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.5rem;
-    font-weight: 700;
-    display: block;
-  }
-  .impact-label {
-    font-size: 0.85rem;
-    opacity: 0.8;
-  }
-
-  /* CTA Section */
+  /* ========== CTA SECTION ========== */
   .cta-section {
     background: var(--white);
-    border-radius: 16px;
+    border-radius: 20px;
     padding: 3rem;
     text-align: center;
-    border: 1px solid var(--border);
+    border: 1.5px solid var(--border);
+    box-shadow: 0 4px 16px rgba(93,13,24,0.08);
   }
   .cta-section h2 {
     font-family: 'Playfair Display', serif;
@@ -324,7 +450,7 @@ catch(PDOException $e) {
     transform: translateY(-2px);
   }
 
-  /* Footer */
+  /* ========== FOOTER ========== */
   footer {
     background: var(--footer-bg);
     color: #d4b8a0;
@@ -347,6 +473,14 @@ catch(PDOException $e) {
     margin-bottom: 16px;
   }
 
+  /* Modal styles */
+  .auth-modal-overlay { display: none; }
+  .auth-modal-overlay.open { display: flex !important; }
+  .auth-form { display: none; }
+  .auth-form.active { display: block; }
+  .auth-tab.active { color: #5d0d18 !important; border-bottom: 2px solid #5d0d18 !important; }
+
+  /* ========== RESPONSIVE ========== */
   @media (max-width: 768px) {
     .container {
       padding: 2rem 1rem;
@@ -360,13 +494,42 @@ catch(PDOException $e) {
     .page-header h1 {
       font-size: 2.4rem;
     }
+    .topbar {
+      flex-direction: column;
+      gap: 10px;
+      padding: 0.8rem 1rem;
+    }
+    .topbar-left, .topbar-right {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .team-grid {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+    .values-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .values-grid {
+      grid-template-columns: 1fr;
+    }
+    .impact-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .page-header h1 {
+      font-size: 1.8rem;
+    }
   }
 </style>
 </head>
-<body data-active-page="apropos">
+<body>
 
-<div id="header-placeholder"></div>
+<!-- ========== INCLUIR HEADER ========== -->
+<?php include 'header.php'; ?>
 
+<!-- ========== PAGE HEADER (COMME STORE.PHP) ========== -->
 <div class="page-header">
   <div class="header-inner">
     <div class="header-eyebrow">🇲🇦 Notre histoire &amp; mission</div>
@@ -375,9 +538,11 @@ catch(PDOException $e) {
   </div>
 </div>
 
+<!-- ========== CONTENU PRINCIPAL ========== -->
 <div class="container">
+
   <!-- Mission Section -->
-  <div class="mission-section">
+  <div class="mission-section reveal">
     <div class="mission-text">
       <h2>Notre mission</h2>
       <p>GreenMarket est né d'une conviction profonde : les trésors artisanaux du Maroc méritent d'être valorisés et accessibles à tous. Notre mission est de créer un pont entre les artisans marocains, perpétuant des savoir-faire ancestraux, et les amateurs d'authenticité à travers le monde.</p>
@@ -389,7 +554,7 @@ catch(PDOException $e) {
   </div>
 
   <!-- Values Section -->
-  <div class="values-section">
+  <div class="values-section reveal-left">
     <h2>Nos valeurs</h2>
     <div class="values-grid">
       <div class="value-card">
@@ -416,10 +581,7 @@ catch(PDOException $e) {
   </div>
 
   <!-- Impact Section -->
-  <div class="impact-section">
-    <h2>Notre impact en chiffres</h2>
-    <div class="impact-grid">
-  <div class="impact-section">
+  <div class="impact-section reveal">
     <h2>Notre impact en chiffres</h2>
     <div class="impact-grid">
       <div>
@@ -442,7 +604,7 @@ catch(PDOException $e) {
   </div>
 
   <!-- Team Section -->
-  <div class="team-section">
+  <div class="team-section reveal-right">
     <h2>L'équipe GreenMarket</h2>
     <div class="team-grid">
       <div class="team-card">
@@ -480,8 +642,17 @@ catch(PDOException $e) {
     </div>
   </div>
 
+  <!-- CTA Section -->
+  <div class="cta-section reveal">
+    <h2>Rejoignez l'aventure GreenMarket</h2>
+    <p>Que vous soyez artisan, producteur ou amateur d'artisanat, il y a une place pour vous chez GreenMarket.</p>
+    <button class="btn-cta" onclick="window.location.href='signin.php'">Devenir partenaire →</button>
+  </div>
 
+</div>
 
+<!-- ========== FOOTER ========== -->
+<?php include 'footer.php'; ?>
 
 <!-- Modal de autenticación -->
 <div class="auth-modal-overlay" id="authModal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:1000;">
@@ -518,12 +689,56 @@ catch(PDOException $e) {
   </div>
 </div>
 
-<style>
-  .auth-modal-overlay.open { display: flex !important; }
-  .auth-modal-overlay { display: none; }
-  .auth-form { display: none; }
-  .auth-form.active { display: block; }
-  .auth-tab.active { color: #5d0d18 !important; border-bottom: 2px solid #5d0d18 !important; }
-</style>
+<script>
+// Script para el modal de autenticación
+document.addEventListener('DOMContentLoaded', function() {
+  // Tabs del modal
+  const tabs = document.querySelectorAll('.auth-tab');
+  const forms = {
+    login: document.getElementById('loginForm'),
+    register: document.getElementById('registerForm'),
+    registerProducer: document.getElementById('registerProducerForm')
+  };
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+      // Remover active de todos los tabs
+      tabs.forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Ocultar todos los forms
+      Object.values(forms).forEach(form => form.classList.remove('active'));
+      
+      // Mostrar el form correspondiente
+      const tabName = this.dataset.tab;
+      if (tabName === 'login') forms.login.classList.add('active');
+      else if (tabName === 'register') forms.register.classList.add('active');
+      else if (tabName === 'registerProducer') forms.registerProducer.classList.add('active');
+    });
+  });
+
+  // Cerrar modal
+  document.getElementById('closeAuthModal')?.addEventListener('click', function() {
+    document.getElementById('authModal').style.display = 'none';
+  });
+});
+
+// ========== SCROLL REVEAL ==========
+function initReveal() {
+  const elements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+  elements.forEach(el => observer.observe(el));
+}
+
+// Inicializar al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+  initReveal();
+});
+</script>
+
 </body>
 </html>

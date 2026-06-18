@@ -229,7 +229,6 @@ function renderStars($rating = 4.5) {
     overflow: hidden;
     border: 1.5px solid #e8ddd0;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
   }
   .product-card:hover {
     transform: translateY(-6px);
@@ -280,6 +279,27 @@ function renderStars($rating = 4.5) {
     transition: 0.4s cubic-bezier(.22,1,.36,1);
   }
   .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* Ajouter au panier button en las tarjetas de productos */
+  .add-to-cart-btn {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .add-to-cart-btn:hover {
+    background: var(--primary-light);
+  }
+  .add-to-cart-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 
   @media (max-width: 768px) {
     .store-banner-section { height: 250px; }
@@ -345,7 +365,7 @@ function renderStars($rating = 4.5) {
     </div>
     
     <?php if (!empty($boutique['producteur_email'])): ?>
-    <div class="mt-4 flex gap-3">
+    <div class="mt-4 flex gap-3 flex-wrap">
       <a href="mailto:<?php echo htmlspecialchars($boutique['producteur_email']); ?>" class="btn-outline">📧 Contacter l'artisan</a>
       <button class="btn-outline" onclick="window.location.href='produits.php?search=<?php echo urlencode($boutique['nom_boutique']); ?>'">🔍 Voir tous les produits</button>
     </div>
@@ -367,16 +387,19 @@ function renderStars($rating = 4.5) {
     <?php else: ?>
       <div class="products-grid">
         <?php foreach ($produits as $produit): ?>
-        <div class="product-card" onclick="window.location.href='info-produit.php?id=<?php echo $produit['id_produit']; ?>'">
+        <div class="product-card">
           <?php 
           $prod_img = !empty($produit['photo_url']) ? $produit['photo_url'] : 'https://placehold.co/400x300/5D0D18/white?text=' . urlencode($produit['nom_produit']);
           ?>
           <img src="<?php echo htmlspecialchars($prod_img); ?>" 
                alt="<?php echo htmlspecialchars($produit['nom_produit']); ?>"
                class="product-img"
+               onclick="window.location.href='info-produit.php?id=<?php echo $produit['id_produit']; ?>'"
                onerror="this.src='https://placehold.co/400x300/5D0D18/white?text=Produit'">
           <div class="product-body">
-            <div class="product-name"><?php echo htmlspecialchars($produit['nom_produit']); ?></div>
+            <div class="product-name" onclick="window.location.href='info-produit.php?id=<?php echo $produit['id_produit']; ?>'">
+              <?php echo htmlspecialchars($produit['nom_produit']); ?>
+            </div>
             <div class="product-price"><?php echo number_format($produit['prix_unitaire'], 0, ',', ' '); ?> DH</div>
             <div class="product-stock <?php echo $produit['stock_quantite'] < 5 ? 'stock-low' : ''; ?>">
               <?php 
@@ -386,6 +409,13 @@ function renderStars($rating = 4.5) {
               ?>
             </div>
             <div class="stars mt-2"><?php echo renderStars(4.5); ?></div>
+            
+            <!-- Botón para añadir al carrito -->
+            <button class="add-to-cart-btn" 
+                    onclick="addToCart(<?php echo $produit['id_produit']; ?>, '<?php echo addslashes($produit['nom_produit']); ?>', <?php echo $produit['prix_unitaire']; ?>)"
+                    <?php echo $produit['stock_quantite'] <= 0 ? 'disabled' : ''; ?>>
+              <?php echo $produit['stock_quantite'] <= 0 ? '❌ Indisponible' : '🛒 Ajouter au panier'; ?>
+            </button>
           </div>
         </div>
         <?php endforeach; ?>
@@ -410,24 +440,98 @@ function initReveal() {
     elements.forEach(el => observer.observe(el));
 }
 
-// ========== PANIER ==========
-function showToast(msg) {
+// ========== TOAST NOTIFICATION ==========
+function showToast(msg, isError = false) {
     const toast = document.getElementById('toast');
     toast.textContent = msg;
+    toast.style.background = isError ? '#d9534f' : 'var(--primary)';
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2800);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        toast.style.background = 'var(--primary)';
+    }, 2800);
 }
 
+// ========== UPDATE CART COUNT ==========
 function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('greenmarket_cart') || '[]');
-    const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-    const badge = document.getElementById('cart-count');
-    if (badge) badge.textContent = total;
+    fetch('get_cart_count.php')
+        .then(res => res.json())
+        .then(data => {
+            const badge = document.getElementById('cart-count');
+            if (badge && data.total !== undefined) {
+                badge.textContent = data.total;
+            }
+        })
+        .catch(() => {});
 }
 
-// Initialisation
-updateCartCount();
-initReveal();
+// ========== ADD TO CART FUNCTION ==========
+function addToCart(productId, productName, price) {
+    // Verificar si el usuario está conectado
+    <?php if (!isset($_SESSION['user_id'])): ?>
+        showToast('⚠️ Veuillez vous connecter pour ajouter au panier', true);
+        setTimeout(() => {
+            window.location.href = 'signin.php';
+        }, 1500);
+        return;
+    <?php endif; ?>
+    
+    // Mostrar loading en el botón
+    const buttons = document.querySelectorAll('.add-to-cart-btn');
+    buttons.forEach(btn => {
+        if (btn.textContent.includes('Ajouter')) {
+            btn.textContent = '⏳ Ajout...';
+            btn.disabled = true;
+        }
+    });
+
+    const formData = new FormData();
+    formData.append('id_produit', productId);
+    formData.append('quantite', 1);
+
+    fetch('ajouter_panier.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Erreur réseau');
+        return res.json();
+    })
+    .then(data => {
+        // Restaurer los botones
+        buttons.forEach(btn => {
+            btn.textContent = '🛒 Ajouter au panier';
+            btn.disabled = false;
+        });
+
+        if (data.success) {
+            showToast(`✓ ${productName} ajouté au panier !`);
+            updateCartCount();
+            
+            // Actualizar el badge en el header si existe
+            const badge = document.getElementById('cart-count');
+            if (badge && data.total_panier !== undefined) {
+                badge.textContent = data.total_panier;
+            }
+        } else {
+            showToast(data.message || '❌ Erreur lors de l\'ajout', true);
+        }
+    })
+    .catch(error => {
+        buttons.forEach(btn => {
+            btn.textContent = '🛒 Ajouter au panier';
+            btn.disabled = false;
+        });
+        showToast('❌ Erreur de connexion au serveur', true);
+        console.error('Erreur:', error);
+    });
+}
+
+// ========== INICIALIZACIÓN ==========
+document.addEventListener('DOMContentLoaded', function() {
+    updateCartCount();
+    initReveal();
+});
 </script>
 </body>
 </html>

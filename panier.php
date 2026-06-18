@@ -66,6 +66,12 @@ $total = 0;
 foreach ($panier as $item) {
     $total += $item['prix_unitaire'] * $item['quantite'];
 }
+
+#calcul du nombre total d'articles
+$total_items = 0;
+foreach ($panier as $item) {
+    $total_items += $item['quantite'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -73,7 +79,9 @@ foreach ($panier as $item) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GreenMarket – Mon Panier</title>
+<!-- ========== LIBRERÍAS NECESARIAS PARA EL HEADER ========== -->
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
 :root{
   --cream:#fff9eb;
@@ -89,9 +97,60 @@ foreach ($panier as $item) {
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
 body{ font-family:'Lato', sans-serif; background:var(--cream); color:var(--text); }
-.topbar{ background:var(--wine); color:white; padding:.8rem 2rem; display:flex; justify-content:space-between; align-items:center; }
-.topbar a{ color:white; text-decoration:none; font-size:.9rem; }
-.topbar a:hover{ text-decoration:underline; }
+
+/* ========== ESTILOS DEL HEADER ========== */
+.topbar{ 
+  background:var(--wine); 
+  color:white; 
+  padding:.8rem 2rem; 
+  display:flex; 
+  justify-content:space-between; 
+  align-items:center; 
+  position:sticky; 
+  top:0; 
+  z-index:100; 
+  flex-wrap:wrap;
+  gap:10px;
+}
+.topbar a{ 
+  color:white; 
+  text-decoration:none; 
+  font-size:.9rem; 
+  transition:opacity 0.2s;
+}
+.topbar a:hover{ 
+  opacity:0.8; 
+  text-decoration:none;
+}
+.topbar-left {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.topbar-right {
+  display:flex;
+  align-items:center;
+  gap:15px;
+  flex-wrap:wrap;
+}
+.cart-link {
+  position:relative;
+}
+.cart-badge {
+  background:#ff6b6b;
+  color:white;
+  font-size:10px;
+  font-weight:700;
+  padding:1px 7px;
+  border-radius:50%;
+  position:absolute;
+  top:-8px;
+  right:-12px;
+  min-width:18px;
+  text-align:center;
+}
+
+/* ========== ESTILOS DE LA PÁGINA ========== */
 .page-header{ background:var(--wine); color:white; padding:3rem 2rem; }
 .page-header h1{ font-family:'Playfair Display', serif; font-size:3rem; }
 .container{ max-width:1100px; margin:2rem auto; padding:0 1rem; }
@@ -105,9 +164,10 @@ body{ font-family:'Lato', sans-serif; background:var(--cream); color:var(--text)
 .item-name{ font-weight:700; color:var(--wine); font-size:1rem; }
 .item-shop{ font-size:.8rem; color:var(--text-muted); margin:.3rem 0; }
 .item-price{ font-size:1rem; font-weight:700; color:var(--sage-dark); }
-.quantity-form{ display:flex; align-items:center; gap:.5rem; margin-top:.7rem; }
+.quantity-form{ display:flex; align-items:center; gap:.5rem; margin-top:.7rem; flex-wrap:wrap; }
 .quantity-form input[type=number]{ width:60px; padding:.3rem; border:1px solid var(--border); border-radius:4px; text-align:center; }
 .btn-qte{ background:var(--wine); color:white; border:none; padding:.4rem .8rem; border-radius:4px; cursor:pointer; font-size:.85rem; }
+.btn-qte:hover{ background:var(--wine-dark); }
 .btn-delete{ background:#eee; color:var(--wine); border:none; padding:.5rem .8rem; border-radius:4px; cursor:pointer; margin-top:.8rem; font-size:.85rem; }
 .btn-delete:hover{ background:#f8d7da; }
 .summary{ background:var(--white); border-radius:10px; padding:1.5rem; height:fit-content; box-shadow:0 10px 30px var(--shadow); }
@@ -120,20 +180,23 @@ body{ font-family:'Lato', sans-serif; background:var(--cream); color:var(--text)
 .btn-clear:hover{ background:var(--sage-dark); }
 .empty{ text-align:center; padding:4rem; background:var(--white); border-radius:10px; }
 .btn-back{ background:var(--wine); color:white; padding:.6rem 1.2rem; border-radius:4px; text-decoration:none; font-size:.9rem; display:inline-block; margin-top:1rem; }
-@media(max-width:850px){ .cart-layout{ grid-template-columns:1fr; } .cart-item{ flex-direction:column; } .cart-item img{ width:100%; height:200px; } }
+.btn-back:hover{ background:var(--wine-dark); }
+
+@media(max-width:850px){ 
+  .cart-layout{ grid-template-columns:1fr; } 
+  .cart-item{ flex-direction:column; } 
+  .cart-item img{ width:100%; height:200px; } 
+  .topbar{ flex-direction:column; align-items:stretch; padding:0.8rem 1rem; }
+  .topbar-left, .topbar-right{ justify-content:center; flex-wrap:wrap; }
+}
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <span>👋 <?php echo htmlspecialchars($_SESSION['user_nom']); ?></span>
-  <div>
-    <a href="produits.php">🛍️ Produits</a> &nbsp;|&nbsp;
-    <a href="dashboard_client.php">Mon espace</a> &nbsp;|&nbsp;
-    <a href="logout.php">Se déconnecter</a>
-  </div>
-</div>
+<!-- ========== INCLUIR EL HEADER ========== -->
+<?php include 'header.php'; ?>
 
+<!-- ========== CONTENIDO DE LA PÁGINA ========== -->
 <div class="page-header">
   <h1>🛒 Mon Panier</h1>
   <p>Retrouvez tous vos produits sélectionnés</p>
@@ -160,14 +223,14 @@ body{ font-family:'Lato', sans-serif; background:var(--cream); color:var(--text)
                  onerror="this.src='https://placehold.co/110x110?text=Produit'">
             <div class="item-info">
               <div class="item-name"><?php echo htmlspecialchars($item['nom_produit']); ?></div>
-              <div class="item-shop">Boutique : <?php echo htmlspecialchars($item['nom_boutique']); ?></div>
+              <div class="item-shop">🏪 Boutique : <?php echo htmlspecialchars($item['nom_boutique']); ?></div>
               <div class="item-price"><?php echo number_format($item['prix_unitaire'], 2); ?> DH</div>
 
               <form method="POST" class="quantity-form">
                 <input type="hidden" name="action" value="modifier_qte">
                 <input type="hidden" name="id_produit" value="<?php echo $item['id_produit']; ?>">
                 <input type="number" name="quantite" value="<?php echo $item['quantite']; ?>" min="1">
-                <button type="submit" class="btn-qte">Mettre à jour</button>
+                <button type="submit" class="btn-qte">🔄 Mettre à jour</button>
               </form>
 
               <form method="POST" style="display:inline;">
@@ -182,20 +245,24 @@ body{ font-family:'Lato', sans-serif; background:var(--cream); color:var(--text)
       </div>
 
       <div class="summary">
-        <h2>Résumé</h2>
+        <h2>📋 Résumé</h2>
         <div class="summary-line">
-          <span>Produits</span>
+          <span>🛍️ Produits</span>
           <span><?php echo count($panier); ?></span>
         </div>
+        <div class="summary-line">
+          <span>📦 Articles</span>
+          <span><?php echo $total_items; ?></span>
+        </div>
         <div class="summary-line total">
-          <span>Total</span>
+          <span>💰 Total</span>
           <span><?php echo number_format($total, 2); ?> DH</span>
         </div>
         <a href="checkout.php" class="btn-checkout">✅ Passer la commande</a>
         <form method="POST">
           <input type="hidden" name="action" value="vider">
           <button type="submit" class="btn-clear"
-            onclick="return confirm('Vider tout le panier ?')">🗑️ Vider le panier</button>
+            onclick="return confirm('⚠️ Vider tout le panier ?')">🗑️ Vider le panier</button>
         </form>
       </div>
     </div>
