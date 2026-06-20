@@ -1,21 +1,25 @@
 <?php
-// Contador del carrito
 $cartCount = 0;
 if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
     foreach ($_SESSION['cart'] as $item) {
         $cartCount += isset($item['quantity']) ? $item['quantity'] : 1;
     }
 }
-$theme = $_COOKIE['theme'] ?? 'light';
+$theme       = $_COOKIE['theme'] ?? 'light';
 $currentPage = basename($_SERVER['PHP_SELF']);
-
-// Dashboard link según rol
 $dashboardLink = '';
 if (isset($_SESSION['user_role'])) {
-    if ($_SESSION['user_role'] === 'client') $dashboardLink = 'dashboard_client.php';
+    if ($_SESSION['user_role'] === 'client')     $dashboardLink = 'dashboard_client.php';
     elseif ($_SESSION['user_role'] === 'producteur') $dashboardLink = 'dashboard-producteur.php';
-    elseif ($_SESSION['user_role'] === 'admin') $dashboardLink = 'dashboard_admin.php';
+    elseif ($_SESSION['user_role'] === 'admin')  $dashboardLink = 'dashboard_admin.php';
 }
+// Ejemplo: notificaciones desde BD (ajusta a tu query real)
+$notifications = [];
+if (isset($_SESSION['user_id'])) {
+    // $notifications = fetchNotifications($_SESSION['user_id']); ← tu función real
+    // Para demo, dejamos array vacío; las notificaciones vendrán de tu BD
+}
+$unreadCount = count(array_filter($notifications, fn($n) => !$n['read']));
 ?>
 <!DOCTYPE html>
 <html lang="fr" data-theme="<?php echo $theme; ?>">
@@ -41,22 +45,18 @@ if (isset($_SESSION['user_role'])) {
             --text-light:     #6B6B6B;
             --border-color:   #e5e7eb;
             --shadow-color:   rgba(93,13,24,0.1);
-
             --header-bg:         #5D0D18;
             --header-text:       #ffffff;
             --header-bg-hover:   rgba(255,255,255,0.15);
             --header-shadow:     rgba(93,13,24,0.18);
             --header-border:     rgba(255,255,255,0.05);
-
             --dropdown-bg:      #ffffff;
             --dropdown-text:    #2C2C2C;
             --dropdown-hover:   #FFF9EB;
             --dropdown-divider: #f0f0f0;
-
             --mobile-menu-bg:   #4A0E17;
             --mobile-menu-text: rgba(255,255,255,0.8);
             --mobile-menu-hover:rgba(255,255,255,0.06);
-
             --suggestions-bg:     #ffffff;
             --suggestions-border: #e8ddd0;
             --suggestions-shadow: rgba(0,0,0,0.15);
@@ -64,7 +64,6 @@ if (isset($_SESSION['user_role'])) {
             --suggestions-text:   #2C2C2C;
             --suggestions-muted:  #6B6B6B;
         }
-
         [data-theme="dark"] {
             --primary:        #8a6048;
             --primary-light:  #a0785a;
@@ -78,22 +77,18 @@ if (isset($_SESSION['user_role'])) {
             --text-light:     #b8a896;
             --border-color:   #5a4a3a;
             --shadow-color:   rgba(0,0,0,0.4);
-
             --header-bg:        #1a1410;
             --header-text:      #f0e6d8;
             --header-bg-hover:  rgba(240,230,216,0.12);
             --header-shadow:    rgba(0,0,0,0.4);
             --header-border:    rgba(240,230,216,0.05);
-
             --dropdown-bg:      #3d3229;
             --dropdown-text:    #f0e6d8;
             --dropdown-hover:   #4d3d32;
             --dropdown-divider: #5a4a3a;
-
             --mobile-menu-bg:    #1a1410;
             --mobile-menu-text:  rgba(240,230,216,0.8);
             --mobile-menu-hover: rgba(240,230,216,0.06);
-
             --suggestions-bg:     #3d3229;
             --suggestions-border: #5a4a3a;
             --suggestions-shadow: rgba(0,0,0,0.4);
@@ -104,405 +99,268 @@ if (isset($_SESSION['user_role'])) {
 
         /* ===== HEADER ===== */
         .hdr {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            position: sticky; top: 0; z-index: 1000;
             background: var(--header-bg);
             box-shadow: 0 4px 25px var(--header-shadow);
             border-bottom: 1px solid var(--header-border);
             font-family: 'Lato', sans-serif;
             transition: background .3s;
         }
-
         .hdr-inner {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            gap: 1.25rem;
-            padding: .85rem 2rem;
+            max-width: 1400px; margin: 0 auto;
+            display: flex; align-items: center;
+            gap: 1.25rem; padding: .85rem 2rem;
         }
 
         /* Logo */
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            flex-shrink: 0;
-            text-decoration: none;
-        }
-        .logo img {
-            height: 38px;
-            border-radius: 6px;
-            object-fit: contain;
-        }
-        .logo-text {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.45rem;
-            font-weight: 700;
-            color: var(--header-text);
-        }
+        .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; flex-shrink: 0; text-decoration: none; }
+        .logo img { height: 38px; border-radius: 6px; object-fit: contain; }
+        .logo-text { font-family: 'Playfair Display', serif; font-size: 1.45rem; font-weight: 700; color: var(--header-text); }
         .logo-accent { color: var(--secondary); }
 
-        /* Search — ocupa todo el espacio libre */
-        .search-wrap {
-            flex: 1;
-            position: relative;
-        }
+        /* Search */
+        .search-wrap { flex: 1; position: relative; }
         .search-wrap input {
-            width: 100%;
-            padding: .65rem 1rem .65rem 2.8rem;
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 12px;
-            font-size: .88rem;
-            color: var(--text-dark);
-            background: rgba(255,255,255,0.96);
-            outline: none;
+            width: 100%; padding: .65rem 1rem .65rem 2.8rem;
+            border: 1px solid rgba(255,255,255,0.15); border-radius: 12px;
+            font-size: .88rem; color: var(--text-dark);
+            background: rgba(255,255,255,0.96); outline: none;
             transition: box-shadow .25s;
         }
-        [data-theme="dark"] .search-wrap input {
-            background: var(--bg-input);
-            color: var(--text-dark);
-            border-color: var(--border-color);
-        }
-        .search-wrap input:focus {
-            box-shadow: 0 0 0 4px rgba(159,178,172,.35);
-        }
+        [data-theme="dark"] .search-wrap input { background: var(--bg-input); color: var(--text-dark); border-color: var(--border-color); }
+        .search-wrap input:focus { box-shadow: 0 0 0 4px rgba(159,178,172,.35); }
         .search-ico {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--primary);
-            font-size: .95rem;
-            opacity: .7;
-            pointer-events: none;
+            position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);
+            color: var(--primary); font-size: .95rem; opacity: .7; pointer-events: none;
         }
         [data-theme="dark"] .search-ico { color: var(--gold); }
 
         /* Suggestions */
         .suggestions {
-            position: absolute;
-            top: calc(100% + 8px);
-            left: 0; right: 0;
-            background: var(--suggestions-bg);
-            border: 1px solid var(--suggestions-border);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px var(--suggestions-shadow);
-            z-index: 1050;
-            display: none;
-            max-height: 390px;
-            overflow-y: auto;
-            padding: .4rem 0;
+            position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+            background: var(--suggestions-bg); border: 1px solid var(--suggestions-border);
+            border-radius: 12px; box-shadow: 0 10px 30px var(--suggestions-shadow);
+            z-index: 1050; display: none; max-height: 390px; overflow-y: auto; padding: .4rem 0;
         }
         .suggestions.show { display: block; }
-        .sug-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: .6rem 1rem;
-            color: var(--suggestions-text);
-            text-decoration: none;
-            cursor: pointer;
-            transition: background .15s;
-        }
+        .sug-item { display: flex; align-items: center; gap: 12px; padding: .6rem 1rem; color: var(--suggestions-text); text-decoration: none; cursor: pointer; transition: background .15s; }
         .sug-item:hover { background: var(--suggestions-hover); }
-        .sug-img {
-            width: 36px; height: 36px;
-            border-radius: 8px;
-            object-fit: cover;
-            background: var(--bg-light);
-            flex-shrink: 0;
-        }
+        .sug-img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; background: var(--bg-light); flex-shrink: 0; }
         .sug-info { flex: 1; min-width: 0; }
-        .sug-name {
-            font-size: .9rem;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .sug-detail {
-            font-size: .75rem;
-            color: var(--suggestions-muted);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .sug-tag {
-            font-size: .6rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            padding: .1rem .45rem;
-            border-radius: 999px;
-            background: var(--secondary);
-            color: #fff;
-        }
-        .sug-price {
-            font-weight: 700;
-            font-size: .85rem;
-            color: var(--primary);
-            flex-shrink: 0;
-        }
+        .sug-name { font-size: .9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sug-detail { font-size: .75rem; color: var(--suggestions-muted); display: flex; align-items: center; gap: 5px; }
+        .sug-tag { font-size: .6rem; font-weight: 700; text-transform: uppercase; padding: .1rem .45rem; border-radius: 999px; background: var(--secondary); color: #fff; }
+        .sug-price { font-weight: 700; font-size: .85rem; color: var(--primary); flex-shrink: 0; }
         [data-theme="dark"] .sug-price { color: var(--gold); }
         .sug-divider { border-top: 1px solid var(--suggestions-border); margin: .3rem 1rem; }
         .sug-empty { padding: 1.5rem; text-align: center; color: var(--suggestions-muted); font-size: .9rem; }
 
         /* Nav links */
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        .nav-links a {
-            position: relative;
-            color: var(--header-text);
-            text-decoration: none;
-            font-size: .93rem;
-            font-weight: 500;
-            opacity: .75;
-            padding: .4rem 0;
-            transition: opacity .2s;
-        }
+        .nav-links { display: flex; gap: 2rem; align-items: center; flex-shrink: 0; }
+        .nav-links a { position: relative; color: var(--header-text); text-decoration: none; font-size: .93rem; font-weight: 500; opacity: .75; padding: .4rem 0; transition: opacity .2s; }
         .nav-links a:hover, .nav-links a.active { opacity: 1; }
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -4px; left: 50%;
-            transform: translateX(-50%);
-            width: 0; height: 4px;
-            background: var(--secondary);
-            border-radius: 50%;
-            transition: width .25s;
-        }
+        .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); width: 0; height: 4px; background: var(--secondary); border-radius: 50%; transition: width .25s; }
         .nav-links a:hover::after, .nav-links a.active::after { width: 4px; }
 
-        /* Right actions */
-        .hdr-actions {
-            display: flex;
-            align-items: center;
-            gap: .9rem;
-            flex-shrink: 0;
-        }
-
-        /* Icon button base */
-        .icon-btn {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px; height: 40px;
-            border-radius: 10px;
-            background: rgba(255,255,255,.08);
-            color: var(--header-text);
-            border: none;
-            cursor: pointer;
-            font-size: 1.25rem;
-            text-decoration: none;
-            transition: background .2s;
-        }
+        /* Actions */
+        .hdr-actions { display: flex; align-items: center; gap: .9rem; flex-shrink: 0; }
+        .icon-btn { position: relative; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,.08); color: var(--header-text); border: none; cursor: pointer; font-size: 1.25rem; text-decoration: none; transition: background .2s; }
         .icon-btn:hover { background: var(--header-bg-hover); }
 
         /* Cart badge */
-        .cart-badge {
-            position: absolute;
-            top: -5px; right: -5px;
-            background: var(--gold);
-            color: #fff;
-            font-size: .68rem;
-            font-weight: 700;
-            min-width: 18px; height: 18px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            padding: 0 4px;
-            border: 2px solid var(--header-bg);
-            opacity: 0;
-            transform: scale(.5);
-            transition: all .3s cubic-bezier(.34,1.56,.64,1);
-        }
+        .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--gold); color: #fff; font-size: .68rem; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--header-bg); opacity: 0; transform: scale(.5); transition: all .3s cubic-bezier(.34,1.56,.64,1); }
         .cart-badge.show { opacity: 1; transform: scale(1); }
 
-        /* Language switcher */
+        /* Language */
         .lang-wrap { position: relative; }
-        .lang-btn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255,255,255,.08);
-            border: none;
-            color: var(--header-text);
-            padding: .55rem .85rem;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: .82rem;
-            font-weight: 500;
-            transition: background .2s;
-        }
+        .lang-btn { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.08); border: none; color: var(--header-text); padding: .55rem .85rem; border-radius: 10px; cursor: pointer; font-size: .82rem; font-weight: 500; transition: background .2s; }
         .lang-btn:hover { background: var(--header-bg-hover); }
         .lang-arrow { font-size: .72rem; transition: transform .2s; }
         .lang-wrap.open .lang-arrow { transform: rotate(180deg); }
-        .lang-drop {
-            position: absolute;
-            right: 0; top: calc(100% + 8px);
-            background: var(--dropdown-bg);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px var(--shadow-color);
-            padding: .4rem;
-            min-width: 150px;
-            z-index: 1020;
-            display: none;
-            flex-direction: column;
-            gap: 2px;
-            animation: fadeDown .2s ease forwards;
-        }
+        .lang-drop { position: absolute; right: 0; top: calc(100% + 8px); background: var(--dropdown-bg); border-radius: 12px; box-shadow: 0 10px 30px var(--shadow-color); padding: .4rem; min-width: 150px; z-index: 1020; display: none; flex-direction: column; gap: 2px; animation: fadeDown .2s ease forwards; }
         .lang-wrap.open .lang-drop { display: flex; }
-        .lang-opt {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            padding: .5rem .75rem;
-            border-radius: 8px;
-            font-size: .87rem;
-            color: var(--dropdown-text);
-            border: none;
-            background: none;
-            cursor: pointer;
-            text-align: left;
-            width: 100%;
-            transition: background .15s;
-        }
+        .lang-opt { display: flex; align-items: center; gap: 9px; padding: .5rem .75rem; border-radius: 8px; font-size: .87rem; color: var(--dropdown-text); border: none; background: none; cursor: pointer; text-align: left; width: 100%; transition: background .15s; }
         .lang-opt:hover { background: var(--dropdown-hover); color: var(--primary); }
         .lang-opt.active { background: rgba(93,13,24,.07); color: var(--primary); font-weight: 700; }
         [data-theme="dark"] .lang-opt.active { background: rgba(240,230,216,.1); color: var(--gold); }
 
-        /* Account dropdown — SOLO ICONO */
+        /* ===== ACCOUNT DROPDOWN (con pestañas) ===== */
         .acc-wrap { position: relative; }
-        .acc-btn {
-            /* igual que icon-btn */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px; height: 40px;
-            border-radius: 10px;
-            background: rgba(255,255,255,.08);
-            color: var(--header-text);
-            border: none;
-            cursor: pointer;
-            font-size: 1.25rem;
-            transition: background .2s;
-        }
+        .acc-btn { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,.08); color: var(--header-text); border: none; cursor: pointer; font-size: 1.25rem; transition: background .2s; }
         .acc-btn:hover, .acc-wrap.open .acc-btn { background: var(--header-bg-hover); }
+
+        /* Badge de notificaciones sin leer */
+        .notif-dot {
+            position: absolute; top: -4px; right: -4px;
+            background: #e53e3e; color: #fff;
+            font-size: .6rem; font-weight: 700;
+            min-width: 16px; height: 16px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 3px;
+            border: 2px solid var(--header-bg);
+            opacity: 0; transform: scale(.5);
+            transition: all .3s cubic-bezier(.34,1.56,.64,1);
+        }
+        .notif-dot.show { opacity: 1; transform: scale(1); }
+
         .acc-drop {
-            position: absolute;
-            right: 0; top: calc(100% + 10px);
-            width: 220px;
+            position: absolute; right: 0; top: calc(100% + 10px);
+            width: 280px;
             background: var(--dropdown-bg);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px var(--shadow-color);
-            padding: .5rem;
-            display: none;
-            flex-direction: column;
+            border-radius: 14px;
+            box-shadow: 0 12px 35px var(--shadow-color);
+            display: none; flex-direction: column;
             z-index: 1010;
+            overflow: hidden;
             animation: fadeDown .2s ease forwards;
         }
         .acc-wrap.open .acc-drop { display: flex; }
-        .acc-head { padding: .45rem .75rem .6rem; }
-        .acc-name { font-weight: 700; color: var(--dropdown-text); font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .acc-role {
-            display: inline-block;
-            font-size: .65rem; font-weight: 700;
-            text-transform: uppercase;
-            background: rgba(93,13,24,.1);
-            color: var(--primary);
-            padding: 1px 6px;
-            border-radius: 4px;
-            margin-top: 3px;
-        }
-        [data-theme="dark"] .acc-role { background: rgba(240,230,216,.1); color: var(--gold); }
-        .acc-divider { border: 0; border-top: 1px solid var(--dropdown-divider); margin: .4rem 0; }
-        .acc-drop a {
+
+        /* Tabs */
+        .acc-tabs {
             display: flex;
-            align-items: center;
-            gap: 9px;
-            padding: .55rem .75rem;
-            color: var(--dropdown-text);
-            text-decoration: none;
-            font-size: .88rem;
-            border-radius: 8px;
-            transition: background .15s;
+            border-bottom: 1px solid var(--dropdown-divider);
+            background: var(--dropdown-bg);
         }
-        .acc-drop a:hover { background: var(--dropdown-hover); color: var(--primary); }
-        [data-theme="dark"] .acc-drop a:hover { color: var(--gold); }
-        .acc-drop a.logout:hover { background: #fff5f5; color: #c0392b; }
-        [data-theme="dark"] .acc-drop a.logout:hover { background: #4a2d30; color: #e8b8b8; }
+        .acc-tab {
+            flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+            padding: .7rem .5rem;
+            font-size: .82rem; font-weight: 600;
+            color: var(--text-light);
+            background: none; border: none; cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: color .2s, border-color .2s;
+            position: relative;
+        }
+        .acc-tab:hover { color: var(--primary); }
+        .acc-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        [data-theme="dark"] .acc-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+        .tab-badge {
+            background: #e53e3e; color: #fff;
+            font-size: .58rem; font-weight: 700;
+            min-width: 16px; height: 16px;
+            border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 0 3px;
+        }
+
+        /* Panel content */
+        .acc-panel { display: none; flex-direction: column; }
+        .acc-panel.active { display: flex; }
+
+        /* Cuenta panel */
+        .acc-head { padding: .7rem .85rem .65rem; }
+        .acc-name { font-weight: 700; color: var(--dropdown-text); font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .acc-role { display: inline-block; font-size: .62rem; font-weight: 700; text-transform: uppercase; background: rgba(93,13,24,.1); color: var(--primary); padding: 1px 6px; border-radius: 4px; margin-top: 3px; }
+        [data-theme="dark"] .acc-role { background: rgba(240,230,216,.1); color: var(--gold); }
+        .acc-divider { border: 0; border-top: 1px solid var(--dropdown-divider); margin: .3rem 0; }
+        .acc-menu-body { padding: .3rem .5rem .5rem; display: flex; flex-direction: column; gap: 2px; }
+        .acc-menu-body a { display: flex; align-items: center; gap: 9px; padding: .55rem .65rem; color: var(--dropdown-text); text-decoration: none; font-size: .87rem; border-radius: 8px; transition: background .15s; }
+        .acc-menu-body a:hover { background: var(--dropdown-hover); color: var(--primary); }
+        [data-theme="dark"] .acc-menu-body a:hover { color: var(--gold); }
+        .acc-menu-body a.logout:hover { background: #fff5f5; color: #c0392b; }
+        [data-theme="dark"] .acc-menu-body a.logout:hover { background: #4a2d30; color: #e8b8b8; }
+
+        /* Notificaciones panel */
+        .notif-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: .65rem .85rem .5rem;
+            font-size: .75rem;
+        }
+        .notif-header span { font-weight: 700; color: var(--dropdown-text); font-size: .82rem; }
+        .notif-mark-all {
+            background: none; border: none;
+            color: var(--primary); font-size: .75rem;
+            cursor: pointer; font-weight: 600;
+            padding: 0; transition: opacity .2s;
+        }
+        [data-theme="dark"] .notif-mark-all { color: var(--gold); }
+        .notif-mark-all:hover { opacity: .7; }
+
+        .notif-list {
+            max-height: 290px; overflow-y: auto;
+            display: flex; flex-direction: column;
+        }
+        .notif-list::-webkit-scrollbar { width: 5px; }
+        .notif-list::-webkit-scrollbar-track { background: transparent; }
+        .notif-list::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 3px; }
+
+        .notif-item {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: .65rem .85rem;
+            border-bottom: 1px solid var(--dropdown-divider);
+            transition: background .15s;
+            cursor: pointer;
+            position: relative;
+        }
+        .notif-item:last-child { border-bottom: none; }
+        .notif-item:hover { background: var(--dropdown-hover); }
+        .notif-item.unread { background: rgba(93,13,24,.04); }
+        [data-theme="dark"] .notif-item.unread { background: rgba(212,168,92,.06); }
+
+        .notif-icon {
+            width: 34px; height: 34px; flex-shrink: 0;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: .95rem;
+        }
+        .notif-icon.order   { background: rgba(93,13,24,.1);  color: var(--primary); }
+        .notif-icon.promo   { background: rgba(192,122,26,.12); color: var(--gold); }
+        .notif-icon.system  { background: rgba(159,178,172,.2); color: var(--secondary); }
+        .notif-icon.message { background: rgba(59,130,246,.1);  color: #3b82f6; }
+        [data-theme="dark"] .notif-icon.order { background: rgba(212,168,92,.12); color: var(--gold); }
+
+        .notif-body { flex: 1; min-width: 0; }
+        .notif-title { font-size: .82rem; font-weight: 600; color: var(--dropdown-text); line-height: 1.3; }
+        .notif-text  { font-size: .75rem; color: var(--text-light); margin-top: 2px; line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .notif-time  { font-size: .68rem; color: var(--suggestions-muted); margin-top: 4px; }
+        .notif-unread-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--primary); flex-shrink: 0; margin-top: 5px;
+        }
+        [data-theme="dark"] .notif-unread-dot { background: var(--gold); }
+
+        .notif-empty {
+            padding: 2.5rem 1rem; text-align: center;
+            color: var(--suggestions-muted); font-size: .88rem;
+        }
+        .notif-empty i { font-size: 2rem; display: block; margin-bottom: .6rem; opacity: .4; }
+
+        .notif-footer {
+            padding: .55rem .85rem;
+            border-top: 1px solid var(--dropdown-divider);
+        }
+        .notif-footer a {
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+            font-size: .8rem; font-weight: 600;
+            color: var(--primary); text-decoration: none;
+            transition: opacity .2s;
+        }
+        [data-theme="dark"] .notif-footer a { color: var(--gold); }
+        .notif-footer a:hover { opacity: .75; }
 
         /* Login link */
-        .login-link {
-            display: flex; align-items: center; gap: 8px;
-            background: var(--secondary);
-            color: var(--primary);
-            padding: .6rem 1.25rem;
-            border-radius: 10px;
-            text-decoration: none;
-            font-size: .88rem; font-weight: 700;
-            transition: background .2s, box-shadow .2s;
-        }
+        .login-link { display: flex; align-items: center; gap: 8px; background: var(--secondary); color: var(--primary); padding: .6rem 1.25rem; border-radius: 10px; text-decoration: none; font-size: .88rem; font-weight: 700; transition: background .2s, box-shadow .2s; }
         .login-link:hover { background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,.1); }
         [data-theme="dark"] .login-link { color: #f0e6d8; }
 
         /* Mobile */
         .mob-actions { display: none; align-items: center; gap: .65rem; }
-        .mob-btn {
-            display: flex; align-items: center; justify-content: center;
-            width: 40px; height: 40px;
-            background: rgba(255,255,255,.08);
-            border: none; border-radius: 10px;
-            color: var(--header-text);
-            font-size: 1.4rem;
-            cursor: pointer; transition: background .2s;
-        }
+        .mob-btn { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(255,255,255,.08); border: none; border-radius: 10px; color: var(--header-text); font-size: 1.4rem; cursor: pointer; transition: background .2s; }
         .mob-btn:hover { background: var(--header-bg-hover); }
-
-        .mob-menu {
-            max-height: 0;
-            overflow: hidden;
-            background: var(--mobile-menu-bg);
-            transition: max-height .35s cubic-bezier(.32,.94,.6,1);
-        }
-        .mob-menu.open { max-height: 540px; }
+        .mob-menu { max-height: 0; overflow: hidden; background: var(--mobile-menu-bg); transition: max-height .35s cubic-bezier(.32,.94,.6,1); }
+        .mob-menu.open { max-height: 560px; }
         .mob-inner { padding: 1rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: .35rem; }
-        .mob-link {
-            display: flex; align-items: center; gap: 11px;
-            padding: .72rem 1rem;
-            color: var(--mobile-menu-text);
-            text-decoration: none;
-            border-radius: 8px; font-size: .96rem;
-            transition: background .15s;
-        }
+        .mob-link { display: flex; align-items: center; gap: 11px; padding: .72rem 1rem; color: var(--mobile-menu-text); text-decoration: none; border-radius: 8px; font-size: .96rem; transition: background .15s; }
         .mob-link i { color: var(--secondary); font-size: 1.1rem; width: 20px; }
         .mob-link:hover, .mob-link.active { background: var(--mobile-menu-hover); color: #fff; }
         .mob-div { height: 1px; background: rgba(255,255,255,.08); margin: .55rem 0; }
-        .mob-user { padding: .35rem 1rem; }
-        .mob-login {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            background: var(--secondary); color: var(--primary);
-            padding: .75rem; border-radius: 8px;
-            text-decoration: none; font-weight: 700; margin-top: .5rem;
-        }
+        .mob-login { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--secondary); color: var(--primary); padding: .75rem; border-radius: 8px; text-decoration: none; font-weight: 700; margin-top: .5rem; }
         [data-theme="dark"] .mob-login { color: #f0e6d8; }
         .mob-lang-label { font-size: .7rem; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .08em; margin-bottom: .45rem; }
         .mob-lang-opts { display: flex; gap: .45rem; flex-wrap: wrap; }
-        .mob-lang-opt {
-            padding: .42rem .8rem;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,.15);
-            background: rgba(255,255,255,.06);
-            color: rgba(255,255,255,.75);
-            font-size: .83rem; cursor: pointer;
-            transition: background .2s;
-        }
+        .mob-lang-opt { padding: .42rem .8rem; border-radius: 8px; border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.06); color: rgba(255,255,255,.75); font-size: .83rem; cursor: pointer; transition: background .2s; }
         .mob-lang-opt:hover { background: rgba(255,255,255,.12); color: #fff; }
         .mob-lang-opt.active { background: var(--secondary); color: var(--primary); font-weight: 700; border-color: var(--secondary); }
 
@@ -510,8 +368,8 @@ if (isset($_SESSION['user_role'])) {
             from { opacity: 0; transform: translateY(8px); }
             to   { opacity: 1; transform: translateY(0); }
         }
+        @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
 
-        /* Responsive */
         @media (max-width: 1024px) {
             .nav-links, .hdr-actions { display: none; }
             .mob-actions { display: flex; }
@@ -521,6 +379,7 @@ if (isset($_SESSION['user_role'])) {
         @media (max-width: 640px) {
             .logo-text { font-size: 1.25rem; }
             .logo img { height: 33px; }
+            .acc-drop { width: 260px; }
         }
     </style>
 </head>
@@ -536,7 +395,7 @@ if (isset($_SESSION['user_role'])) {
             <span class="logo-text">Green<span class="logo-accent">Market</span></span>
         </a>
 
-        <!-- Barra de búsqueda -->
+        <!-- Búsqueda -->
         <div class="search-wrap">
             <i class="bi bi-search search-ico"></i>
             <input type="text" id="headerSearch"
@@ -568,7 +427,7 @@ if (isset($_SESSION['user_role'])) {
                 <button class="lang-btn" id="langBtn">
                     <span id="curFlag">🇫🇷</span>
                     <span id="curCode" style="font-size:.78rem;letter-spacing:.5px">FR</span>
-                    <i class="bi bi-chevron-down lang-arrow" id="langArrow"></i>
+                    <i class="bi bi-chevron-down lang-arrow"></i>
                 </button>
                 <div class="lang-drop" id="langDrop">
                     <button class="lang-opt active" data-lang="fr" data-flag="🇫🇷">🇫🇷 &nbsp;Français</button>
@@ -578,23 +437,98 @@ if (isset($_SESSION['user_role'])) {
                 </div>
             </div>
 
-            <!-- Cuenta -->
+            <!-- Cuenta / Notificaciones -->
             <?php if (isset($_SESSION['user_role'])): ?>
             <div class="acc-wrap" id="accWrap">
                 <button class="acc-btn" id="accBtn" title="Mon compte">
                     <i class="bi bi-person-circle"></i>
+                    <!-- Badge notificaciones sin leer -->
+                    <span class="notif-dot <?= $unreadCount > 0 ? 'show' : '' ?>" id="notifDot">
+                        <?= $unreadCount > 0 ? ($unreadCount > 9 ? '9+' : $unreadCount) : '' ?>
+                    </span>
                 </button>
+
                 <div class="acc-drop" id="accDrop">
-                    <div class="acc-head">
-                        <p class="acc-name"><?= htmlspecialchars($_SESSION['user_nom']) ?></p>
-                        <span class="acc-role"><?= ucfirst($_SESSION['user_role']) ?></span>
+                    <!-- Pestañas -->
+                    <div class="acc-tabs">
+                        <button class="acc-tab active" data-tab="compte">
+                            <i class="bi bi-person"></i> Compte
+                        </button>
+                        <button class="acc-tab" data-tab="notifs">
+                            <i class="bi bi-bell"></i> Notifications
+                            <?php if ($unreadCount > 0): ?>
+                            <span class="tab-badge" id="tabBadge"><?= $unreadCount > 9 ? '9+' : $unreadCount ?></span>
+                            <?php endif; ?>
+                        </button>
                     </div>
-                    <hr class="acc-divider">
-                    <a href="<?= $dashboardLink ?>"><i class="bi bi-grid-1x2"></i> Tableau de bord</a>
-                    <a href="profile.php"><i class="bi bi-sliders"></i> Paramètres</a>
-                    <hr class="acc-divider">
-                    <a href="logout.php" class="logout"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
-                </div>
+
+                    <!-- Panel: Compte -->
+                    <div class="acc-panel active" id="panel-compte">
+                        <div class="acc-head">
+                            <p class="acc-name"><?= htmlspecialchars($_SESSION['user_nom']) ?></p>
+                            <span class="acc-role"><?= ucfirst($_SESSION['user_role']) ?></span>
+                        </div>
+                        <hr class="acc-divider">
+                        <div class="acc-menu-body">
+                            <a href="<?= $dashboardLink ?>"><i class="bi bi-grid-1x2"></i> Tableau de bord</a>
+                            <a href="profile.php"><i class="bi bi-sliders"></i> Paramètres</a>
+                            <?php if ($_SESSION['user_role'] === 'client'): ?>
+                            <a href="mes-commandes.php"><i class="bi bi-box-seam"></i> Mes commandes</a>
+                            <?php endif; ?>
+                            <hr class="acc-divider">
+                            <a href="logout.php" class="logout"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
+                        </div>
+                    </div>
+
+                    <!-- Panel: Notifications -->
+                    <div class="acc-panel" id="panel-notifs">
+                        <div class="notif-header">
+                            <span>Notifications</span>
+                            <?php if ($unreadCount > 0): ?>
+                            <button class="notif-mark-all" id="markAllRead">Tout marquer lu</button>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="notif-list" id="notifList">
+                            <?php if (empty($notifications)): ?>
+                            <!-- Estado vacío — se reemplaza con JS si hay notifs via AJAX -->
+                            <div class="notif-empty" id="notifEmpty">
+                                <i class="bi bi-bell-slash"></i>
+                                Aucune notification pour l'instant
+                            </div>
+                            <?php else: ?>
+                            <?php foreach ($notifications as $n): ?>
+                            <div class="notif-item <?= !$n['read'] ? 'unread' : '' ?>"
+                                 data-id="<?= $n['id'] ?>"
+                                 onclick="markRead(this, '<?= $n['link'] ?? '#' ?>')">
+                                <div class="notif-icon <?= $n['type'] ?? 'system' ?>">
+                                    <i class="bi <?= match($n['type'] ?? '') {
+                                        'order'   => 'bi-bag-check',
+                                        'promo'   => 'bi-tag',
+                                        'message' => 'bi-chat-dots',
+                                        default   => 'bi-info-circle'
+                                    } ?>"></i>
+                                </div>
+                                <div class="notif-body">
+                                    <div class="notif-title"><?= htmlspecialchars($n['title']) ?></div>
+                                    <div class="notif-text"><?= htmlspecialchars($n['text']) ?></div>
+                                    <div class="notif-time"><?= htmlspecialchars($n['time']) ?></div>
+                                </div>
+                                <?php if (!$n['read']): ?>
+                                <div class="notif-unread-dot"></div>
+                                <?php endif; ?>
+                            </div>
+                            <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="notif-footer">
+                            <a href="notifications.php">
+                                Voir toutes les notifications <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div><!-- /acc-drop -->
             </div>
             <?php else: ?>
             <a href="signin.php" class="login-link">
@@ -603,7 +537,7 @@ if (isset($_SESSION['user_role'])) {
             <?php endif; ?>
         </div>
 
-        <!-- Actions mobile -->
+        <!-- Mobile actions -->
         <div class="mob-actions">
             <a href="panier.php" class="icon-btn">
                 <i class="bi bi-bag"></i>
@@ -613,7 +547,7 @@ if (isset($_SESSION['user_role'])) {
                 <i class="bi bi-list" id="mobIcon"></i>
             </button>
         </div>
-    </div><!-- /hdr-inner -->
+    </div>
 
     <!-- Menú móvil -->
     <div class="mob-menu" id="mobMenu">
@@ -622,10 +556,7 @@ if (isset($_SESSION['user_role'])) {
             <a href="store.php"    class="mob-link <?= $currentPage==='store.php'    ? 'active':'' ?>"><i class="bi bi-shop"></i> Boutiques</a>
             <a href="produits.php" class="mob-link <?= $currentPage==='produits.php' ? 'active':'' ?>"><i class="bi bi-box-seam"></i> Produits</a>
             <a href="apropos.php"  class="mob-link <?= $currentPage==='apropos.php'  ? 'active':'' ?>"><i class="bi bi-info-circle"></i> À propos</a>
-
             <div class="mob-div"></div>
-
-            <!-- Idioma mobile -->
             <div style="padding:.4rem 1rem">
                 <p class="mob-lang-label">Langue / Language</p>
                 <div class="mob-lang-opts">
@@ -635,17 +566,19 @@ if (isset($_SESSION['user_role'])) {
                     <button class="mob-lang-opt" data-lang="es">🇪🇸 ES</button>
                 </div>
             </div>
-
             <div class="mob-div"></div>
-
             <?php if (isset($_SESSION['user_role'])): ?>
-            <div class="mob-user">
-                <p style="font-size:.7rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em">
-                    Mon compte (<?= ucfirst($_SESSION['user_role']) ?>)
-                </p>
+            <div style="padding:.35rem 1rem">
+                <p style="font-size:.7rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em">Mon compte (<?= ucfirst($_SESSION['user_role']) ?>)</p>
                 <p style="font-weight:600;color:#fff;margin-top:2px"><?= htmlspecialchars($_SESSION['user_nom']) ?></p>
             </div>
             <a href="<?= $dashboardLink ?>" class="mob-link"><i class="bi bi-grid-1x2"></i> Tableau de bord</a>
+            <a href="notifications.php" class="mob-link">
+                <i class="bi bi-bell"></i> Notifications
+                <?php if ($unreadCount > 0): ?>
+                <span style="margin-left:auto;background:#e53e3e;color:#fff;font-size:.65rem;font-weight:700;padding:1px 6px;border-radius:999px"><?= $unreadCount ?></span>
+                <?php endif; ?>
+            </a>
             <a href="logout.php" class="mob-link" style="color:#f87171"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
             <?php else: ?>
             <a href="signin.php" class="mob-login"><i class="bi bi-box-arrow-in-right"></i> Se connecter</a>
@@ -654,7 +587,6 @@ if (isset($_SESSION['user_role'])) {
     </div>
 </header>
 
-<!-- Google Translate container (oculto) -->
 <div id="google_translate_element" style="display:none"></div>
 
 <script>
@@ -665,11 +597,7 @@ if (isset($_SESSION['user_role'])) {
     document.head.appendChild(s);
 })();
 window.googleTranslateElementInit = function(){
-    new google.translate.TranslateElement({
-        pageLanguage:'fr',
-        includedLanguages:'fr,en,ar,es',
-        autoDisplay: false
-    }, 'google_translate_element');
+    new google.translate.TranslateElement({ pageLanguage:'fr', includedLanguages:'fr,en,ar,es', autoDisplay:false }, 'google_translate_element');
 };
 function applyLang(lang){
     const v = `/fr/${lang}`;
@@ -700,18 +628,69 @@ mobToggle?.addEventListener('click', e => {
     mobIcon.className = open ? 'bi bi-x-lg' : 'bi bi-list';
 });
 
-/* ===== Dropdown cuenta ===== */
+/* ===== Account dropdown ===== */
 const accWrap = document.getElementById('accWrap');
 document.getElementById('accBtn')?.addEventListener('click', e => {
     e.stopPropagation();
     accWrap.classList.toggle('open');
 });
 
-/* ===== Dropdown idioma ===== */
+/* ===== Tabs cuenta/notificaciones ===== */
+document.querySelectorAll('.acc-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.acc-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.acc-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('panel-' + tab.dataset.tab)?.classList.add('active');
+    });
+});
+
+/* ===== Marcar notificación como leída ===== */
+function markRead(el, link) {
+    if(el.classList.contains('unread')) {
+        el.classList.remove('unread');
+        const dot = el.querySelector('.notif-unread-dot');
+        if(dot) dot.remove();
+        // Actualizar contadores
+        updateNotifCount(-1);
+        // Llamar al servidor (ajusta la URL)
+        const id = el.dataset.id;
+        if(id) fetch(`mark_notification_read.php?id=${id}`).catch(()=>{});
+    }
+    if(link && link !== '#') setTimeout(() => location.href = link, 150);
+}
+
+/* ===== Marcar todas como leídas ===== */
+document.getElementById('markAllRead')?.addEventListener('click', () => {
+    document.querySelectorAll('.notif-item.unread').forEach(el => {
+        el.classList.remove('unread');
+        el.querySelector('.notif-unread-dot')?.remove();
+    });
+    updateNotifCount(0, true);
+    fetch('mark_all_notifications_read.php').catch(()=>{});
+    document.getElementById('markAllRead')?.remove();
+    document.getElementById('tabBadge')?.remove();
+});
+
+function updateNotifCount(delta, reset = false) {
+    const dot     = document.getElementById('notifDot');
+    const tabBadge= document.getElementById('tabBadge');
+    let current   = parseInt(dot?.textContent) || 0;
+    const next    = reset ? 0 : Math.max(0, current + delta);
+    if(dot) {
+        if(next <= 0){ dot.classList.remove('show'); dot.textContent = ''; }
+        else { dot.textContent = next > 9 ? '9+' : next; dot.classList.add('show'); }
+    }
+    if(tabBadge) {
+        if(next <= 0) tabBadge.remove();
+        else tabBadge.textContent = next > 9 ? '9+' : next;
+    }
+}
+
+/* ===== Idioma ===== */
 const langWrap = document.getElementById('langWrap');
 document.getElementById('langBtn')?.addEventListener('click', e => {
-    e.stopPropagation();
-    langWrap.classList.toggle('open');
+    e.stopPropagation(); langWrap.classList.toggle('open');
 });
 document.querySelectorAll('.lang-opt').forEach(opt => {
     opt.addEventListener('click', () => {
@@ -724,32 +703,31 @@ document.querySelectorAll('.mob-lang-opt').forEach(btn => {
     btn.addEventListener('click', () => applyLang(btn.dataset.lang));
 });
 
-/* ===== Cerrar dropdowns al clic exterior ===== */
+/* ===== Cerrar al clic exterior ===== */
 document.addEventListener('click', e => {
-    if(accWrap && !accWrap.contains(e.target)) accWrap.classList.remove('open');
+    if(accWrap  && !accWrap.contains(e.target))  accWrap.classList.remove('open');
     if(langWrap && !langWrap.contains(e.target)) langWrap.classList.remove('open');
-    if(mobMenu && !mobMenu.contains(e.target) && !mobToggle.contains(e.target)){
+    if(mobMenu  && !mobMenu.contains(e.target) && !mobToggle.contains(e.target)){
         mobMenu.classList.remove('open');
         mobIcon.className = 'bi bi-list';
     }
 });
 
-/* ===== Búsqueda con sugerencias ===== */
-const searchInput  = document.getElementById('headerSearch');
-const suggestions  = document.getElementById('suggestions');
-let searchTimer = null;
-let activeIdx = -1;
+/* ===== Búsqueda ===== */
+const searchInput = document.getElementById('headerSearch');
+const suggestions = document.getElementById('suggestions');
+let searchTimer = null, activeIdx = -1;
 
 function renderSuggestions(data, q){
     if(!data.length){
         suggestions.innerHTML = `<div class="sug-empty"><i class="bi bi-search" style="font-size:1.4rem;display:block;margin-bottom:.5rem"></i>Aucun résultat pour "<strong>${q}</strong>"</div>`;
         suggestions.classList.add('show'); return;
     }
-    let html = ''; let lastType = '';
+    let html = '', lastType = '';
     data.forEach((item, i) => {
         if(item.type !== lastType && i > 0) html += '<div class="sug-divider"></div>';
         lastType = item.type;
-        const img = item.image || (item.type==='produit' ? 'IMAGES/default-product.jpg' : 'IMAGES/default-boutique.jpg');
+        const img   = item.image || (item.type==='produit' ? 'IMAGES/default-product.jpg' : 'IMAGES/default-boutique.jpg');
         const label = item.type==='produit' ? 'Produit' : 'Boutique';
         html += `
         <a href="${item.link}" class="sug-item">
@@ -770,8 +748,7 @@ function renderSuggestions(data, q){
 }
 
 searchInput?.addEventListener('input', function(){
-    activeIdx = -1;
-    clearTimeout(searchTimer);
+    activeIdx = -1; clearTimeout(searchTimer);
     const q = this.value.trim();
     if(!q){ suggestions.classList.remove('show'); return; }
     suggestions.innerHTML = `<div class="sug-empty"><i class="bi bi-arrow-repeat" style="font-size:1.3rem;display:block;margin-bottom:.5rem;animation:spin 1s linear infinite"></i>Recherche...</div>`;
@@ -804,9 +781,4 @@ document.addEventListener('click', e => {
         suggestions.classList.remove('show');
 });
 suggestions?.addEventListener('click', () => setTimeout(() => suggestions.classList.remove('show'), 100));
-
-/* ===== Spinner animation ===== */
-const st = document.createElement('style');
-st.textContent = '@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
-document.head.appendChild(st);
 </script>
