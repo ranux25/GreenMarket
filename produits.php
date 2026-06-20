@@ -7,7 +7,6 @@ $theme = $_COOKIE['theme'] ?? 'light';
 
 // Récupérer les produits depuis la base de données
 try {
-    // Récupérer tous les produits validés avec leurs infos boutique et catégorie
     $stmt = $pdo->prepare("
         SELECT p.*, 
                b.nom_boutique, b.id_boutique,
@@ -33,7 +32,7 @@ try {
     $stmt = $pdo->query("SELECT COUNT(DISTINCT id_boutique) as total FROM produit WHERE est_valide_par_admin = 1 AND statut_publie = 'Publié'");
     $total_boutiques = $stmt->fetch()['total'];
 
-    #compter les articles dans le panier du client connecte (pour le badge)
+    // Compter les articles dans le panier du client connecté
     $panier_count = 0;
     if (isset($_SESSION['user_id']) && $_SESSION['user_role'] == 'client') {
         $stmtP = $pdo->prepare("SELECT SUM(quantite) as total FROM panier WHERE id_client = ?");
@@ -49,6 +48,9 @@ try {
     $total_boutiques = 0;
     $panier_count = 0;
 }
+
+// Vérifier si l'utilisateur est admin
+$isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
 
 // Formater les produits pour le JavaScript
 $produits_json = [];
@@ -81,50 +83,35 @@ foreach ($produits_db as $p) {
 <style>
   /* ========== VARIABLES DE TEMA GLOBAL ========== */
   :root {
-    /* Colores principales */
     --primary: #5D0D18;
     --primary-light: #7a1020;
     --secondary: #9FB2AC;
     --secondary-dark: #8aa09a;
     --gold: #c07a1a;
-    
-    /* Fondos */
     --bg: #FFF9EB;
     --bg-light: #f5f0e8;
     --bg-card: #ffffff;
     --bg-input: #ffffff;
     --bg-white: #fffdf7;
-    
-    /* Textos */
     --text-dark: #2C2C2C;
     --text-light: #6B6B6B;
     --text-muted: #6B6B6B;
-    
-    /* Bordes y sombras */
     --border-color: #e8ddd0;
     --card-border: #e8ddd0;
     --shadow-color: rgba(93, 13, 24, 0.08);
     --shadow-hover: rgba(93, 13, 24, 0.14);
-    
-    /* Footer */
     --footer-bg: #3A0A10;
     --footer-text: #d4b8a0;
     --footer-link: #c4a890;
     --footer-link-hover: #ffffff;
-    
-    /* Page header */
     --page-header-bg: var(--primary);
     --page-header-text: #fff;
     --page-header-sub: rgba(255,249,235,.7);
     --page-header-border: rgba(255,249,235,.05);
     --page-header-border-top: rgba(255,249,235,.15);
-    
-    /* Search bar */
     --search-bg: #fff;
     --search-border: #e8ddd0;
     --search-input-bg: var(--bg);
-    
-    /* Sidebar */
     --sidebar-bg: #fff;
     --sidebar-border: #e8ddd0;
     --sidebar-shadow: rgba(93,13,24,0.08);
@@ -135,8 +122,6 @@ foreach ($produits_db as $p) {
     --category-count-bg: #e8ddd0;
     --category-count-text: var(--text-light);
     --category-count-active: #fff;
-    
-    /* Product cards */
     --product-bg: #fff;
     --product-border: #e8ddd0;
     --product-shadow: rgba(93,13,24,0.08);
@@ -149,61 +134,46 @@ foreach ($produits_db as $p) {
     --product-stock-color: var(--primary);
     --product-stock-low: #e67e22;
     --product-stock-out: #e74c3c;
-    
-    /* Toast */
     --toast-bg: var(--primary);
     --toast-text: #fff;
-    
-    /* Empty state */
     --empty-color: var(--text-light);
+    --pagination-bg: #fff;
+    --pagination-border: #e8ddd0;
+    --pagination-text: var(--text-dark);
+    --pagination-active-bg: var(--primary);
+    --pagination-active-text: #fff;
   }
 
-  /* ========== TEMA OSCURO BEIGE ========== */
   [data-theme="dark"] {
-    /* Colores principales */
     --primary: #8a6048;
     --primary-light: #a0785a;
     --secondary: #6d4c3a;
     --secondary-dark: #5a4a3a;
     --gold: #d4a85c;
-    
-    /* Fondos */
     --bg: #2c241e;
     --bg-light: #3d3229;
     --bg-card: #3d3229;
     --bg-input: #4d3d32;
     --bg-white: #3d3229;
-    
-    /* Textos */
     --text-dark: #f0e6d8;
     --text-light: #b8a896;
     --text-muted: #b8a896;
-    
-    /* Bordes y sombras */
     --border-color: #5a4a3a;
     --card-border: #5a4a3a;
     --shadow-color: rgba(0, 0, 0, 0.3);
     --shadow-hover: rgba(0, 0, 0, 0.4);
-    
-    /* Footer */
     --footer-bg: #1a1410;
     --footer-text: #b8a896;
     --footer-link: #b8a896;
     --footer-link-hover: #f0e6d8;
-    
-    /* Page header */
     --page-header-bg: #1a1410;
     --page-header-text: #f0e6d8;
     --page-header-sub: rgba(240,230,216,0.6);
     --page-header-border: rgba(240,230,216,0.05);
     --page-header-border-top: rgba(240,230,216,0.15);
-    
-    /* Search bar */
     --search-bg: #3d3229;
     --search-border: #5a4a3a;
     --search-input-bg: #4d3d32;
-    
-    /* Sidebar */
     --sidebar-bg: #3d3229;
     --sidebar-border: #5a4a3a;
     --sidebar-shadow: rgba(0, 0, 0, 0.3);
@@ -214,8 +184,6 @@ foreach ($produits_db as $p) {
     --category-count-bg: #4d3d32;
     --category-count-text: #b8a896;
     --category-count-active: #f0e6d8;
-    
-    /* Product cards */
     --product-bg: #3d3229;
     --product-border: #5a4a3a;
     --product-shadow: rgba(0, 0, 0, 0.3);
@@ -228,16 +196,16 @@ foreach ($produits_db as $p) {
     --product-stock-color: var(--gold);
     --product-stock-low: #e6a822;
     --product-stock-out: #e85a4a;
-    
-    /* Toast */
     --toast-bg: #6d4c3a;
     --toast-text: #f0e6d8;
-    
-    /* Empty state */
     --empty-color: #b8a896;
+    --pagination-bg: #3d3229;
+    --pagination-border: #5a4a3a;
+    --pagination-text: #f0e6d8;
+    --pagination-active-bg: #6d4c3a;
+    --pagination-active-text: #f0e6d8;
   }
 
-  /* ========== STYLES UNIFIÉS ========== */
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
@@ -250,7 +218,6 @@ foreach ($produits_db as $p) {
 
   h1, h2, h3, .playfair { font-family: 'Playfair Display', serif; }
 
-  /* Animations */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(40px); }
     to { opacity: 1; transform: translateY(0); }
@@ -264,6 +231,24 @@ foreach ($produits_db as $p) {
   .reveal.visible {
     opacity: 1;
     transform: translateY(0);
+  }
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal-left.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .reveal-right {
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal-right.visible {
+    opacity: 1;
+    transform: translateX(0);
   }
 
   /* Page Header */
@@ -433,6 +418,9 @@ foreach ($produits_db as $p) {
   .sidebar-header {
     background: var(--sidebar-header-bg);
     padding: 1rem 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     transition: background 0.3s ease;
   }
   .sidebar-header h3 {
@@ -442,6 +430,22 @@ foreach ($produits_db as $p) {
     font-weight: 600;
     transition: color 0.3s ease;
   }
+  .add-btn {
+    background: rgba(255,255,255,0.15);
+    color: var(--sidebar-header-text);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 999px;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: background 0.2s;
+  }
+  .add-btn:hover { background: rgba(255,255,255,0.25); }
+
   .category-list { padding: 0.5rem 0; }
   .category-item {
     display: flex;
@@ -479,12 +483,69 @@ foreach ($produits_db as $p) {
     color: var(--bg);
   }
 
+  /* Add category form */
+  .add-cat-form {
+    padding: 1.2rem;
+    border-top: 1px solid var(--sidebar-border);
+    display: none;
+    transition: border-color 0.3s ease;
+  }
+  .add-cat-form.open { display: block; }
+  .add-cat-form label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-light);
+    display: block;
+    margin-bottom: 0.35rem;
+    transition: color 0.3s ease;
+  }
+  .add-cat-form input {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border: 1.5px solid var(--sidebar-border);
+    border-radius: 12px;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.85rem;
+    background: var(--bg-input);
+    color: var(--text-dark);
+    margin-bottom: 0.75rem;
+    transition: border-color 0.2s, background 0.3s ease, color 0.3s ease;
+  }
+  .add-cat-form input:focus { border-color: var(--primary); outline: none; }
+  .form-actions { display: flex; gap: 0.5rem; }
+  .btn-sm-wine {
+    flex: 1;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 0.55rem;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+  .btn-sm-wine:hover { background: var(--primary-light); }
+  .btn-sm-cancel {
+    flex: 1;
+    background: var(--category-count-bg);
+    color: var(--text-light);
+    border: none;
+    padding: 0.55rem;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
   /* Products Grid */
   .stores-title-row {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
   .stores-area h2 {
     font-family: 'Playfair Display', serif;
@@ -500,7 +561,7 @@ foreach ($produits_db as $p) {
   }
   .stores-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
   }
 
@@ -576,10 +637,12 @@ foreach ($produits_db as $p) {
   }
   .product-stats {
     display: flex;
+    flex-wrap: wrap;
     border-top: 1px solid var(--product-stats-border);
     padding-top: 0.8rem;
     align-items: center;
     justify-content: space-between;
+    gap: 0.5rem;
     transition: border-color 0.3s ease;
   }
   .product-stock {
@@ -617,6 +680,84 @@ foreach ($produits_db as $p) {
   [data-theme="dark"] .add-cart-btn {
     color: var(--bg);
   }
+  .add-cart-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .admin-btn-delete {
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .admin-btn-delete:hover {
+    background: #c82333;
+    transform: scale(1.05);
+  }
+
+  /* Pagination */
+  .pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2rem 0 1rem;
+    flex-wrap: wrap;
+  }
+  .pagination-wrapper button {
+    min-width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    border: 2px solid var(--pagination-border);
+    background: var(--pagination-bg);
+    color: var(--pagination-text);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pagination-wrapper button:hover:not(:disabled) {
+    background: var(--pagination-active-bg);
+    color: var(--pagination-active-text);
+    border-color: var(--pagination-active-bg);
+    transform: translateY(-2px);
+  }
+  .pagination-wrapper button.active {
+    background: var(--pagination-active-bg);
+    color: var(--pagination-active-text);
+    border-color: var(--pagination-active-bg);
+  }
+  .pagination-wrapper button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .pagination-wrapper .page-btn {
+    min-width: 44px;
+  }
+  .pagination-wrapper .nav-btn {
+    padding: 0 1.2rem;
+    gap: 0.3rem;
+  }
+  .pagination-info {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    text-align: center;
+    padding: 0.5rem 0;
+    transition: color 0.3s ease;
+  }
 
   /* Toast */
   .toast {
@@ -632,6 +773,7 @@ foreach ($produits_db as $p) {
     transform: translateY(80px);
     opacity: 0;
     transition: 0.4s cubic-bezier(.22,1,.36,1);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
   }
   .toast.show { transform: translateY(0); opacity: 1; }
 
@@ -663,6 +805,14 @@ foreach ($produits_db as $p) {
     .stores-grid {
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     }
+    .pagination-wrapper button {
+      min-width: 38px;
+      height: 38px;
+      font-size: 0.8rem;
+    }
+    .pagination-wrapper .nav-btn {
+      padding: 0 0.8rem;
+    }
   }
 </style>
 </head>
@@ -670,7 +820,7 @@ foreach ($produits_db as $p) {
 
 <?php include 'header.php'; ?>
 
-<!-- HEADER SECTION -->
+<!-- PAGE HEADER -->
 <div class="page-header">
   <div class="header-inner">
     <div class="header-eyebrow">🇲🇦 Artisanat &amp; Traditions marocaines</div>
@@ -699,22 +849,38 @@ foreach ($produits_db as $p) {
       </option>
     <?php endforeach; ?>
   </select>
-  <select class="filter-select" id="sortFilter">
-    <option value="">Trier par</option>
-    <option value="price_asc">Prix : croissant</option>
-    <option value="price_desc">Prix : décroissant</option>
-    <option value="name">Nom A–Z</option>
+  <select class="filter-select" id="perPageFilter">
+    <option value="6">6 par page</option>
+    <option value="9">9 par page</option>
+    <option value="12" selected>12 par page</option>
+    <option value="18">18 par page</option>
+    <option value="24">24 par page</option>
   </select>
 </div>
 
 <!-- MAIN CONTENT -->
 <div class="main-layout">
   <aside class="sidebar">
-    <div class="sidebar-section reveal">
+    <div class="sidebar-section reveal-left">
       <div class="sidebar-header">
         <h3>Catégories artisanales</h3>
+        <?php if ($isAdmin): ?>
+          <button class="add-btn" id="toggleAddCat">➕ Ajouter</button>
+        <?php endif; ?>
       </div>
       <div class="category-list" id="categoryList"></div>
+      <?php if ($isAdmin): ?>
+      <div class="add-cat-form" id="addCatForm">
+        <label>Nom de la catégorie</label>
+        <input type="text" id="catNameInput" placeholder="Ex: Poterie, Tissage...">
+        <label>Icône (emoji)</label>
+        <input type="text" id="catIconInput" placeholder="📦" maxlength="2">
+        <div class="form-actions">
+          <button class="btn-sm-cancel" id="cancelCat">Annuler</button>
+          <button class="btn-sm-wine" id="saveCat">Enregistrer</button>
+        </div>
+      </div>
+      <?php endif; ?>
     </div>
   </aside>
   
@@ -724,49 +890,82 @@ foreach ($produits_db as $p) {
       <span class="stores-count" id="storesCount"></span>
     </div>
     <div class="stores-grid reveal" id="productsGrid"></div>
+    
+    <!-- Pagination -->
+    <div class="pagination-info" id="paginationInfo"></div>
+    <div class="pagination-wrapper" id="paginationWrapper"></div>
   </section>
 </div>
 
+<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
 // ========== DONNÉES DEPUIS PHP ==========
 const produitsFromDB = <?php echo json_encode($produits_json); ?>;
 const categoriesFromDB = <?php echo json_encode($categories_db); ?>;
+const isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
 
 let allProducts = produitsFromDB;
+let filteredProducts = [];
+let activeCategory = null;
+let deleteProductId = null;
 
-// Configuration des icônes pour catégories
-const categoryIcons = {
-    'Caftans & Vêtements traditionnels': '👘',
-    'Tapis & Tissage': '🪑',
-    'Poterie & Céramique': '🏺',
-    'Marqueterie & Bois': '🪵',
-    'Bijoux & Joaillerie': '💍',
-    'Lampes & Fer forgé': '🕯️',
-    'Cosmétiques naturels': '🧴',
-    'Produits du terroir': '🍯'
-};
+// ====== PAGINATION VARIABLES ======
+let currentPage = 1;
+let perPage = 12;
 
-function getCategoryIcon(categoryName) {
-    return categoryIcons[categoryName] || '📦';
+// Initialiser les catégories depuis la base de données
+let categories = [];
+if (categoriesFromDB.length > 0) {
+    categories = categoriesFromDB.map(c => ({
+        id: c.id_categorie,
+        icon: getCategoryIcon(c.nom_categorie),
+        name: c.nom_categorie
+    }));
 }
 
-let activeCategory = null;
+// Configuration des icônes pour catégories
+function getCategoryIcon(categoryName) {
+    const icons = {
+        'Caftans & Vêtements traditionnels': '👘',
+        'Tapis & Tissage': '🪑',
+        'Poterie & Céramique': '🏺',
+        'Marqueterie & Bois': '🪵',
+        'Bijoux & Joaillerie': '💍',
+        'Lampes & Fer forgé': '🕯️',
+        'Cosmétiques naturels': '🧴',
+        'Produits du terroir': '🍯'
+    };
+    return icons[categoryName] || '📦';
+}
 
-// Lire paramètres URL
-(function() {
-    const params = new URLSearchParams(window.location.search);
-    const catParam = params.get('cat');
-    if (catParam) activeCategory = catParam;
-})();
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>"]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        if (m === '"') return '&quot;';
+        return m;
+    });
+}
 
-// ========== FONCTIONS PANIER ==========
-function showToast(msg) {
+function showToast(msg, isError = false) {
     const toast = document.getElementById('toast');
     toast.textContent = msg;
+    if (isError) {
+        toast.style.background = '#dc3545';
+    } else {
+        toast.style.background = 'var(--toast-bg)';
+    }
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2800);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toast.style.background = 'var(--toast-bg)';
+        }, 400);
+    }, 2800);
 }
 
 let panierCount = <?php echo json_encode($panier_count); ?>;
@@ -777,6 +976,17 @@ function updateCartCount() {
 }
 
 function addToCart(product) {
+    const userRole = '<?php echo $_SESSION['user_role'] ?? ''; ?>';
+    if (userRole !== 'client') {
+        showToast('Veuillez vous connecter en tant que client', true);
+        return;
+    }
+
+    if (product.stock <= 0) {
+        showToast('❌ Produit en rupture de stock', true);
+        return;
+    }
+
     fetch('ajouter_panier.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -790,15 +1000,10 @@ function addToCart(product) {
             if (badge) badge.textContent = data.total_panier;
             showToast(`✓ ${product.name} ajouté au panier !`);
         } else {
-            showToast(data.message || 'Erreur lors de l\'ajout au panier');
+            showToast(data.message || '❌ Erreur lors de l\'ajout au panier', true);
         }
     })
-    .catch(() => showToast('Erreur de connexion au serveur'));
-}
-
-function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    .catch(() => showToast('❌ Erreur de connexion au serveur', true));
 }
 
 function getStockClass(stock) {
@@ -823,7 +1028,7 @@ function renderCategories() {
         categoryCounts[p.category] = (categoryCounts[p.category] || 0) + 1;
     });
     
-    list.innerHTML = `
+    let html = `
         <div class="category-item ${activeCategory === null ? 'active' : ''}" data-name="">
             <div class="cat-left">
                 <span class="cat-icon">🏪</span>
@@ -831,20 +1036,27 @@ function renderCategories() {
             </div>
             <span class="cat-count">${allProducts.length}</span>
         </div>
-        ${categoriesFromDB.map(c => `
-            <div class="category-item ${activeCategory === c.nom_categorie ? 'active' : ''}" data-name="${escapeHtml(c.nom_categorie)}">
-                <div class="cat-left">
-                    <span class="cat-icon">${getCategoryIcon(c.nom_categorie)}</span>
-                    <span class="cat-name">${escapeHtml(c.nom_categorie)}</span>
-                </div>
-                <span class="cat-count">${categoryCounts[c.nom_categorie] || 0}</span>
-            </div>
-        `).join('')}
     `;
+    
+    categories.forEach(c => {
+        const count = categoryCounts[c.name] || 0;
+        html += `
+            <div class="category-item ${activeCategory === c.name ? 'active' : ''}" data-name="${escapeHtml(c.name)}" data-cat-id="${c.id}">
+                <div class="cat-left">
+                    <span class="cat-icon">${c.icon}</span>
+                    <span class="cat-name">${escapeHtml(c.name)}</span>
+                </div>
+                <span class="cat-count">${count}</span>
+            </div>
+        `;
+    });
+    
+    list.innerHTML = html;
     
     list.querySelectorAll('.category-item').forEach(el => {
         el.addEventListener('click', () => {
             activeCategory = el.dataset.name || null;
+            currentPage = 1;
             const catFilter = document.getElementById('catFilter');
             if (catFilter) catFilter.value = activeCategory || '';
             renderCategories();
@@ -853,12 +1065,12 @@ function renderCategories() {
     });
 }
 
-// ========== RENDU PRODUITS ==========
-function renderProducts() {
+// ====== FILTRER LES PRODUITS ======
+function filterProducts() {
     const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
     const sortValue = document.getElementById('sortFilter')?.value || '';
     
-    let filtered = allProducts.filter(p => {
+    filteredProducts = allProducts.filter(p => {
         const matchSearch = !searchTerm || 
             p.name.toLowerCase().includes(searchTerm) || 
             p.shopName.toLowerCase().includes(searchTerm);
@@ -868,60 +1080,232 @@ function renderProducts() {
     
     // Tri
     if (sortValue === 'price_asc') {
-        filtered.sort((a, b) => a.prix_numerique - b.prix_numerique);
+        filteredProducts.sort((a, b) => a.prix_numerique - b.prix_numerique);
     } else if (sortValue === 'price_desc') {
-        filtered.sort((a, b) => b.prix_numerique - a.prix_numerique);
+        filteredProducts.sort((a, b) => b.prix_numerique - a.prix_numerique);
     } else if (sortValue === 'name') {
-        filtered.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+        filteredProducts.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
     }
     
-    // Mettre à jour les titres
-    const titleEl = document.getElementById('storesTitle');
-    const countEl = document.getElementById('storesCount');
-    if (titleEl) titleEl.textContent = activeCategory || 'Tous les produits artisanaux';
-    if (countEl) countEl.textContent = `${filtered.length} produit${filtered.length > 1 ? 's' : ''}`;
-    
+    // Mettre à jour les statistiques
+    document.getElementById('statProducts').textContent = filteredProducts.length;
+}
+
+// ====== RENDU PRODUITS AVEC PAGINATION ======
+function renderProducts() {
     const grid = document.getElementById('productsGrid');
     if (!grid) return;
     
-    if (filtered.length === 0) {
+    filterProducts();
+    
+    const totalItems = filteredProducts.length;
+    const totalPages = Math.ceil(totalItems / perPage);
+    
+    if (currentPage > totalPages && totalPages > 0) {
+        currentPage = totalPages;
+    }
+    if (currentPage < 1) currentPage = 1;
+    
+    const startIndex = (currentPage - 1) * perPage;
+    const endIndex = Math.min(startIndex + perPage, totalItems);
+    const pageItems = filteredProducts.slice(startIndex, endIndex);
+    
+    const titleEl = document.getElementById('storesTitle');
+    const countEl = document.getElementById('storesCount');
+    if (titleEl) titleEl.textContent = activeCategory || 'Tous les produits artisanaux';
+    if (countEl) countEl.textContent = `${totalItems} produit${totalItems > 1 ? 's' : ''}`;
+    
+    if (pageItems.length === 0) {
         grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🛍️</div><p>Aucun produit trouvé.</p></div>`;
+        renderPagination(0, 0);
         return;
     }
     
-    const fallbackImg = 'https://placehold.co/500x400/5D0D18/white?text=Produit';
-    const stockClass = getStockClass;
-    const stockText = getStockText;
+    const fallbackImg = 'IMAGES/default-product.jpg';
     
-    grid.innerHTML = filtered.map(p => `
-        <div class="product-card">
-            <div class="product-banner" onclick="window.location.href='info-produit.php?id=${p.id}'">
-                <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy" 
-                     onerror="this.src='${fallbackImg}'">
-                <span class="product-price-badge">${escapeHtml(p.price)}</span>
-            </div>
-            <div class="product-body">
-                <div class="product-name">${escapeHtml(p.name)}</div>
-                <span class="product-shop-tag" onclick="window.location.href='info-store.php?id=${p.shopId}'">
-                    🏪 ${escapeHtml(p.shopName)}
-                </span>
-                <p class="product-desc">${escapeHtml(p.description.substring(0, 100))}${p.description.length > 100 ? '…' : ''}</p>
-                <div class="product-stats">
-                    <div>
-                        <span class="product-stock ${stockClass(p.stock)}">${stockText(p.stock)}</span>
+    grid.innerHTML = pageItems.map(p => {
+        const stockClass = getStockClass(p.stock);
+        const stockText = getStockText(p.stock);
+        const isOutOfStock = p.stock <= 0;
+        
+        let buttons = '';
+        if (isAdmin) {
+            buttons = `
+                <button class="admin-btn-delete" onclick='deleteProduct(${p.id}, "${escapeHtml(p.name)}")'>
+                    <i class="bi bi-trash3"></i> Supprimer
+                </button>
+            `;
+        } else {
+            buttons = `
+                <button class="add-cart-btn" onclick='addToCart(${JSON.stringify(p)})' ${isOutOfStock ? 'disabled' : ''}>
+                    🛒 ${isOutOfStock ? 'Rupture' : 'Ajouter'}
+                </button>
+            `;
+        }
+        
+        return `
+            <div class="product-card">
+                <div class="product-banner" onclick="window.location.href='info-produit.php?id=${p.id}'">
+                    <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy" 
+                         onerror="this.src='${fallbackImg}'">
+                    <span class="product-price-badge">${escapeHtml(p.price)}</span>
+                </div>
+                <div class="product-body">
+                    <div class="product-name">${escapeHtml(p.name)}</div>
+                    <span class="product-shop-tag" onclick="event.stopPropagation();window.location.href='info-store.php?id=${p.shopId}'">
+                        🏪 ${escapeHtml(p.shopName)}
+                    </span>
+                    <p class="product-desc">${escapeHtml(p.description.substring(0, 100))}${p.description.length > 100 ? '…' : ''}</p>
+                    <div class="product-stats">
+                        <div>
+                            <span class="product-stock ${stockClass}">${stockText}</span>
+                        </div>
+                        ${buttons}
                     </div>
-                    <button class="add-cart-btn" onclick='addToCart(${JSON.stringify(p)})'>
-                        🛒 Ajouter
-                    </button>
                 </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
+    
+    const infoEl = document.getElementById('paginationInfo');
+    if (infoEl && totalItems > 0) {
+        infoEl.textContent = `Affichage ${startIndex + 1} - ${endIndex} sur ${totalItems} produit${totalItems > 1 ? 's' : ''}`;
+    } else if (infoEl) {
+        infoEl.textContent = '';
+    }
+    
+    renderPagination(currentPage, totalPages);
+}
+
+// ====== RENDU DE LA PAGINATION ======
+function renderPagination(activePage, totalPages) {
+    const wrapper = document.getElementById('paginationWrapper');
+    if (!wrapper) return;
+
+    if (totalPages <= 1) {
+        wrapper.innerHTML = '';
+        return;
+    }
+
+    let html = '';
+
+    html += `
+        <button class="nav-btn" onclick="goToPage(${activePage - 1})" ${activePage <= 1 ? 'disabled' : ''}>
+            <i class="bi bi-chevron-left"></i> Préc
+        </button>
+    `;
+
+    let startPage = Math.max(1, activePage - 2);
+    let endPage   = Math.min(totalPages, activePage + 2);
+
+    if (endPage - startPage < 4) {
+        if (startPage === 1) endPage = Math.min(5, totalPages);
+        else if (endPage === totalPages) startPage = Math.max(1, totalPages - 4);
+    }
+
+    if (startPage > 1) {
+        html += `<button class="page-btn" onclick="goToPage(1)">1</button>`;
+        if (startPage > 2) html += `<button class="page-btn" disabled>…</button>`;
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<button class="page-btn ${i === activePage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) html += `<button class="page-btn" disabled>…</button>`;
+        html += `<button class="page-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+    }
+
+    html += `
+        <button class="nav-btn" onclick="goToPage(${activePage + 1})" ${activePage >= totalPages ? 'disabled' : ''}>
+            Suiv <i class="bi bi-chevron-right"></i>
+        </button>
+    `;
+
+    wrapper.innerHTML = html;
+}
+
+function goToPage(page) {
+    const totalPages = Math.ceil(filteredProducts.length / perPage);
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    renderProducts();
+    document.querySelector('.stores-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ========== ADMIN FUNCTIONS ==========
+function addCategory() {
+    const name = document.getElementById('catNameInput').value.trim();
+    const icon = document.getElementById('catIconInput').value.trim() || '📦';
+    
+    if (!name) {
+        showToast('⚠️ Veuillez saisir un nom', true);
+        return;
+    }
+    
+    if (categories.find(c => c.name.toLowerCase() === name.toLowerCase())) {
+        showToast('⚠️ Cette catégorie existe déjà', true);
+        return;
+    }
+    
+    fetch('add_category.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'nom_categorie=' + encodeURIComponent(name) + '&description=' + encodeURIComponent('Catégorie ' + name)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            categories.push({ id: data.id, icon: icon, name: name });
+            renderCategories();
+            const catFilter = document.getElementById('catFilter');
+            if (catFilter) {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                catFilter.appendChild(opt);
+            }
+            document.getElementById('addCatForm').classList.remove('open');
+            document.getElementById('catNameInput').value = '';
+            document.getElementById('catIconInput').value = '';
+            showToast('✅ Catégorie ajoutée avec succès');
+        } else {
+            showToast('❌ ' + data.message, true);
+        }
+    })
+    .catch(error => {
+        showToast('❌ Erreur lors de l\'ajout', true);
+    });
+}
+
+function deleteProduct(productId, productName) {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer "' + productName + '" ? Cette action est irréversible.')) {
+        return;
+    }
+    
+    fetch('supprimer_produit.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'id_produit=' + productId
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('✅ Produit supprimé avec succès');
+            allProducts = allProducts.filter(p => p.id !== productId);
+            renderProducts();
+            renderCategories();
+        } else {
+            showToast('❌ ' + data.message, true);
+        }
+    })
+    .catch(() => showToast('❌ Erreur de connexion au serveur', true));
 }
 
 // ========== SCROLL REVEAL ==========
 function initReveal() {
-    const elements = document.querySelectorAll('.reveal');
+    const elements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(e => {
             if (e.isIntersecting) e.target.classList.add('visible');
@@ -929,6 +1313,52 @@ function initReveal() {
     }, { threshold: 0.1 });
     elements.forEach(el => observer.observe(el));
 }
+
+// ========== ÉVÉNEMENTS ==========
+document.getElementById('searchInput')?.addEventListener('input', () => {
+    currentPage = 1;
+    renderProducts();
+});
+
+document.getElementById('sortFilter')?.addEventListener('change', () => {
+    currentPage = 1;
+    renderProducts();
+});
+
+// Filtre par catégorie
+const catFilter = document.getElementById('catFilter');
+if (catFilter) {
+    catFilter.addEventListener('change', (e) => {
+        activeCategory = e.target.value || null;
+        currentPage = 1;
+        renderCategories();
+        renderProducts();
+    });
+}
+
+// Filtre par nombre d'éléments par page
+const perPageFilter = document.getElementById('perPageFilter');
+if (perPageFilter) {
+    perPage = parseInt(perPageFilter.value) || 12;
+    perPageFilter.addEventListener('change', function(e) {
+        perPage = parseInt(e.target.value) || 12;
+        currentPage = 1;
+        renderProducts();
+    });
+}
+
+// Admin: toggle add category form
+document.getElementById('toggleAddCat')?.addEventListener('click', () => {
+    document.getElementById('addCatForm').classList.toggle('open');
+});
+
+document.getElementById('cancelCat')?.addEventListener('click', () => {
+    document.getElementById('addCatForm').classList.remove('open');
+    document.getElementById('catNameInput').value = '';
+    document.getElementById('catIconInput').value = '';
+});
+
+document.getElementById('saveCat')?.addEventListener('click', addCategory);
 
 // ========== INITIALISATION ==========
 function init() {
@@ -938,17 +1368,8 @@ function init() {
     initReveal();
 }
 
-// Événements
-document.getElementById('searchInput')?.addEventListener('input', renderProducts);
-document.getElementById('sortFilter')?.addEventListener('change', renderProducts);
-document.getElementById('catFilter')?.addEventListener('change', (e) => {
-    activeCategory = e.target.value || null;
-    renderCategories();
-    renderProducts();
-});
-
 // Démarrer
-init();
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>

@@ -46,6 +46,15 @@ try {
     $stmt = $pdo->query("SELECT COUNT(*) as total FROM produit");
     $total_produits = $stmt->fetch()['total'];
     
+    #boutiques en attente de validation
+    $stmt = $pdo->query("SELECT b.*, p.nom_entreprise as producteur_nom, p.email as producteur_email 
+                         FROM boutique b 
+                         JOIN producteur p ON b.id_producteur = p.id_producteur 
+                         WHERE b.est_valide_par_admin = 0 OR b.est_valide_par_admin IS NULL
+                         ORDER BY b.date_creation DESC");
+    $boutiques_attente = $stmt->fetchAll();
+    $nb_boutiques_attente = count($boutiques_attente);
+    
     #produits en attente de validation
     $stmt = $pdo->query("SELECT p.*, b.nom_boutique FROM produit p 
                          JOIN boutique b ON p.id_boutique = b.id_boutique 
@@ -99,6 +108,7 @@ try {
     $commandes = [];
     $produits_populaires = [];
     $produits_attente = [];
+    $boutiques_attente = [];
     $total_users = 0;
     $active_producers = 0;
     $ca_total = 0;
@@ -106,6 +116,7 @@ try {
     $total_boutiques = 0;
     $total_produits = 0;
     $nb_attente = 0;
+    $nb_boutiques_attente = 0;
 }
 ?>
 <!DOCTYPE html>
@@ -191,6 +202,14 @@ try {
     color: var(--wine);
     border-bottom: 2px solid var(--wine);
     font-weight: 600;
+  }
+  .tab-btn .badge-tab {
+    background: var(--danger);
+    color: white;
+    border-radius: 50%;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.7rem;
+    margin-left: 0.3rem;
   }
 
   .main-content {
@@ -293,9 +312,34 @@ try {
     opacity: 1;
   }
 
+  /* Estilos para la imagen de la boutique */
+  .boutique-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .boutique-img-placeholder {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--cream);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 1.5rem;
+  }
+
   @media (max-width: 768px) {
     .dashboard-grid, .tabs-container, .main-content {
       padding: 1rem;
+    }
+    .tab-btn {
+      padding: 0.5rem 0.8rem;
+      font-size: 0.8rem;
     }
   }
 </style>
@@ -322,7 +366,7 @@ try {
   </div>
   <div class="stat-card">
     <div class="stat-icon">🚨</div>
-    <div class="stat-val"><?php echo $nb_attente; ?></div>
+    <div class="stat-val"><?php echo $nb_attente + $nb_boutiques_attente; ?></div>
     <div class="stat-label">En Attente</div>
   </div>
 </div>
@@ -330,7 +374,12 @@ try {
 <div class="tabs-container">
   <div class="tabs">
     <button class="tab-btn active" data-tab="producteurs">👥 Producteurs</button>
-    <button class="tab-btn" data-tab="boutiques">🏪 Boutiques</button>
+    <button class="tab-btn" data-tab="boutiques">
+      🏪 Boutiques
+      <?php if ($nb_boutiques_attente > 0): ?>
+        <span class="badge-tab"><?php echo $nb_boutiques_attente; ?></span>
+      <?php endif; ?>
+    </button>
     <button class="tab-btn" data-tab="produits">📦 Produits</button>
     <button class="tab-btn" data-tab="commandes">🛒 Commandes</button>
     <button class="tab-btn" data-tab="clients">👤 Clients</button>
@@ -338,7 +387,10 @@ try {
 </div>
 
 <div class="main-content">
-  <!-- Onglet Producteurs avec validation -->
+  
+  <!-- ============================================================ -->
+  <!-- ONGLET PRODUCTEURS                                            -->
+  <!-- ============================================================ -->
   <div class="tab-panel active" id="tab-producteurs">
     <div class="section-card">
       <div class="section-header">
@@ -415,17 +467,69 @@ try {
     </div>
   </div>
 
-  <!-- Onglet Boutiques -->
+  <!-- ============================================================ -->
+  <!-- ONGLET BOUTIQUES - NOUVEAU AVEC VALIDATION                    -->
+  <!-- ============================================================ -->
   <div class="tab-panel" id="tab-boutiques">
+    
+    <!-- Boutiques en attente de validation -->
     <div class="section-card">
       <div class="section-header">
-        🏪 Toutes les boutiques
+        🏪 Boutiques en attente de validation
+        <span class="badge-count"><?php echo $nb_boutiques_attente; ?> en attente</span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr><th>Image</th><th>Nom de la boutique</th><th>Producteur</th><th>Email</th><th>Date création</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            <?php if (empty($boutiques_attente)): ?>
+              <tr><td colspan="6" class="empty-state">🎉 Aucune boutique en attente de validation.</td></tr>
+            <?php else: ?>
+              <?php foreach ($boutiques_attente as $b): ?>
+              <tr>
+                <td>
+                  <?php if (!empty($b['image']) && file_exists($b['image'])): ?>
+                    <img src="<?php echo htmlspecialchars($b['image']); ?>" alt="<?php echo htmlspecialchars($b['nom_boutique']); ?>" class="boutique-img">
+                  <?php else: ?>
+                    <div class="boutique-img-placeholder">
+                      <i class="bi bi-shop"></i>
+                    </div>
+                  <?php endif; ?>
+                </td>
+                <td><strong><?php echo htmlspecialchars($b['nom_boutique']); ?></strong></td>
+                <td><?php echo htmlspecialchars($b['producteur_nom']); ?></td>
+                <td><?php echo htmlspecialchars($b['producteur_email']); ?></td>
+                <td><?php echo date('d/m/Y', strtotime($b['date_creation'])); ?></td>
+                <td>
+                  <div class="action-group">
+                    <button class="btn btn-success" onclick="validerBoutique(<?php echo $b['id_boutique']; ?>)">
+                      <i class="bi bi-check-circle"></i> Valider
+                    </button>
+                    <button class="btn btn-danger" onclick="refuserBoutique(<?php echo $b['id_boutique']; ?>)">
+                      <i class="bi bi-x-circle"></i> Refuser
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <?php endforeach; ?>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Toutes les boutiques -->
+    <div class="section-card">
+      <div class="section-header">
+        📋 Toutes les boutiques
         <span class="badge-count"><?php echo count($boutiques); ?> boutique(s)</span>
       </div>
       <div class="table-wrapper">
         <table>
           <thead>
-            <tr><th>Nom</th><th>Producteur</th><th>Description</th><th>Date création</th></tr>
+            <tr><th>Nom</th><th>Producteur</th><th>Description</th><th>Date création</th><th>Status</th></tr>
           </thead>
           <tbody>
             <?php if (empty($boutiques)): ?>
@@ -437,6 +541,13 @@ try {
                 <td><?php echo htmlspecialchars($b['producteur_nom']); ?></td>
                 <td><?php echo htmlspecialchars($b['description'] ?? 'Boutique artisanale'); ?></td>
                 <td><?php echo date('d/m/Y', strtotime($b['date_creation'])); ?></td>
+                <td>
+                  <?php if (isset($b['est_valide_par_admin']) && $b['est_valide_par_admin'] == 1): ?>
+                    <span class="badge badge-success">✅ Validée</span>
+                  <?php else: ?>
+                    <span class="badge badge-warning">⏳ En attente</span>
+                  <?php endif; ?>
+                </td>
               </tr>
               <?php endforeach; ?>
             <?php endif; ?>
@@ -446,7 +557,9 @@ try {
     </div>
   </div>
 
-  <!-- Onglet Produits -->
+  <!-- ============================================================ -->
+  <!-- ONGLET PRODUITS                                               -->
+  <!-- ============================================================ -->
   <div class="tab-panel" id="tab-produits">
     <div class="section-card">
       <div class="section-header">
@@ -460,20 +573,20 @@ try {
           </thead>
           <tbody>
             <?php if (empty($produits_attente)): ?>
-              <tr><td colspan="4" class="empty-state">Aucun produit en attente. </div>
+              <tr><td colspan="4" class="empty-state">🎉 Aucun produit en attente de validation.</td></tr>
             <?php else: ?>
               <?php foreach ($produits_attente as $p): ?>
               <tr>
                 <td><strong><?php echo htmlspecialchars($p['nom_produit']); ?></strong></td>
                 <td><?php echo htmlspecialchars($p['nom_boutique']); ?></td>
-                <td><?php echo number_format($p['prix_unitaire'], 2); ?> DH</div>
+                <td><?php echo number_format($p['prix_unitaire'], 2); ?> DH</td>
                 <td>
                   <div class="action-group">
                     <button class="btn btn-success" onclick="validerProduit(<?php echo $p['id_produit']; ?>)">✅ Valider</button>
                     <button class="btn btn-danger" onclick="refuserProduit(<?php echo $p['id_produit']; ?>)">❌ Refuser</button>
                   </div>
-                 </div>
-               </tr>
+                </td>
+              </tr>
               <?php endforeach; ?>
             <?php endif; ?>
           </tbody>
@@ -482,7 +595,9 @@ try {
     </div>
   </div>
 
-  <!-- Onglet Commandes -->
+  <!-- ============================================================ -->
+  <!-- ONGLET COMMANDES                                              -->
+  <!-- ============================================================ -->
   <div class="tab-panel" id="tab-commandes">
     <div class="section-card">
       <div class="section-header">
@@ -496,16 +611,16 @@ try {
           </thead>
           <tbody>
             <?php if (empty($commandes)): ?>
-              <tr><td colspan="5" class="empty-state">Aucune commande. </div>
+              <tr><td colspan="5" class="empty-state">Aucune commande.</td></tr>
             <?php else: ?>
               <?php foreach ($commandes as $cmd): ?>
               <tr>
-                <td><strong>#<?php echo $cmd['id_commande']; ?></strong></div>
-                <td><?php echo htmlspecialchars($cmd['nom_client']); ?></div>
-                <td><?php echo number_format($cmd['montant_total'], 2); ?> DH</div>
-                <td><?php echo date('d/m/Y', strtotime($cmd['date_commande'])); ?></div>
-                <td><span class="badge badge-<?php echo $cmd['statut_commande'] === 'Livrée' ? 'success' : 'info'; ?>"><?php echo $cmd['statut_commande']; ?></span></div>
-               </tr>
+                <td><strong>#<?php echo $cmd['id_commande']; ?></strong></td>
+                <td><?php echo htmlspecialchars($cmd['nom_client']); ?></td>
+                <td><?php echo number_format($cmd['montant_total'], 2); ?> DH</td>
+                <td><?php echo date('d/m/Y', strtotime($cmd['date_commande'])); ?></td>
+                <td><span class="badge badge-<?php echo $cmd['statut_commande'] === 'Livrée' ? 'success' : 'info'; ?>"><?php echo $cmd['statut_commande']; ?></span></td>
+              </tr>
               <?php endforeach; ?>
             <?php endif; ?>
           </tbody>
@@ -514,7 +629,9 @@ try {
     </div>
   </div>
 
-  <!-- Onglet Clients -->
+  <!-- ============================================================ -->
+  <!-- ONGLET CLIENTS                                                -->
+  <!-- ============================================================ -->
   <div class="tab-panel" id="tab-clients">
     <div class="section-card">
       <div class="section-header">
@@ -528,15 +645,15 @@ try {
           </thead>
           <tbody>
             <?php if (empty($clients)): ?>
-              <tr><td colspan="4" class="empty-state">Aucun client. </div>
+              <tr><td colspan="4" class="empty-state">Aucun client.</td></tr>
             <?php else: ?>
               <?php foreach ($clients as $c): ?>
               <tr>
-                <td><strong><?php echo htmlspecialchars($c['nom']); ?></strong></div>
-                <td><?php echo htmlspecialchars($c['email']); ?></div>
-                <td><?php echo date('d/m/Y', strtotime($c['date_inscription'] ?? 'now')); ?></div>
-                <td><span class="badge badge-success">Actif</span></div>
-               </tr>
+                <td><strong><?php echo htmlspecialchars($c['nom']); ?></strong></td>
+                <td><?php echo htmlspecialchars($c['email']); ?></td>
+                <td><?php echo date('d/m/Y', strtotime($c['date_inscription'] ?? 'now')); ?></td>
+                <td><span class="badge badge-success">Actif</span></td>
+              </tr>
               <?php endforeach; ?>
             <?php endif; ?>
           </tbody>
@@ -560,13 +677,22 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-function showToast(msg) {
+function showToast(msg, isError = false) {
   const toast = document.getElementById('toast');
   toast.innerHTML = msg;
+  if (isError) {
+    toast.style.background = '#c0392b';
+  } else {
+    toast.style.background = '#5d0d18';
+  }
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
+  setTimeout(() => {
+    toast.classList.remove('show');
+    toast.style.background = '#5d0d18';
+  }, 3000);
 }
 
+// ===== GESTION DES PRODUCTEURS =====
 function validerProducteur(id) {
   if(confirm('Valider ce compte producteur ?')) {
     window.location.href = 'valider_producteur.php?id=' + id + '&action=valider';
@@ -585,6 +711,22 @@ function suspendreProducteur(id) {
   }
 }
 
+// ===== GESTION DES BOUTIQUES =====
+function validerBoutique(id) {
+  if(confirm('Valider cette boutique ?\n\nLe producteur pourra alors gérer ses produits.')) {
+    window.location.href = 'valider_boutique.php?id=' + id + '&action=valider';
+  }
+}
+
+function refuserBoutique(id) {
+  if(confirm('Refuser cette boutique ?\n\nCette action supprimera définitivement la boutique.')) {
+    if(confirm('Confirmation finale : Voulez-vous vraiment refuser cette boutique ?')) {
+      window.location.href = 'valider_boutique.php?id=' + id + '&action=refuser';
+    }
+  }
+}
+
+// ===== GESTION DES PRODUITS =====
 function validerProduit(id) {
   if(confirm('Valider ce produit ?')) {
     window.location.href = 'valider_produit.php?id=' + id + '&action=valider';
@@ -596,6 +738,19 @@ function refuserProduit(id) {
     window.location.href = 'valider_produit.php?id=' + id + '&action=refuser';
   }
 }
+
+// Activer l'onglet Boutiques si l'URL contient un paramètre
+document.addEventListener('DOMContentLoaded', function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tab = urlParams.get('tab');
+  if (tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      if (b.getAttribute('data-tab') === tab) {
+        b.click();
+      }
+    });
+  }
+});
 </script>
 </body>
 </html>

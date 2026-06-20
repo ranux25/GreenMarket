@@ -35,6 +35,17 @@ if (isset($_SESSION['user_id'])) {
         } catch(PDOException $e) { $notifications = []; }
     }
 }
+
+// Récupérer les boutiques du producteur
+$mesBoutiques = [];
+if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
+    if (!isset($pdo)) { include_once __DIR__ . '/connexion.php'; }
+    try {
+        $reqBoutiques = $pdo->prepare("SELECT id_boutique, nom_boutique FROM boutique WHERE id_producteur = ?");
+        $reqBoutiques->execute([$_SESSION['user_id']]);
+        $mesBoutiques = $reqBoutiques->fetchAll(PDO::FETCH_ASSOC);
+    } catch(PDOException $e) { $mesBoutiques = []; }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr" data-theme="<?php echo $theme; ?>">
@@ -199,12 +210,11 @@ if (isset($_SESSION['user_id'])) {
         .lang-opt.active { background: rgba(93,13,24,.07); color: var(--primary); font-weight: 700; }
         [data-theme="dark"] .lang-opt.active { background: rgba(240,230,216,.1); color: var(--gold); }
 
-        /* ===== ACCOUNT DROPDOWN (con pestañas) ===== */
+        /* ===== ACCOUNT DROPDOWN ===== */
         .acc-wrap { position: relative; }
         .acc-btn { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,.08); color: var(--header-text); border: none; cursor: pointer; font-size: 1.25rem; transition: background .2s; }
         .acc-btn:hover, .acc-wrap.open .acc-btn { background: var(--header-bg-hover); }
 
-        /* Badge de notificaciones sin leer */
         .notif-dot {
             position: absolute; top: -4px; right: -4px;
             background: #e53e3e; color: #fff;
@@ -221,7 +231,7 @@ if (isset($_SESSION['user_id'])) {
 
         .acc-drop {
             position: absolute; right: 0; top: calc(100% + 10px);
-            width: 280px;
+            width: 320px;
             background: var(--dropdown-bg);
             border-radius: 14px;
             box-shadow: 0 12px 35px var(--shadow-color);
@@ -260,11 +270,10 @@ if (isset($_SESSION['user_id'])) {
             padding: 0 3px;
         }
 
-        /* Panel content */
         .acc-panel { display: none; flex-direction: column; }
         .acc-panel.active { display: flex; }
 
-        /* Cuenta panel */
+        /* Panel Compte */
         .acc-head { padding: .7rem .85rem .65rem; }
         .acc-name { font-weight: 700; color: var(--dropdown-text); font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .acc-role { display: inline-block; font-size: .62rem; font-weight: 700; text-transform: uppercase; background: rgba(93,13,24,.1); color: var(--primary); padding: 1px 6px; border-radius: 4px; margin-top: 3px; }
@@ -277,7 +286,55 @@ if (isset($_SESSION['user_id'])) {
         .acc-menu-body a.logout:hover { background: #fff5f5; color: #c0392b; }
         [data-theme="dark"] .acc-menu-body a.logout:hover { background: #4a2d30; color: #e8b8b8; }
 
-        /* Notificaciones panel */
+        /* ===== SUB-MENU BOUTIQUES ===== */
+        .boutique-submenu {
+            padding: .2rem .5rem .5rem;
+            border-top: 1px solid var(--dropdown-divider);
+            margin-top: .2rem;
+        }
+        .boutique-submenu .sub-label {
+            font-size: .65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-light);
+            padding: .4rem .65rem .2rem;
+            letter-spacing: .05em;
+            transition: color 0.3s ease;
+        }
+        .boutique-submenu a {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: .5rem .65rem;
+            color: var(--dropdown-text);
+            text-decoration: none;
+            font-size: .82rem;
+            border-radius: 8px;
+            transition: background .15s;
+        }
+        .boutique-submenu a:hover {
+            background: var(--dropdown-hover);
+            color: var(--primary);
+        }
+        [data-theme="dark"] .boutique-submenu a:hover {
+            color: var(--gold);
+        }
+        .boutique-submenu a i {
+            font-size: .95rem;
+            opacity: .7;
+        }
+        .boutique-submenu .add-boutique {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        .boutique-submenu .add-boutique:hover {
+            color: var(--primary);
+        }
+        [data-theme="dark"] .boutique-submenu .add-boutique:hover {
+            color: var(--gold);
+        }
+
+        /* ===== NOTIFICATIONS PANEL STYLES ===== */
         .notif-header {
             display: flex; align-items: center; justify-content: space-between;
             padding: .65rem .85rem .5rem;
@@ -294,7 +351,7 @@ if (isset($_SESSION['user_id'])) {
         .notif-mark-all:hover { opacity: .7; }
 
         .notif-list {
-            max-height: 290px; overflow-y: auto;
+            max-height: 320px; overflow-y: auto;
             display: flex; flex-direction: column;
         }
         .notif-list::-webkit-scrollbar { width: 5px; }
@@ -311,45 +368,115 @@ if (isset($_SESSION['user_id'])) {
         }
         .notif-item:last-child { border-bottom: none; }
         .notif-item:hover { background: var(--dropdown-hover); }
-        .notif-item.unread { background: rgba(93,13,24,.04); }
-        [data-theme="dark"] .notif-item.unread { background: rgba(212,168,92,.06); }
+        .notif-item.unread { 
+            background: rgba(93,13,24,.04); 
+            border-left: 3px solid var(--primary);
+        }
+        [data-theme="dark"] .notif-item.unread { 
+            background: rgba(212,168,92,.06);
+            border-left: 3px solid var(--gold);
+        }
 
         .notif-icon {
-            width: 34px; height: 34px; flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
             border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: .95rem;
+            flex-shrink: 0;
+            margin-top: 2px;
         }
-        .notif-icon.order   { background: rgba(93,13,24,.1);  color: var(--primary); }
-        .notif-icon.promo   { background: rgba(192,122,26,.12); color: var(--gold); }
-        .notif-icon.system  { background: rgba(159,178,172,.2); color: var(--secondary); }
-        .notif-icon.message { background: rgba(59,130,246,.1);  color: #3b82f6; }
-        [data-theme="dark"] .notif-icon.order { background: rgba(212,168,92,.12); color: var(--gold); }
+        .notif-icon.order { 
+            background: rgba(93,13,24,.1); 
+            color: var(--primary); 
+        }
+        .notif-icon.promo { 
+            background: rgba(192,122,26,.12); 
+            color: var(--gold); 
+        }
+        .notif-icon.system { 
+            background: rgba(159,178,172,.2); 
+            color: var(--secondary); 
+        }
+        .notif-icon.message { 
+            background: rgba(59,130,246,.1); 
+            color: #3b82f6; 
+        }
+        .notif-icon.success { 
+            background: rgba(46,125,50,.1); 
+            color: #2e7d32; 
+        }
+        [data-theme="dark"] .notif-icon.order { 
+            background: rgba(212,168,92,.15); 
+            color: var(--gold); 
+        }
+        [data-theme="dark"] .notif-icon.success { 
+            background: rgba(102,187,106,.15); 
+            color: #66bb6a; 
+        }
 
         .notif-body { flex: 1; min-width: 0; }
-        .notif-title { font-size: .82rem; font-weight: 600; color: var(--dropdown-text); line-height: 1.3; }
-        .notif-text  { font-size: .75rem; color: var(--text-light); margin-top: 2px; line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .notif-time  { font-size: .68rem; color: var(--suggestions-muted); margin-top: 4px; }
+        .notif-title { 
+            font-size: .82rem; 
+            font-weight: 600; 
+            color: var(--dropdown-text); 
+            line-height: 1.3;
+            margin-bottom: 2px;
+        }
+        .notif-text { 
+            font-size: .78rem; 
+            color: var(--text-light); 
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .notif-time { 
+            font-size: .65rem; 
+            color: var(--suggestions-muted); 
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
         .notif-unread-dot {
-            width: 7px; height: 7px; border-radius: 50%;
-            background: var(--primary); flex-shrink: 0; margin-top: 5px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            flex-shrink: 0;
+            margin-top: 8px;
         }
         [data-theme="dark"] .notif-unread-dot { background: var(--gold); }
 
         .notif-empty {
-            padding: 2.5rem 1rem; text-align: center;
-            color: var(--suggestions-muted); font-size: .88rem;
+            padding: 2.5rem 1rem;
+            text-align: center;
+            color: var(--suggestions-muted);
+            font-size: .88rem;
         }
-        .notif-empty i { font-size: 2rem; display: block; margin-bottom: .6rem; opacity: .4; }
+        .notif-empty i { 
+            font-size: 2.2rem; 
+            display: block; 
+            margin-bottom: .6rem; 
+            opacity: .4; 
+        }
 
         .notif-footer {
             padding: .55rem .85rem;
             border-top: 1px solid var(--dropdown-divider);
         }
         .notif-footer a {
-            display: flex; align-items: center; justify-content: center; gap: 5px;
-            font-size: .8rem; font-weight: 600;
-            color: var(--primary); text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-size: .8rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-decoration: none;
             transition: opacity .2s;
         }
         [data-theme="dark"] .notif-footer a { color: var(--gold); }
@@ -365,7 +492,7 @@ if (isset($_SESSION['user_id'])) {
         .mob-btn { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(255,255,255,.08); border: none; border-radius: 10px; color: var(--header-text); font-size: 1.4rem; cursor: pointer; transition: background .2s; }
         .mob-btn:hover { background: var(--header-bg-hover); }
         .mob-menu { max-height: 0; overflow: hidden; background: var(--mobile-menu-bg); transition: max-height .35s cubic-bezier(.32,.94,.6,1); }
-        .mob-menu.open { max-height: 560px; }
+        .mob-menu.open { max-height: 600px; }
         .mob-inner { padding: 1rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: .35rem; }
         .mob-link { display: flex; align-items: center; gap: 11px; padding: .72rem 1rem; color: var(--mobile-menu-text); text-decoration: none; border-radius: 8px; font-size: .96rem; transition: background .15s; }
         .mob-link i { color: var(--secondary); font-size: 1.1rem; width: 20px; }
@@ -378,6 +505,42 @@ if (isset($_SESSION['user_id'])) {
         .mob-lang-opt { padding: .42rem .8rem; border-radius: 8px; border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.06); color: rgba(255,255,255,.75); font-size: .83rem; cursor: pointer; transition: background .2s; }
         .mob-lang-opt:hover { background: rgba(255,255,255,.12); color: #fff; }
         .mob-lang-opt.active { background: var(--secondary); color: var(--primary); font-weight: 700; border-color: var(--secondary); }
+        .mob-sub-label {
+            font-size: .7rem;
+            color: rgba(255,255,255,.4);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            padding: .3rem 1rem .1rem;
+        }
+        .mob-boutique-link {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: .5rem 1rem .5rem 2.5rem;
+            color: rgba(255,255,255,.6);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: .88rem;
+            transition: background .15s;
+        }
+        .mob-boutique-link:hover {
+            background: var(--mobile-menu-hover);
+            color: #fff;
+        }
+        .mob-boutique-link i {
+            font-size: .9rem;
+            opacity: .6;
+        }
+
+        .mob-notif-badge {
+            margin-left: auto;
+            background: #e53e3e;
+            color: #fff;
+            font-size: .65rem;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 999px;
+        }
 
         @keyframes fadeDown {
             from { opacity: 0; transform: translateY(8px); }
@@ -394,7 +557,7 @@ if (isset($_SESSION['user_id'])) {
         @media (max-width: 640px) {
             .logo-text { font-size: 1.25rem; }
             .logo img { height: 33px; }
-            .acc-drop { width: 260px; }
+            .acc-drop { width: 290px; right: -60px; }
         }
     </style>
 </head>
@@ -430,12 +593,14 @@ if (isset($_SESSION['user_id'])) {
         <!-- Actions desktop -->
         <div class="hdr-actions">
 
-            <!-- Carrito -->
+            <!-- Carrito (solo para clientes) -->
+            <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] === 'client'): ?>
             <a href="panier.php" class="icon-btn" title="Mon panier">
                 <i class="bi bi-bag"></i>
                 <span class="cart-badge <?= $cartCount > 0 ? 'show' : '' ?>"
                       id="cart-count"><?= $cartCount ?></span>
             </a>
+            <?php endif; ?>
 
             <!-- Idioma -->
             <div class="lang-wrap" id="langWrap">
@@ -457,7 +622,6 @@ if (isset($_SESSION['user_id'])) {
             <div class="acc-wrap" id="accWrap">
                 <button class="acc-btn" id="accBtn" title="Mon compte">
                     <i class="bi bi-person-circle"></i>
-                    <!-- Badge notificaciones sin leer -->
                     <span class="notif-dot <?= $unreadCount > 0 ? 'show' : '' ?>" id="notifDot">
                         <?= $unreadCount > 0 ? ($unreadCount > 9 ? '9+' : $unreadCount) : '' ?>
                     </span>
@@ -490,15 +654,38 @@ if (isset($_SESSION['user_id'])) {
                             <?php if ($_SESSION['user_role'] === 'client'): ?>
                             <a href="mes-commandes.php"><i class="bi bi-box-seam"></i> Mes commandes</a>
                             <?php endif; ?>
+                            
+                            <!-- ===== Mes boutiques pour producteur ===== -->
+                            <?php if ($_SESSION['user_role'] === 'producteur'): ?>
+                            <div class="boutique-submenu">
+                                <div class="sub-label"><i class="bi bi-shop"></i> Mes boutiques</div>
+                                <?php if (!empty($mesBoutiques)): ?>
+                                    <?php foreach ($mesBoutiques as $boutique): ?>
+                                    <a href="gerer-boutique.php?id=<?= $boutique['id_boutique'] ?>">
+                                        <i class="bi bi-shop"></i> <?= htmlspecialchars($boutique['nom_boutique']) ?>
+                                    </a>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <a href="creer-boutique.php" class="add-boutique">
+                                        <i class="bi bi-plus-circle"></i> Créer ma boutique
+                                    </a>
+                                <?php endif; ?>
+                                <a href="creer-boutique.php" style="color:var(--secondary);font-weight:600;margin-top:2px;">
+                                    <i class="bi bi-plus-circle"></i> + Nouvelle boutique
+                                </a>
+                            </div>
+                            <hr class="acc-divider">
+                            <?php endif; ?>
+                            
                             <hr class="acc-divider">
                             <a href="logout.php" class="logout"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
                         </div>
                     </div>
 
-                    <!-- Panel: Notifications -->
+                    <!-- ===== Panel: Notifications ===== -->
                     <div class="acc-panel" id="panel-notifs">
                         <div class="notif-header">
-                            <span>Notifications</span>
+                            <span><i class="bi bi-bell"></i> Notifications</span>
                             <?php if ($unreadCount > 0): ?>
                             <button class="notif-mark-all" id="markAllRead">Tout marquer lu</button>
                             <?php endif; ?>
@@ -506,7 +693,6 @@ if (isset($_SESSION['user_id'])) {
 
                         <div class="notif-list" id="notifList">
                             <?php if (empty($notifications)): ?>
-                            <!-- Estado vacío — se reemplaza con JS si hay notifs via AJAX -->
                             <div class="notif-empty" id="notifEmpty">
                                 <i class="bi bi-bell-slash"></i>
                                 Aucune notification pour l'instant
@@ -514,20 +700,36 @@ if (isset($_SESSION['user_id'])) {
                             <?php else: ?>
                             <?php foreach ($notifications as $n): ?>
                             <div class="notif-item <?= !$n['is_read'] ? 'unread' : '' ?>"
-                                 data-id="<?= $n['id'] ?>"
-                                 onclick="markRead(this, '<?= $n['link'] ?? '#' ?>')">
+                                 data-id="<?= $n['id'] ?>">
                                 <div class="notif-icon <?= $n['type'] ?? 'system' ?>">
                                     <i class="bi <?= match($n['type'] ?? '') {
                                         'order'   => 'bi-bag-check',
                                         'promo'   => 'bi-tag',
                                         'message' => 'bi-chat-dots',
+                                        'system'  => 'bi-info-circle',
+                                        'success' => 'bi-check-circle',
                                         default   => 'bi-info-circle'
                                     } ?>"></i>
                                 </div>
                                 <div class="notif-body">
-                                    <div class="notif-title"><?= htmlspecialchars(ucfirst($n['type'] ?? 'Notification')) ?></div>
-                                    <div class="notif-text"><?= htmlspecialchars($n['text']) ?></div>
-                                    <div class="notif-time"><?= isset($n['date_notification']) ? date('d/m/Y H:i', strtotime($n['date_notification'])) : '' ?></div>
+                                    <div class="notif-title">
+                                        <?php 
+                                        $titre = match($n['type'] ?? '') {
+                                            'order'   => '🛒 Nouvelle commande',
+                                            'promo'   => '🎉 Promotion',
+                                            'message' => '💬 Message',
+                                            'system'  => '📢 Information',
+                                            'success' => '✅ Succès',
+                                            default   => '📢 Notification'
+                                        };
+                                        echo htmlspecialchars($titre);
+                                        ?>
+                                    </div>
+                                    <div class="notif-text"><?= nl2br(htmlspecialchars($n['text'])) ?></div>
+                                    <div class="notif-time">
+                                        <i class="bi bi-clock"></i>
+                                        <?= isset($n['date_notification']) ? date('d/m/Y H:i', strtotime($n['date_notification'])) : '' ?>
+                                    </div>
                                 </div>
                                 <?php if (!$n['is_read']): ?>
                                 <div class="notif-unread-dot"></div>
@@ -554,10 +756,12 @@ if (isset($_SESSION['user_id'])) {
 
         <!-- Mobile actions -->
         <div class="mob-actions">
+            <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] === 'client'): ?>
             <a href="panier.php" class="icon-btn">
                 <i class="bi bi-bag"></i>
                 <span class="cart-badge <?= $cartCount > 0 ? 'show' : '' ?>"><?= $cartCount ?></span>
             </a>
+            <?php endif; ?>
             <button class="mob-btn" id="mobToggle" aria-label="Menu">
                 <i class="bi bi-list" id="mobIcon"></i>
             </button>
@@ -572,6 +776,29 @@ if (isset($_SESSION['user_id'])) {
             <a href="produits.php" class="mob-link <?= $currentPage==='produits.php' ? 'active':'' ?>"><i class="bi bi-box-seam"></i> Produits</a>
             <a href="apropos.php"  class="mob-link <?= $currentPage==='apropos.php'  ? 'active':'' ?>"><i class="bi bi-info-circle"></i> À propos</a>
             <div class="mob-div"></div>
+            
+            <!-- ===== Mes boutiques mobile pour producteur ===== -->
+            <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'producteur'): ?>
+            <div style="padding:.2rem 1rem">
+                <p class="mob-sub-label"><i class="bi bi-shop"></i> Mes boutiques</p>
+                <?php if (!empty($mesBoutiques)): ?>
+                    <?php foreach ($mesBoutiques as $boutique): ?>
+                    <a href="gerer-boutique.php?id=<?= $boutique['id_boutique'] ?>" class="mob-boutique-link">
+                        <i class="bi bi-shop"></i> <?= htmlspecialchars($boutique['nom_boutique']) ?>
+                    </a>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <a href="creer-boutique.php" class="mob-boutique-link" style="color:var(--secondary);font-weight:600;">
+                        <i class="bi bi-plus-circle"></i> Créer ma boutique
+                    </a>
+                <?php endif; ?>
+                <a href="creer-boutique.php" class="mob-boutique-link" style="color:var(--secondary);">
+                    <i class="bi bi-plus-circle"></i> + Nouvelle boutique
+                </a>
+            </div>
+            <div class="mob-div"></div>
+            <?php endif; ?>
+            
             <div style="padding:.4rem 1rem">
                 <p class="mob-lang-label">Langue / Language</p>
                 <div class="mob-lang-opts">
@@ -591,7 +818,7 @@ if (isset($_SESSION['user_id'])) {
             <a href="notifications.php" class="mob-link">
                 <i class="bi bi-bell"></i> Notifications
                 <?php if ($unreadCount > 0): ?>
-                <span style="margin-left:auto;background:#e53e3e;color:#fff;font-size:.65rem;font-weight:700;padding:1px 6px;border-radius:999px"><?= $unreadCount ?></span>
+                <span class="mob-notif-badge"><?= $unreadCount ?></span>
                 <?php endif; ?>
             </a>
             <a href="logout.php" class="mob-link" style="color:#f87171"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
@@ -664,26 +891,34 @@ document.querySelectorAll('.acc-tab').forEach(tab => {
 function markRead(el, link) {
     if(el.classList.contains('unread')) {
         el.classList.remove('unread');
+        el.style.borderLeft = 'none';
         const dot = el.querySelector('.notif-unread-dot');
         if(dot) dot.remove();
-        // Actualizar contadores
         updateNotifCount(-1);
-        // Llamar al servidor (ajusta la URL)
         const id = el.dataset.id;
-        if(id) fetch(`mark_notification_read.php?id=${id}`).catch(()=>{});
+        if(id) fetch('mark_notification_read.php?id=' + id).catch(()=>{});
     }
     if(link && link !== '#') setTimeout(() => location.href = link, 150);
 }
 
+// Marcar notificación al hacer clic en ella
+document.querySelectorAll('.notif-item').forEach(item => {
+    item.addEventListener('click', function() {
+        const link = this.dataset.link || '#';
+        markRead(this, link);
+    });
+});
+
 /* ===== Marcar todas como leídas ===== */
-document.getElementById('markAllRead')?.addEventListener('click', () => {
+document.getElementById('markAllRead')?.addEventListener('click', function() {
     document.querySelectorAll('.notif-item.unread').forEach(el => {
         el.classList.remove('unread');
+        el.style.borderLeft = 'none';
         el.querySelector('.notif-unread-dot')?.remove();
     });
     updateNotifCount(0, true);
     fetch('mark_all_notifications_read.php').catch(()=>{});
-    document.getElementById('markAllRead')?.remove();
+    this.remove();
     document.getElementById('tabBadge')?.remove();
 });
 

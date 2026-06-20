@@ -35,26 +35,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 $role = $_SESSION['user_role'];
 $uid  = $_SESSION['user_id'];
 $col  = ($role === 'client') ? 'id_client' : 'id_producteur';
-try {
-    $stmt = $pdo->prepare("SELECT id_notification as id, type_notification as type, message, date_notification, est_lu as is_read FROM notification WHERE $col = ? ORDER BY date_notification DESC");
-    $stmt->execute([$uid]);
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $notifications = array_map(function($n) {
-        return [
-            'id'      => $n['id'],
-            'type'    => $n['type'],
-            'title'   => ucfirst($n['type']),
-            'text'    => $n['message'],
-            'time'    => date('d M, H\hi', strtotime($n['date_notification'])),
-            'is_read' => (int)$n['is_read'],
-            'link'    => '#',
-        ];
-    }, $rows);
-} catch(PDOException $e) {
+
+// Si el usuario es admin, no tiene notificaciones
+if ($role === 'admin') {
     $notifications = [];
+    $unreadCount = 0;
+} else {
+    try {
+        $stmt = $pdo->prepare("SELECT id_notification as id, type_notification as type, message, date_notification, est_lu as is_read FROM notification WHERE $col = ? ORDER BY date_notification DESC");
+        $stmt->execute([$uid]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $notifications = array_map(function($n) {
+            // Calcular el tiempo relativo
+            $time = strtotime($n['date_notification']);
+            $diff = time() - $time;
+            
+            if ($diff < 60) {
+                $time_str = 'Il y a ' . $diff . ' secondes';
+            } elseif ($diff < 3600) {
+                $time_str = 'Il y a ' . floor($diff / 60) . ' minutes';
+            } elseif ($diff < 86400) {
+                $time_str = 'Il y a ' . floor($diff / 3600) . ' heures';
+            } elseif ($diff < 172800) {
+                $time_str = 'Hier';
+            } else {
+                $time_str = date('d M, H\hi', $time);
+            }
+            
+            // Determinar el título según el tipo
+            $titles = [
+                'order' => 'Nouvelle commande',
+                'promo' => 'Promotion',
+                'message' => 'Message',
+                'system' => 'Information système',
+                'success' => 'Succès'
+            ];
+            $title = $titles[$n['type']] ?? 'Notification';
+            
+            return [
+                'id' => $n['id'],
+                'type' => $n['type'],
+                'title' => $title,
+                'text' => $n['message'],
+                'time' => $time_str,
+                'date_raw' => $n['date_notification'], // 🔥 Esto es lo importante
+                'is_read' => (int)$n['is_read'],
+                'link' => '#',
+            ];
+        }, $rows);
+        
+        $unreadCount = count(array_filter($notifications, fn($n) => !$n['is_read']));
+    } catch(PDOException $e) {
+        $notifications = [];
+        $unreadCount = 0;
+    }
 }
 
-$unreadCount = count(array_filter($notifications, fn($n) => !$n['is_read']));
 $theme       = $_COOKIE['theme'] ?? 'light';
 $currentPage = basename($_SERVER['PHP_SELF']);
 
@@ -63,6 +100,54 @@ $dashboardLink = '';
 if ($_SESSION['user_role'] === 'client')     $dashboardLink = 'dashboard_client.php';
 elseif ($_SESSION['user_role'] === 'producteur') $dashboardLink = 'dashboard-producteur.php';
 elseif ($_SESSION['user_role'] === 'admin')  $dashboardLink = 'dashboard_admin.php';
+
+// Función para agrupar por fecha
+function getDateGroup($date_raw) {
+    if (empty($date_raw)) {
+        return 'Date inconnue';
+    }
+    
+    $today = date('Y-m-d');
+    $date = date('Y-m-d', strtotime($date_raw));
+    
+    if ($date == $today) return "Aujourd'hui";
+    if ($date == date('Y-m-d', strtotime('-1 day'))) return 'Hier';
+    if ($date == date('Y-m-d', strtotime('-2 days'))) return 'Avant-hier';
+    
+    // Esta semana (lunes a domingo)
+    $week_start = date('Y-m-d', strtotime('monday this week'));
+    if ($date >= $week_start) return 'Cette semaine';
+    
+    // Mes en curso
+    if (date('m', strtotime($date)) == date('m')) {
+        return 'Ce mois-ci';
+    }
+    
+    return date('F Y', strtotime($date));
+}
+
+// Agrupar las notificaciones
+$groups = [];
+foreach ($notifications as $n) {
+    $group = getDateGroup($n['date_raw'] ?? date('Y-m-d H:i:s'));
+    $groups[$group][] = $n;
+}
+
+// Definir los íconos y etiquetas para cada tipo
+$typeIcons = [
+    'order'   => 'bi-bag-check',
+    'promo'   => 'bi-tag',
+    'message' => 'bi-chat-dots',
+    'system'  => 'bi-info-circle',
+    'success' => 'bi-check-circle',
+];
+$typeLabels = [
+    'order'   => 'Commande',
+    'promo'   => 'Promotion',
+    'message' => 'Message',
+    'system'  => 'Système',
+    'success' => 'Succès',
+];
 ?>
 <!DOCTYPE html>
 <html lang="fr" data-theme="<?= $theme ?>">
@@ -218,8 +303,10 @@ elseif ($_SESSION['user_role'] === 'admin')  $dashboardLink = 'dashboard_admin.p
         .notif-icon.promo   { background: rgba(192,122,26,.12); color: var(--gold); }
         .notif-icon.system  { background: rgba(159,178,172,.2); color: var(--secondary); }
         .notif-icon.message { background: rgba(59,130,246,.1);  color: #3b82f6; }
+        .notif-icon.success { background: rgba(46,125,50,.1);   color: #2e7d32; }
         [data-theme="dark"] .notif-icon.order   { background: rgba(212,168,92,.12); color: var(--gold); }
         [data-theme="dark"] .notif-icon.message { background: rgba(59,130,246,.15); }
+        [data-theme="dark"] .notif-icon.success { background: rgba(102,187,106,.15); color: #66bb6a; }
 
         /* Body */
         .notif-body { flex: 1; min-width: 0; }
@@ -230,7 +317,7 @@ elseif ($_SESSION['user_role'] === 'admin')  $dashboardLink = 'dashboard_admin.p
         }
         .notif-card:not(.unread) .notif-title { font-weight: 500; }
         .notif-time { font-size: .75rem; color: var(--text-light); white-space: nowrap; flex-shrink: 0; }
-        .notif-text { font-size: .85rem; color: var(--text-light); margin-top: .35rem; line-height: 1.5; }
+        .notif-text { font-size: .85rem; color: var(--text-light); margin-top: .35rem; line-height: 1.5; white-space: pre-wrap; }
         .notif-meta { display: flex; align-items: center; gap: .65rem; margin-top: .6rem; }
         .notif-type-tag {
             font-size: .65rem; font-weight: 700; text-transform: uppercase;
@@ -240,7 +327,9 @@ elseif ($_SESSION['user_role'] === 'admin')  $dashboardLink = 'dashboard_admin.p
         .notif-type-tag.promo   { background: rgba(192,122,26,.12); color: var(--gold); }
         .notif-type-tag.system  { background: rgba(159,178,172,.3); color: #4a6b65; }
         .notif-type-tag.message { background: rgba(59,130,246,.12); color: #3b82f6; }
+        .notif-type-tag.success { background: rgba(46,125,50,.1);   color: #2e7d32; }
         [data-theme="dark"] .notif-type-tag.order { background: rgba(212,168,92,.15); color: var(--gold); }
+        [data-theme="dark"] .notif-type-tag.success { background: rgba(102,187,106,.15); color: #66bb6a; }
 
         .notif-link-btn {
             font-size: .78rem; font-weight: 600;
@@ -376,83 +465,66 @@ elseif ($_SESSION['user_role'] === 'admin')  $dashboardLink = 'dashboard_admin.p
         <button class="filter-btn" data-filter="system">
             <i class="bi bi-info-circle"></i> Système
         </button>
+        <button class="filter-btn" data-filter="success">
+            <i class="bi bi-check-circle"></i> Succès
+        </button>
     </div>
 
     <!-- Lista -->
     <div class="notif-list" id="notifList">
 
-        <?php
-        // Agrupar por fecha para separadores
-        $groups = [];
-        foreach ($notifications as $n) {
-            // Simplificado: agrupa por "tiempo" (en producción usa date())
-            $day = strstr($n['time'], 'Il y a') ? 'Aujourd\'hui' :
-                   ($n['time'] === 'Hier, 14h32' ? 'Hier' : 'Plus tôt');
-            $groups[$day][] = $n;
-        }
-        $typeIcons = [
-            'order'   => 'bi-bag-check',
-            'promo'   => 'bi-tag',
-            'message' => 'bi-chat-dots',
-            'system'  => 'bi-info-circle',
-        ];
-        $typeLabels = [
-            'order'   => 'Commande',
-            'promo'   => 'Promotion',
-            'message' => 'Message',
-            'system'  => 'Système',
-        ];
-        foreach ($groups as $day => $items):
-        ?>
-        <div class="date-sep" data-group="<?= htmlspecialchars($day) ?>"><?= htmlspecialchars($day) ?></div>
-
-        <?php foreach ($items as $n): ?>
-        <div class="notif-card <?= !$n['is_read'] ? 'unread' : '' ?>"
-             data-id="<?= $n['id'] ?>"
-             data-type="<?= htmlspecialchars($n['type']) ?>"
-             data-read="<?= $n['is_read'] ? '1' : '0' ?>"
-             onclick="handleCardClick(this, '<?= htmlspecialchars($n['link']) ?>')">
-
-            <div class="notif-icon <?= $n['type'] ?>">
-                <i class="bi <?= $typeIcons[$n['type']] ?? 'bi-bell' ?>"></i>
+        <?php if (empty($groups)): ?>
+            <!-- Estado vacío -->
+            <div class="empty-state" id="emptyState">
+                <div class="empty-icon"><i class="bi bi-bell-slash"></i></div>
+                <h3>Aucune notification</h3>
+                <p>Vous êtes à jour ! Revenez plus tard.</p>
             </div>
+        <?php else: ?>
+            <?php foreach ($groups as $group => $items): ?>
+            <div class="date-sep"><?= htmlspecialchars($group) ?></div>
 
-            <div class="notif-body">
-                <div class="notif-top">
-                    <span class="notif-title"><?= htmlspecialchars($n['title']) ?></span>
-                    <span class="notif-time"><?= htmlspecialchars($n['time']) ?></span>
+            <?php foreach ($items as $n): ?>
+            <div class="notif-card <?= !$n['is_read'] ? 'unread' : '' ?>"
+                 data-id="<?= $n['id'] ?>"
+                 data-type="<?= htmlspecialchars($n['type']) ?>"
+                 data-read="<?= $n['is_read'] ? '1' : '0' ?>"
+                 onclick="handleCardClick(this, '<?= htmlspecialchars($n['link'] ?? '#') ?>')">
+
+                <div class="notif-icon <?= $n['type'] ?>">
+                    <i class="bi <?= $typeIcons[$n['type']] ?? 'bi-bell' ?>"></i>
                 </div>
-                <p class="notif-text"><?= htmlspecialchars($n['text']) ?></p>
-                <div class="notif-meta">
-                    <span class="notif-type-tag <?= $n['type'] ?>"><?= $typeLabels[$n['type']] ?? $n['type'] ?></span>
-                    <?php if (!empty($n['link'])): ?>
-                    <a href="<?= htmlspecialchars($n['link']) ?>" class="notif-link-btn" onclick="event.stopPropagation()">
-                        Voir <i class="bi bi-arrow-right"></i>
-                    </a>
-                    <?php endif; ?>
+
+                <div class="notif-body">
+                    <div class="notif-top">
+                        <span class="notif-title"><?= htmlspecialchars($n['title']) ?></span>
+                        <span class="notif-time"><?= htmlspecialchars($n['time']) ?></span>
+                    </div>
+                    <p class="notif-text"><?= nl2br(htmlspecialchars($n['text'])) ?></p>
+                    <div class="notif-meta">
+                        <span class="notif-type-tag <?= $n['type'] ?>"><?= $typeLabels[$n['type']] ?? $n['type'] ?></span>
+                        <?php if (!empty($n['link']) && $n['link'] !== '#'): ?>
+                        <a href="<?= htmlspecialchars($n['link']) ?>" class="notif-link-btn" onclick="event.stopPropagation()">
+                            Voir <i class="bi bi-arrow-right"></i>
+                        </a>
+                        <?php endif; ?>
+                    </div>
                 </div>
+
+                <?php if (!$n['is_read']): ?>
+                <div class="unread-dot"></div>
+                <?php endif; ?>
+
+                <button class="notif-delete" title="Supprimer"
+                        onclick="event.stopPropagation(); deleteNotif(this.closest('.notif-card'))">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
-
-            <?php if (!$n['is_read']): ?>
-            <div class="unread-dot"></div>
-            <?php endif; ?>
-
-            <button class="notif-delete" title="Supprimer"
-                    onclick="event.stopPropagation(); deleteNotif(this.closest('.notif-card'))">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </div>
-        <?php endforeach; ?>
-        <?php endforeach; ?>
+            <?php endforeach; ?>
+            <?php endforeach; ?>
+        <?php endif; ?>
 
     </div><!-- /notif-list -->
-
-    <!-- Estado vacío (oculto por defecto, JS lo muestra si hace falta) -->
-    <div class="empty-state" id="emptyState" style="display:none">
-        <div class="empty-icon"><i class="bi bi-bell-slash"></i></div>
-        <h3>Aucune notification</h3>
-        <p>Vous êtes à jour ! Revenez plus tard.</p>
-    </div>
 
 </main>
 
@@ -504,7 +576,9 @@ function applyFilter() {
     });
 
     const emptyState = document.getElementById('emptyState');
-    if (emptyState) emptyState.style.display = visible === 0 ? 'block' : 'none';
+    if (emptyState) {
+        emptyState.style.display = visible === 0 ? 'block' : 'none';
+    }
 }
 
 /* ── Marcar una como leída ──────────────────────────────────── */
@@ -564,11 +638,15 @@ function deleteNotif(card) {
 document.getElementById('deleteReadBtn')?.addEventListener('click', () => {
     const read = document.querySelectorAll('.notif-card[data-read="1"]');
     let count = read.length;
+    if (count === 0) {
+        showToast('Aucune notification lue à supprimer');
+        return;
+    }
     read.forEach(card => {
         card.classList.add('removing');
         setTimeout(() => { card.remove(); checkEmpty(); }, 300);
     });
-    if (count > 0) showToast(count + ' notification(s) supprimée(s)');
+    showToast(count + ' notification(s) supprimée(s)');
 });
 
 /* ── Contador de no leídas ──────────────────────────────────── */
@@ -577,14 +655,30 @@ function updateUnreadCount(delta, reset) {
     if (!pill) return;
     let current = parseInt(pill.textContent) || 0;
     const next  = reset ? 0 : Math.max(0, current + delta);
-    if (next <= 0) pill.remove();
-    else pill.textContent = next + ' non lue' + (next > 1 ? 's' : '');
+    if (next <= 0) {
+        pill.remove();
+        // También eliminar el botón de marcar todas si existe
+        document.getElementById('markAllBtn')?.remove();
+    } else {
+        pill.textContent = next + ' non lue' + (next > 1 ? 's' : '');
+    }
 }
 
 function checkEmpty() {
     const remaining = document.querySelectorAll('.notif-card');
     const emptyState = document.getElementById('emptyState');
-    if (emptyState) emptyState.style.display = remaining.length === 0 ? 'block' : 'none';
+    if (emptyState) {
+        emptyState.style.display = remaining.length === 0 ? 'block' : 'none';
+    }
+    // Ocultar separadores si no hay notificaciones
+    document.querySelectorAll('.date-sep').forEach(sep => {
+        const nextSibling = sep.nextElementSibling;
+        if (nextSibling && nextSibling.classList.contains('notif-card')) {
+            sep.style.display = '';
+        } else {
+            sep.style.display = 'none';
+        }
+    });
 }
 
 /* ── Toast ──────────────────────────────────────────────────── */
@@ -596,4 +690,11 @@ function showToast(msg) {
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
 }
+
+/* ── Inicializar ────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function() {
+    applyFilter();
+});
 </script>
+</body>
+</html>
