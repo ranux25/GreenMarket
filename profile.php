@@ -181,10 +181,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
     }
 }
-?>
 
+// Detectar tema guardado (por defecto claro)
+$theme = $_COOKIE['theme'] ?? 'light';
+?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="<?php echo $theme; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -193,16 +195,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
+        /* Variables de tema */
+        :root {
+            --bg-primary: #f5f0e8;
+            --bg-secondary: #fff9eb;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #2C2C2C;
+            --text-muted: #6B6B6B;
+            --border-color: #e5e7eb;
+            --shadow-color: rgba(93, 13, 24, 0.1);
+            --input-bg: #ffffff;
+            --card-bg: #f9f9f9;
+            --header-gradient-start: #5D0D18;
+            --header-gradient-end: #7a1322;
+            --alert-success-bg: #d4edda;
+            --alert-success-text: #155724;
+            --alert-error-bg: #f8d7da;
+            --alert-error-text: #721c24;
+        }
+
+        /* Tema oscuro beige */
+        [data-theme="dark"] {
+            --bg-primary: #2c241e;
+            --bg-secondary: #3d3229;
+            --bg-card: #3d3229;
+            --text-primary: #f0e6d8;
+            --text-secondary: #e8dccc;
+            --text-muted: #b8a896;
+            --border-color: #5a4a3a;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --input-bg: #4d3d32;
+            --card-bg: #4d3d32;
+            --header-gradient-start: #1a1410;
+            --header-gradient-end: #2c241e;
+            --alert-success-bg: #2d4a35;
+            --alert-success-text: #b8dcc8;
+            --alert-error-bg: #4a2d30;
+            --alert-error-text: #e8b8b8;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
         
         body {
-            background: linear-gradient(135deg, #f5f0e8 0%, #fff9eb 100%);
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
             font-family: 'Lato', sans-serif;
             min-height: 100vh;
+            color: var(--text-primary);
         }
         
         .profile-container {
@@ -212,22 +256,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
         
         .profile-card {
-            background: white;
+            background: var(--bg-card);
             border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(93, 13, 24, 0.1);
+            box-shadow: 0 20px 40px var(--shadow-color);
             overflow: hidden;
         }
         
         .profile-header {
-            background: linear-gradient(135deg, #5D0D18 0%, #7a1322 100%);
+            background: linear-gradient(135deg, var(--header-gradient-start) 0%, var(--header-gradient-end) 100%);
             padding: 2rem;
-            color: white;
+            color: #f0e6d8;
+        }
+
+        [data-theme="dark"] .profile-header h1 {
+            color: #f0e6d8;
         }
         
         .profile-avatar {
             width: 100px;
             height: 100px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.15);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -235,12 +283,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             font-size: 3rem;
             margin-bottom: 1rem;
             border: 3px solid #9FB2AC;
+            color: #f0e6d8;
         }
         
         .profile-role-badge {
             display: inline-block;
             background: #9FB2AC;
-            color: #5D0D18;
+            color: #2c241e;
             padding: 0.25rem 1rem;
             border-radius: 50px;
             font-size: 0.75rem;
@@ -251,8 +300,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         
         .tabs-nav {
             display: flex;
-            border-bottom: 2px solid #eee;
-            background: white;
+            border-bottom: 2px solid var(--border-color);
+            background: var(--bg-card);
             padding: 0 1.5rem;
             gap: 0.5rem;
             flex-wrap: wrap;
@@ -264,18 +313,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             border: none;
             font-size: 1rem;
             font-weight: 600;
-            color: #6B6B6B;
+            color: var(--text-muted);
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
         }
         
         .tab-btn:hover {
-            color: #5D0D18;
+            color: var(--text-secondary);
         }
         
         .tab-btn.active {
             color: #5D0D18;
+        }
+        
+        [data-theme="dark"] .tab-btn.active {
+            color: #d4c4b0;
         }
         
         .tab-btn.active::after {
@@ -289,10 +342,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             border-radius: 3px 3px 0 0;
         }
         
+        [data-theme="dark"] .tab-btn.active::after {
+            background: #d4c4b0;
+        }
+        
         .tab-content {
             display: none;
             padding: 2rem 1.5rem;
             animation: fadeIn 0.4s ease;
+            color: var(--text-secondary);
         }
         
         .tab-content.active {
@@ -312,7 +370,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
-            color: #2C2C2C;
+            color: var(--text-secondary);
             font-size: 0.9rem;
         }
         
@@ -320,11 +378,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         .form-group textarea {
             width: 100%;
             padding: 0.75rem 1rem;
-            border: 2px solid #e5e7eb;
+            border: 2px solid var(--border-color);
             border-radius: 12px;
             font-size: 1rem;
             transition: all 0.3s ease;
             font-family: inherit;
+            background: var(--input-bg);
+            color: var(--text-secondary);
+        }
+        
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--text-muted);
         }
         
         .form-group input:focus,
@@ -350,10 +415,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(93,13,24,0.3);
         }
+
+        [data-theme="dark"] .btn-primary {
+            background: #6d4c3a;
+            color: #f0e6d8;
+        }
+
+        [data-theme="dark"] .btn-primary:hover {
+            background: #8a6048;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
         
         .btn-secondary {
             background: #9FB2AC;
-            color: #5D0D18;
+            color: #2c241e;
             border: none;
             padding: 0.75rem 1.5rem;
             border-radius: 12px;
@@ -367,9 +442,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             transform: translateY(-2px);
         }
         
+        .btn-theme {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 2px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-theme:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+        
         .alert-success {
-            background: #d4edda;
-            color: #155724;
+            background: var(--alert-success-bg);
+            color: var(--alert-success-text);
             padding: 1rem;
             border-radius: 12px;
             margin-bottom: 1.5rem;
@@ -377,8 +471,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
         
         .alert-error {
-            background: #f8d7da;
-            color: #721c24;
+            background: var(--alert-error-bg);
+            color: var(--alert-error-text);
             padding: 1rem;
             border-radius: 12px;
             margin-bottom: 1.5rem;
@@ -386,17 +480,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
         
         .info-card {
-            background: #f9f9f9;
+            background: var(--card-bg);
             border-radius: 16px;
             padding: 1.5rem;
             margin-top: 1.5rem;
+            border: 1px solid var(--border-color);
         }
         
         .info-row {
             display: flex;
             justify-content: space-between;
             padding: 0.75rem 0;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
         }
         
         .info-row:last-child {
@@ -405,11 +500,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         
         .info-label {
             font-weight: 600;
-            color: #6B6B6B;
+            color: var(--text-muted);
         }
         
         .info-value {
-            color: #2C2C2C;
+            color: var(--text-secondary);
+        }
+
+        .info-card h3 {
+            color: var(--text-secondary);
+        }
+
+        .info-card p {
+            color: var(--text-secondary);
+        }
+
+        .text-gray-600 {
+            color: var(--text-muted) !important;
         }
         
         @media (max-width: 768px) {
@@ -455,6 +562,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             position: relative;
             cursor: pointer;
             transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        [data-theme="dark"] .toggle-checkbox {
+            background: #5a4a3a;
         }
 
         .toggle-checkbox:checked {
@@ -475,6 +587,89 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         .toggle-checkbox:checked::before {
             transform: translateX(20px);
+        }
+
+        .theme-toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .theme-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* Estilos para selects en modo oscuro */
+        [data-theme="dark"] select {
+            background: var(--input-bg);
+            color: var(--text-secondary);
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] select option {
+            background: var(--input-bg);
+            color: var(--text-secondary);
+        }
+
+        /* Estilos para el toggle de tema */
+        .theme-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        [data-theme="dark"] .theme-switch {
+            background: #5a4a3a;
+        }
+
+        .theme-switch.active {
+            background: #9FB2AC;
+        }
+
+        .theme-switch .slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        [data-theme="dark"] .theme-switch .slider {
+            transform: translateX(30px);
+            background: #f0e6d8;
+        }
+
+        .theme-switch .slider i {
+            font-size: 12px;
+            color: #555;
+        }
+
+        [data-theme="dark"] .theme-switch .slider i {
+            color: #2c241e;
+        }
+
+        /* Estilos para la pestaña "À propos" en modo oscuro */
+        [data-theme="dark"] .btn-secondary {
+            background: #6d4c3a;
+            color: #f0e6d8;
+        }
+
+        [data-theme="dark"] .btn-secondary:hover {
+            background: #8a6048;
         }
     </style>
 </head>
@@ -573,9 +768,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         
         <!-- Pestaña: Paramètres -->
         <div class="tab-content" id="tab-settings">
-            <h2 class="text-xl font-bold mb-4" style="color:#5D0D18;">
+            <h2 class="text-xl font-bold mb-4" style="color: var(--text-secondary);">
                 <i class="bi bi-sliders2"></i> Préférences
             </h2>
+            
+            <!-- Control de tema -->
+            <div class="info-card">
+                <h3 class="font-bold text-lg mb-3">
+                    <i class="bi bi-palette"></i> Thème
+                </h3>
+                <div class="theme-toggle-container">
+                    <span class="theme-label">
+                        <i class="bi bi-sun"></i> Mode clair
+                    </span>
+                    <div class="theme-switch <?php echo $theme === 'dark' ? 'active' : ''; ?>" onclick="toggleTheme()" id="themeToggle">
+                        <div class="slider">
+                            <i class="bi <?php echo $theme === 'dark' ? 'bi-moon-fill' : 'bi-sun-fill'; ?>"></i>
+                        </div>
+                    </div>
+                    <span class="theme-label">
+                        <i class="bi bi-moon"></i> Mode sombre beige
+                    </span>
+                </div>
+            </div>
             
             <div class="space-y-4">
                 <div class="info-card">
@@ -619,7 +834,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         
         <!-- Pestaña: Sécurité -->
         <div class="tab-content" id="tab-security">
-            <h2 class="text-xl font-bold mb-4" style="color:#5D0D18;">
+            <h2 class="text-xl font-bold mb-4" style="color: var(--text-secondary);">
                 <i class="bi bi-shield-lock"></i> Sécurité du compte
             </h2>
             
@@ -667,7 +882,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         
         <!-- Pestaña: À propos -->
         <div class="tab-content" id="tab-info">
-            <h2 class="text-xl font-bold mb-4" style="color:#5D0D18;">
+            <h2 class="text-xl font-bold mb-4" style="color: var(--text-secondary);">
                 <i class="bi bi-info-circle"></i> Informations sur GreenMarket
             </h2>
             
@@ -745,9 +960,62 @@ function loadPreferences() {
     }
 }
 
+// Función para cambiar el tema
+function toggleTheme() {
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    html.setAttribute('data-theme', newTheme);
+    
+    // Guardar en cookie
+    document.cookie = `theme=${newTheme}; path=/; max-age=31536000`;
+    
+    // Actualizar el ícono del slider
+    const sliderIcon = document.querySelector('.theme-switch .slider i');
+    if (sliderIcon) {
+        sliderIcon.className = `bi ${newTheme === 'dark' ? 'bi-moon-fill' : 'bi-sun-fill'}`;
+    }
+    
+    // Actualizar clase active del switch
+    const themeSwitch = document.getElementById('themeToggle');
+    if (themeSwitch) {
+        if (newTheme === 'dark') {
+            themeSwitch.classList.add('active');
+        } else {
+            themeSwitch.classList.remove('active');
+        }
+    }
+}
+
+// Cargar el tema guardado
 document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
+    if (savedTheme) {
+        const theme = savedTheme.split('=')[1];
+        document.documentElement.setAttribute('data-theme', theme);
+        
+        // Actualizar el ícono del slider
+        const sliderIcon = document.querySelector('.theme-switch .slider i');
+        if (sliderIcon) {
+            sliderIcon.className = `bi ${theme === 'dark' ? 'bi-moon-fill' : 'bi-sun-fill'}`;
+        }
+        
+        const themeSwitch = document.getElementById('themeToggle');
+        if (themeSwitch && theme === 'dark') {
+            themeSwitch.classList.add('active');
+        } else if (themeSwitch) {
+            themeSwitch.classList.remove('active');
+        }
+    }
+    
     loadPreferences();
 });
+
+// Función para toggle manual del tema (para el onclick del switch)
+function toggleThemeClick() {
+    toggleTheme();
+}
 </script>
 
 </body>

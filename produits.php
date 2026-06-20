@@ -2,6 +2,9 @@
 session_start();
 include('connexion.php');
 
+// Detectar tema guardado (por defecto claro)
+$theme = $_COOKIE['theme'] ?? 'light';
+
 // Récupérer les produits depuis la base de données
 try {
     // Récupérer tous les produits validés avec leurs infos boutique et catégorie
@@ -67,7 +70,7 @@ foreach ($produits_db as $p) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="<?php echo $theme; ?>">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
@@ -76,18 +79,165 @@ foreach ($produits_db as $p) {
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
-  /* ========== STYLES UNIFIÉS ========== */
+  /* ========== VARIABLES DE TEMA GLOBAL ========== */
   :root {
+    /* Colores principales */
     --primary: #5D0D18;
     --primary-light: #7a1020;
     --secondary: #9FB2AC;
+    --secondary-dark: #8aa09a;
+    --gold: #c07a1a;
+    
+    /* Fondos */
     --bg: #FFF9EB;
+    --bg-light: #f5f0e8;
+    --bg-card: #ffffff;
+    --bg-input: #ffffff;
+    --bg-white: #fffdf7;
+    
+    /* Textos */
     --text-dark: #2C2C2C;
     --text-light: #6B6B6B;
+    --text-muted: #6B6B6B;
+    
+    /* Bordes y sombras */
+    --border-color: #e8ddd0;
+    --card-border: #e8ddd0;
+    --shadow-color: rgba(93, 13, 24, 0.08);
+    --shadow-hover: rgba(93, 13, 24, 0.14);
+    
+    /* Footer */
     --footer-bg: #3A0A10;
-    --gold: #c07a1a;
+    --footer-text: #d4b8a0;
+    --footer-link: #c4a890;
+    --footer-link-hover: #ffffff;
+    
+    /* Page header */
+    --page-header-bg: var(--primary);
+    --page-header-text: #fff;
+    --page-header-sub: rgba(255,249,235,.7);
+    --page-header-border: rgba(255,249,235,.05);
+    --page-header-border-top: rgba(255,249,235,.15);
+    
+    /* Search bar */
+    --search-bg: #fff;
+    --search-border: #e8ddd0;
+    --search-input-bg: var(--bg);
+    
+    /* Sidebar */
+    --sidebar-bg: #fff;
+    --sidebar-border: #e8ddd0;
+    --sidebar-shadow: rgba(93,13,24,0.08);
+    --sidebar-header-bg: var(--primary);
+    --sidebar-header-text: #fff;
+    --category-hover: var(--bg);
+    --category-active: rgba(93,13,24,0.05);
+    --category-count-bg: #e8ddd0;
+    --category-count-text: var(--text-light);
+    --category-count-active: #fff;
+    
+    /* Product cards */
+    --product-bg: #fff;
+    --product-border: #e8ddd0;
+    --product-shadow: rgba(93,13,24,0.08);
+    --product-shadow-hover: rgba(93,13,24,0.14);
+    --product-price-bg: var(--primary);
+    --product-price-text: #fff;
+    --product-shop-bg: var(--secondary);
+    --product-shop-text: #fff;
+    --product-stats-border: #e8ddd0;
+    --product-stock-color: var(--primary);
+    --product-stock-low: #e67e22;
+    --product-stock-out: #e74c3c;
+    
+    /* Toast */
+    --toast-bg: var(--primary);
+    --toast-text: #fff;
+    
+    /* Empty state */
+    --empty-color: var(--text-light);
   }
 
+  /* ========== TEMA OSCURO BEIGE ========== */
+  [data-theme="dark"] {
+    /* Colores principales */
+    --primary: #8a6048;
+    --primary-light: #a0785a;
+    --secondary: #6d4c3a;
+    --secondary-dark: #5a4a3a;
+    --gold: #d4a85c;
+    
+    /* Fondos */
+    --bg: #2c241e;
+    --bg-light: #3d3229;
+    --bg-card: #3d3229;
+    --bg-input: #4d3d32;
+    --bg-white: #3d3229;
+    
+    /* Textos */
+    --text-dark: #f0e6d8;
+    --text-light: #b8a896;
+    --text-muted: #b8a896;
+    
+    /* Bordes y sombras */
+    --border-color: #5a4a3a;
+    --card-border: #5a4a3a;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --shadow-hover: rgba(0, 0, 0, 0.4);
+    
+    /* Footer */
+    --footer-bg: #1a1410;
+    --footer-text: #b8a896;
+    --footer-link: #b8a896;
+    --footer-link-hover: #f0e6d8;
+    
+    /* Page header */
+    --page-header-bg: #1a1410;
+    --page-header-text: #f0e6d8;
+    --page-header-sub: rgba(240,230,216,0.6);
+    --page-header-border: rgba(240,230,216,0.05);
+    --page-header-border-top: rgba(240,230,216,0.15);
+    
+    /* Search bar */
+    --search-bg: #3d3229;
+    --search-border: #5a4a3a;
+    --search-input-bg: #4d3d32;
+    
+    /* Sidebar */
+    --sidebar-bg: #3d3229;
+    --sidebar-border: #5a4a3a;
+    --sidebar-shadow: rgba(0, 0, 0, 0.3);
+    --sidebar-header-bg: #1a1410;
+    --sidebar-header-text: #f0e6d8;
+    --category-hover: #4d3d32;
+    --category-active: rgba(240,230,216,0.05);
+    --category-count-bg: #4d3d32;
+    --category-count-text: #b8a896;
+    --category-count-active: #f0e6d8;
+    
+    /* Product cards */
+    --product-bg: #3d3229;
+    --product-border: #5a4a3a;
+    --product-shadow: rgba(0, 0, 0, 0.3);
+    --product-shadow-hover: rgba(0, 0, 0, 0.4);
+    --product-price-bg: #6d4c3a;
+    --product-price-text: #f0e6d8;
+    --product-shop-bg: #6d4c3a;
+    --product-shop-text: #f0e6d8;
+    --product-stats-border: #5a4a3a;
+    --product-stock-color: var(--gold);
+    --product-stock-low: #e6a822;
+    --product-stock-out: #e85a4a;
+    
+    /* Toast */
+    --toast-bg: #6d4c3a;
+    --toast-text: #f0e6d8;
+    
+    /* Empty state */
+    --empty-color: #b8a896;
+  }
+
+  /* ========== STYLES UNIFIÉS ========== */
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
@@ -95,6 +245,7 @@ foreach ($produits_db as $p) {
     background: var(--bg);
     color: var(--text-dark);
     min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   h1, h2, h3, .playfair { font-family: 'Playfair Display', serif; }
@@ -117,10 +268,11 @@ foreach ($produits_db as $p) {
 
   /* Page Header */
   .page-header {
-    background: var(--primary);
+    background: var(--page-header-bg);
     padding: 4rem 2.5rem 3rem;
     position: relative;
     overflow: hidden;
+    transition: background 0.3s ease;
   }
   .page-header::before {
     content: '';
@@ -129,8 +281,9 @@ foreach ($produits_db as $p) {
     top: -80px;
     width: 420px;
     height: 420px;
-    border: 55px solid rgba(255,249,235,.05);
+    border: 55px solid var(--page-header-border);
     border-radius: 50%;
+    transition: border-color 0.3s ease;
   }
   .page-header::after {
     content: '';
@@ -148,16 +301,18 @@ foreach ($produits_db as $p) {
     font-weight: 600;
     letter-spacing: .2em;
     text-transform: uppercase;
-    color: rgba(255,249,235,.7);
+    color: var(--page-header-sub);
     margin-bottom: 1rem;
+    transition: color 0.3s ease;
   }
   .page-header h1 {
     font-family: 'Playfair Display', serif;
     font-size: clamp(32px, 5vw, 52px);
     font-weight: 700;
     line-height: 1.1;
-    color: #fff;
+    color: var(--page-header-text);
     margin-bottom: 1rem;
+    transition: color 0.3s ease;
   }
   .page-header h1 em {
     font-style: italic;
@@ -165,41 +320,46 @@ foreach ($produits_db as $p) {
     display: block;
   }
   .page-header p {
-    color: rgba(255,249,235,.7);
+    color: var(--page-header-sub);
     font-size: 1rem;
     max-width: 500px;
+    transition: color 0.3s ease;
   }
   .header-stats {
     display: flex;
     gap: 2.5rem;
     margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 1px solid rgba(255,249,235,.15);
+    border-top: 1px solid var(--page-header-border-top);
+    transition: border-color 0.3s ease;
   }
   .h-stat-val {
     font-family: 'Playfair Display', serif;
     font-size: 2rem;
     font-weight: 700;
-    color: #fff;
+    color: var(--page-header-text);
     display: block;
     line-height: 1;
+    transition: color 0.3s ease;
   }
   .h-stat-label {
     font-size: .7rem;
-    color: rgba(255,249,235,.6);
+    color: var(--page-header-sub);
     letter-spacing: .1em;
     text-transform: uppercase;
+    transition: color 0.3s ease;
   }
 
   /* Search Bar */
   .search-bar-wrap {
-    background: #fff;
+    background: var(--search-bg);
     padding: 1.2rem 2.5rem;
-    border-bottom: 1px solid #e8ddd0;
+    border-bottom: 1px solid var(--search-border);
     display: flex;
     gap: 1rem;
     align-items: center;
     flex-wrap: wrap;
+    transition: background 0.3s ease, border-color 0.3s ease;
   }
   .search-input-wrapper {
     flex: 1;
@@ -216,21 +376,21 @@ foreach ($produits_db as $p) {
   .search-input {
     width: 100%;
     padding: 0.75rem 1rem 0.75rem 2.8rem;
-    border: 1.5px solid #e8ddd0;
+    border: 1.5px solid var(--search-border);
     border-radius: 999px;
-    background: var(--bg);
+    background: var(--search-input-bg);
     font-family: 'Lato', sans-serif;
     font-size: 0.9rem;
     color: var(--text-dark);
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, background 0.3s ease, color 0.3s ease;
   }
   .search-input:focus { border-color: var(--primary); }
   .filter-select {
     padding: 0.75rem 2rem 0.75rem 1rem;
-    border: 1.5px solid #e8ddd0;
+    border: 1.5px solid var(--search-border);
     border-radius: 999px;
-    background: var(--bg);
+    background: var(--search-input-bg);
     font-family: 'Lato', sans-serif;
     font-size: 0.85rem;
     color: var(--text-dark);
@@ -240,6 +400,14 @@ foreach ($produits_db as $p) {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 12 12'%3E%3Cpath fill='%235d0d18' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 1rem center;
+    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
+  [data-theme="dark"] .filter-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 12 12'%3E%3Cpath fill='%23f0e6d8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  }
+  [data-theme="dark"] .filter-select option {
+    background: var(--bg-input);
+    color: var(--text-dark);
   }
 
   /* Main Layout */
@@ -255,21 +423,24 @@ foreach ($produits_db as $p) {
   /* Sidebar */
   .sidebar { position: sticky; top: 88px; align-self: start; }
   .sidebar-section {
-    background: #fff;
-    border: 1.5px solid #e8ddd0;
+    background: var(--sidebar-bg);
+    border: 1.5px solid var(--sidebar-border);
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 4px 16px rgba(93,13,24,0.08);
+    box-shadow: 0 4px 16px var(--sidebar-shadow);
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   }
   .sidebar-header {
-    background: var(--primary);
+    background: var(--sidebar-header-bg);
     padding: 1rem 1.3rem;
+    transition: background 0.3s ease;
   }
   .sidebar-header h3 {
     font-family: 'Playfair Display', serif;
-    color: #fff;
+    color: var(--sidebar-header-text);
     font-size: 1.1rem;
     font-weight: 600;
+    transition: color 0.3s ease;
   }
   .category-list { padding: 0.5rem 0; }
   .category-item {
@@ -280,26 +451,32 @@ foreach ($produits_db as $p) {
     cursor: pointer;
     transition: all 0.2s;
     border-left: 3px solid transparent;
+    color: var(--text-dark);
   }
-  .category-item:hover { background: var(--bg); border-left-color: var(--secondary); }
+  .category-item:hover { background: var(--category-hover); border-left-color: var(--secondary); }
   .category-item.active {
-    background: rgba(93,13,24,0.05);
+    background: var(--category-active);
     border-left-color: var(--primary);
   }
   .cat-left { display: flex; align-items: center; gap: 0.7rem; }
   .cat-icon { font-size: 1.1rem; }
   .cat-name { font-size: 0.85rem; font-weight: 500; }
   .cat-count {
-    background: #e8ddd0;
-    color: var(--text-light);
+    background: var(--category-count-bg);
+    color: var(--category-count-text);
     padding: 0.15rem 0.55rem;
     border-radius: 999px;
     font-size: 0.7rem;
     font-weight: 600;
+    transition: background 0.3s ease, color 0.3s ease;
   }
   .category-item.active .cat-count {
     background: var(--primary);
-    color: #fff;
+    color: var(--category-count-active);
+  }
+  [data-theme="dark"] .category-item.active .cat-count {
+    background: var(--gold);
+    color: var(--bg);
   }
 
   /* Products Grid */
@@ -314,10 +491,12 @@ foreach ($produits_db as $p) {
     font-size: 1.75rem;
     font-weight: 700;
     color: var(--text-dark);
+    transition: color 0.3s ease;
   }
   .stores-count {
     font-size: 0.85rem;
     color: var(--text-light);
+    transition: color 0.3s ease;
   }
   .stores-grid {
     display: grid;
@@ -327,16 +506,16 @@ foreach ($produits_db as $p) {
 
   /* Product Card */
   .product-card {
-    background: #fff;
-    border: 1.5px solid #e8ddd0;
+    background: var(--product-bg);
+    border: 1.5px solid var(--product-border);
     border-radius: 20px;
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 16px rgba(93,13,24,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+    box-shadow: 0 4px 16px var(--product-shadow);
   }
   .product-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 16px 36px rgba(93,13,24,0.14);
+    box-shadow: 0 16px 36px var(--product-shadow-hover);
   }
   .product-banner {
     height: 220px;
@@ -355,13 +534,14 @@ foreach ($produits_db as $p) {
     position: absolute;
     top: 0.8rem;
     right: 0.8rem;
-    background: var(--primary);
-    color: #fff;
+    background: var(--product-price-bg);
+    color: var(--product-price-text);
     font-size: 0.9rem;
     font-weight: 700;
     padding: 0.3rem 0.8rem;
     border-radius: 999px;
     z-index: 2;
+    transition: background 0.3s ease, color 0.3s ease;
   }
   .product-body { padding: 1.2rem; }
   .product-name {
@@ -371,11 +551,12 @@ foreach ($produits_db as $p) {
     color: var(--text-dark);
     line-height: 1.3;
     margin-bottom: 0.3rem;
+    transition: color 0.3s ease;
   }
   .product-shop-tag {
     display: inline-block;
-    background: var(--secondary);
-    color: #fff;
+    background: var(--product-shop-bg);
+    color: var(--product-shop-text);
     font-size: 0.65rem;
     font-weight: 600;
     letter-spacing: 0.05em;
@@ -383,7 +564,7 @@ foreach ($produits_db as $p) {
     border-radius: 999px;
     margin-bottom: 0.6rem;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, color 0.3s ease;
   }
   .product-shop-tag:hover { background: var(--primary); }
   .product-desc {
@@ -391,27 +572,31 @@ foreach ($produits_db as $p) {
     color: var(--text-light);
     line-height: 1.5;
     margin-bottom: 1rem;
+    transition: color 0.3s ease;
   }
   .product-stats {
     display: flex;
-    border-top: 1px solid #e8ddd0;
+    border-top: 1px solid var(--product-stats-border);
     padding-top: 0.8rem;
     align-items: center;
     justify-content: space-between;
+    transition: border-color 0.3s ease;
   }
   .product-stock {
     font-family: 'Playfair Display', serif;
     font-size: 0.9rem;
     font-weight: 700;
-    color: var(--primary);
+    color: var(--product-stock-color);
+    transition: color 0.3s ease;
   }
   .stock-label {
     font-size: 0.65rem;
     color: var(--text-light);
     text-transform: uppercase;
+    transition: color 0.3s ease;
   }
-  .stock-low { color: #e67e22; }
-  .stock-out { color: #e74c3c; }
+  .stock-low { color: var(--product-stock-low); }
+  .stock-out { color: var(--product-stock-out); }
 
   /* Buttons */
   .add-cart-btn {
@@ -429,14 +614,17 @@ foreach ($produits_db as $p) {
     background: var(--primary-light);
     transform: translateY(-2px);
   }
+  [data-theme="dark"] .add-cart-btn {
+    color: var(--bg);
+  }
 
   /* Toast */
   .toast {
     position: fixed;
     bottom: 28px;
     right: 28px;
-    background: var(--primary);
-    color: #fff;
+    background: var(--toast-bg);
+    color: var(--toast-text);
     padding: 14px 22px;
     border-radius: 14px;
     font-weight: 700;
@@ -451,8 +639,9 @@ foreach ($produits_db as $p) {
   .empty-state {
     text-align: center;
     padding: 3rem;
-    color: var(--text-light);
+    color: var(--empty-color);
     grid-column: 1/-1;
+    transition: color 0.3s ease;
   }
   .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
 
@@ -467,6 +656,13 @@ foreach ($produits_db as $p) {
     .search-input-wrapper { width: 100%; }
     .filter-select { width: 100%; }
     .main-layout { padding: 1.2rem 1rem; }
+    .header-stats {
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .stores-grid {
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
   }
 </style>
 </head>

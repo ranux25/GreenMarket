@@ -2,6 +2,9 @@
 session_start();
 include("connexion.php");
 
+// Detectar tema guardado (por defecto claro)
+$theme = $_COOKIE['theme'] ?? 'light';
+
 #recuperer les statistiques reelles depuis la BD
 try {
     $req = $pdo->query("SELECT COUNT(*) as total FROM client");
@@ -24,7 +27,7 @@ catch(PDOException $e) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="<?php echo $theme; ?>">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
@@ -36,31 +39,163 @@ catch(PDOException $e) {
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
-  /* ========== STYLES UNIFIÉS AVEC STORE.PHP ========== */
+  /* ========== VARIABLES DE TEMA GLOBAL ========== */
   :root {
-    --cream:      #fff9eb;
-    --sage:       #9fb2ac;
-    --sage-dark:  #7a9490;
-    --sage-light: #c8d8d4;
-    --wine:       #5d0d18;
-    --wine-dark:  #3e0910;
-    --wine-light: #8c2030;
-    --wine-pale:  #f5e6e8;
-    --text:       #2a1a1c;
-    --text-muted: #6b5055;
-    --border:     #e8ddd0;
-    --white:      #fffdf7;
-    --shadow:     rgba(93,13,24,.10);
-    --shadow-md:  rgba(93,13,24,.18);
+    /* Colores principales */
     --primary: #5D0D18;
+    --primary-light: #7a1020;
     --secondary: #9FB2AC;
+    --secondary-dark: #7a9490;
+    --secondary-light: #c8d8d4;
+    --gold: #c07a1a;
+    --wine: #5d0d18;
+    --wine-dark: #3e0910;
+    --wine-light: #8c2030;
+    --wine-pale: #f5e6e8;
+    
+    /* Fondos */
     --bg: #FFF9EB;
+    --bg-light: #f5f0e8;
+    --bg-card: #ffffff;
+    --bg-input: #ffffff;
+    --bg-white: #fffdf7;
+    
+    /* Textos */
     --text-dark: #2C2C2C;
     --text-light: #6B6B6B;
+    --text-muted: #6B6B6B;
+    --text-wine: #2a1a1c;
+    --text-muted-wine: #6b5055;
+    
+    /* Bordes y sombras */
+    --border-color: #e5e7eb;
+    --card-border: #e8ddd0;
+    --shadow-color: rgba(93, 13, 24, 0.08);
+    --shadow-md: rgba(93, 13, 24, 0.18);
+    
+    /* Header específico */
+    --header-bg: #5D0D18;
+    --header-text: #ffffff;
+    --header-text-hover: #ffffff;
+    --header-bg-hover: rgba(255, 255, 255, 0.15);
+    --header-shadow: rgba(93, 13, 24, 0.18);
+    --header-border: rgba(255, 255, 255, 0.05);
+    
+    /* Dropdown */
+    --dropdown-bg: #ffffff;
+    --dropdown-text: #2C2C2C;
+    --dropdown-hover: #FFF9EB;
+    --dropdown-divider: #f0f0f0;
+    
+    /* Footer */
     --footer-bg: #3A0A10;
-    --gold: #c07a1a;
+    --footer-text: #d4b8a0;
+    --footer-link: #c4a890;
+    --footer-link-hover: #ffffff;
+    
+    /* Page header - HERO BEIGE CLARITO */
+    --page-header-bg: #f5ede0;
+    --page-header-text: #5D0D18;
+    --page-header-sub: #6B6B6B;
+    --page-header-border: rgba(93, 13, 24, 0.08);
+    --page-header-eyebrow: #5D0D18;
+    --page-header-eyebrow-bg: rgba(93, 13, 24, 0.06);
+    
+    /* Cream */
+    --cream: #fff9eb;
+    
+    /* Alertas */
+    --alert-success-bg: #d4edda;
+    --alert-success-text: #155724;
+    --alert-error-bg: #f8d7da;
+    --alert-error-text: #721c24;
+    
+    /* Modal */
+    --modal-bg: #fffdf7;
+    --modal-shadow: rgba(0,0,0,0.2);
+    --modal-border: #e8ddd0;
+    --modal-input-bg: #fff9eb;
   }
 
+  /* ========== TEMA OSCURO BEIGE ========== */
+  [data-theme="dark"] {
+    /* Colores principales (adaptados) */
+    --primary: #8a6048;
+    --primary-light: #a0785a;
+    --secondary: #6d4c3a;
+    --secondary-dark: #5a4a3a;
+    --secondary-light: #8a7a6a;
+    --gold: #d4a85c;
+    --wine: #2c241e;
+    --wine-dark: #1a1410;
+    --wine-light: #4d3d32;
+    --wine-pale: #3d3229;
+    
+    /* Fondos */
+    --bg: #2c241e;
+    --bg-light: #3d3229;
+    --bg-card: #3d3229;
+    --bg-input: #4d3d32;
+    --bg-white: #3d3229;
+    
+    /* Textos */
+    --text-dark: #f0e6d8;
+    --text-light: #b8a896;
+    --text-muted: #b8a896;
+    --text-wine: #f0e6d8;
+    --text-muted-wine: #b8a896;
+    
+    /* Bordes y sombras */
+    --border-color: #5a4a3a;
+    --card-border: #5a4a3a;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --shadow-md: rgba(0, 0, 0, 0.4);
+    
+    /* Header específico */
+    --header-bg: #1a1410;
+    --header-text: #f0e6d8;
+    --header-text-hover: #ffffff;
+    --header-bg-hover: rgba(240, 230, 216, 0.12);
+    --header-shadow: rgba(0, 0, 0, 0.4);
+    --header-border: rgba(240, 230, 216, 0.05);
+    
+    /* Dropdown */
+    --dropdown-bg: #3d3229;
+    --dropdown-text: #f0e6d8;
+    --dropdown-hover: #4d3d32;
+    --dropdown-divider: #5a4a3a;
+    
+    /* Footer */
+    --footer-bg: #1a1410;
+    --footer-text: #b8a896;
+    --footer-link: #b8a896;
+    --footer-link-hover: #f0e6d8;
+    
+    /* Page header - HERO BEIGE OSCURO (más oscuro pero manteniendo tono beige) */
+    --page-header-bg: #3d3229;
+    --page-header-text: #f0e6d8;
+    --page-header-sub: #b8a896;
+    --page-header-border: rgba(240, 230, 216, 0.08);
+    --page-header-eyebrow: #d4a85c;
+    --page-header-eyebrow-bg: rgba(240, 230, 216, 0.06);
+    
+    /* Cream */
+    --cream: #f0e6d8;
+    
+    /* Alertas */
+    --alert-success-bg: #2d4a35;
+    --alert-success-text: #b8dcc8;
+    --alert-error-bg: #4a2d30;
+    --alert-error-text: #e8b8b8;
+    
+    /* Modal */
+    --modal-bg: #3d3229;
+    --modal-shadow: rgba(0,0,0,0.4);
+    --modal-border: #5a4a3a;
+    --modal-input-bg: #4d3d32;
+  }
+
+  /* ========== STYLES UNIFIÉS ========== */
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
@@ -69,68 +204,18 @@ catch(PDOException $e) {
     font-family: 'Lato', sans-serif;
     overflow-x: hidden;
     min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   h1, h2, h3, .playfair { font-family: 'Playfair Display', serif; }
 
-  /* ========== ESTILOS DEL HEADER ========== */
-  .topbar {
-    background: var(--wine);
-    color: white;
-    padding: .8rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .topbar a {
-    color: white;
-    text-decoration: none;
-    font-size: .9rem;
-    transition: opacity 0.2s;
-  }
-  .topbar a:hover {
-    opacity: 0.8;
-    text-decoration: none;
-  }
-  .topbar-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .topbar-right {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
-  }
-  .cart-link {
-    position: relative;
-  }
-  .cart-badge {
-    background: #ff6b6b;
-    color: white;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 1px 7px;
-    border-radius: 50%;
-    position: absolute;
-    top: -8px;
-    right: -12px;
-    min-width: 18px;
-    text-align: center;
-  }
-
-  /* ========== PAGE HEADER (COMME STORE.PHP) ========== */
+  /* ========== PAGE HEADER - HERO BEIGE ========== */
   .page-header {
-    background: var(--wine);
+    background: var(--page-header-bg);
     padding: 4rem 2.5rem 3rem;
     position: relative;
     overflow: hidden;
+    transition: background-color 0.3s ease;
   }
   .page-header::before {
     content: '';
@@ -139,8 +224,9 @@ catch(PDOException $e) {
     top: -80px;
     width: 420px;
     height: 420px;
-    border: 55px solid rgba(255,249,235,.05);
+    border: 55px solid var(--page-header-border);
     border-radius: 50%;
+    transition: border-color 0.3s ease;
   }
   .page-header::after {
     content: '';
@@ -157,20 +243,26 @@ catch(PDOException $e) {
     z-index: 1;
   }
   .header-eyebrow {
+    display: inline-block;
     font-size: .72rem;
     font-weight: 600;
     letter-spacing: .2em;
     text-transform: uppercase;
-    color: var(--sage-light);
+    color: var(--page-header-eyebrow);
+    background: var(--page-header-eyebrow-bg);
+    padding: 0.3rem 1rem;
+    border-radius: 999px;
     margin-bottom: .9rem;
+    transition: color 0.3s ease, background-color 0.3s ease;
   }
   .page-header h1 {
     font-family: 'Playfair Display', serif;
     font-size: 3.6rem;
     font-weight: 700;
     line-height: 1.05;
-    color: var(--cream);
+    color: var(--page-header-text);
     margin-bottom: .7rem;
+    transition: color 0.3s ease;
   }
   .page-header h1 em {
     font-style: italic;
@@ -178,10 +270,11 @@ catch(PDOException $e) {
     display: block;
   }
   .page-header p {
-    color: rgba(255,249,235,.62);
+    color: var(--page-header-sub);
     font-size: .93rem;
     font-weight: 300;
     max-width: 500px;
+    transition: color 0.3s ease;
   }
 
   /* ========== ANIMATIONS ========== */
@@ -227,28 +320,30 @@ catch(PDOException $e) {
 
   /* ========== MISSION SECTION ========== */
   .mission-section {
-    background: var(--white);
+    background: var(--bg-card);
     border-radius: 20px;
     padding: 3rem;
     margin-bottom: 2.5rem;
-    border: 1.5px solid var(--border);
-    box-shadow: 0 4px 16px rgba(93,13,24,0.08);
+    border: 1.5px solid var(--card-border);
+    box-shadow: 0 4px 16px var(--shadow-color);
     text-align: center;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   }
   .mission-text h2 {
     font-family: 'Playfair Display', serif;
     font-size: 2rem;
-    color: var(--wine);
+    color: var(--primary);
     margin-bottom: 1.5rem;
     position: relative;
     display: inline-block;
+    transition: color 0.3s ease;
   }
   .mission-text h2::after {
     content: '';
     display: block;
     width: 60px;
     height: 3px;
-    background: var(--sage);
+    background: var(--secondary);
     margin: 0.5rem auto 0;
   }
   .mission-text p {
@@ -259,31 +354,35 @@ catch(PDOException $e) {
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
+    transition: color 0.3s ease;
   }
   .mission-quote {
     font-style: italic;
     font-size: 1.1rem;
-    color: var(--wine);
+    color: var(--primary);
     margin-top: 1.5rem;
     padding-top: 1rem;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--card-border);
+    transition: color 0.3s ease, border-color 0.3s ease;
   }
 
   /* ========== VALUES SECTION ========== */
   .values-section {
-    background: var(--white);
+    background: var(--bg-card);
     border-radius: 20px;
     padding: 3rem;
     margin-bottom: 2.5rem;
-    border: 1.5px solid var(--border);
-    box-shadow: 0 4px 16px rgba(93,13,24,0.08);
+    border: 1.5px solid var(--card-border);
+    box-shadow: 0 4px 16px var(--shadow-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   }
   .values-section h2 {
     font-family: 'Playfair Display', serif;
     font-size: 2rem;
-    color: var(--wine);
+    color: var(--primary);
     text-align: center;
     margin-bottom: 2.5rem;
+    transition: color 0.3s ease;
   }
   .values-grid {
     display: grid;
@@ -304,17 +403,20 @@ catch(PDOException $e) {
     justify-content: center;
     margin: 0 auto 1rem;
     font-size: 2rem;
+    transition: background-color 0.3s ease;
   }
   .value-card h3 {
     font-family: 'Playfair Display', serif;
     font-size: 1.2rem;
-    color: var(--wine);
+    color: var(--primary);
     margin-bottom: 0.5rem;
+    transition: color 0.3s ease;
   }
   .value-card p {
     font-size: 0.85rem;
     color: var(--text-muted);
     line-height: 1.5;
+    transition: color 0.3s ease;
   }
 
   /* ========== IMPACT SECTION ========== */
@@ -322,15 +424,17 @@ catch(PDOException $e) {
     background: linear-gradient(135deg, var(--wine) 0%, var(--wine-dark) 100%);
     border-radius: 20px;
     padding: 3rem;
-    color: white;
+    color: var(--cream);
     margin-bottom: 2.5rem;
-    box-shadow: 0 4px 16px rgba(93,13,24,0.15);
+    box-shadow: 0 4px 16px var(--shadow-md);
+    transition: background 0.3s ease, color 0.3s ease;
   }
   .impact-section h2 {
     font-family: 'Playfair Display', serif;
     font-size: 2rem;
     text-align: center;
     margin-bottom: 2rem;
+    color: var(--cream);
   }
   .impact-grid {
     display: grid;
@@ -343,6 +447,7 @@ catch(PDOException $e) {
     font-size: 2.5rem;
     font-weight: 700;
     display: block;
+    color: var(--gold);
   }
   .impact-label {
     font-size: 0.85rem;
@@ -356,9 +461,10 @@ catch(PDOException $e) {
   .team-section h2 {
     font-family: 'Playfair Display', serif;
     font-size: 2rem;
-    color: var(--wine);
+    color: var(--primary);
     text-align: center;
     margin-bottom: 2.5rem;
+    transition: color 0.3s ease;
   }
   .team-grid {
     display: grid;
@@ -367,28 +473,29 @@ catch(PDOException $e) {
   }
   .team-card {
     text-align: center;
-    background: var(--white);
+    background: var(--bg-card);
     padding: 1.5rem;
     border-radius: 20px;
-    border: 1.5px solid var(--border);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 16px rgba(93,13,24,0.08);
+    border: 1.5px solid var(--card-border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+    box-shadow: 0 4px 16px var(--shadow-color);
   }
   .team-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 16px 36px rgba(93,13,24,0.14);
+    box-shadow: 0 16px 36px var(--shadow-md);
   }
   .team-avatar {
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    background: var(--sage-light);
+    background: var(--secondary-light);
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 1rem;
     font-size: 2.5rem;
     overflow: hidden;
+    transition: background-color 0.3s ease;
   }
   .team-avatar img {
     width: 100%;
@@ -398,43 +505,49 @@ catch(PDOException $e) {
   .team-card h3 {
     font-family: 'Playfair Display', serif;
     font-size: 1.1rem;
-    color: var(--wine);
+    color: var(--primary);
     margin-bottom: 0.25rem;
+    transition: color 0.3s ease;
   }
   .team-role {
     font-size: 0.75rem;
-    color: var(--sage-dark);
+    color: var(--secondary-dark);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 0.5rem;
+    transition: color 0.3s ease;
   }
   .team-bio {
     font-size: 0.8rem;
     color: var(--text-muted);
     line-height: 1.4;
+    transition: color 0.3s ease;
   }
 
   /* ========== CTA SECTION ========== */
   .cta-section {
-    background: var(--white);
+    background: var(--bg-card);
     border-radius: 20px;
     padding: 3rem;
     text-align: center;
-    border: 1.5px solid var(--border);
-    box-shadow: 0 4px 16px rgba(93,13,24,0.08);
+    border: 1.5px solid var(--card-border);
+    box-shadow: 0 4px 16px var(--shadow-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   }
   .cta-section h2 {
     font-family: 'Playfair Display', serif;
     font-size: 1.8rem;
-    color: var(--wine);
+    color: var(--primary);
     margin-bottom: 1rem;
+    transition: color 0.3s ease;
   }
   .cta-section p {
     color: var(--text-muted);
     margin-bottom: 1.5rem;
+    transition: color 0.3s ease;
   }
   .btn-cta {
-    background: var(--wine);
+    background: var(--primary);
     color: white;
     border: none;
     padding: 0.8rem 2rem;
@@ -446,39 +559,123 @@ catch(PDOException $e) {
     transition: background 0.2s, transform 0.15s;
   }
   .btn-cta:hover {
-    background: var(--wine-dark);
+    background: var(--primary-light);
     transform: translateY(-2px);
   }
 
   /* ========== FOOTER ========== */
   footer {
     background: var(--footer-bg);
-    color: #d4b8a0;
+    color: var(--footer-text);
     margin-top: 2rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
   footer a {
-    color: #c4a890;
+    color: var(--footer-link);
     text-decoration: none;
     transition: color 0.2s;
     font-size: 14px;
     display: block;
     margin-bottom: 8px;
   }
-  footer a:hover { color: #fff; }
+  footer a:hover { color: var(--footer-link-hover); }
   .footer-heading {
     font-family: 'Playfair Display', serif;
-    color: #fff;
+    color: var(--cream);
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 16px;
+    transition: color 0.3s ease;
   }
 
-  /* Modal styles */
+  /* ========== MODAL ========== */
   .auth-modal-overlay { display: none; }
   .auth-modal-overlay.open { display: flex !important; }
   .auth-form { display: none; }
   .auth-form.active { display: block; }
-  .auth-tab.active { color: #5d0d18 !important; border-bottom: 2px solid #5d0d18 !important; }
+  .auth-tab.active { 
+    color: var(--primary) !important; 
+    border-bottom: 2px solid var(--primary) !important; 
+  }
+  .auth-modal {
+    background: var(--modal-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 450px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 20px 40px var(--modal-shadow);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .auth-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--modal-border);
+    transition: border-color 0.3s ease;
+  }
+  .auth-tab {
+    background: none;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  .auth-modal h3 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+    transition: color 0.3s ease;
+  }
+  .auth-modal input {
+    width: 100%;
+    padding: 0.7rem;
+    margin-bottom: 1rem;
+    border: 1.5px solid var(--modal-border);
+    border-radius: 8px;
+    background: var(--modal-input-bg);
+    color: var(--text-dark);
+    transition: all 0.3s ease;
+  }
+  .auth-modal input:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+  .btn-filled {
+    width: 100%;
+    background: var(--primary);
+    color: var(--bg);
+    border: none;
+    padding: .5rem 1.3rem;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  .btn-filled:hover {
+    background: var(--primary-light);
+  }
+  .auth-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: color 0.3s ease;
+  }
+  .auth-close:hover {
+    color: var(--primary);
+  }
+  .auth-error {
+    color: #d9534f;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    text-align: center;
+  }
 
   /* ========== RESPONSIVE ========== */
   @media (max-width: 768px) {
@@ -493,15 +690,6 @@ catch(PDOException $e) {
     }
     .page-header h1 {
       font-size: 2.4rem;
-    }
-    .topbar {
-      flex-direction: column;
-      gap: 10px;
-      padding: 0.8rem 1rem;
-    }
-    .topbar-left, .topbar-right {
-      justify-content: center;
-      flex-wrap: wrap;
     }
     .team-grid {
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -521,6 +709,14 @@ catch(PDOException $e) {
     .page-header h1 {
       font-size: 1.8rem;
     }
+    .auth-tabs {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .auth-tab {
+      font-size: 0.85rem;
+      padding: 0.4rem 0.7rem;
+    }
   }
 </style>
 </head>
@@ -529,7 +725,7 @@ catch(PDOException $e) {
 <!-- ========== INCLUIR HEADER ========== -->
 <?php include 'header.php'; ?>
 
-<!-- ========== PAGE HEADER (COMME STORE.PHP) ========== -->
+<!-- ========== PAGE HEADER - HERO BEIGE CLARITO ========== -->
 <div class="page-header">
   <div class="header-inner">
     <div class="header-eyebrow">🇲🇦 Notre histoire &amp; mission</div>
@@ -656,36 +852,36 @@ catch(PDOException $e) {
 
 <!-- Modal de autenticación -->
 <div class="auth-modal-overlay" id="authModal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:1000;">
-  <div class="auth-modal" style="background: #fffdf7; border-radius: 16px; padding: 2rem; max-width: 450px; width: 90%; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
-    <div class="auth-tabs" style="display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e8ddd0;">
-      <button class="auth-tab active" data-tab="login" style="background: none; border: none; padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; color: #6b5055; font-weight: 500;">Connexion</button>
-      <button class="auth-tab" data-tab="register" style="background: none; border: none; padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; color: #6b5055; font-weight: 500;">Inscription Client</button>
-      <button class="auth-tab" data-tab="registerProducer" style="background: none; border: none; padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; color: #6b5055; font-weight: 500;">Inscription Artisan</button>
+  <div class="auth-modal">
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Connexion</button>
+      <button class="auth-tab" data-tab="register">Inscription Client</button>
+      <button class="auth-tab" data-tab="registerProducer">Inscription Artisan</button>
     </div>
     <div id="loginForm" class="auth-form active">
-      <h3 style="color: #5d0d18; margin-bottom: 1rem;">🔐 Se connecter</h3>
-      <input type="email" id="loginEmail" placeholder="Email" style="width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1.5px solid #e8ddd0; border-radius: 8px; background: #fff9eb;">
-      <input type="password" id="loginPassword" placeholder="Mot de passe" style="width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1.5px solid #e8ddd0; border-radius: 8px; background: #fff9eb;">
-      <button class="btn-filled" id="doLoginBtn" style="width:100%; background:#5d0d18; color:#fff9eb; border:none; padding:.5rem 1.3rem; border-radius:3px; cursor:pointer;">Se connecter</button>
-      <p class="auth-error" id="loginError" style="color:#d9534f; font-size:0.8rem; margin-top:0.5rem; text-align:center;"></p>
+      <h3>🔐 Se connecter</h3>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Mot de passe">
+      <button class="btn-filled" id="doLoginBtn">Se connecter</button>
+      <p class="auth-error" id="loginError"></p>
     </div>
     <div id="registerForm" class="auth-form" style="display:none;">
-      <h3 style="color: #5d0d18; margin-bottom: 1rem;">📝 Inscription Client</h3>
-      <input type="text" id="regName" placeholder="Nom complet" style="width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1.5px solid #e8ddd0; border-radius: 8px; background: #fff9eb;">
-      <input type="email" id="regEmail" placeholder="Email" style="width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1.5px solid #e8ddd0; border-radius: 8px; background: #fff9eb;">
-      <input type="password" id="regPassword" placeholder="Mot de passe" style="width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1.5px solid #e8ddd0; border-radius: 8px; background: #fff9eb;">
-      <button class="btn-filled" id="doRegisterBtn" style="width:100%; background:#5d0d18; color:#fff9eb; border:none; padding:.5rem 1.3rem; border-radius:3px; cursor:pointer;">S'inscrire</button>
-      <p class="auth-error" id="registerError" style="color:#d9534f; font-size:0.8rem; margin-top:0.5rem; text-align:center;"></p>
+      <h3>📝 Inscription Client</h3>
+      <input type="text" id="regName" placeholder="Nom complet">
+      <input type="email" id="regEmail" placeholder="Email">
+      <input type="password" id="regPassword" placeholder="Mot de passe">
+      <button class="btn-filled" id="doRegisterBtn">S'inscrire</button>
+      <p class="auth-error" id="registerError"></p>
     </div>
     <div id="registerProducerForm" class="auth-form" style="display:none;">
-      <h3 style="color: #5d0d18; margin-bottom: 1rem;">🏪 Inscription Artisan</h3>
-      <input type="text" id="regProdName" placeholder="Nom de l'artisan" style="width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1.5px solid #e8ddd0; border-radius: 8px; background: #fff9eb;">
-      <input type="email" id="regProdEmail" placeholder="Email" style="width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1.5px solid #e8ddd0; border-radius: 8px; background: #fff9eb;">
-      <input type="password" id="regProdPassword" placeholder="Mot de passe" style="width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1.5px solid #e8ddd0; border-radius: 8px; background: #fff9eb;">
-      <button class="btn-filled" id="doRegisterProducerBtn" style="width:100%; background:#5d0d18; color:#fff9eb; border:none; padding:.5rem 1.3rem; border-radius:3px; cursor:pointer;">S'inscrire comme artisan</button>
-      <p class="auth-error" id="registerProducerError" style="color:#d9534f; font-size:0.8rem; margin-top:0.5rem; text-align:center;"></p>
+      <h3>🏪 Inscription Artisan</h3>
+      <input type="text" id="regProdName" placeholder="Nom de l'artisan">
+      <input type="email" id="regProdEmail" placeholder="Email">
+      <input type="password" id="regProdPassword" placeholder="Mot de passe">
+      <button class="btn-filled" id="doRegisterProducerBtn">S'inscrire comme artisan</button>
+      <p class="auth-error" id="registerProducerError"></p>
     </div>
-    <button class="auth-close" id="closeAuthModal" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer;">✕</button>
+    <button class="auth-close" id="closeAuthModal">✕</button>
   </div>
 </div>
 

@@ -2,6 +2,9 @@
 session_start();
 include('connexion.php');
 
+// Detectar tema guardado (por defecto claro)
+$theme = $_COOKIE['theme'] ?? 'light';
+
 #recuperer les boutiques validees depuis la BD
 try {
     $req = $pdo->prepare("
@@ -35,7 +38,7 @@ try {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="<?php echo $theme; ?>">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -44,17 +47,138 @@ try {
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <style>
-    /* ========== STYLES (conservés) ========== */
+    /* ========== VARIABLES DE TEMA ========== */
     :root {
+      /* Colores principales */
       --primary: #5D0D18;
       --primary-light: #7a1020;
       --secondary: #9FB2AC;
+      --secondary-dark: #8aa09a;
+      --gold: #c07a1a;
+      
+      /* Fondos */
       --bg: #FFF9EB;
+      --bg-light: #f5f0e8;
+      --bg-card: #ffffff;
+      --bg-input: #ffffff;
+      --bg-section: #fdf8ee;
+      --bg-section-alt: #fff9eb;
+      --bg-why: linear-gradient(135deg, #fdf5e0, #f5ede0);
+      
+      /* Textos */
       --text-dark: #2C2C2C;
       --text-light: #6B6B6B;
-      --gold: #c07a1a;
+      --text-muted: #6B6B6B;
+      
+      /* Bordes y sombras */
+      --border-color: #f0e8d5;
+      --shadow-color: rgba(93, 13, 24, 0.08);
+      --shadow-hover: rgba(93, 13, 24, 0.16);
+      
+      /* Hero */
+      --hero-overlay: linear-gradient(105deg, rgba(255,249,235,0.96) 0%, rgba(255,249,235,0.88) 35%, rgba(93,13,24,0.12) 70%, rgba(93,13,24,0.25) 100%);
+      --hero-stat-bg: rgba(255,255,255,0.92);
+      --hero-stat-border: rgba(93,13,24,0.1);
+      
+      /* Ticker */
+      --ticker-bg: var(--primary);
+      --ticker-text: rgba(255,255,255,0.9);
+      
+      /* Category */
+      --category-bg: #fff;
+      --category-border: #f0e8d5;
+      --category-hover: #fff8f0;
+      
+      /* Product */
+      --product-bg: #fff;
+      --product-border: #f0e8d5;
+      
+      /* Store */
+      --store-bg: #fff;
+      --store-border: #f0e8d5;
+      
+      /* Why section */
+      --why-border: rgba(93,13,24,0.08);
+      --why-check-bg: var(--primary);
+      
+      /* Toast */
+      --toast-bg: var(--primary);
+      --toast-text: #fff;
+      
+      /* Badges */
+      --badge-secondary-bg: var(--secondary);
+      --badge-rare-bg: #c0392b;
+      --badge-bio-bg: #6aaf6a;
+      --badge-fait-bg: var(--gold);
+      --badge-text: #fff;
     }
 
+    /* ========== TEMA OSCURO BEIGE ========== */
+    [data-theme="dark"] {
+      /* Colores principales */
+      --primary: #8a6048;
+      --primary-light: #a0785a;
+      --secondary: #6d4c3a;
+      --secondary-dark: #5a4a3a;
+      --gold: #d4a85c;
+      
+      /* Fondos */
+      --bg: #2c241e;
+      --bg-light: #3d3229;
+      --bg-card: #3d3229;
+      --bg-input: #4d3d32;
+      --bg-section: #3d3229;
+      --bg-section-alt: #2c241e;
+      --bg-why: linear-gradient(135deg, #3d3229, #2c241e);
+      
+      /* Textos */
+      --text-dark: #f0e6d8;
+      --text-light: #b8a896;
+      --text-muted: #b8a896;
+      
+      /* Bordes y sombras */
+      --border-color: #5a4a3a;
+      --shadow-color: rgba(0, 0, 0, 0.3);
+      --shadow-hover: rgba(0, 0, 0, 0.4);
+      
+      /* Hero */
+      --hero-overlay: linear-gradient(105deg, rgba(44,36,30,0.96) 0%, rgba(44,36,30,0.88) 35%, rgba(44,36,30,0.12) 70%, rgba(44,36,30,0.25) 100%);
+      --hero-stat-bg: rgba(61,50,41,0.92);
+      --hero-stat-border: rgba(240,230,216,0.1);
+      
+      /* Ticker */
+      --ticker-bg: #1a1410;
+      --ticker-text: #f0e6d8;
+      
+      /* Category */
+      --category-bg: #3d3229;
+      --category-border: #5a4a3a;
+      --category-hover: #4d3d32;
+      
+      /* Product */
+      --product-bg: #3d3229;
+      --product-border: #5a4a3a;
+      
+      /* Store */
+      --store-bg: #3d3229;
+      --store-border: #5a4a3a;
+      
+      /* Why section */
+      --why-border: #5a4a3a;
+      --why-check-bg: var(--gold);
+      
+      /* Toast */
+      --toast-bg: var(--primary);
+      --toast-text: #f0e6d8;
+      
+      /* Badges */
+      --badge-secondary-bg: #6d4c3a;
+      --badge-rare-bg: #8a2a20;
+      --badge-bio-bg: #4a7a4a;
+      --badge-fait-bg: #b8943a;
+    }
+
+    /* ========== STYLES BASE ========== */
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -62,6 +186,7 @@ try {
       color: var(--text-dark);
       font-family: 'Lato', sans-serif;
       overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     h1, h2, h3, .playfair { font-family: 'Playfair Display', serif; }
@@ -148,13 +273,8 @@ try {
     .hero-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(
-        105deg,
-        rgba(255,249,235,0.96) 0%,
-        rgba(255,249,235,0.88) 35%,
-        rgba(93,13,24,0.12) 70%,
-        rgba(93,13,24,0.25) 100%
-      );
+      background: var(--hero-overlay);
+      transition: background 0.3s ease;
     }
     .hero-content {
       position: relative;
@@ -177,6 +297,12 @@ try {
       text-transform: uppercase;
       color: var(--primary);
       margin-bottom: 24px;
+      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+    [data-theme="dark"] .hero-eyebrow {
+      background: rgba(240,230,216,0.08);
+      border-color: rgba(240,230,216,0.18);
+      color: var(--text-dark);
     }
     .hero-dot {
       width: 7px;
@@ -190,12 +316,19 @@ try {
       70%  { box-shadow: 0 0 0 18px rgba(93,13,24,0); }
       100% { box-shadow: 0 0 0 0 rgba(93,13,24,0); }
     }
+    [data-theme="dark"] .hero-dot {
+      background: var(--gold);
+    }
     .hero-title {
       font-size: clamp(32px, 5vw, 60px);
       font-weight: 700;
       line-height: 1.1;
       color: var(--primary);
       margin-bottom: 20px;
+      transition: color 0.3s ease;
+    }
+    [data-theme="dark"] .hero-title {
+      color: var(--text-dark);
     }
     .hero-title em {
       font-style: italic;
@@ -208,6 +341,7 @@ try {
       max-width: 460px;
       margin-bottom: 36px;
       line-height: 1.6;
+      transition: color 0.3s ease;
     }
     .hero-cta-group {
       display: flex;
@@ -224,13 +358,14 @@ try {
       gap: 12px;
     }
     .hero-stat-card {
-      background: rgba(255,255,255,0.92);
+      background: var(--hero-stat-bg);
       backdrop-filter: blur(10px);
-      border: 1px solid rgba(93,13,24,0.1);
+      border: 1px solid var(--hero-stat-border);
       border-radius: 16px;
       padding: 16px 20px;
       text-align: center;
       min-width: 110px;
+      transition: background 0.3s ease, border-color 0.3s ease;
     }
     .hero-stat-card .num {
       font-family: 'Playfair Display', serif;
@@ -238,14 +373,23 @@ try {
       font-weight: 700;
       color: var(--primary);
       line-height: 1;
+      transition: color 0.3s ease;
+    }
+    [data-theme="dark"] .hero-stat-card .num {
+      color: var(--gold);
+    }
+    .hero-stat-card div {
+      color: var(--text-light);
+      transition: color 0.3s ease;
     }
 
     /* ========== TICKER ========== */
     .ticker-wrap {
-      background: var(--primary);
+      background: var(--ticker-bg);
       padding: 12px 0;
       overflow: hidden;
       white-space: nowrap;
+      transition: background 0.3s ease;
     }
     .ticker-inner {
       display: inline-flex;
@@ -256,44 +400,50 @@ try {
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      color: rgba(255,255,255,0.9);
+      color: var(--ticker-text);
       font-size: 13px;
       font-weight: 700;
       padding: 0 40px;
+      transition: color 0.3s ease;
     }
     .ticker-sep { color: rgba(255,255,255,0.35); font-size: 20px; }
 
     /* ========== CATEGORIES ========== */
     .category-card {
-      background: #fff;
+      background: var(--category-bg);
       border-radius: 20px;
       padding: 28px 12px 22px;
       text-align: center;
       cursor: pointer;
-      transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s ease;
-      box-shadow: 0 2px 12px rgba(93,13,24,0.07);
-      border: 1.5px solid #f0e8d5;
+      transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+      box-shadow: 0 2px 12px var(--shadow-color);
+      border: 1.5px solid var(--category-border);
     }
     .category-card:hover {
       transform: translateY(-8px) scale(1.03);
-      box-shadow: 0 16px 36px rgba(93,13,24,0.16);
-      background: #fff8f0;
+      box-shadow: 0 16px 36px var(--shadow-hover);
+      background: var(--category-hover);
     }
     .category-icon { font-size: 38px; margin-bottom: 10px; display: block; }
-    .category-name { font-weight: 700; font-size: 12px; color: var(--text-dark); }
+    .category-name { 
+      font-weight: 700; 
+      font-size: 12px; 
+      color: var(--text-dark);
+      transition: color 0.3s ease;
+    }
 
     /* ========== PRODUCT CARDS ========== */
     .product-card {
-      background: #fff;
+      background: var(--product-bg);
       border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 4px 16px rgba(93,13,24,0.08);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      border: 1.5px solid #f0e8d5;
+      box-shadow: 0 4px 16px var(--shadow-color);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+      border: 1.5px solid var(--product-border);
     }
     .product-card:hover {
       transform: translateY(-6px);
-      box-shadow: 0 16px 40px rgba(93,13,24,0.16);
+      box-shadow: 0 16px 40px var(--shadow-hover);
     }
     .product-img-wrap { position: relative; overflow: hidden; }
     .product-img {
@@ -311,11 +461,12 @@ try {
       font-size: 11px;
       font-weight: 700;
       padding: 3px 12px;
+      color: var(--badge-text);
     }
-    .badge-secondary { background: var(--secondary); color: #fff; }
-    .badge-rare { background: #c0392b; color: #fff; }
-    .badge-bio { background: #6aaf6a; color: #fff; }
-    .badge-fait { background: var(--gold); color: #fff; }
+    .badge-secondary { background: var(--badge-secondary-bg); }
+    .badge-rare { background: var(--badge-rare-bg); }
+    .badge-bio { background: var(--badge-bio-bg); }
+    .badge-fait { background: var(--badge-fait-bg); }
     .stars { color: #e0a82e; font-size: 14px; }
 
     /* ========== BUTTONS ========== */
@@ -341,6 +492,15 @@ try {
       transition: all 0.25s ease;
     }
     .btn-outline:hover { background: var(--primary); color: #fff; }
+    [data-theme="dark"] .btn-outline {
+      color: var(--text-dark);
+      border-color: var(--text-dark);
+    }
+    [data-theme="dark"] .btn-outline:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
     .btn-sage {
       background: var(--secondary);
       color: #fff;
@@ -351,7 +511,7 @@ try {
       cursor: pointer;
       transition: background 0.2s, transform 0.2s;
     }
-    .btn-sage:hover { background: #8aa09a; transform: translateY(-2px); }
+    .btn-sage:hover { background: var(--secondary-dark); transform: translateY(-2px); }
 
     /* ========== SECTION TITLE ========== */
     .section-title {
@@ -360,6 +520,8 @@ try {
       font-weight: 700;
       position: relative;
       display: inline-block;
+      color: var(--text-dark);
+      transition: color 0.3s ease;
     }
     .section-title::after {
       content: '';
@@ -368,21 +530,22 @@ try {
       background: linear-gradient(90deg, var(--primary), var(--secondary), transparent);
       width: 70%;
       margin-top: 8px;
+      transition: background 0.3s ease;
     }
 
     /* ========== STORE CARDS ========== */
     .store-card {
-      background: #fff;
+      background: var(--store-bg);
       border-radius: 18px;
       overflow: hidden;
-      box-shadow: 0 4px 16px rgba(93,13,24,0.08);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 16px var(--shadow-color);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
       cursor: pointer;
-      border: 1.5px solid #f0e8d5;
+      border: 1.5px solid var(--store-border);
     }
     .store-card:hover {
       transform: translateY(-6px);
-      box-shadow: 0 16px 36px rgba(93,13,24,0.14);
+      box-shadow: 0 16px 36px var(--shadow-hover);
     }
     .store-banner {
       height: 160px;
@@ -392,27 +555,59 @@ try {
     }
     .store-card:hover .store-banner { transform: scale(1.05); }
     .store-info { padding: 1.1rem 1.2rem; }
-    .store-name { font-weight: 700; font-size: 1.05rem; color: var(--primary); }
-    .store-category { font-size: 0.68rem; color: var(--text-light); text-transform: uppercase; }
+    .store-name { 
+      font-weight: 700; 
+      font-size: 1.05rem; 
+      color: var(--primary);
+      transition: color 0.3s ease;
+    }
+    [data-theme="dark"] .store-name {
+      color: var(--gold);
+    }
+    .store-category { 
+      font-size: 0.68rem; 
+      color: var(--text-light); 
+      text-transform: uppercase;
+      transition: color 0.3s ease;
+    }
+    .store-info p {
+      color: var(--text-light);
+      transition: color 0.3s ease;
+    }
 
     /* ========== WHY SECTION ========== */
+    .why-section {
+      background: var(--bg-why);
+      transition: background 0.3s ease;
+    }
     .why-feature {
       display: flex;
       align-items: flex-start;
       gap: 16px;
       padding: 18px 0;
-      border-bottom: 1px solid rgba(93,13,24,0.08);
+      border-bottom: 1px solid var(--why-border);
+      transition: border-color 0.3s ease;
     }
     .why-check {
       width: 32px;
       height: 32px;
-      background: var(--primary);
+      background: var(--why-check-bg);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
       font-size: 15px;
+      flex-shrink: 0;
+      transition: background 0.3s ease;
+    }
+    .why-feature p {
+      color: var(--text-dark);
+      transition: color 0.3s ease;
+    }
+    .why-feature .text-sm {
+      color: var(--text-light) !important;
+      transition: color 0.3s ease;
     }
 
     /* ========== TOAST ========== */
@@ -420,8 +615,8 @@ try {
       position: fixed;
       bottom: 28px;
       right: 28px;
-      background: var(--primary);
-      color: #fff;
+      background: var(--toast-bg);
+      color: var(--toast-text);
       padding: 14px 22px;
       border-radius: 14px;
       font-weight: 700;
@@ -432,6 +627,29 @@ try {
     }
     #toast.show { transform: translateY(0); opacity: 1; }
 
+    /* ========== SECTION BACKGROUNDS ========== */
+    .section-categories {
+      background: var(--bg);
+      transition: background 0.3s ease;
+    }
+    .section-stores {
+      background: var(--bg-section);
+      transition: background 0.3s ease;
+    }
+    .section-products {
+      background: var(--bg-card);
+      transition: background 0.3s ease;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+      .hero-decorative {
+        display: none;
+      }
+      .hero-content {
+        padding: 0 5%;
+      }
+    }
   </style>
 </head>
 <body data-active-page="accueil">
@@ -487,7 +705,7 @@ try {
 </section>
 
 <!-- CATEGORIES -->
-<section class="py-16 px-4 max-w-7xl mx-auto">
+<section class="py-16 px-4 max-w-7xl mx-auto section-categories">
   <div class="mb-10 reveal">
     <h2 class="section-title">Nos catégories de produits traditionnels</h2>
   </div>
@@ -503,16 +721,16 @@ try {
   </div>
 </section>
 
-<!-- BOUTIQUES PARTENAIRES - DEPUIS LA BASE DE DONNÉES -->
-<section class="py-14 px-4" style="background: linear-gradient(180deg,#fdf8ee,#fff9eb);">
+<!-- BOUTIQUES PARTENAIRES -->
+<section class="py-14 px-4 section-stores">
   <div class="max-w-7xl mx-auto">
     <div class="mb-10 reveal">
       <h2 class="section-title">Nos boutiques partenaires</h2>
-      <p class="mt-2 text-sm text-gray-500">Découvrez nos producteurs locaux et artisans</p>
+      <p class="mt-2 text-sm" style="color: var(--text-light);">Découvrez nos producteurs locaux et artisans</p>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 reveal" id="storesGrid">
       <?php if (empty($boutiques_db)): ?>
-        <div class="text-center text-gray-500 col-span-3">Aucune boutique disponible pour le moment.</div>
+        <div class="text-center col-span-3" style="color: var(--text-light);">Aucune boutique disponible pour le moment.</div>
       <?php else: ?>
         <?php foreach ($boutiques_db as $boutique): ?>
         <div class="store-card" onclick="window.location.href='store.php?id=<?php echo $boutique['id_boutique']; ?>'">
@@ -525,7 +743,7 @@ try {
           <div class="store-info">
             <div class="store-name"><?php echo htmlspecialchars($boutique['nom_boutique']); ?></div>
             <div class="store-category"><?php echo htmlspecialchars($boutique['producteur_nom']); ?></div>
-            <p class="text-sm mt-2" style="color:var(--text-light)"><?php echo htmlspecialchars(substr($boutique['description'] ?? 'Boutique artisanale', 0, 70)); ?>…</p>
+            <p class="text-sm mt-2"><?php echo htmlspecialchars(substr($boutique['description'] ?? 'Boutique artisanale', 0, 70)); ?>…</p>
             <div class="flex items-center gap-1 mt-3">
               <span class="stars">★★★★★</span>
               <span style="font-size:12px;color:var(--text-light);">4.8</span>
@@ -542,7 +760,7 @@ try {
 </section>
 
 <!-- PRODUITS POPULAIRES -->
-<section id="products" class="py-16 px-4" style="background:#fff;">
+<section id="products" class="py-16 px-4 section-products">
   <div class="max-w-7xl mx-auto">
     <div class="mb-10 reveal">
       <h2 class="section-title">Produits populaires</h2>
@@ -555,17 +773,17 @@ try {
 </section>
 
 <!-- WHY SECTION -->
-<section class="py-16 px-4" style="background:linear-gradient(135deg,#fdf5e0,#f5ede0);">
+<section class="py-16 px-4 why-section">
   <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-14 items-center">
     <div class="reveal-left">
       <h2 class="section-title mb-8">Pourquoi acheter en coopérative ?</h2>
-      <div class="why-feature"><div class="why-check">✓</div><div><p class="font-bold">Produits authentiques</p><p class="text-sm text-gray-500 mt-1">Sélectionnés avec soin, issus du savoir-faire local.</p></div></div>
-      <div class="why-feature"><div class="why-check">✓</div><div><p class="font-bold">Prix équitable</p><p class="text-sm text-gray-500 mt-1">Vos achats soutiennent directement les producteurs.</p></div></div>
-      <div class="why-feature"><div class="why-check">✓</div><div><p class="font-bold">Traçabilité garantie</p><p class="text-sm text-gray-500 mt-1">Connaissez l'origine exacte de chaque produit.</p></div></div>
-      <div class="why-feature"><div class="why-check">✓</div><div><p class="font-bold">Savoir-faire traditionnel</p><p class="text-sm text-gray-500 mt-1">Transmission des techniques ancestrales.</p></div></div>
+      <div class="why-feature"><div class="why-check">✓</div><div><p class="font-bold">Produits authentiques</p><p class="text-sm">Sélectionnés avec soin, issus du savoir-faire local.</p></div></div>
+      <div class="why-feature"><div class="why-check">✓</div><div><p class="font-bold">Prix équitable</p><p class="text-sm">Vos achats soutiennent directement les producteurs.</p></div></div>
+      <div class="why-feature"><div class="why-check">✓</div><div><p class="font-bold">Traçabilité garantie</p><p class="text-sm">Connaissez l'origine exacte de chaque produit.</p></div></div>
+      <div class="why-feature"><div class="why-check">✓</div><div><p class="font-bold">Savoir-faire traditionnel</p><p class="text-sm">Transmission des techniques ancestrales.</p></div></div>
     </div>
     <div class="flex justify-center reveal-right">
-      <img src="IMAGES\imagepage.jpg" alt="Artisanat coopératif" class="rounded-2xl shadow-2xl w-full max-w-sm" style="aspect-ratio:1/1;object-fit:cover;">
+      <img src="IMAGES/imagepage.jpg" alt="Artisanat coopératif" class="rounded-2xl shadow-2xl w-full max-w-sm" style="aspect-ratio:1/1;object-fit:cover;">
     </div>
   </div>
 </section>
@@ -620,9 +838,9 @@ function renderProducts() {
       </div>
       <div class="p-4">
         <span class="badge ${badgeClass}">${p.badge}</span>
-        <h3 class="font-bold mt-2">${p.name}</h3>
-        <p class="text-xs text-gray-500 mt-1">👩‍🌾 ${p.coop}</p>
-        <div class="stars my-2">${renderStars(p.rating)} <span style="font-size:12px;">(${p.reviews})</span></div>
+        <h3 class="font-bold mt-2" style="color: var(--text-dark);">${p.name}</h3>
+        <p class="text-xs mt-1" style="color: var(--text-light);">👩‍🌾 ${p.coop}</p>
+        <div class="stars my-2">${renderStars(p.rating)} <span style="font-size:12px;color:var(--text-light);">(${p.reviews})</span></div>
         <p class="font-bold text-xl" style="color:var(--primary);">${p.price}</p>
         <button class="btn-primary w-full mt-3 py-2" onclick='addToCart(${JSON.stringify(p)})'>Ajouter au panier</button>
       </div>

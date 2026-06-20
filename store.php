@@ -2,6 +2,9 @@
 session_start();
 include('connexion.php');
 
+// Detectar tema guardado (por defecto claro)
+$theme = $_COOKIE['theme'] ?? 'light';
+
 // Función para normalizar URLs de imágenes
 function normalizeImageUrl($url) {
     if (empty($url)) {
@@ -18,7 +21,7 @@ function normalizeImageUrl($url) {
     return $url;
 }
 
-// Récupérer les boutiques desde la base de données avec leur catégorie
+// Récupérer les boutiques desde la base de données con su catégorie
 try {
     $stmt = $pdo->prepare("
         SELECT b.*, p.nom_entreprise as producteur_nom, 
@@ -80,7 +83,7 @@ foreach ($boutiques_db as $b) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="<?php echo $theme; ?>">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -89,18 +92,166 @@ foreach ($boutiques_db as $b) {
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
-  /* ========== STYLES UNIFIÉS AVEC ACCUEIL.PHP ========== */
+  /* ========== VARIABLES DE TEMA GLOBAL ========== */
   :root {
+    /* Colores principales */
     --primary: #5D0D18;
     --primary-light: #7a1020;
     --secondary: #9FB2AC;
+    --secondary-dark: #8aa09a;
+    --gold: #c07a1a;
+    
+    /* Fondos */
     --bg: #FFF9EB;
+    --bg-light: #f5f0e8;
+    --bg-card: #ffffff;
+    --bg-input: #ffffff;
+    --bg-white: #fffdf7;
+    
+    /* Textos */
     --text-dark: #2C2C2C;
     --text-light: #6B6B6B;
+    --text-muted: #6B6B6B;
+    
+    /* Bordes y sombras */
+    --border-color: #e8ddd0;
+    --card-border: #f0e8d5;
+    --shadow-color: rgba(93, 13, 24, 0.08);
+    --shadow-hover: rgba(93, 13, 24, 0.14);
+    
+    /* Footer */
     --footer-bg: #3A0A10;
-    --gold: #c07a1a;
+    --footer-text: #d4b8a0;
+    --footer-link: #c4a890;
+    --footer-link-hover: #ffffff;
+    
+    /* Page header */
+    --page-header-bg: var(--primary);
+    --page-header-text: #fff;
+    --page-header-sub: rgba(255,249,235,.7);
+    --page-header-border: rgba(255,249,235,.05);
+    --page-header-border-top: rgba(255,249,235,.15);
+    
+    /* Search bar */
+    --search-bg: #fff;
+    --search-border: #e8ddd0;
+    --search-input-bg: var(--bg);
+    
+    /* Sidebar */
+    --sidebar-bg: #fff;
+    --sidebar-border: #e8ddd0;
+    --sidebar-shadow: rgba(93,13,24,0.08);
+    --sidebar-header-bg: var(--primary);
+    --sidebar-header-text: #fff;
+    --category-hover: var(--bg);
+    --category-active: rgba(93,13,24,0.05);
+    --category-count-bg: #e8ddd0;
+    --category-count-text: var(--text-muted);
+    
+    /* Store cards */
+    --store-bg: #fff;
+    --store-border: #f0e8d5;
+    --store-shadow: rgba(93,13,24,0.08);
+    --store-shadow-hover: rgba(93,13,24,0.14);
+    --store-badge-bg: var(--primary);
+    --store-badge-text: #fff;
+    --store-stats-border: #e8ddd0;
+    --store-stat-color: var(--primary);
+    
+    /* Pagination */
+    --pagination-bg: #fff;
+    --pagination-border: #e8ddd0;
+    --pagination-text: var(--text-dark);
+    --pagination-active-bg: var(--primary);
+    --pagination-active-text: #fff;
+    
+    /* Toast */
+    --toast-bg: var(--primary);
+    --toast-text: #fff;
+    
+    /* Badges */
+    --badge-text: #fff;
   }
 
+  /* ========== TEMA OSCURO BEIGE ========== */
+  [data-theme="dark"] {
+    /* Colores principales */
+    --primary: #8a6048;
+    --primary-light: #a0785a;
+    --secondary: #6d4c3a;
+    --secondary-dark: #5a4a3a;
+    --gold: #d4a85c;
+    
+    /* Fondos */
+    --bg: #2c241e;
+    --bg-light: #3d3229;
+    --bg-card: #3d3229;
+    --bg-input: #4d3d32;
+    --bg-white: #3d3229;
+    
+    /* Textos */
+    --text-dark: #f0e6d8;
+    --text-light: #b8a896;
+    --text-muted: #b8a896;
+    
+    /* Bordes y sombras */
+    --border-color: #5a4a3a;
+    --card-border: #5a4a3a;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --shadow-hover: rgba(0, 0, 0, 0.4);
+    
+    /* Footer */
+    --footer-bg: #1a1410;
+    --footer-text: #b8a896;
+    --footer-link: #b8a896;
+    --footer-link-hover: #f0e6d8;
+    
+    /* Page header */
+    --page-header-bg: #1a1410;
+    --page-header-text: #f0e6d8;
+    --page-header-sub: rgba(240,230,216,0.6);
+    --page-header-border: rgba(240,230,216,0.05);
+    --page-header-border-top: rgba(240,230,216,0.15);
+    
+    /* Search bar */
+    --search-bg: #3d3229;
+    --search-border: #5a4a3a;
+    --search-input-bg: #4d3d32;
+    
+    /* Sidebar */
+    --sidebar-bg: #3d3229;
+    --sidebar-border: #5a4a3a;
+    --sidebar-shadow: rgba(0, 0, 0, 0.3);
+    --sidebar-header-bg: #1a1410;
+    --sidebar-header-text: #f0e6d8;
+    --category-hover: #4d3d32;
+    --category-active: rgba(240,230,216,0.05);
+    --category-count-bg: #4d3d32;
+    --category-count-text: #b8a896;
+    
+    /* Store cards */
+    --store-bg: #3d3229;
+    --store-border: #5a4a3a;
+    --store-shadow: rgba(0, 0, 0, 0.3);
+    --store-shadow-hover: rgba(0, 0, 0, 0.4);
+    --store-badge-bg: #6d4c3a;
+    --store-badge-text: #f0e6d8;
+    --store-stats-border: #5a4a3a;
+    --store-stat-color: var(--gold);
+    
+    /* Pagination */
+    --pagination-bg: #3d3229;
+    --pagination-border: #5a4a3a;
+    --pagination-text: #f0e6d8;
+    --pagination-active-bg: #6d4c3a;
+    --pagination-active-text: #f0e6d8;
+    
+    /* Toast */
+    --toast-bg: #6d4c3a;
+    --toast-text: #f0e6d8;
+  }
+
+  /* ========== STYLES UNIFIÉS ========== */
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -108,6 +259,7 @@ foreach ($boutiques_db as $b) {
     color: var(--text-dark);
     font-family: 'Lato', sans-serif;
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   h1, h2, h3, .playfair { font-family: 'Playfair Display', serif; }
@@ -158,6 +310,8 @@ foreach ($boutiques_db as $b) {
     font-weight: 700;
     position: relative;
     display: inline-block;
+    color: var(--text-dark);
+    transition: color 0.3s ease;
   }
   .section-title::after {
     content: '';
@@ -166,6 +320,7 @@ foreach ($boutiques_db as $b) {
     background: linear-gradient(90deg, var(--primary), var(--secondary), transparent);
     width: 70%;
     margin-top: 8px;
+    transition: background 0.3s ease;
   }
 
   /* Buttons */
@@ -191,6 +346,15 @@ foreach ($boutiques_db as $b) {
     transition: all 0.25s ease;
   }
   .btn-outline:hover { background: var(--primary); color: #fff; }
+  [data-theme="dark"] .btn-outline {
+    color: var(--text-dark);
+    border-color: var(--text-dark);
+  }
+  [data-theme="dark"] .btn-outline:hover {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
   .btn-sage {
     background: var(--secondary);
     color: #fff;
@@ -201,14 +365,15 @@ foreach ($boutiques_db as $b) {
     cursor: pointer;
     transition: background 0.2s, transform 0.2s;
   }
-  .btn-sage:hover { background: #8aa09a; transform: translateY(-2px); }
+  .btn-sage:hover { background: var(--secondary-dark); transform: translateY(-2px); }
 
-  /* Page header spécifique store */
+  /* Page header */
   .page-header {
-    background: var(--primary);
+    background: var(--page-header-bg);
     padding: 4rem 2.5rem 3rem;
     position: relative;
     overflow: hidden;
+    transition: background 0.3s ease;
   }
   .page-header::before {
     content: '';
@@ -217,8 +382,9 @@ foreach ($boutiques_db as $b) {
     top: -80px;
     width: 420px;
     height: 420px;
-    border: 55px solid rgba(255,249,235,.05);
+    border: 55px solid var(--page-header-border);
     border-radius: 50%;
+    transition: border-color 0.3s ease;
   }
   .header-inner { position: relative; z-index: 1; }
   .header-eyebrow {
@@ -226,16 +392,18 @@ foreach ($boutiques_db as $b) {
     font-weight: 600;
     letter-spacing: .2em;
     text-transform: uppercase;
-    color: rgba(255,249,235,.7);
+    color: var(--page-header-sub);
     margin-bottom: 1rem;
+    transition: color 0.3s ease;
   }
   .page-header h1 {
     font-family: 'Playfair Display', serif;
     font-size: clamp(32px, 5vw, 52px);
     font-weight: 700;
     line-height: 1.1;
-    color: #fff;
+    color: var(--page-header-text);
     margin-bottom: 1rem;
+    transition: color 0.3s ease;
   }
   .page-header h1 em {
     font-style: italic;
@@ -243,41 +411,46 @@ foreach ($boutiques_db as $b) {
     display: block;
   }
   .page-header p {
-    color: rgba(255,249,235,.7);
+    color: var(--page-header-sub);
     font-size: 1rem;
     max-width: 500px;
+    transition: color 0.3s ease;
   }
   .header-stats {
     display: flex;
     gap: 2.5rem;
     margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 1px solid rgba(255,249,235,.15);
+    border-top: 1px solid var(--page-header-border-top);
+    transition: border-color 0.3s ease;
   }
   .h-stat-val {
     font-family: 'Playfair Display', serif;
     font-size: 2rem;
     font-weight: 700;
-    color: #fff;
+    color: var(--page-header-text);
     display: block;
     line-height: 1;
+    transition: color 0.3s ease;
   }
   .h-stat-label {
     font-size: .7rem;
-    color: rgba(255,249,235,.6);
+    color: var(--page-header-sub);
     letter-spacing: .1em;
     text-transform: uppercase;
+    transition: color 0.3s ease;
   }
 
   /* Search bar */
   .search-bar-wrap {
-    background: #fff;
+    background: var(--search-bg);
     padding: 1.2rem 2.5rem;
-    border-bottom: 1px solid #e8ddd0;
+    border-bottom: 1px solid var(--search-border);
     display: flex;
     gap: 1rem;
     align-items: center;
     flex-wrap: wrap;
+    transition: background 0.3s ease, border-color 0.3s ease;
   }
   .search-input-wrapper {
     flex: 1;
@@ -294,26 +467,31 @@ foreach ($boutiques_db as $b) {
   .search-input {
     width: 100%;
     padding: 0.75rem 1rem 0.75rem 2.8rem;
-    border: 1.5px solid #e8ddd0;
+    border: 1.5px solid var(--search-border);
     border-radius: 999px;
-    background: var(--bg);
+    background: var(--search-input-bg);
     font-family: 'Lato', sans-serif;
     font-size: 0.9rem;
     color: var(--text-dark);
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, background 0.3s ease, color 0.3s ease;
   }
   .search-input:focus { border-color: var(--primary); }
   .filter-select {
     padding: 0.75rem 2rem 0.75rem 1rem;
-    border: 1.5px solid #e8ddd0;
+    border: 1.5px solid var(--search-border);
     border-radius: 999px;
-    background: var(--bg);
+    background: var(--search-input-bg);
     font-family: 'Lato', sans-serif;
     font-size: 0.85rem;
     color: var(--text-dark);
     outline: none;
     cursor: pointer;
+    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
+  [data-theme="dark"] .filter-select option {
+    background: var(--bg-input);
+    color: var(--text-dark);
   }
 
   /* Layout */
@@ -329,29 +507,32 @@ foreach ($boutiques_db as $b) {
   /* Sidebar */
   .sidebar { position: sticky; top: 88px; align-self: start; }
   .sidebar-section {
-    background: #fff;
-    border: 1.5px solid #e8ddd0;
+    background: var(--sidebar-bg);
+    border: 1.5px solid var(--sidebar-border);
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 4px 16px rgba(93,13,24,0.08);
+    box-shadow: 0 4px 16px var(--sidebar-shadow);
     margin-bottom: 1.2rem;
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   }
   .sidebar-header {
-    background: var(--primary);
+    background: var(--sidebar-header-bg);
     padding: 1rem 1.3rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    transition: background 0.3s ease;
   }
   .sidebar-header h3 {
     font-family: 'Playfair Display', serif;
-    color: #fff;
+    color: var(--sidebar-header-text);
     font-size: 1.1rem;
     font-weight: 600;
+    transition: color 0.3s ease;
   }
   .add-btn {
     background: rgba(255,255,255,0.15);
-    color: #fff;
+    color: var(--sidebar-header-text);
     border: 1px solid rgba(255,255,255,0.25);
     border-radius: 999px;
     padding: 0.3rem 0.8rem;
@@ -361,6 +542,7 @@ foreach ($boutiques_db as $b) {
     display: flex;
     align-items: center;
     gap: 0.3rem;
+    transition: background 0.2s;
   }
   .add-btn:hover { background: rgba(255,255,255,0.25); }
 
@@ -373,29 +555,32 @@ foreach ($boutiques_db as $b) {
     cursor: pointer;
     transition: all 0.2s;
     border-left: 3px solid transparent;
+    color: var(--text-dark);
   }
-  .category-item:hover { background: var(--bg); border-left-color: var(--secondary); }
+  .category-item:hover { background: var(--category-hover); border-left-color: var(--secondary); }
   .category-item.active {
-    background: rgba(93,13,24,0.05);
+    background: var(--category-active);
     border-left-color: var(--primary);
   }
   .cat-left { display: flex; align-items: center; gap: 0.7rem; }
   .cat-icon { font-size: 1.1rem; }
   .cat-name { font-size: 0.85rem; font-weight: 500; }
   .cat-count {
-    background: #e8ddd0;
-    color: var(--text-muted);
+    background: var(--category-count-bg);
+    color: var(--category-count-text);
     padding: 0.15rem 0.55rem;
     border-radius: 999px;
     font-size: 0.7rem;
     font-weight: 600;
+    transition: background 0.3s ease, color 0.3s ease;
   }
 
   /* Add category form */
   .add-cat-form {
     padding: 1.2rem;
-    border-top: 1px solid #e8ddd0;
+    border-top: 1px solid var(--sidebar-border);
     display: none;
+    transition: border-color 0.3s ease;
   }
   .add-cat-form.open { display: block; }
   .add-cat-form label {
@@ -405,16 +590,19 @@ foreach ($boutiques_db as $b) {
     color: var(--text-light);
     display: block;
     margin-bottom: 0.35rem;
+    transition: color 0.3s ease;
   }
   .add-cat-form input {
     width: 100%;
     padding: 0.6rem 0.8rem;
-    border: 1.5px solid #e8ddd0;
+    border: 1.5px solid var(--sidebar-border);
     border-radius: 12px;
     font-family: 'Lato', sans-serif;
     font-size: 0.85rem;
-    background: var(--bg);
+    background: var(--bg-input);
+    color: var(--text-dark);
     margin-bottom: 0.75rem;
+    transition: border-color 0.2s, background 0.3s ease, color 0.3s ease;
   }
   .add-cat-form input:focus { border-color: var(--primary); outline: none; }
   .form-actions { display: flex; gap: 0.5rem; }
@@ -427,17 +615,19 @@ foreach ($boutiques_db as $b) {
     border-radius: 999px;
     cursor: pointer;
     font-weight: 600;
+    transition: background 0.2s;
   }
   .btn-sm-wine:hover { background: var(--primary-light); }
   .btn-sm-cancel {
     flex: 1;
-    background: #e8ddd0;
+    background: var(--category-count-bg);
     color: var(--text-light);
     border: none;
     padding: 0.55rem;
     border-radius: 999px;
     cursor: pointer;
     font-weight: 600;
+    transition: background 0.3s ease, color 0.3s ease;
   }
 
   /* Store cards */
@@ -447,16 +637,16 @@ foreach ($boutiques_db as $b) {
     gap: 1.5rem;
   }
   .store-card {
-    background: #fff;
+    background: var(--store-bg);
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 4px 16px rgba(93,13,24,0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1.5px solid #f0e8d5;
+    box-shadow: 0 4px 16px var(--store-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+    border: 1.5px solid var(--store-border);
   }
   .store-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 16px 36px rgba(93,13,24,0.14);
+    box-shadow: 0 16px 36px var(--store-shadow-hover);
   }
   .store-banner {
     height: 180px;
@@ -475,12 +665,13 @@ foreach ($boutiques_db as $b) {
     position: absolute;
     top: 0.8rem;
     right: 0.8rem;
-    background: var(--primary);
-    color: white;
+    background: var(--store-badge-bg);
+    color: var(--store-badge-text);
     font-size: 0.7rem;
     font-weight: 700;
     padding: 0.2rem 0.7rem;
     border-radius: 999px;
+    transition: background 0.3s ease, color 0.3s ease;
   }
   .store-body { padding: 1.2rem; }
   .store-name {
@@ -489,6 +680,10 @@ foreach ($boutiques_db as $b) {
     font-weight: 700;
     color: var(--primary);
     margin-bottom: 0.3rem;
+    transition: color 0.3s ease;
+  }
+  [data-theme="dark"] .store-name {
+    color: var(--gold);
   }
   .store-category-tag {
     display: inline-block;
@@ -499,28 +694,36 @@ foreach ($boutiques_db as $b) {
     padding: 0.15rem 0.7rem;
     border-radius: 999px;
     margin-bottom: 0.6rem;
+    transition: background 0.3s ease;
   }
   .store-desc {
     font-size: 0.85rem;
     color: var(--text-light);
     line-height: 1.5;
     margin-bottom: 1rem;
+    transition: color 0.3s ease;
   }
   .store-stats {
     display: flex;
     justify-content: space-between;
-    border-top: 1px solid #e8ddd0;
+    border-top: 1px solid var(--store-stats-border);
     padding-top: 0.8rem;
     margin-top: 0.5rem;
+    transition: border-color 0.3s ease;
   }
   .store-stat { text-align: center; flex: 1; }
   .store-stat-val {
     font-family: 'Playfair Display', serif;
     font-size: 1rem;
     font-weight: 700;
-    color: var(--primary);
+    color: var(--store-stat-color);
+    transition: color 0.3s ease;
   }
-  .store-stat-label { font-size: 0.65rem; color: var(--text-light); }
+  .store-stat-label { 
+    font-size: 0.65rem; 
+    color: var(--text-light);
+    transition: color 0.3s ease;
+  }
   .stars { color: #e0a82e; font-size: 0.7rem; }
 
   /* ====== PAGINATION STYLES ====== */
@@ -536,9 +739,9 @@ foreach ($boutiques_db as $b) {
     min-width: 44px;
     height: 44px;
     border-radius: 999px;
-    border: 2px solid #e8ddd0;
-    background: #fff;
-    color: var(--text-dark);
+    border: 2px solid var(--pagination-border);
+    background: var(--pagination-bg);
+    color: var(--pagination-text);
     font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;
@@ -548,15 +751,15 @@ foreach ($boutiques_db as $b) {
     justify-content: center;
   }
   .pagination-wrapper button:hover:not(:disabled) {
-    background: var(--primary);
-    color: #fff;
-    border-color: var(--primary);
+    background: var(--pagination-active-bg);
+    color: var(--pagination-active-text);
+    border-color: var(--pagination-active-bg);
     transform: translateY(-2px);
   }
   .pagination-wrapper button.active {
-    background: var(--primary);
-    color: #fff;
-    border-color: var(--primary);
+    background: var(--pagination-active-bg);
+    color: var(--pagination-active-text);
+    border-color: var(--pagination-active-bg);
   }
   .pagination-wrapper button:disabled {
     opacity: 0.4;
@@ -574,6 +777,7 @@ foreach ($boutiques_db as $b) {
     color: var(--text-light);
     text-align: center;
     padding: 0.5rem 0;
+    transition: color 0.3s ease;
   }
 
   /* Empty state */
@@ -581,6 +785,7 @@ foreach ($boutiques_db as $b) {
     text-align: center;
     padding: 3rem;
     color: var(--text-light);
+    transition: color 0.3s ease;
   }
   .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
 
@@ -589,8 +794,8 @@ foreach ($boutiques_db as $b) {
     position: fixed;
     bottom: 28px;
     right: 28px;
-    background: var(--primary);
-    color: #fff;
+    background: var(--toast-bg);
+    color: var(--toast-text);
     padding: 14px 22px;
     border-radius: 14px;
     font-weight: 700;
@@ -619,6 +824,10 @@ foreach ($boutiques_db as $b) {
     }
     .pagination-wrapper .nav-btn {
       padding: 0 0.8rem;
+    }
+    .header-stats {
+      gap: 1.5rem;
+      flex-wrap: wrap;
     }
   }
 </style>
@@ -929,7 +1138,7 @@ function renderPagination(activePage, totalPages) {
 function goToPage(page) {
     const totalPages = Math.ceil(filteredStores.length / perPage);
     if (page < 1 || page > totalPages) return;
-    currentPage = page;   // ← variable globale, pas de let/const ici
+    currentPage = page;
     renderStores();
     document.querySelector('.stores-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
