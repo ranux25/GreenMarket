@@ -6,6 +6,13 @@
 -- Généré le : mar. 09 juin 2026 à 22:52
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.0.30
+--
+-- IMPORTANT : Après avoir importé cette base de données, exécutez le script
+-- migrate_passwords.php UNE SEULE FOIS via votre navigateur (ex: http://localhost/Projet-Web/migrate_passwords.php)
+-- pour hasher les mots de passe en clair. Les comptes par défaut sont :
+--   Admin    : admin@greenmarket.com / admin123
+--   Producteurs : caftan@gmail.com / 123456  (et tous les autres producteurs)
+--
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -52,6 +59,7 @@ CREATE TABLE `boutique` (
   `id_producteur` int(11) NOT NULL,
   `nom_boutique` varchar(100) NOT NULL,
   `description` varchar(255) DEFAULT NULL,
+  `image` varchar(255) DEFAULT NULL,
   `date_creation` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -106,8 +114,11 @@ INSERT INTO `categorie` (`id_categorie`, `nom_categorie`, `description`) VALUES
 CREATE TABLE `client` (
   `id_client` int(11) NOT NULL,
   `nom_client` varchar(50) NOT NULL,
+  `prenom_client` varchar(50) DEFAULT NULL,
   `email` varchar(100) NOT NULL,
   `mot_de_passe` varchar(255) NOT NULL,
+  `telephone_client` varchar(20) DEFAULT NULL,
+  `adresse_client` varchar(255) DEFAULT NULL,
   `date_inscription` datetime NOT NULL DEFAULT current_timestamp(),
   `est_actif` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -125,6 +136,7 @@ CREATE TABLE `commande` (
   `date_commande` datetime NOT NULL DEFAULT current_timestamp(),
   `statut_commande` enum('En attente','Confirmée','Expédiée','Livrée','Annulée') NOT NULL DEFAULT 'En attente',
   `montant_total` decimal(10,2) NOT NULL,
+  `adresse_livraison` varchar(500) DEFAULT NULL,
   `facture` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -218,8 +230,11 @@ CREATE TABLE `producteur` (
   `id_producteur` int(11) NOT NULL,
   `id_admin` int(11) DEFAULT NULL,
   `nom_entreprise` varchar(100) NOT NULL,
+  `nom_contact` varchar(100) DEFAULT NULL,
   `email` varchar(100) NOT NULL,
   `mot_de_passe` varchar(255) NOT NULL,
+  `telephone_producteur` varchar(20) DEFAULT NULL,
+  `adresse_producteur` varchar(255) DEFAULT NULL,
   `est_valide_par_admin` tinyint(1) NOT NULL DEFAULT 0,
   `date_inscription` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

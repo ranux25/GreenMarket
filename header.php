@@ -1,25 +1,40 @@
 <?php
-$cartCount = 0;
-if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
-    foreach ($_SESSION['cart'] as $item) {
-        $cartCount += isset($item['quantity']) ? $item['quantity'] : 1;
-    }
-}
 $theme       = $_COOKIE['theme'] ?? 'light';
 $currentPage = basename($_SERVER['PHP_SELF']);
 $dashboardLink = '';
 if (isset($_SESSION['user_role'])) {
     if ($_SESSION['user_role'] === 'client')     $dashboardLink = 'dashboard_client.php';
-    elseif ($_SESSION['user_role'] === 'producteur') $dashboardLink = 'dashboard-producteur.php';
+    elseif ($_SESSION['user_role'] === 'producteur') $dashboardLink = 'dashboard_producteur.php';
     elseif ($_SESSION['user_role'] === 'admin')  $dashboardLink = 'dashboard_admin.php';
 }
-// Ejemplo: notificaciones desde BD (ajusta a tu query real)
-$notifications = [];
-if (isset($_SESSION['user_id'])) {
-    // $notifications = fetchNotifications($_SESSION['user_id']); ← tu función real
-    // Para demo, dejamos array vacío; las notificaciones vendrán de tu BD
+
+// Charger le nombre d'articles dans le panier depuis la BD
+$cartCount = 0;
+if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'client') {
+    if (!isset($pdo)) { include_once __DIR__ . '/connexion.php'; }
+    try {
+        $reqCart = $pdo->prepare("SELECT COALESCE(SUM(quantite), 0) as total FROM panier WHERE id_client = ?");
+        $reqCart->execute([$_SESSION['user_id']]);
+        $cartCount = (int)$reqCart->fetch(PDO::FETCH_ASSOC)['total'];
+    } catch(PDOException $e) { $cartCount = 0; }
 }
-$unreadCount = count(array_filter($notifications, fn($n) => !$n['read']));
+
+// Charger les notifications non lues depuis la BD
+$notifications = [];
+$unreadCount   = 0;
+if (isset($_SESSION['user_id'])) {
+    if (!isset($pdo)) { include_once __DIR__ . '/connexion.php'; }
+    $role = $_SESSION['user_role'] ?? '';
+    $col  = ($role === 'client') ? 'id_client' : 'id_producteur';
+    if ($role === 'client' || $role === 'producteur') {
+        try {
+            $reqN = $pdo->prepare("SELECT id_notification as id, type_notification as type, message as text, date_notification, est_lu as is_read FROM notification WHERE $col = ? ORDER BY date_notification DESC LIMIT 5");
+            $reqN->execute([$_SESSION['user_id']]);
+            $notifications = $reqN->fetchAll(PDO::FETCH_ASSOC);
+            $unreadCount   = count(array_filter($notifications, fn($n) => !$n['is_read']));
+        } catch(PDOException $e) { $notifications = []; }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr" data-theme="<?php echo $theme; ?>">
@@ -498,7 +513,7 @@ $unreadCount = count(array_filter($notifications, fn($n) => !$n['read']));
                             </div>
                             <?php else: ?>
                             <?php foreach ($notifications as $n): ?>
-                            <div class="notif-item <?= !$n['read'] ? 'unread' : '' ?>"
+                            <div class="notif-item <?= !$n['is_read'] ? 'unread' : '' ?>"
                                  data-id="<?= $n['id'] ?>"
                                  onclick="markRead(this, '<?= $n['link'] ?? '#' ?>')">
                                 <div class="notif-icon <?= $n['type'] ?? 'system' ?>">
@@ -510,11 +525,11 @@ $unreadCount = count(array_filter($notifications, fn($n) => !$n['read']));
                                     } ?>"></i>
                                 </div>
                                 <div class="notif-body">
-                                    <div class="notif-title"><?= htmlspecialchars($n['title']) ?></div>
+                                    <div class="notif-title"><?= htmlspecialchars(ucfirst($n['type'] ?? 'Notification')) ?></div>
                                     <div class="notif-text"><?= htmlspecialchars($n['text']) ?></div>
-                                    <div class="notif-time"><?= htmlspecialchars($n['time']) ?></div>
+                                    <div class="notif-time"><?= isset($n['date_notification']) ? date('d/m/Y H:i', strtotime($n['date_notification'])) : '' ?></div>
                                 </div>
-                                <?php if (!$n['read']): ?>
+                                <?php if (!$n['is_read']): ?>
                                 <div class="notif-unread-dot"></div>
                                 <?php endif; ?>
                             </div>

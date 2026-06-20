@@ -7,44 +7,52 @@ if (!isset($_SESSION['user_role'])) {
     exit;
 }
 
-// Conexión BD (ajusta a tu configuración)
-// require_once 'config/db.php';
+include('connexion.php');
 
 // ── Marcar como leída via AJAX ──────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     header('Content-Type: application/json');
+    $role = $_SESSION['user_role'];
+    $uid  = $_SESSION['user_id'];
+    $col  = ($role === 'client') ? 'id_client' : 'id_producteur';
     if ($_POST['action'] === 'mark_read' && isset($_POST['id'])) {
-        // $stmt = $pdo->prepare("UPDATE notifications SET is_read=1 WHERE id=? AND user_id=?");
-        // $stmt->execute([$_POST['id'], $_SESSION['user_id']]);
+        $stmt = $pdo->prepare("UPDATE notification SET est_lu=1 WHERE id_notification=? AND $col=?");
+        $stmt->execute([$_POST['id'], $uid]);
         echo json_encode(['ok' => true]);
     } elseif ($_POST['action'] === 'mark_all') {
-        // $stmt = $pdo->prepare("UPDATE notifications SET is_read=1 WHERE user_id=?");
-        // $stmt->execute([$_SESSION['user_id']]);
+        $stmt = $pdo->prepare("UPDATE notification SET est_lu=1 WHERE $col=?");
+        $stmt->execute([$uid]);
         echo json_encode(['ok' => true]);
     } elseif ($_POST['action'] === 'delete' && isset($_POST['id'])) {
-        // $stmt = $pdo->prepare("DELETE FROM notifications WHERE id=? AND user_id=?");
-        // $stmt->execute([$_POST['id'], $_SESSION['user_id']]);
+        $stmt = $pdo->prepare("DELETE FROM notification WHERE id_notification=? AND $col=?");
+        $stmt->execute([$_POST['id'], $uid]);
         echo json_encode(['ok' => true]);
     }
     exit;
 }
 
-// ── Cargar notificaciones desde BD ──────────────────────────────────────────
-// Ejemplo real:
-// $stmt = $pdo->prepare("SELECT * FROM notifications WHERE user_id=? ORDER BY created_at DESC");
-// $stmt->execute([$_SESSION['user_id']]);
-// $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// ── Datos de demostración (reemplaza con tu consulta) ────────────────────────
-$notifications = [
-    ['id'=>1,  'type'=>'order',   'title'=>'Commande expédiée',         'text'=>'Votre commande #1042 a été expédiée et sera livrée sous 48h.',     'time'=>'Il y a 5 min',   'is_read'=>0, 'link'=>'mes-commandes.php'],
-    ['id'=>2,  'type'=>'promo',   'title'=>'Offre spéciale -20%',        'text'=>'Profitez de 20% de réduction sur tous les produits bio ce weekend.','time'=>'Il y a 1h',     'is_read'=>0, 'link'=>'produits.php'],
-    ['id'=>3,  'type'=>'message', 'title'=>'Nouveau message',            'text'=>'La boutique "Ferme du Soleil" vous a envoyé un message.',           'time'=>'Il y a 3h',     'is_read'=>0, 'link'=>'messages.php'],
-    ['id'=>4,  'type'=>'order',   'title'=>'Commande livrée',            'text'=>'Votre commande #1038 a bien été livrée. Partagez votre avis !',     'time'=>'Hier, 14h32',   'is_read'=>1, 'link'=>'mes-commandes.php'],
-    ['id'=>5,  'type'=>'system',  'title'=>'Bienvenue sur GreenMarket', 'text'=>'Votre compte a été créé avec succès. Explorez nos boutiques !',     'time'=>'12 juin',       'is_read'=>1, 'link'=>'accueil.php'],
-    ['id'=>6,  'type'=>'promo',   'title'=>'Nouveaux produits disponibles','text'=>'Découvrez les nouveaux arrivages de la saison printemps-été.',    'time'=>'10 juin',       'is_read'=>1, 'link'=>'produits.php'],
-    ['id'=>7,  'type'=>'order',   'title'=>'Paiement confirmé',          'text'=>'Le paiement de votre commande #1035 a été confirmé.',               'time'=>'8 juin',        'is_read'=>1, 'link'=>'mes-commandes.php'],
-];
+// ── Charger les notifications depuis la BD ──────────────────────────────────
+$role = $_SESSION['user_role'];
+$uid  = $_SESSION['user_id'];
+$col  = ($role === 'client') ? 'id_client' : 'id_producteur';
+try {
+    $stmt = $pdo->prepare("SELECT id_notification as id, type_notification as type, message, date_notification, est_lu as is_read FROM notification WHERE $col = ? ORDER BY date_notification DESC");
+    $stmt->execute([$uid]);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $notifications = array_map(function($n) {
+        return [
+            'id'      => $n['id'],
+            'type'    => $n['type'],
+            'title'   => ucfirst($n['type']),
+            'text'    => $n['message'],
+            'time'    => date('d M, H\hi', strtotime($n['date_notification'])),
+            'is_read' => (int)$n['is_read'],
+            'link'    => '#',
+        ];
+    }, $rows);
+} catch(PDOException $e) {
+    $notifications = [];
+}
 
 $unreadCount = count(array_filter($notifications, fn($n) => !$n['is_read']));
 $theme       = $_COOKIE['theme'] ?? 'light';

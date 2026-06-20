@@ -33,7 +33,7 @@ try {
         if ($user_data) {
             $user['nom'] = $user_data['nom_client'] ?? '';
             $user['prenom'] = $user_data['prenom_client'] ?? '';
-            $user['email'] = $user_data['email_client'] ?? '';
+            $user['email'] = $user_data['email'] ?? '';
             $user['telephone'] = $user_data['telephone_client'] ?? '';
             $user['adresse'] = $user_data['adresse_client'] ?? '';
             $user['role'] = 'client';
@@ -49,7 +49,7 @@ try {
         if ($user_data) {
             $user['nom'] = $user_data['nom_entreprise'] ?? '';
             $user['prenom'] = $user_data['nom_contact'] ?? '';
-            $user['email'] = $user_data['email_producteur'] ?? '';
+            $user['email'] = $user_data['email'] ?? '';
             $user['telephone'] = $user_data['telephone_producteur'] ?? '';
             $user['adresse'] = $user_data['adresse_producteur'] ?? '';
             $user['role'] = 'producteur';
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         
         try {
             if ($user_role === 'client') {
-                $stmt = $pdo->prepare("UPDATE client SET nom_client = ?, prenom_client = ?, email_client = ?, telephone_client = ?, adresse_client = ? WHERE id_client = ?");
+                $stmt = $pdo->prepare("UPDATE client SET nom_client = ?, prenom_client = ?, email = ?, telephone_client = ?, adresse_client = ? WHERE id_client = ?");
                 $stmt->execute([$nom, $prenom, $email, $telephone, $adresse, $user_id]);
                 
                 $user['nom'] = $nom;
@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $user['adresse'] = $adresse;
                 
             } elseif ($user_role === 'producteur') {
-                $stmt = $pdo->prepare("UPDATE producteur SET nom_entreprise = ?, nom_contact = ?, email_producteur = ?, telephone_producteur = ?, adresse_producteur = ? WHERE id_producteur = ?");
+                $stmt = $pdo->prepare("UPDATE producteur SET nom_entreprise = ?, nom_contact = ?, email = ?, telephone_producteur = ?, adresse_producteur = ? WHERE id_producteur = ?");
                 $stmt->execute([$nom, $prenom, $email, $telephone, $adresse, $user_id]);
                 
                 $user['nom'] = $nom;
@@ -144,15 +144,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $stored_password = null;
                 
                 if ($user_role === 'client') {
-                    $stmt = $pdo->prepare("SELECT mot_de_passe_client FROM client WHERE id_client = ?");
+                    $stmt = $pdo->prepare("SELECT mot_de_passe FROM client WHERE id_client = ?");
                     $stmt->execute([$user_id]);
                     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                    $stored_password = $result['mot_de_passe_client'] ?? null;
+                    $stored_password = $result['mot_de_passe'] ?? null;
                 } elseif ($user_role === 'producteur') {
-                    $stmt = $pdo->prepare("SELECT mot_de_passe_producteur FROM producteur WHERE id_producteur = ?");
+                    $stmt = $pdo->prepare("SELECT mot_de_passe FROM producteur WHERE id_producteur = ?");
                     $stmt->execute([$user_id]);
                     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                    $stored_password = $result['mot_de_passe_producteur'] ?? null;
+                    $stored_password = $result['mot_de_passe'] ?? null;
                 } elseif ($user_role === 'admin') {
                     $stmt = $pdo->prepare("SELECT mot_de_passe FROM administrateur WHERE id_admin = ?");
                     $stmt->execute([$user_id]);
@@ -164,9 +164,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $new_hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
                     
                     if ($user_role === 'client') {
-                        $stmt = $pdo->prepare("UPDATE client SET mot_de_passe_client = ? WHERE id_client = ?");
+                        $stmt = $pdo->prepare("UPDATE client SET mot_de_passe = ? WHERE id_client = ?");
                     } elseif ($user_role === 'producteur') {
-                        $stmt = $pdo->prepare("UPDATE producteur SET mot_de_passe_producteur = ? WHERE id_producteur = ?");
+                        $stmt = $pdo->prepare("UPDATE producteur SET mot_de_passe = ? WHERE id_producteur = ?");
                     } elseif ($user_role === 'admin') {
                         $stmt = $pdo->prepare("UPDATE administrateur SET mot_de_passe = ? WHERE id_admin = ?");
                     }
