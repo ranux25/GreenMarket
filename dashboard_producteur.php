@@ -10,6 +10,11 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'producteur') {
 #connexion a la base de donnees
 include('connexion.php');
 
+# 🔥 DEBUG - Verificar sesión
+$debug_info = [];
+$debug_info['session_user_id'] = $_SESSION['user_id'] ?? 'NO SET';
+$debug_info['session_user_email'] = $_SESSION['user_email'] ?? 'NO SET';
+
 #verifier si le producteur est valide
 $est_valide = $_SESSION['est_valide'] ?? 0;
 
@@ -33,13 +38,16 @@ try {
     #recuperer les informations du producteur
     $stmt = $pdo->prepare("SELECT * FROM producteur WHERE id_producteur = ?");
     $stmt->execute([$_SESSION['user_id']]);
-    $producteur = $stmt->fetch();
+    $producteur = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$producteur) {
         session_destroy();
         header('Location: signin.php');
         exit;
     }
+    
+    $debug_info['producteur_trouve'] = $producteur['nom_entreprise'] ?? 'NO';
+    $debug_info['est_valide_db'] = $producteur['est_valide_par_admin'] ?? 0;
     
     #si l'etat de validation a change, mettre a jour la session
     if ($producteur['est_valide_par_admin'] != $est_valide) {
@@ -54,6 +62,7 @@ try {
         $stmt->execute([$_SESSION['user_id']]);
         $boutiques = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $nb_boutiques = count($boutiques);
+        $debug_info['nb_boutiques'] = $nb_boutiques;
         
         #recuperer les produits des boutiques
         if (!empty($boutiques)) {
@@ -61,13 +70,15 @@ try {
             $placeholders = implode(',', array_fill(0, count($boutiqueIds), '?'));
             $stmt = $pdo->prepare("SELECT p.*, c.nom_categorie FROM produit p 
                                    LEFT JOIN categorie c ON p.id_categorie = c.id_categorie
-                                   WHERE p.id_boutique IN ($placeholders)");
+                                   WHERE p.id_boutique IN ($placeholders) AND p.est_valide_par_admin = 1");
             $stmt->execute($boutiqueIds);
             $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $nb_produits = count($produits);
+            $debug_info['nb_produits'] = $nb_produits;
         } else {
             $produits = [];
             $nb_produits = 0;
+            $debug_info['nb_produits'] = 0;
         }
         
         #recuperer les commandes des produits (groupées par commande)
@@ -76,10 +87,10 @@ try {
             $produitIds = array_column($produits, 'id_produit');
             $placeholders = implode(',', array_fill(0, count($produitIds), '?'));
             
-            // 🔥 CORREGIDO: GROUP BY id_commande para evitar duplicados
+            // 🔥 CORRIGÉ: Supprimé cl.telephone qui n'existe pas dans la table client
             $stmt = $pdo->prepare("
                 SELECT DISTINCT c.id_commande, c.date_commande, c.statut_commande, c.montant_total,
-                       cl.nom_client, cl.email, cl.telephone,
+                       cl.nom_client, cl.email,
                        (SELECT COUNT(*) FROM contenir WHERE id_commande = c.id_commande) as nb_produits
                 FROM commande c
                 JOIN client cl ON c.id_client = cl.id_client
@@ -95,10 +106,14 @@ try {
             
             #calculer le CA total
             $ca_total = array_sum(array_column($commandes, 'montant_total'));
+            $debug_info['nb_commandes'] = $nb_commandes;
+            $debug_info['ca_total'] = $ca_total;
         } else {
             $commandes = [];
             $nb_commandes = 0;
             $ca_total = 0;
+            $debug_info['nb_commandes'] = 0;
+            $debug_info['ca_total'] = 0;
         }
         
     } else {
@@ -110,6 +125,7 @@ try {
         $nb_commandes = 0;
         $nb_boutiques = 0;
         $nb_produits = 0;
+        $debug_info['est_valide'] = 0;
     }
     
 } catch(PDOException $e) {
@@ -121,6 +137,7 @@ try {
     $nb_commandes = 0;
     $nb_boutiques = 0;
     $nb_produits = 0;
+    $debug_info['error'] = $e->getMessage();
 }
 
 // Récupérer les notifications non lues pour le compteur
@@ -255,6 +272,20 @@ try {
     margin: 1.5rem;
   }
 
+  /* 🔥 DEBUG INFO */
+  .debug-info {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 2.5rem;
+    font-family: monospace;
+    font-size: 12px;
+    color: #333;
+    display: block;
+  }
+  .debug-info strong { color: #5d0d18; }
+
   .table-wrapper { overflow-x: auto; }
   table {
     width: 100%;
@@ -350,6 +381,8 @@ try {
 <body>
 
 <?php include 'header.php'; ?>
+
+<!-- 🔥 DEBUG INFO -->
 
 <!-- Mensaje de éxito al crear boutique -->
 <?php if (isset($_GET['boutique_creation']) && $_GET['boutique_creation'] == 'success'): ?>

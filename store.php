@@ -5,16 +5,16 @@ include('connexion.php');
 // Detectar tema guardado (por defecto claro)
 $theme = $_COOKIE['theme'] ?? 'light';
 
+// Verificar si el usuario es admin
+$isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
+
 // Función para normalizar URLs de imágenes
 function normalizeImageUrl($url) {
     if (empty($url)) {
         return 'IMAGES/default-boutique.jpg';
     }
-    // Reemplazar backslashes por slashes
     $url = str_replace('\\', '/', $url);
-    // Codificar espacios
     $url = str_replace(' ', '%20', $url);
-    // Si no tiene http o /, añadir ./
     if (strpos($url, 'http') !== 0 && strpos($url, '/') !== 0) {
         $url = './' . $url;
     }
@@ -36,11 +36,11 @@ try {
     $stmt->execute();
     $boutiques_db = $stmt->fetchAll();
     
-    // Récupérer toutes les catégories disponibles
+    // Récupérer toutes las categorías disponibles
     $stmt = $pdo->query("SELECT * FROM categorie ORDER BY nom_categorie");
     $categories_db = $stmt->fetchAll();
     
-    // Récupérer les statistiques
+    // Récupérer las estadísticas
     $stmt = $pdo->query("SELECT COUNT(*) as total FROM boutique b JOIN producteur p ON b.id_producteur = p.id_producteur WHERE p.est_valide_par_admin = 1");
     $total_boutiques = $stmt->fetch()['total'];
     
@@ -55,10 +55,9 @@ try {
     $total_produits = 0;
 }
 
-// Convertir les données pour le JavaScript - CORRECTION DES IMAGES
+// Convertir les données pour le JavaScript
 $boutiques_json = [];
 foreach ($boutiques_db as $b) {
-    // Normaliser l'URL de l'image
     $banner_url = normalizeImageUrl($b['image']);
     
     $boutiques_json[] = [
@@ -94,50 +93,35 @@ foreach ($boutiques_db as $b) {
 <style>
   /* ========== VARIABLES DE TEMA GLOBAL ========== */
   :root {
-    /* Colores principales */
     --primary: #5D0D18;
     --primary-light: #7a1020;
     --secondary: #9FB2AC;
     --secondary-dark: #8aa09a;
     --gold: #c07a1a;
-    
-    /* Fondos */
     --bg: #FFF9EB;
     --bg-light: #f5f0e8;
     --bg-card: #ffffff;
     --bg-input: #ffffff;
     --bg-white: #fffdf7;
-    
-    /* Textos */
     --text-dark: #2C2C2C;
     --text-light: #6B6B6B;
     --text-muted: #6B6B6B;
-    
-    /* Bordes y sombras */
     --border-color: #e8ddd0;
     --card-border: #f0e8d5;
     --shadow-color: rgba(93, 13, 24, 0.08);
     --shadow-hover: rgba(93, 13, 24, 0.14);
-    
-    /* Footer */
     --footer-bg: #3A0A10;
     --footer-text: #d4b8a0;
     --footer-link: #c4a890;
     --footer-link-hover: #ffffff;
-    
-    /* Page header */
     --page-header-bg: var(--primary);
     --page-header-text: #fff;
     --page-header-sub: rgba(255,249,235,.7);
     --page-header-border: rgba(255,249,235,.05);
     --page-header-border-top: rgba(255,249,235,.15);
-    
-    /* Search bar */
     --search-bg: #fff;
     --search-border: #e8ddd0;
     --search-input-bg: var(--bg);
-    
-    /* Sidebar */
     --sidebar-bg: #fff;
     --sidebar-border: #e8ddd0;
     --sidebar-shadow: rgba(93,13,24,0.08);
@@ -147,8 +131,6 @@ foreach ($boutiques_db as $b) {
     --category-active: rgba(93,13,24,0.05);
     --category-count-bg: #e8ddd0;
     --category-count-text: var(--text-muted);
-    
-    /* Store cards */
     --store-bg: #fff;
     --store-border: #f0e8d5;
     --store-shadow: rgba(93,13,24,0.08);
@@ -157,68 +139,49 @@ foreach ($boutiques_db as $b) {
     --store-badge-text: #fff;
     --store-stats-border: #e8ddd0;
     --store-stat-color: var(--primary);
-    
-    /* Pagination */
     --pagination-bg: #fff;
     --pagination-border: #e8ddd0;
     --pagination-text: var(--text-dark);
     --pagination-active-bg: var(--primary);
     --pagination-active-text: #fff;
-    
-    /* Toast */
     --toast-bg: var(--primary);
     --toast-text: #fff;
-    
-    /* Badges */
     --badge-text: #fff;
+    --danger: #c62828;
+    --danger-hover: #b71c1c;
   }
 
   /* ========== TEMA OSCURO BEIGE ========== */
   [data-theme="dark"] {
-    /* Colores principales */
     --primary: #8a6048;
     --primary-light: #a0785a;
     --secondary: #6d4c3a;
     --secondary-dark: #5a4a3a;
     --gold: #d4a85c;
-    
-    /* Fondos */
     --bg: #2c241e;
     --bg-light: #3d3229;
     --bg-card: #3d3229;
     --bg-input: #4d3d32;
     --bg-white: #3d3229;
-    
-    /* Textos */
     --text-dark: #f0e6d8;
     --text-light: #b8a896;
     --text-muted: #b8a896;
-    
-    /* Bordes y sombras */
     --border-color: #5a4a3a;
     --card-border: #5a4a3a;
     --shadow-color: rgba(0, 0, 0, 0.3);
     --shadow-hover: rgba(0, 0, 0, 0.4);
-    
-    /* Footer */
     --footer-bg: #1a1410;
     --footer-text: #b8a896;
     --footer-link: #b8a896;
     --footer-link-hover: #f0e6d8;
-    
-    /* Page header */
     --page-header-bg: #1a1410;
     --page-header-text: #f0e6d8;
     --page-header-sub: rgba(240,230,216,0.6);
     --page-header-border: rgba(240,230,216,0.05);
     --page-header-border-top: rgba(240,230,216,0.15);
-    
-    /* Search bar */
     --search-bg: #3d3229;
     --search-border: #5a4a3a;
     --search-input-bg: #4d3d32;
-    
-    /* Sidebar */
     --sidebar-bg: #3d3229;
     --sidebar-border: #5a4a3a;
     --sidebar-shadow: rgba(0, 0, 0, 0.3);
@@ -228,8 +191,6 @@ foreach ($boutiques_db as $b) {
     --category-active: rgba(240,230,216,0.05);
     --category-count-bg: #4d3d32;
     --category-count-text: #b8a896;
-    
-    /* Store cards */
     --store-bg: #3d3229;
     --store-border: #5a4a3a;
     --store-shadow: rgba(0, 0, 0, 0.3);
@@ -238,17 +199,15 @@ foreach ($boutiques_db as $b) {
     --store-badge-text: #f0e6d8;
     --store-stats-border: #5a4a3a;
     --store-stat-color: var(--gold);
-    
-    /* Pagination */
     --pagination-bg: #3d3229;
     --pagination-border: #5a4a3a;
     --pagination-text: #f0e6d8;
     --pagination-active-bg: #6d4c3a;
     --pagination-active-text: #f0e6d8;
-    
-    /* Toast */
     --toast-bg: #6d4c3a;
     --toast-text: #f0e6d8;
+    --danger: #ef5350;
+    --danger-hover: #c62828;
   }
 
   /* ========== STYLES UNIFIÉS ========== */
@@ -268,10 +227,6 @@ foreach ($boutiques_db as $b) {
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(40px); }
     to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
   }
 
   /* Scroll-reveal */
@@ -335,37 +290,26 @@ foreach ($boutiques_db as $b) {
     transition: background 0.2s, transform 0.2s;
   }
   .btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); }
-  .btn-outline {
-    background: transparent;
-    color: var(--primary);
-    border: 2px solid var(--primary);
-    border-radius: 999px;
-    padding: 9px 22px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.25s ease;
-  }
-  .btn-outline:hover { background: var(--primary); color: #fff; }
-  [data-theme="dark"] .btn-outline {
-    color: var(--text-dark);
-    border-color: var(--text-dark);
-  }
-  [data-theme="dark"] .btn-outline:hover {
-    background: var(--primary);
-    color: #fff;
-    border-color: var(--primary);
-  }
-  .btn-sage {
-    background: var(--secondary);
-    color: #fff;
+  
+  /* 🔥 Botón de eliminar para admin */
+  .btn-danger-admin {
+    background: var(--danger);
+    color: white;
     border: none;
-    border-radius: 999px;
-    padding: 12px 28px;
-    font-weight: 700;
+    border-radius: 6px;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.7rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
   }
-  .btn-sage:hover { background: var(--secondary-dark); transform: translateY(-2px); }
+  .btn-danger-admin:hover {
+    background: var(--danger-hover);
+    transform: scale(1.05);
+  }
 
   /* Page header */
   .page-header {
@@ -487,7 +431,14 @@ foreach ($boutiques_db as $b) {
     color: var(--text-dark);
     outline: none;
     cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 12 12'%3E%3Cpath fill='%235d0d18' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
     transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
+  [data-theme="dark"] .filter-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 12 12'%3E%3Cpath fill='%23f0e6d8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   }
   [data-theme="dark"] .filter-select option {
     background: var(--bg-input);
@@ -643,6 +594,7 @@ foreach ($boutiques_db as $b) {
     box-shadow: 0 4px 16px var(--store-shadow);
     transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
     border: 1.5px solid var(--store-border);
+    position: relative;
   }
   .store-card:hover {
     transform: translateY(-6px);
@@ -725,6 +677,34 @@ foreach ($boutiques_db as $b) {
     transition: color 0.3s ease;
   }
   .stars { color: #e0a82e; font-size: 0.7rem; }
+
+  /* 🔥 Admin delete button en la tarjeta */
+  .admin-delete-btn {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .admin-delete-btn:hover {
+    background: var(--danger-hover);
+    transform: scale(1.05);
+  }
+  [data-theme="dark"] .admin-delete-btn {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
 
   /* ====== PAGINATION STYLES ====== */
   .pagination-wrapper {
@@ -850,7 +830,9 @@ foreach ($boutiques_db as $b) {
   </div>
 </div>
 
-<!-- SEARCH BAR -->
+<!-- ============================================================ -->
+<!-- SEARCH BAR                                                   -->
+<!-- ============================================================ -->
 <div class="search-bar-wrap">
   <div class="search-input-wrapper">
     <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
@@ -858,9 +840,26 @@ foreach ($boutiques_db as $b) {
     </svg>
     <input class="search-input" id="searchInput" type="text" placeholder="Rechercher une boutique...">
   </div>
+  
+  <!-- Selector: Catégorie -->
   <select class="filter-select" id="catFilter">
     <option value="">Toutes les catégories</option>
+    <?php foreach ($categories_db as $cat): ?>
+      <option value="<?php echo htmlspecialchars($cat['nom_categorie']); ?>">
+        <?php echo htmlspecialchars($cat['nom_categorie']); ?>
+      </option>
+    <?php endforeach; ?>
   </select>
+  
+  <!-- Selector de tri -->
+  <select class="filter-select" id="sortFilter">
+    <option value="">Trier par</option>
+    <option value="name">Nom A–Z</option>
+    <option value="products">Plus de produits</option>
+    <option value="sales">Plus vendues</option>
+  </select>
+  
+  <!-- Selector: Nombre par page -->
   <select class="filter-select" id="perPageFilter">
     <option value="6">6 par page</option>
     <option value="9">9 par page</option>
@@ -876,11 +875,12 @@ foreach ($boutiques_db as $b) {
     <div class="sidebar-section reveal-left">
       <div class="sidebar-header">
         <h3>Catégories artisanales</h3>
-        <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+        <?php if ($isAdmin): ?>
           <button class="add-btn" id="toggleAddCat">➕ Ajouter</button>
         <?php endif; ?>
       </div>
       <div class="category-list" id="categoryList"></div>
+      <?php if ($isAdmin): ?>
       <div class="add-cat-form" id="addCatForm">
         <label>Nom de la catégorie</label>
         <input type="text" id="catNameInput" placeholder="Ex: Poterie, Tissage...">
@@ -891,6 +891,7 @@ foreach ($boutiques_db as $b) {
           <button class="btn-sm-wine" id="saveCat">Enregistrer</button>
         </div>
       </div>
+      <?php endif; ?>
     </div>
   </aside>
   
@@ -909,6 +910,7 @@ foreach ($boutiques_db as $b) {
 // Données PHP converties en JavaScript
 const boutiquesFromDB = <?php echo json_encode($boutiques_json); ?>;
 const categoriesFromDB = <?php echo json_encode($categories_db); ?>;
+const isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
 
 console.log('Boutiques chargées:', boutiquesFromDB.length);
 console.log('Catégories chargées:', categoriesFromDB.length);
@@ -917,7 +919,7 @@ let stores = boutiquesFromDB.length > 0 ? boutiquesFromDB : [];
 
 // ====== PAGINATION VARIABLES ======
 let currentPage = 1;
-let perPage = 12; // Valeur par défaut
+let perPage = 12;
 let filteredStores = [];
 
 // Initialiser les catégories depuis la base de données
@@ -951,11 +953,23 @@ function escapeHtml(str) {
     return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
 }
 
-function showToast(msg) {
+function showToast(msg, isError = false) {
     const toast = document.getElementById('toast');
     toast.innerHTML = msg;
+    if (isError) {
+        toast.style.background = '#c0392b';
+    } else {
+        toast.style.background = 'var(--toast-bg)';
+    }
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        if (isError) {
+            setTimeout(() => {
+                toast.style.background = 'var(--toast-bg)';
+            }, 300);
+        }
+    }, 3000);
 }
 
 function renderStars(rating) {
@@ -964,6 +978,7 @@ function renderStars(rating) {
     return '★'.repeat(full) + '☆'.repeat(empty);
 }
 
+// ====== RENDER CATEGORIES ======
 function renderCategories() {
     const list = document.getElementById('categoryList');
     if (!list) return;
@@ -1002,9 +1017,11 @@ function renderCategories() {
     });
 }
 
-// ====== FONCTION POUR FILTRER LES BOUTIQUES ======
+// ====== FILTER STORES ======
 function filterStores() {
     const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+    const sortValue = document.getElementById('sortFilter')?.value || '';
+    
     filteredStores = stores.filter(s => {
         const matchSearch = !searchTerm || 
             s.name.toLowerCase().includes(searchTerm) || 
@@ -1013,11 +1030,50 @@ function filterStores() {
         return matchSearch && matchCategory;
     });
     
+    // Tri
+    if (sortValue === 'name') {
+        filteredStores.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+    } else if (sortValue === 'products') {
+        filteredStores.sort((a, b) => (b.products || 0) - (a.products || 0));
+    } else if (sortValue === 'sales') {
+        filteredStores.sort((a, b) => (b.sales || 0) - (a.sales || 0));
+    }
+    
     document.getElementById('statStores').textContent = filteredStores.length;
-    console.log('Total boutiques filtrées:', filteredStores.length);
 }
 
-// ====== RENDU DES BOUTIQUES AVEC PAGINATION ======
+// 🔥 FUNCIÓN PARA ELIMINAR TIENDA (SOLO ADMIN)
+function deleteStoreAdmin(storeId, storeName) {
+    if (!isAdmin) {
+        showToast('❌ Non autorisé', true);
+        return;
+    }
+    
+    if (confirm('⚠️ Êtes-vous sûr de vouloir supprimer la boutique "' + storeName + '" ?\n\nCette action supprimera également tous ses produits et est irréversible.')) {
+        if (confirm('Confirmation finale : Voulez-vous vraiment supprimer cette boutique ?')) {
+            fetch('supprimer_boutique_admin.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'id_boutique=' + storeId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('✅ Boutique supprimée avec succès !');
+                    // Eliminar la tienda de la lista
+                    stores = stores.filter(s => s.id !== storeId);
+                    renderCategories();
+                    renderStores();
+                } else {
+                    showToast('❌ Erreur : ' + data.message, true);
+                }
+            })
+            .catch(() => showToast('❌ Erreur de connexion au serveur', true));
+        }
+    }
+}
+
+// ====== RENDER STORES ======
 function renderStores() {
     const grid = document.getElementById('storesGrid');
     if (!grid) return;
@@ -1026,8 +1082,6 @@ function renderStores() {
     
     const totalItems = filteredStores.length;
     const totalPages = Math.ceil(totalItems / perPage);
-    
-    console.log('Total pages:', totalPages, 'PerPage:', perPage, 'Total items:', totalItems);
     
     if (currentPage > totalPages && totalPages > 0) {
         currentPage = totalPages;
@@ -1038,43 +1092,54 @@ function renderStores() {
     const endIndex = Math.min(startIndex + perPage, totalItems);
     const pageItems = filteredStores.slice(startIndex, endIndex);
     
-    console.log('Affichage items:', startIndex, 'à', endIndex, 'sur', totalItems, 'pageItems:', pageItems.length);
-    
     if (pageItems.length === 0) {
         grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🏪</div><p>Aucune boutique trouvée.</p></div>`;
         renderPagination(0, 0);
         return;
     }
     
-    const fallbackImg = 'https://placehold.co/400x200/5D0D18/white?text=GreenMarket';
+    const fallbackImg = 'IMAGES/default-boutique.jpg';
     
-    grid.innerHTML = pageItems.map(s => `
-      <div class="store-card">
-            <div class="store-banner" onclick="window.location.href='info-store.php?id=${s.id}'">
-                <img src="${escapeHtml(s.banner || fallbackImg)}" alt="${escapeHtml(s.name)}" onerror="this.src='${fallbackImg}'">
-                ${s.badge ? `<span class="store-badge">${escapeHtml(s.badge)}</span>` : ''}
-            </div>
-            <div class="store-body">
-                <div class="store-name">${escapeHtml(s.name)}</div>
-                <span class="store-category-tag">${escapeHtml(s.categoryName)}</span>
-                <p class="store-desc">${escapeHtml((s.desc || '').substring(0, 100))}${(s.desc || '').length > 100 ? '…' : ''}</p>
-                <div class="store-stats">
-                    <div class="store-stat">
-                        <div class="stars">${renderStars(s.rating || 4.5)}</div>
-                        <span class="store-stat-label">${s.reviews || 0} avis</span>
-                    </div>
-                    <div class="store-stat">
-                        <div class="store-stat-val">${s.products || 0}</div>
-                        <span class="store-stat-label">Produits</span>
-                    </div>
-                    <div class="store-stat">
-                        <div class="store-stat-val">${typeof s.sales === 'number' ? s.sales.toLocaleString() : s.sales || '0'}</div>
-                        <span class="store-stat-label">Ventes</span>
+    grid.innerHTML = pageItems.map(s => {
+        // 🔥 Botón de eliminar solo para admin
+        let deleteBtn = '';
+        if (isAdmin) {
+            deleteBtn = `
+                <button class="admin-delete-btn" onclick="event.stopPropagation(); deleteStoreAdmin(${s.id}, '${escapeHtml(s.name)}')" title="Supprimer cette boutique">
+                    <i class="bi bi-trash3"></i> Supprimer
+                </button>
+            `;
+        }
+        
+        return `
+            <div class="store-card">
+                ${deleteBtn}
+                <div class="store-banner" onclick="window.location.href='info-store.php?id=${s.id}'">
+                    <img src="${escapeHtml(s.banner || fallbackImg)}" alt="${escapeHtml(s.name)}" onerror="this.src='${fallbackImg}'">
+                    ${s.badge ? `<span class="store-badge">${escapeHtml(s.badge)}</span>` : ''}
+                </div>
+                <div class="store-body">
+                    <div class="store-name">${escapeHtml(s.name)}</div>
+                    <span class="store-category-tag">${escapeHtml(s.categoryName)}</span>
+                    <p class="store-desc">${escapeHtml((s.desc || '').substring(0, 100))}${(s.desc || '').length > 100 ? '…' : ''}</p>
+                    <div class="store-stats">
+                        <div class="store-stat">
+                            <div class="stars">${renderStars(s.rating || 4.5)}</div>
+                            <span class="store-stat-label">${s.reviews || 0} avis</span>
+                        </div>
+                        <div class="store-stat">
+                            <div class="store-stat-val">${s.products || 0}</div>
+                            <span class="store-stat-label">Produits</span>
+                        </div>
+                        <div class="store-stat">
+                            <div class="store-stat-val">${typeof s.sales === 'number' ? s.sales.toLocaleString() : s.sales || '0'}</div>
+                            <span class="store-stat-label">Ventes</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
     
     const infoEl = document.getElementById('paginationInfo');
     if (infoEl && totalItems > 0) {
@@ -1086,7 +1151,7 @@ function renderStores() {
     renderPagination(currentPage, totalPages);
 }
 
-// ====== RENDU DE LA PAGINATION ======
+// ====== RENDER PAGINATION ======
 function renderPagination(activePage, totalPages) {
     const wrapper = document.getElementById('paginationWrapper');
     if (!wrapper) return;
@@ -1143,17 +1208,18 @@ function goToPage(page) {
     document.querySelector('.stores-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+// ====== ADD CATEGORY ======
 function addCategory() {
     const name = document.getElementById('catNameInput').value.trim();
     const icon = document.getElementById('catIconInput').value.trim() || '📦';
     
     if (!name) {
-        showToast('⚠️ Veuillez saisir un nom');
+        showToast('⚠️ Veuillez saisir un nom', true);
         return;
     }
     
     if (categories.find(c => c.name.toLowerCase() === name.toLowerCase())) {
-        showToast('⚠️ Cette catégorie existe déjà');
+        showToast('⚠️ Cette catégorie existe déjà', true);
         return;
     }
     
@@ -1179,15 +1245,15 @@ function addCategory() {
             document.getElementById('catIconInput').value = '';
             showToast('✅ Catégorie ajoutée avec succès');
         } else {
-            showToast('❌ ' + data.message);
+            showToast('❌ ' + data.message, true);
         }
     })
     .catch(error => {
-        showToast('❌ Erreur lors de l\'ajout');
+        showToast('❌ Erreur lors de l\'ajout', true);
     });
 }
 
-// Scroll reveal
+// ====== SCROLL REVEAL ======
 function initReveal() {
     const elements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
     const observer = new IntersectionObserver((entries) => {
@@ -1200,6 +1266,11 @@ function initReveal() {
 
 // ====== ÉVÉNEMENTS ======
 document.getElementById('searchInput')?.addEventListener('input', () => {
+    currentPage = 1;
+    renderStores();
+});
+
+document.getElementById('sortFilter')?.addEventListener('change', () => {
     currentPage = 1;
     renderStores();
 });
@@ -1236,7 +1307,6 @@ if (catFilter) {
 // Filtre par nombre d'éléments par page
 const perPageFilter = document.getElementById('perPageFilter');
 if (perPageFilter) {
-    // Définir la valeur initiale
     perPage = parseInt(perPageFilter.value) || 12;
     
     perPageFilter.addEventListener('change', function(e) {
