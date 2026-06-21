@@ -28,11 +28,24 @@ if (isset($_SESSION['user_id'])) {
     $col  = ($role === 'client') ? 'id_client' : 'id_producteur';
     if ($role === 'client' || $role === 'producteur') {
         try {
-            $reqN = $pdo->prepare("SELECT id_notification as id, type_notification as type, message as text, date_notification, est_lu as is_read FROM notification WHERE $col = ? ORDER BY date_notification DESC LIMIT 5");
+            $reqN = $pdo->prepare("
+                SELECT n.id_notification as id, 
+                       n.type_notification as type, 
+                       n.message as text, 
+                       n.date_notification, 
+                       n.est_lu as is_read,
+                       n.id_produit,
+                       p.nom_produit
+                FROM notification n
+                LEFT JOIN produit p ON n.id_produit = p.id_produit
+                WHERE n.$col = ? 
+                ORDER BY n.date_notification DESC 
+                LIMIT 10
+            ");
             $reqN->execute([$_SESSION['user_id']]);
             $notifications = $reqN->fetchAll(PDO::FETCH_ASSOC);
             $unreadCount   = count(array_filter($notifications, fn($n) => !$n['is_read']));
-        } catch(PDOException $e) { $notifications = []; }
+        } catch(PDOException $e) { $notifications = []; $unreadCount = 0; }
     }
 }
 
@@ -45,6 +58,43 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
         $reqBoutiques->execute([$_SESSION['user_id']]);
         $mesBoutiques = $reqBoutiques->fetchAll(PDO::FETCH_ASSOC);
     } catch(PDOException $e) { $mesBoutiques = []; }
+}
+
+// Fonction pour obtenir l'icône selon le type de notification
+function getNotifIcon($type) {
+    return match($type) {
+        'evaluation' => 'bi-star-fill',
+        'order'      => 'bi-bag-check',
+        'promo'      => 'bi-tag',
+        'message'    => 'bi-chat-dots',
+        'success'    => 'bi-check-circle',
+        'system'     => 'bi-info-circle',
+        default      => 'bi-info-circle'
+    };
+}
+
+function getNotifIconClass($type) {
+    return match($type) {
+        'evaluation' => 'evaluation',
+        'order'      => 'order',
+        'promo'      => 'promo',
+        'message'    => 'message',
+        'success'    => 'success',
+        'system'     => 'system',
+        default      => 'system'
+    };
+}
+
+function getNotifTitle($type) {
+    return match($type) {
+        'evaluation' => '⭐ Nouvelle évaluation',
+        'order'      => '🛒 Nouvelle commande',
+        'promo'      => '🎉 Promotion',
+        'message'    => '💬 Message',
+        'success'    => '✅ Succès',
+        'system'     => '📢 Information',
+        default      => '📢 Notification'
+    };
 }
 ?>
 <!DOCTYPE html>
@@ -231,7 +281,8 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
 
         .acc-drop {
             position: absolute; right: 0; top: calc(100% + 10px);
-            width: 320px;
+            width: 380px;
+            max-width: 95vw;
             background: var(--dropdown-bg);
             border-radius: 14px;
             box-shadow: 0 12px 35px var(--shadow-color);
@@ -270,7 +321,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
             padding: 0 3px;
         }
 
-        .acc-panel { display: none; flex-direction: column; }
+        .acc-panel { display: none; flex-direction: column; max-height: 450px; overflow-y: auto; }
         .acc-panel.active { display: flex; }
 
         /* Panel Compte */
@@ -351,10 +402,10 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
         .notif-mark-all:hover { opacity: .7; }
 
         .notif-list {
-            max-height: 320px; overflow-y: auto;
+            max-height: 350px; overflow-y: auto;
             display: flex; flex-direction: column;
         }
-        .notif-list::-webkit-scrollbar { width: 5px; }
+        .notif-list::-webkit-scrollbar { width: 4px; }
         .notif-list::-webkit-scrollbar-track { background: transparent; }
         .notif-list::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 3px; }
 
@@ -385,17 +436,30 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
             flex-shrink: 0;
             margin-top: 2px;
         }
+        .notif-icon.evaluation { background: rgba(192,122,26,0.15); color: var(--gold); }
         .notif-icon.order { background: rgba(93,13,24,.1); color: var(--primary); }
         .notif-icon.promo { background: rgba(192,122,26,.12); color: var(--gold); }
         .notif-icon.system { background: rgba(159,178,172,.2); color: var(--secondary); }
         .notif-icon.message { background: rgba(59,130,246,.1); color: #3b82f6; }
         .notif-icon.success { background: rgba(46,125,50,.1); color: #2e7d32; }
+        [data-theme="dark"] .notif-icon.evaluation { background: rgba(212,168,92,.15); color: var(--gold); }
         [data-theme="dark"] .notif-icon.order { background: rgba(212,168,92,.15); color: var(--gold); }
         [data-theme="dark"] .notif-icon.success { background: rgba(102,187,106,.15); color: #66bb6a; }
 
         .notif-body { flex: 1; min-width: 0; }
         .notif-title { font-size: .82rem; font-weight: 600; color: var(--dropdown-text); line-height: 1.3; margin-bottom: 2px; }
         .notif-text { font-size: .78rem; color: var(--text-light); line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+        .notif-text .stars { color: var(--gold); font-weight: 700; }
+        .notif-produit-link {
+            display: inline-block;
+            margin-top: 4px;
+            font-size: .7rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        [data-theme="dark"] .notif-produit-link { color: var(--gold); }
+        .notif-produit-link:hover { text-decoration: underline; }
         .notif-time { font-size: .65rem; color: var(--suggestions-muted); margin-top: 4px; display: flex; align-items: center; gap: 4px; }
         .notif-unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); flex-shrink: 0; margin-top: 8px; }
         [data-theme="dark"] .notif-unread-dot { background: var(--gold); }
@@ -436,7 +500,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
         .mob-btn { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(255,255,255,.08); border: none; border-radius: 10px; color: var(--header-text); font-size: 1.4rem; cursor: pointer; transition: background .2s; }
         .mob-btn:hover { background: var(--header-bg-hover); }
         .mob-menu { max-height: 0; overflow: hidden; background: var(--mobile-menu-bg); transition: max-height .35s cubic-bezier(.32,.94,.6,1); }
-        .mob-menu.open { max-height: 600px; }
+        .mob-menu.open { max-height: 700px; }
         .mob-inner { padding: 1rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: .35rem; }
         .mob-link { display: flex; align-items: center; gap: 11px; padding: .72rem 1rem; color: var(--mobile-menu-text); text-decoration: none; border-radius: 8px; font-size: .96rem; transition: background .15s; }
         .mob-link i { color: var(--secondary); font-size: 1.1rem; width: 20px; }
@@ -501,7 +565,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
         @media (max-width: 640px) {
             .logo-text { font-size: 1.25rem; }
             .logo img { height: 33px; }
-            .acc-drop { width: 290px; right: -60px; }
+            .acc-drop { width: 320px; right: -60px; }
         }
     </style>
 </head>
@@ -598,11 +662,10 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
                             
                             <?php if ($_SESSION['user_role'] === 'client'): ?>
                             <a href="mes-commandes.php"><i class="bi bi-box-seam"></i> Mes commandes</a>
-                            <!-- ===== 🔥 NOUVEAU: FAVORIS POUR CLIENT ===== -->
                             <a href="favoris.php"><i class="bi bi-heart"></i> Mes favoris</a>
                             <?php endif; ?>
                             
-                            <!-- ===== Mes boutiques pour producteur ===== -->
+                            <!-- Mes boutiques pour producteur -->
                             <?php if ($_SESSION['user_role'] === 'producteur'): ?>
                             <div class="boutique-submenu">
                                 <div class="sub-label"><i class="bi bi-shop"></i> Mes boutiques</div>
@@ -645,34 +708,33 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
                                 Aucune notification pour l'instant
                             </div>
                             <?php else: ?>
-                            <?php foreach ($notifications as $n): ?>
+                            <?php foreach ($notifications as $n): 
+                                $type = $n['type'] ?? 'system';
+                                $isEvaluation = $type === 'evaluation';
+                            ?>
                             <div class="notif-item <?= !$n['is_read'] ? 'unread' : '' ?>"
-                                 data-id="<?= $n['id'] ?>">
-                                <div class="notif-icon <?= $n['type'] ?? 'system' ?>">
-                                    <i class="bi <?= match($n['type'] ?? '') {
-                                        'order'   => 'bi-bag-check',
-                                        'promo'   => 'bi-tag',
-                                        'message' => 'bi-chat-dots',
-                                        'system'  => 'bi-info-circle',
-                                        'success' => 'bi-check-circle',
-                                        default   => 'bi-info-circle'
-                                    } ?>"></i>
+                                 data-id="<?= $n['id'] ?>"
+                                 data-link="<?= !empty($n['id_produit']) ? 'info-produit.php?id=' . $n['id_produit'] : 'notifications.php' ?>">
+                                <div class="notif-icon <?= getNotifIconClass($type) ?>">
+                                    <i class="bi <?= getNotifIcon($type) ?>"></i>
                                 </div>
                                 <div class="notif-body">
-                                    <div class="notif-title">
+                                    <div class="notif-title"><?= getNotifTitle($type) ?></div>
+                                    <div class="notif-text">
                                         <?php 
-                                        $titre = match($n['type'] ?? '') {
-                                            'order'   => '🛒 Nouvelle commande',
-                                            'promo'   => '🎉 Promotion',
-                                            'message' => '💬 Message',
-                                            'system'  => '📢 Information',
-                                            'success' => '✅ Succès',
-                                            default   => '📢 Notification'
-                                        };
-                                        echo htmlspecialchars($titre);
+                                        $message = $n['text'];
+                                        // Si es evaluación, resaltar estrellas
+                                        if ($isEvaluation) {
+                                            $message = preg_replace('/(⭐{1,5}☆{0,5})/', '<span class="stars">$1</span>', $message);
+                                        }
+                                        echo nl2br(htmlspecialchars($message));
                                         ?>
                                     </div>
-                                    <div class="notif-text"><?= nl2br(htmlspecialchars($n['text'])) ?></div>
+                                    <?php if (!empty($n['nom_produit'])): ?>
+                                    <a href="info-produit.php?id=<?= $n['id_produit'] ?>" class="notif-produit-link">
+                                        <i class="bi bi-box-seam"></i> Voir le produit
+                                    </a>
+                                    <?php endif; ?>
                                     <div class="notif-time">
                                         <i class="bi bi-clock"></i>
                                         <?= isset($n['date_notification']) ? date('d/m/Y H:i', strtotime($n['date_notification'])) : '' ?>
@@ -724,7 +786,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
             <a href="apropos.php"  class="mob-link <?= $currentPage==='apropos.php'  ? 'active':'' ?>"><i class="bi bi-info-circle"></i> À propos</a>
             <div class="mob-div"></div>
             
-            <!-- ===== Mes boutiques mobile pour producteur ===== -->
+            <!-- Mes boutiques mobile pour producteur -->
             <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'producteur'): ?>
             <div style="padding:.2rem 1rem">
                 <p class="mob-sub-label"><i class="bi bi-shop"></i> Mes boutiques</p>
@@ -746,7 +808,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
             <div class="mob-div"></div>
             <?php endif; ?>
             
-            <!-- 🔥 NOUVEAU: Favoris dans le menu mobile pour client -->
+            <!-- Favoris pour client -->
             <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'client'): ?>
             <a href="favoris.php" class="mob-link">
                 <i class="bi bi-heart" style="color:var(--gold);"></i> Mes favoris
@@ -763,6 +825,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
                 </div>
             </div>
             <div class="mob-div"></div>
+            
             <?php if (isset($_SESSION['user_role'])): ?>
             <div style="padding:.35rem 1rem">
                 <p style="font-size:.7rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em">Mon compte (<?= ucfirst($_SESSION['user_role']) ?>)</p>
@@ -850,7 +913,11 @@ function markRead(el, link) {
         if(dot) dot.remove();
         updateNotifCount(-1);
         const id = el.dataset.id;
-        if(id) fetch('mark_notification_read.php?id=' + id).catch(()=>{});
+        if(id) fetch('mark_notification_read.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'id=' + id
+        }).catch(()=>{});
     }
     if(link && link !== '#') setTimeout(() => location.href = link, 150);
 }
@@ -870,7 +937,7 @@ document.getElementById('markAllRead')?.addEventListener('click', function() {
         el.querySelector('.notif-unread-dot')?.remove();
     });
     updateNotifCount(0, true);
-    fetch('mark_all_notifications_read.php').catch(()=>{});
+    fetch('mark_all_notifications_read.php', { method: 'POST' }).catch(()=>{});
     this.remove();
     document.getElementById('tabBadge')?.remove();
 });

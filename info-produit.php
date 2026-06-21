@@ -10,6 +10,9 @@ if ($id_produit <= 0) {
     exit;
 }
 
+$isClient = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'client';
+$userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+
 // Récupérer les détails du produit
 try {
     $stmt = $pdo->prepare("
@@ -29,6 +32,49 @@ try {
     if (!$produit) {
         header('Location: produits.php?error=not_found');
         exit;
+    }
+    
+    // ===== RÉCUPÉRER LES ÉVALUATIONS =====
+    $stmtEvals = $pdo->prepare("
+        SELECT e.*, c.nom_client
+        FROM evaluer e
+        JOIN client c ON e.id_client = c.id_client
+        WHERE e.id_produit = ? AND e.est_publie = 1
+        ORDER BY e.date_evaluation DESC
+    ");
+    $stmtEvals->execute([$id_produit]);
+    $evaluaciones = $stmtEvals->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Calcular promedio de notas
+    $promedio = 0;
+    $total_eval = count($evaluaciones);
+    if ($total_eval > 0) {
+        $suma = array_sum(array_column($evaluaciones, 'note'));
+        $promedio = round($suma / $total_eval, 1);
+    }
+    
+    // Verificar si el cliente ya evaluó este producto
+    $ya_evaluado = false;
+    $evaluacion_cliente = null;
+    if ($isClient && $userId) {
+        $stmtCheck = $pdo->prepare("
+            SELECT * FROM evaluer WHERE id_client = ? AND id_produit = ?
+        ");
+        $stmtCheck->execute([$userId, $id_produit]);
+        $evaluacion_cliente = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+        $ya_evaluado = $evaluacion_cliente ? true : false;
+    }
+    
+    // Verificar si el cliente compró este producto
+    $a_achete = false;
+    if ($isClient && $userId) {
+        $stmtCheck = $pdo->prepare("
+            SELECT COUNT(*) FROM commande c
+            JOIN contenir ct ON c.id_commande = ct.id_commande
+            WHERE c.id_client = ? AND ct.id_produit = ? AND c.statut_commande = 'Livrée'
+        ");
+        $stmtCheck->execute([$userId, $id_produit]);
+        $a_achete = $stmtCheck->fetchColumn() > 0;
     }
     
     // Récupérer d'autres produits de la même boutique
@@ -71,6 +117,19 @@ function renderStars($rating = 4.5) {
     $half = ($rating - $full) >= 0.5 ? 1 : 0;
     $empty = 5 - $full - $half;
     return str_repeat('★', $full) . str_repeat('½', $half) . str_repeat('☆', $empty);
+}
+
+// Fonction pour renderStars avec taille personnalisée
+function renderStarsSize($rating, $size = '1rem') {
+    $full = floor($rating);
+    $half = ($rating - $full) >= 0.5 ? 1 : 0;
+    $empty = 5 - $full - $half;
+    $html = '<span style="color: #e0a82e; font-size: ' . $size . ';">';
+    $html .= str_repeat('★', $full);
+    if ($half) $html .= '½';
+    $html .= str_repeat('☆', $empty);
+    $html .= '</span>';
+    return $html;
 }
 ?>
 <!DOCTYPE html>
@@ -137,6 +196,8 @@ function renderStars($rating = 4.5) {
     transition: background 0.2s, transform 0.2s;
   }
   .btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  
   .btn-outline {
     background: transparent;
     color: var(--primary);
@@ -316,11 +377,55 @@ function renderStars($rating = 4.5) {
     transition: 0.4s cubic-bezier(.22,1,.36,1);
   }
   .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.error { background: #d9534f; }
+
+  /* ⭐ STYLES POUR L'ÉVALUATION */
+  .star-rating {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    gap: 0.3rem;
+  }
+  .star-rating input {
+    display: none;
+  }
+  .star-rating label {
+    font-size: 2rem;
+    color: #ddd;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .star-rating label:hover,
+  .star-rating label:hover ~ label,
+  .star-rating input:checked ~ label {
+    color: #e0a82e;
+  }
+  
+  .evaluation-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1rem;
+    border: 1px solid #e8ddd0;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s;
+  }
+  .evaluation-card:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(93,13,24,0.08);
+  }
+  
+  .evaluation-section {
+    background: #fff;
+    border-radius: 24px;
+    padding: 2rem;
+    border: 1.5px solid #e8ddd0;
+    margin-top: 3rem;
+  }
 
   @media (max-width: 768px) {
     .product-detail-container { padding: 0 1rem; }
     .product-main-image { height: 300px; }
     .product-title { font-size: 1.5rem; }
+    .evaluation-section { padding: 1rem; }
   }
 </style>
 </head>
@@ -352,8 +457,8 @@ function renderStars($rating = 4.5) {
         <h1 class="product-title"><?php echo htmlspecialchars($produit['nom_produit']); ?></h1>
         
         <div class="stars">
-          <?php echo renderStars(4.8); ?>
-          <span style="color: var(--text-light); font-size: 0.8rem;">(128 avis)</span>
+          <?php echo renderStars($promedio > 0 ? $promedio : 4.8); ?>
+          <span style="color: var(--text-light); font-size: 0.8rem;">(<?php echo $total_eval; ?> avis)</span>
         </div>
 
         <div class="product-price">
@@ -413,6 +518,109 @@ function renderStars($rating = 4.5) {
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 📝 SECTION D'ÉVALUATION                    -->
+  <!-- ========================================== -->
+  <div class="evaluation-section reveal">
+    <h2 class="text-2xl font-bold mb-6" style="color: var(--primary);">
+      <i class="bi bi-star"></i> Avis et évaluations
+    </h2>
+    
+    <!-- Statistiques des évaluations -->
+    <div class="flex items-center gap-6 mb-6 flex-wrap">
+      <div class="flex items-center gap-2">
+        <span class="text-3xl font-bold text-[var(--gold)]"><?php echo $promedio > 0 ? $promedio : '4.5'; ?></span>
+        <div>
+          <div class="stars text-xl"><?php echo renderStars($promedio > 0 ? $promedio : 4.5); ?></div>
+          <span class="text-sm text-gray-400"><?php echo $total_eval; ?> avis</span>
+        </div>
+      </div>
+      <div class="text-sm text-gray-500">
+        <i class="bi bi-check-circle text-green-500"></i>
+        <?php echo $total_eval; ?> client(s) ont évalué ce produit
+      </div>
+    </div>
+    
+    <!-- FORMULAIRE D'ÉVALUATION -->
+    <?php if ($isClient && $a_achete): ?>
+      <div class="bg-[var(--bg)] rounded-2xl p-6 border border-[#e8ddd0] mb-8">
+        <h3 class="font-bold text-lg mb-3" style="color: var(--primary);">
+          <?php echo $ya_evaluado ? '✏️ Modifier votre avis' : '⭐ Donnez votre avis'; ?>
+        </h3>
+        
+        <form id="evaluationForm" onsubmit="return submitEvaluation(event)">
+          <input type="hidden" name="id_produit" value="<?php echo $produit['id_produit']; ?>">
+          
+          <div class="mb-4">
+            <label class="block font-semibold mb-2" style="color: var(--text-dark);">Votre note :</label>
+            <div class="star-rating" id="starRating">
+              <input type="radio" name="note" id="star5" value="5" <?php echo ($ya_evaluado && isset($evaluacion_cliente['note']) && $evaluacion_cliente['note'] == 5) ? 'checked' : ''; ?>>
+              <label for="star5" title="5 étoiles">★</label>
+              
+              <input type="radio" name="note" id="star4" value="4" <?php echo ($ya_evaluado && isset($evaluacion_cliente['note']) && $evaluacion_cliente['note'] == 4) ? 'checked' : ''; ?>>
+              <label for="star4" title="4 étoiles">★</label>
+              
+              <input type="radio" name="note" id="star3" value="3" <?php echo ($ya_evaluado && isset($evaluacion_cliente['note']) && $evaluacion_cliente['note'] == 3) ? 'checked' : ''; ?>>
+              <label for="star3" title="3 étoiles">★</label>
+              
+              <input type="radio" name="note" id="star2" value="2" <?php echo ($ya_evaluado && isset($evaluacion_cliente['note']) && $evaluacion_cliente['note'] == 2) ? 'checked' : ''; ?>>
+              <label for="star2" title="2 étoiles">★</label>
+              
+              <input type="radio" name="note" id="star1" value="1" <?php echo ($ya_evaluado && isset($evaluacion_cliente['note']) && $evaluacion_cliente['note'] == 1) ? 'checked' : ''; ?>>
+              <label for="star1" title="1 étoile">★</label>
+            </div>
+            <div id="starError" class="text-red-500 text-sm mt-1 hidden">Veuillez sélectionner une note.</div>
+          </div>
+          
+          <div class="mb-4">
+            <label class="block font-semibold mb-2" style="color: var(--text-dark);">Votre commentaire :</label>
+            <textarea name="commentaire" rows="3" 
+                      class="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:border-[var(--primary)]"
+                      placeholder="Partagez votre expérience avec ce produit..."><?php echo ($ya_evaluado && isset($evaluacion_cliente['commentaire'])) ? htmlspecialchars($evaluacion_cliente['commentaire']) : ''; ?></textarea>
+          </div>
+          
+          <button type="submit" id="submitEvalBtn" class="btn-primary">
+            <?php echo $ya_evaluado ? '✏️ Mettre à jour' : '⭐ Envoyer mon avis'; ?>
+          </button>
+        </form>
+      </div>
+    <?php elseif ($isClient && !$a_achete): ?>
+      <div class="bg-yellow-50 rounded-2xl p-6 border border-yellow-200 mb-8 text-center">
+        <p class="text-gray-700">📦 Vous devez avoir acheté ce produit pour laisser un avis.</p>
+        <p class="text-sm text-gray-500 mt-1">La commande doit être <span class="font-bold text-green-600">"Livrée"</span></p>
+      </div>
+    <?php elseif (!$isClient): ?>
+      <div class="bg-yellow-50 rounded-2xl p-6 border border-yellow-200 mb-8 text-center">
+        <p class="text-gray-700">🔑 <a href="signin.php" class="text-[var(--primary)] hover:underline font-bold">Connectez-vous</a> pour laisser un avis.</p>
+      </div>
+    <?php endif; ?>
+    
+    <!-- 📋 LISTE DES ÉVALUATIONS -->
+    <div id="evaluationsList">
+      <?php if (empty($evaluaciones)): ?>
+        <div class="text-center py-8 bg-white rounded-2xl border border-[#e8ddd0]">
+          <p class="text-gray-400">Aucun avis pour ce produit pour le moment.</p>
+          <p class="text-sm text-gray-400">Soyez le premier à donner votre avis !</p>
+        </div>
+      <?php else: ?>
+        <?php foreach ($evaluaciones as $eval): ?>
+          <div class="evaluation-card">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="font-bold"><?php echo htmlspecialchars($eval['nom_client']); ?></span>
+                <span class="text-sm text-gray-400 ml-2"><?php echo date('d/m/Y', strtotime($eval['date_evaluation'])); ?></span>
+              </div>
+              <div><?php echo renderStarsSize($eval['note'], '1.2rem'); ?></div>
+            </div>
+            <?php if (!empty($eval['commentaire'])): ?>
+              <p class="text-gray-600 mt-2"><?php echo htmlspecialchars($eval['commentaire']); ?></p>
+            <?php endif; ?>
+          </div>
+        <?php endforeach; ?>
+      <?php endif; ?>
     </div>
   </div>
 
@@ -495,10 +703,11 @@ if (qtyInput) {
     });
 }
 
-// ========== PANIER ==========
-function showToast(msg) {
+// ========== TOAST ==========
+function showToast(msg, isError = false) {
     const toast = document.getElementById('toast');
     toast.textContent = msg;
+    toast.className = 'toast' + (isError ? ' error' : '');
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 2800);
 }
@@ -508,9 +717,10 @@ function updateCartCount(total) {
     if (badge && total !== undefined) badge.textContent = total;
 }
 
+// ========== PANIER ==========
 function addToCart() {
     <?php if ($stock <= 0): ?>
-    showToast('❌ Ce produit n\'est plus disponible');
+    showToast('❌ Ce produit n\'est plus disponible', true);
     return;
     <?php endif; ?>
 
@@ -525,17 +735,69 @@ function addToCart() {
             if (data.success) {
                 updateCartCount(data.total_panier);
                 showToast(`✓ <?php echo addslashes($produit['nom_produit']); ?> (x${quantity}) ajouté au panier !`);
-            } else if (data.message.includes('connecter')) {
-                showToast('⚠️ Connectez-vous pour ajouter au panier');
+            } else if (data.message && data.message.includes('connecter')) {
+                showToast('⚠️ Connectez-vous pour ajouter au panier', true);
                 setTimeout(() => { window.location.href = 'signin.php'; }, 1500);
             } else {
-                showToast('❌ ' + data.message);
+                showToast('❌ ' + (data.message || 'Erreur'), true);
             }
         })
-        .catch(() => showToast('❌ Erreur de connexion au serveur'));
+        .catch(() => showToast('❌ Erreur de connexion au serveur', true));
 }
 
 document.getElementById('addToCartBtn')?.addEventListener('click', addToCart);
+
+// ========== SOUMETTRE UNE ÉVALUATION ==========
+function submitEvaluation(event) {
+    event.preventDefault();
+    
+    const form = document.getElementById('evaluationForm');
+    const formData = new FormData(form);
+    const note = formData.get('note');
+    const id_produit = formData.get('id_produit');
+    
+    // Validation
+    if (!note) {
+        document.getElementById('starError').classList.remove('hidden');
+        showToast('⚠️ Veuillez sélectionner une note', true);
+        return false;
+    }
+    document.getElementById('starError').classList.add('hidden');
+    
+    if (!id_produit || id_produit <= 0) {
+        showToast('❌ Erreur: ID produit invalide', true);
+        return false;
+    }
+    
+    const submitBtn = document.getElementById('submitEvalBtn');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = '⏳ Envoi...';
+    
+    fetch('evaluation_produit.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('✅ ' + data.message);
+            setTimeout(() => { window.location.reload(); }, 1500);
+        } else {
+            showToast('❌ ' + (data.message || 'Erreur inconnue'), true);
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        showToast('❌ Erreur de connexion au serveur', true);
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    });
+    
+    return false;
+}
 
 // ========== SCROLL REVEAL ==========
 function initReveal() {
@@ -548,9 +810,19 @@ function initReveal() {
     elements.forEach(el => observer.observe(el));
 }
 
-// Initialisation
+// ========== INITIALISATION ==========
 updateCartCount();
 initReveal();
+
+// Log pour savoir si le formulaire existe
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('evaluationForm');
+    if (form) {
+        console.log('✅ Formulaire d\'évaluation trouvé');
+    } else {
+        console.log('ℹ️ Pas de formulaire d\'évaluation');
+    }
+});
 </script>
 </body>
 </html>

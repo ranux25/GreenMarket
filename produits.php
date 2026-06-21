@@ -1689,17 +1689,5 @@ function init() {
 document.addEventListener('DOMContentLoaded', init);
 </script>
 
-<!-- ===== BOTÓN DE DEBUG (opcional) ===== -->
-<div style="position: fixed; bottom: 80px; right: 20px; z-index: 9999; display: flex; gap: 10px;">
-    <button onclick="console.log('allProducts:', allProducts); debugProducto(75);" 
-            style="background: #333; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px;">
-        🐛 Debug ID 75
-    </button>
-    <button onclick="console.log('IDs:', allProducts.map(p => p.id));" 
-            style="background: #555; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px;">
-        📋 Mostrar IDs
-    </button>
-</div>
-
 </body>
 </html>

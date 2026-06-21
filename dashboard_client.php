@@ -1,16 +1,20 @@
 <?php
 session_start();
 
-#verifier que l'utilisateur est connecte et est client
+// Verificar que el usuario está conectado y es cliente
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'client') {
     header('Location: signin.php');
     exit;
 }
 
-#connexion a la base de donnees
+// ===== THEME ET LANGUE (COOKIES) =====
+$theme = $_COOKIE['theme'] ?? 'light';
+$lang = $_COOKIE['lang'] ?? 'fr';
+
+// Connexion à la base de données
 include('connexion.php');
 
-#recuperer les donnees du client depuis la BD
+// Récupérer les données du client depuis la BD
 try {
     $stmt = $pdo->prepare("SELECT * FROM client WHERE id_client = ?");
     $stmt->execute([$_SESSION['user_id']]);
@@ -22,19 +26,20 @@ try {
         exit;
     }
     
-    #recuperer les commandes du client
+    // Récupérer les commandes du client
     $stmt = $pdo->prepare("SELECT * FROM commande WHERE id_client = ? ORDER BY date_commande DESC");
     $stmt->execute([$_SESSION['user_id']]);
     $commandes = $stmt->fetchAll();
     
-    #recuperer les favoris
-    $stmt = $pdo->prepare("SELECT p.* FROM produit p 
+    // Récupérer les favoris
+    $stmt = $pdo->prepare("SELECT p.*, b.nom_boutique FROM produit p 
                            JOIN favoris f ON p.id_produit = f.id_produit 
+                           LEFT JOIN boutique b ON p.id_boutique = b.id_boutique
                            WHERE f.id_client = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $favoris = $stmt->fetchAll();
     
-    #recuperer les articles du panier
+    // Récupérer les articles du panier
     $stmt = $pdo->prepare("SELECT p.*, pa.quantite FROM panier pa 
                            JOIN produit p ON pa.id_produit = p.id_produit 
                            WHERE pa.id_client = ?");
@@ -42,25 +47,118 @@ try {
     $panier = $stmt->fetchAll();
     
 } catch(PDOException $e) {
-    error_log("Error dashboard client: " . $e->getMessage());
+    error_log("Erreur dashboard client: " . $e->getMessage());
     $commandes = [];
     $favoris = [];
     $panier = [];
 }
+
+// Traductions (français uniquement)
+$t = [
+    'dashboard_title' => 'Mon Espace Client',
+    'orders' => 'Mes Commandes',
+    'favorites' => 'Favoris',
+    'profile' => 'Mon Profil',
+    'settings' => 'Paramètres',
+    'no_orders' => 'Aucune commande pour le moment.',
+    'no_favorites' => 'Aucun produit favori.',
+    'order_number' => 'N° Commande',
+    'date' => 'Date',
+    'total' => 'Total',
+    'status' => 'Statut',
+    'save' => '💾 Enregistrer',
+    'saved' => '✅ Profil mis à jour avec succès !',
+    'full_name' => 'Nom complet',
+    'email' => 'Email',
+    'phone' => 'Téléphone',
+    'address' => 'Adresse',
+    'theme_light' => '☀️ Clair',
+    'theme_dark' => '🌙 Sombre',
+    'my_orders' => '📦 Mes Commandes',
+    'my_favorites' => '❤️ Mes Produits Favoris',
+    'my_profile' => '👤 Mon Profil',
+    'cart' => 'Panier',
+    'shop' => 'Boutique',
+    'price' => 'Prix',
+    'view_product' => 'Voir le produit',
+    'remove_favorite' => 'Retirer des favoris',
+    'delivered' => 'Livrée',
+    'pending' => 'En attente',
+    'confirmed' => 'Confirmée',
+    'shipped' => 'Expédiée',
+    'cancelled' => 'Annulée',
+    'theme_changed' => '✅ Thème changé en ',
+    'light' => 'clair',
+    'dark' => 'sombre'
+];
+
+// Fonction pour obtenir le badge de statut
+function getStatusBadge($status, $t) {
+    $map = [
+        'Livrée' => 'success',
+        'En attente' => 'warning',
+        'Confirmée' => 'info',
+        'Expédiée' => 'info',
+        'Annulée' => 'danger'
+    ];
+    $class = $map[$status] ?? 'info';
+    $label = $t[strtolower(str_replace(['é', 'è', 'ê'], ['e', 'e', 'e'], $status))] ?? $status;
+    return '<span class="badge badge-' . $class . '">' . htmlspecialchars($label) . '</span>';
+}
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="<?php echo $theme; ?>">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GreenMarket – Mon Espace Client</title>
+<title>GreenMarket – <?php echo $t['dashboard_title']; ?></title>
+<script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
-  /* Styles spécifiques au dashboard client */
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Lato', sans-serif; background: #fff9eb; }
+  /* ===== VARIABLES THEME ===== */
+  :root {
+    --primary: #5D0D18;
+    --primary-light: #7a1020;
+    --secondary: #9FB2AC;
+    --bg: #FFF9EB;
+    --bg-light: #f5f0e8;
+    --bg-card: #ffffff;
+    --bg-input: #ffffff;
+    --text-dark: #2C2C2C;
+    --text-light: #6B6B6B;
+    --border-color: #e8ddd0;
+    --shadow-color: rgba(93,13,24,0.1);
+    --gold: #c07a1a;
+  }
+  
+  [data-theme="dark"] {
+    --primary: #8a6048;
+    --primary-light: #a0785a;
+    --secondary: #6d4c3a;
+    --bg: #2c241e;
+    --bg-light: #3d3229;
+    --bg-card: #3d3229;
+    --bg-input: #4d3d32;
+    --text-dark: #f0e6d8;
+    --text-light: #b8a896;
+    --border-color: #5a4a3a;
+    --shadow-color: rgba(0,0,0,0.4);
+    --gold: #d4a85c;
+  }
 
+  /* ===== STYLES GENERAUX ===== */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { 
+    font-family: 'Lato', sans-serif; 
+    background: var(--bg); 
+    color: var(--text-dark);
+    transition: background 0.3s, color 0.3s;
+  }
+  
+  h1, h2, h3, .playfair { font-family: 'Playfair Display', serif; }
+
+  /* ===== DASHBOARD GRID ===== */
   .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -69,29 +167,31 @@ try {
     max-width: 1400px;
     margin: 0 auto;
   }
+  
   .stat-card {
-    background: white;
-    border: 1px solid #e8ddd0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 1.5rem;
     text-align: center;
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
   }
-  .stat-card:hover { transform: translateY(-5px); }
+  .stat-card:hover { transform: translateY(-5px); box-shadow: 0 4px 20px var(--shadow-color); }
   .stat-icon { font-size: 2rem; }
   .stat-val {
     font-family: 'Playfair Display', serif;
     font-size: 2rem;
     font-weight: 700;
-    color: #5d0d18;
+    color: var(--primary);
     margin: 0.5rem 0;
   }
   .stat-label {
     font-size: 0.8rem;
-    color: #6b5055;
+    color: var(--text-light);
     text-transform: uppercase;
   }
 
+  /* ===== TABS ===== */
   .tabs-container {
     max-width: 1400px;
     margin: 0 auto;
@@ -100,7 +200,7 @@ try {
   .tabs {
     display: flex;
     gap: 0.5rem;
-    border-bottom: 2px solid #e8ddd0;
+    border-bottom: 2px solid var(--border-color);
     flex-wrap: wrap;
   }
   .tab-btn {
@@ -109,16 +209,20 @@ try {
     background: none;
     cursor: pointer;
     font-size: 0.9rem;
-    color: #6b5055;
+    color: var(--text-light);
     transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
   }
-  .tab-btn:hover { color: #5d0d18; }
+  .tab-btn:hover { color: var(--primary); }
   .tab-btn.active {
-    color: #5d0d18;
-    border-bottom: 2px solid #5d0d18;
+    color: var(--primary);
+    border-bottom-color: var(--primary);
     font-weight: 600;
   }
+  [data-theme="dark"] .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
 
+  /* ===== MAIN CONTENT ===== */
   .main-content {
     max-width: 1400px;
     margin: 0 auto;
@@ -127,21 +231,25 @@ try {
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
 
+  /* ===== SECTION CARD ===== */
   .section-card {
-    background: white;
-    border: 1px solid #e8ddd0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     overflow: hidden;
     margin-bottom: 2rem;
+    transition: background 0.3s, border-color 0.3s;
   }
   .section-header {
-    background: #5d0d18;
+    background: var(--primary);
     color: #fff9eb;
     padding: 1rem 1.5rem;
     font-family: 'Playfair Display', serif;
     font-size: 1.2rem;
     font-weight: 600;
   }
+  [data-theme="dark"] .section-header { background: var(--primary-light); }
+  
   .badge-count {
     background: rgba(255,255,255,0.2);
     border-radius: 20px;
@@ -149,67 +257,263 @@ try {
     font-size: 0.8rem;
   }
 
+  /* ===== TABLEAU ===== */
   .table-wrapper { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; }
-  th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #e8ddd0; }
-  th { background: #fff9eb; font-weight: 600; }
-  .empty-state { text-align: center; padding: 3rem; color: #6b5055; }
+  th, td { 
+    padding: 1rem; 
+    text-align: left; 
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-dark);
+  }
+  th { 
+    background: var(--bg-light); 
+    font-weight: 600;
+    color: var(--text-dark);
+  }
+  [data-theme="dark"] th { background: var(--bg); }
+  
+  .empty-state { 
+    text-align: center; 
+    padding: 3rem; 
+    color: var(--text-light);
+  }
 
+  /* ===== BADGES ===== */
   .badge {
     padding: 0.25rem 0.65rem;
     border-radius: 4px;
     font-size: 0.75rem;
     font-weight: 600;
   }
-  .badge-success { background: #d4edda; color: #27ae60; }
-  .badge-info { background: #d1ecf1; color: #2980b9; }
+  .badge-success { background: #d4edda; color: #155724; }
+  .badge-warning { background: #fff3cd; color: #856404; }
+  .badge-info { background: #d1ecf1; color: #0c5460; }
+  .badge-danger { background: #f8d7da; color: #721c24; }
+  
+  [data-theme="dark"] .badge-success { background: #1e4620; color: #8fdf9f; }
+  [data-theme="dark"] .badge-warning { background: #4a3a1a; color: #f0d080; }
+  [data-theme="dark"] .badge-info { background: #1a3a4a; color: #80d0f0; }
+  [data-theme="dark"] .badge-danger { background: #4a1a1a; color: #f08080; }
 
+  /* ===== BOUTONS ===== */
   .btn {
-    padding: 0.4rem 0.8rem;
+    padding: 0.5rem 1rem;
     border-radius: 6px;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     border: none;
     cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
   }
-  .btn-wine { background: #5d0d18; color: white; }
-  .btn-wine:hover { background: #3e0910; }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-wine { background: var(--primary); color: white; }
+  .btn-wine:hover { background: var(--primary-light); }
+  .btn-outline-wine { 
+    background: transparent; 
+    color: var(--primary); 
+    border: 1.5px solid var(--primary);
+  }
+  .btn-outline-wine:hover { background: var(--primary); color: white; }
+  .btn-danger-outline { 
+    background: transparent; 
+    color: #c0392b; 
+    border: 1.5px solid #c0392b;
+  }
+  .btn-danger-outline:hover { background: #c0392b; color: white; }
 
+  /* ===== FORMULAIRE ===== */
   .form-group { margin-bottom: 1rem; }
   .form-group label {
     display: block;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 600;
     margin-bottom: 0.3rem;
-    color: #6b5055;
+    color: var(--text-light);
   }
   .form-control {
     width: 100%;
-    padding: 0.6rem;
-    border: 1px solid #e8ddd0;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
+    background: var(--bg-input);
+    color: var(--text-dark);
+    transition: border-color 0.2s;
+  }
+  .form-control:focus {
+    outline: none;
+    border-color: var(--primary);
   }
   .profile-form { padding: 1.5rem; }
 
+  /* ===== FAVORIS GRID ===== */
   .favorites-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 1rem;
     padding: 1.5rem;
   }
   .fav-card {
-    border: 1px solid #e8ddd0;
+    background: var(--bg);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 1rem;
     text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
   }
-  .fav-name { font-weight: 600; margin-bottom: 0.5rem; }
-  .fav-price { color: #5d0d18; font-weight: 700; }
+  .fav-card:hover { transform: translateY(-4px); box-shadow: 0 4px 15px var(--shadow-color); }
+  .fav-card .fav-img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+  }
+  .fav-card .fav-name { font-weight: 600; margin-bottom: 0.3rem; }
+  .fav-card .fav-price { color: var(--primary); font-weight: 700; }
+  .fav-card .fav-shop { font-size: 0.75rem; color: var(--text-light); }
+  .fav-card .fav-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .fav-card .fav-actions .btn { font-size: 0.7rem; padding: 0.3rem 0.6rem; }
 
+  /* ===== SETTINGS PANEL ===== */
+  .settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 1.5rem;
+  }
+  .settings-group {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 1.2rem;
+    border: 1px solid var(--border-color);
+  }
+  .settings-group h4 {
+    font-family: 'Playfair Display', serif;
+    color: var(--primary);
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+  }
+
+  /* ========================================== */
+  /* ===== TOGGLE THEME AVEC ANIMATION ===== */
+  /* ========================================== */
+  .theme-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+  }
+  .theme-toggle-label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: 500;
+  }
+  
+  /* Switch personnalisé */
+  .theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .theme-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #ccc;
+    transition: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border-radius: 34px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+  }
+  
+  .theme-slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background: white;
+    transition: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+  
+  /* Icônes dans le slider */
+  .theme-slider .slider-icons {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    padding: 0 8px;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    font-size: 14px;
+    color: #fff;
+    z-index: 1;
+  }
+  .theme-slider .slider-icons .icon-sun { opacity: 1; }
+  .theme-slider .slider-icons .icon-moon { opacity: 0.3; }
+  
+  /* État actif (dark) */
+  .theme-switch input:checked + .theme-slider {
+    background: #2c241e;
+  }
+  
+  .theme-switch input:checked + .theme-slider:before {
+    transform: translateX(26px);
+    background: #f0e6d8;
+  }
+  
+  .theme-switch input:checked + .theme-slider .slider-icons .icon-sun {
+    opacity: 0.3;
+  }
+  .theme-switch input:checked + .theme-slider .slider-icons .icon-moon {
+    opacity: 1;
+  }
+  
+  /* Animation de pulsation au clic */
+  .theme-switch input:active + .theme-slider:before {
+    width: 32px;
+  }
+  
+  /* Effet hover */
+  .theme-switch:hover .theme-slider {
+    box-shadow: 0 0 0 4px rgba(93,13,24,0.15);
+  }
+  [data-theme="dark"] .theme-switch:hover .theme-slider {
+    box-shadow: 0 0 0 4px rgba(212,168,92,0.2);
+  }
+
+  /* ===== TOAST ===== */
   .toast {
     position: fixed;
     bottom: 2rem;
     right: 2rem;
-    background: #5d0d18;
+    background: var(--primary);
     color: white;
     padding: 0.8rem 1.5rem;
     border-radius: 8px;
@@ -219,62 +523,89 @@ try {
     z-index: 9999;
   }
   .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.error { background: #c0392b; }
 
+  /* ===== RESPONSIVE ===== */
   @media (max-width: 768px) {
     .dashboard-grid, .tabs-container, .main-content { padding: 1rem; }
+    .settings-grid { grid-template-columns: 1fr; }
+    .favorites-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    .tabs .tab-btn { font-size: 0.8rem; padding: 0.5rem 0.8rem; }
+    .section-header { font-size: 1rem; padding: 0.8rem 1rem; }
+    .theme-switch { width: 50px; height: 28px; }
+    .theme-slider:before { height: 20px; width: 20px; left: 4px; bottom: 4px; }
+    .theme-switch input:checked + .theme-slider:before { transform: translateX(22px); }
+    .theme-slider .slider-icons { font-size: 11px; padding: 0 5px; }
   }
 </style>
 </head>
 <body>
 
-<!-- INCLUIR EL HEADER -->
+<!-- INCLURE LE HEADER -->
 <?php include 'header.php'; ?>
 
-<!-- DASHBOARD CONTENT -->
+<!-- ========================================== -->
+<!-- DASHBOARD STATS -->
+<!-- ========================================== -->
 <div class="dashboard-grid">
   <div class="stat-card">
     <div class="stat-icon">📦</div>
     <div class="stat-val"><?php echo count($commandes); ?></div>
-    <div class="stat-label">Commandes</div>
+    <div class="stat-label"><?php echo $t['orders']; ?></div>
   </div>
   <div class="stat-card">
     <div class="stat-icon">❤️</div>
     <div class="stat-val"><?php echo count($favoris); ?></div>
-    <div class="stat-label">Favoris</div>
+    <div class="stat-label"><?php echo $t['favorites']; ?></div>
   </div>
   <div class="stat-card">
     <div class="stat-icon">🛒</div>
     <div class="stat-val"><?php echo array_sum(array_column($panier, 'quantite')); ?></div>
-    <div class="stat-label">Panier</div>
+    <div class="stat-label"><?php echo $t['cart']; ?></div>
   </div>
 </div>
 
+<!-- ========================================== -->
+<!-- TABS -->
+<!-- ========================================== -->
 <div class="tabs-container">
   <div class="tabs">
-    <button class="tab-btn active" data-tab="commandes">📦 Mes Commandes</button>
-    <button class="tab-btn" data-tab="favoris">❤️ Favoris</button>
-    <button class="tab-btn" data-tab="profil">👤 Mon Profil</button>
+    <button class="tab-btn active" data-tab="commandes">📦 <?php echo $t['orders']; ?></button>
+    <button class="tab-btn" data-tab="favoris">❤️ <?php echo $t['favorites']; ?></button>
+    <button class="tab-btn" data-tab="profil">👤 <?php echo $t['profile']; ?></button>
+    <button class="tab-btn" data-tab="parametres">⚙️ <?php echo $t['settings']; ?></button>
   </div>
 </div>
 
+<!-- ========================================== -->
+<!-- MAIN CONTENT -->
+<!-- ========================================== -->
 <div class="main-content">
-  <!-- Onglet Commandes -->
+
+  <!-- ===== ONGLET COMMANDES ===== -->
   <div class="tab-panel active" id="tab-commandes">
     <div class="section-card">
-      <div class="section-header">📦 Mes Commandes</div>
+      <div class="section-header">📦 <?php echo $t['my_orders']; ?></div>
       <div class="table-wrapper">
         <table>
-          <thead><tr><th>N° Commande</th><th>Date</th><th>Total</th><th>Statut</th></tr></thead>
+          <thead>
+            <tr>
+              <th><?php echo $t['order_number']; ?></th>
+              <th><?php echo $t['date']; ?></th>
+              <th><?php echo $t['total']; ?></th>
+              <th><?php echo $t['status']; ?></th>
+            </tr>
+          </thead>
           <tbody>
             <?php if (empty($commandes)): ?>
-              <tr><td colspan="4" class="empty-state">Aucune commande pour le moment.</td></tr>
+              <tr><td colspan="4" class="empty-state"><?php echo $t['no_orders']; ?></td></tr>
             <?php else: ?>
               <?php foreach ($commandes as $commande): ?>
               <tr>
                 <td><strong>#<?php echo $commande['id_commande']; ?></strong></td>
                 <td><?php echo date('d/m/Y', strtotime($commande['date_commande'])); ?></td>
-                <td><strong><?php echo number_format($commande['montant_total'], 2); ?> DH</strong></td>
-                <td><span class="badge badge-<?php echo $commande['statut_commande'] === 'Livrée' ? 'success' : 'info'; ?>"><?php echo $commande['statut_commande']; ?></span></td>
+                <td><strong><?php echo number_format($commande['montant_total'], 0, ',', ' '); ?> DH</strong></td>
+                <td><?php echo getStatusBadge($commande['statut_commande'], $t); ?></td>
               </tr>
               <?php endforeach; ?>
             <?php endif; ?>
@@ -284,18 +615,31 @@ try {
     </div>
   </div>
 
-  <!-- Onglet Favoris -->
+  <!-- ===== ONGLET FAVORIS ===== -->
   <div class="tab-panel" id="tab-favoris">
     <div class="section-card">
-      <div class="section-header">❤️ Mes Produits Favoris</div>
+      <div class="section-header">❤️ <?php echo $t['my_favorites']; ?></div>
       <div class="favorites-grid">
         <?php if (empty($favoris)): ?>
-          <div class="empty-state" style="grid-column:1/-1;">Aucun produit favori.</div>
+          <div class="empty-state" style="grid-column:1/-1;"><?php echo $t['no_favorites']; ?></div>
         <?php else: ?>
           <?php foreach ($favoris as $fav): ?>
           <div class="fav-card">
+            <img src="<?php echo !empty($fav['photo_url']) ? htmlspecialchars($fav['photo_url']) : 'IMAGES/default-product.jpg'; ?>" 
+                 class="fav-img" 
+                 alt="<?php echo htmlspecialchars($fav['nom_produit']); ?>"
+                 onerror="this.src='IMAGES/default-product.jpg'">
             <div class="fav-name"><?php echo htmlspecialchars($fav['nom_produit']); ?></div>
-            <div class="fav-price"><?php echo number_format($fav['prix_unitaire'], 2); ?> DH</div>
+            <div class="fav-price"><?php echo number_format($fav['prix_unitaire'], 0, ',', ' '); ?> DH</div>
+            <div class="fav-shop">🏪 <?php echo htmlspecialchars($fav['nom_boutique'] ?? 'Boutique'); ?></div>
+            <div class="fav-actions">
+              <a href="info-produit.php?id=<?php echo $fav['id_produit']; ?>" class="btn btn-wine">
+                👁️ <?php echo $t['view_product']; ?>
+              </a>
+              <button class="btn btn-danger-outline" onclick="removeFavorite(<?php echo $fav['id_produit']; ?>)">
+                ❌ <?php echo $t['remove_favorite']; ?>
+              </button>
+            </div>
           </div>
           <?php endforeach; ?>
         <?php endif; ?>
@@ -303,24 +647,75 @@ try {
     </div>
   </div>
 
-  <!-- Onglet Profil -->
+  <!-- ===== ONGLET PROFIL ===== -->
   <div class="tab-panel" id="tab-profil">
     <div class="section-card">
-      <div class="section-header">👤 Mon Profil</div>
+      <div class="section-header">👤 <?php echo $t['my_profile']; ?></div>
       <div class="profile-form">
-        <div class="form-group"><label>Nom complet</label><input type="text" id="profileName" value="<?php echo htmlspecialchars($client['nom_client']); ?>" class="form-control"></div>
-        <div class="form-group"><label>Email</label><input type="email" id="profileEmail" value="<?php echo htmlspecialchars($client['email']); ?>" class="form-control"></div>
-        <div class="form-group"><label>Téléphone</label><input type="tel" id="profilePhone" placeholder="+212 6XX XX XX XX" class="form-control"></div>
-        <div class="form-group"><label>Adresse</label><textarea id="profileAddress" rows="3" class="form-control" placeholder="Votre adresse complète"></textarea></div>
-        <button class="btn btn-wine" onclick="saveProfile()">💾 Enregistrer</button>
+        <form id="profileForm" onsubmit="return saveProfile(event)">
+          <div class="form-group">
+            <label><?php echo $t['full_name']; ?></label>
+            <input type="text" id="profileName" name="nom_client" value="<?php echo htmlspecialchars($client['nom_client']); ?>" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label><?php echo $t['email']; ?></label>
+            <input type="email" id="profileEmail" name="email" value="<?php echo htmlspecialchars($client['email']); ?>" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label><?php echo $t['phone']; ?></label>
+            <input type="tel" id="profilePhone" name="telephone" placeholder="+212 6XX XX XX XX" class="form-control" value="<?php echo htmlspecialchars($client['telephone'] ?? ''); ?>">
+          </div>
+          <div class="form-group">
+            <label><?php echo $t['address']; ?></label>
+            <textarea id="profileAddress" name="adresse" rows="3" class="form-control" placeholder="Votre adresse complète"><?php echo htmlspecialchars($client['adresse'] ?? ''); ?></textarea>
+          </div>
+          <button type="submit" class="btn btn-wine">💾 <?php echo $t['save']; ?></button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ONGLET PARAMÈTRES ===== -->
+  <div class="tab-panel" id="tab-parametres">
+    <div class="section-card">
+      <div class="section-header">⚙️ <?php echo $t['settings']; ?></div>
+      <div class="settings-grid">
+        
+        <!-- ===== THEME TOGGLE AVEC ANIMATION ===== -->
+        <div class="settings-group">
+          <h4>🎨 <?php echo $t['theme_light']; ?> / <?php echo $t['theme_dark']; ?></h4>
+          <div class="theme-toggle-wrapper">
+            <span class="theme-toggle-label">☀️ <?php echo $t['theme_light']; ?></span>
+            <label class="theme-switch">
+              <input type="checkbox" id="themeToggle" <?php echo $theme === 'dark' ? 'checked' : ''; ?> onchange="toggleTheme()">
+              <span class="theme-slider">
+                <span class="slider-icons">
+                  <span class="icon-sun">☀️</span>
+                  <span class="icon-moon">🌙</span>
+                </span>
+              </span>
+            </label>
+            <span class="theme-toggle-label">🌙 <?php echo $t['theme_dark']; ?></span>
+          </div>
+          <p style="font-size:0.75rem;color:var(--text-light);margin-top:0.5rem;">
+            <?php echo $theme === 'dark' ? '🌙 Mode sombre activé' : '☀️ Mode clair activé'; ?>
+          </p>
+        </div>
+        
       </div>
     </div>
   </div>
 </div>
 
+<!-- ========================================== -->
+<!-- TOAST -->
+<!-- ========================================== -->
 <div class="toast" id="toast"></div>
 
 <script>
+// ============================================
+// TABS
+// ============================================
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', function() {
     const tabName = this.getAttribute('data-tab');
@@ -331,16 +726,103 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-function showToast(msg) {
+// ============================================
+// TOAST
+// ============================================
+function showToast(msg, isError = false) {
   const toast = document.getElementById('toast');
   toast.innerHTML = msg;
+  toast.className = 'toast' + (isError ? ' error' : '');
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-function saveProfile() {
-  showToast('✅ Profil mis à jour avec succès !');
+// ============================================
+// SAUVEGARDER PROFIL
+// ============================================
+function saveProfile(event) {
+  event.preventDefault();
+  
+  const formData = new FormData(document.getElementById('profileForm'));
+  
+  fetch('update_client_profile.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      showToast('<?php echo $t['saved']; ?>');
+    } else {
+      showToast('❌ ' + (data.message || 'Erreur'), true);
+    }
+  })
+  .catch(error => {
+    showToast('❌ Erreur de connexion', true);
+  });
+  
+  return false;
 }
+
+// ============================================
+// SUPPRIMER FAVORI
+// ============================================
+function removeFavorite(productId) {
+  if (!confirm('❌ Supprimer ce produit de vos favoris ?')) return;
+  
+  fetch('remove_favorite.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'id_produit=' + productId
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      showToast('✅ Produit retiré des favoris');
+      setTimeout(() => location.reload(), 1000);
+    } else {
+      showToast('❌ ' + (data.message || 'Erreur'), true);
+    }
+  })
+  .catch(error => {
+    showToast('❌ Erreur de connexion', true);
+  });
+}
+
+// ============================================
+// TOGGLE THEME AVEC ANIMATION
+// ============================================
+function toggleTheme() {
+  const checkbox = document.getElementById('themeToggle');
+  const theme = checkbox.checked ? 'dark' : 'light';
+  
+  // Sauvegarder dans un cookie
+  document.cookie = 'theme=' + theme + '; path=/; max-age=31536000';
+  
+  // Appliquer le thème immédiatement
+  document.documentElement.setAttribute('data-theme', theme);
+  
+  // Mettre à jour le texte de statut
+  const statusText = document.querySelector('.settings-group p');
+  if (statusText) {
+    statusText.textContent = theme === 'dark' ? '🌙 Mode sombre activé' : '☀️ Mode clair activé';
+  }
+  
+  // Afficher le message
+  const themeName = theme === 'light' ? 'clair' : 'sombre';
+  showToast('✅ Thème changé en ' + themeName);
+  
+  // Recharger la page pour appliquer les changements dans le header également
+  setTimeout(() => location.reload(), 600);
+}
+
+// ============================================
+// INIT - Appliquer le thème au chargement
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+  const theme = '<?php echo $theme; ?>';
+  document.documentElement.setAttribute('data-theme', theme);
+});
 </script>
 </body>
 </html>
