@@ -48,12 +48,26 @@ try {
     $stmt = $pdo->query("SELECT COUNT(*) as total FROM produit WHERE est_valide_par_admin = 1");
     $total_produits = $stmt->fetch()['total'];
     
+    // 🔥 Si el cliente está conectado, obtener sus favoritos de boutiques
+    $favoris_boutiques_ids = [];
+    if ($isClient) {
+        try {
+            $stmtFav = $pdo->prepare("SELECT id_boutique FROM favoris_boutique WHERE id_client = ?");
+            $stmtFav->execute([$_SESSION['user_id']]);
+            $favoris_boutiques_ids = $stmtFav->fetchAll(PDO::FETCH_COLUMN);
+        } catch(PDOException $e) {
+            error_log("Error favoris boutique: " . $e->getMessage());
+            $favoris_boutiques_ids = [];
+        }
+    }
+    
 } catch(PDOException $e) {
     error_log("Error store: " . $e->getMessage());
     $boutiques_db = [];
     $categories_db = [];
     $total_boutiques = 0;
     $total_produits = 0;
+    $favoris_boutiques_ids = [];
 }
 
 // Convertir les données pour le JavaScript
@@ -78,7 +92,8 @@ foreach ($boutiques_db as $b) {
         'producerId' => $b['id_producteur'],
         'producerName' => $b['producteur_nom'],
         'location' => 'Maroc',
-        'since' => date('Y', strtotime($b['date_creation']))
+        'since' => date('Y', strtotime($b['date_creation'])),
+        'isFavori' => in_array($b['id_boutique'], $favoris_boutiques_ids) // 🔥 Estado del favorito
     ];
 }
 ?>
@@ -860,6 +875,13 @@ const isClient = <?php echo $isClient ? 'true' : 'false'; ?>;
 
 console.log('Boutiques chargées:', boutiquesFromDB.length);
 console.log('Catégories chargées:', categoriesFromDB.length);
+console.log('isClient:', isClient);
+
+// 🔥 Mostrar estado de favoritos en consola
+if (isClient) {
+    const favoris = boutiquesFromDB.filter(s => s.isFavori).map(s => s.id);
+    console.log('Boutiques favoris ID:', favoris);
+}
 
 let stores = boutiquesFromDB.length > 0 ? boutiquesFromDB : [];
 
@@ -896,7 +918,7 @@ let currentCategory = null;
 
 function escapeHtml(str) {
     if (!str) return '';
-    return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
 }
 
 function showToast(msg, isError = false) {
@@ -939,9 +961,11 @@ function toggleFavoriBoutique(boutiqueId, button) {
     if (isFavori) {
         icon.className = 'bi bi-heart';
         button.style.color = 'var(--text-light)';
+        button.classList.remove('active');
     } else {
         icon.className = 'bi bi-heart-fill';
         button.style.color = '#c0392b';
+        button.classList.add('active');
     }
     
     fetch('toggle_favori_boutique.php', {
@@ -955,20 +979,30 @@ function toggleFavoriBoutique(boutiqueId, button) {
             if (data.action === 'added') {
                 icon.className = 'bi bi-heart-fill';
                 button.style.color = '#c0392b';
+                button.classList.add('active');
                 showToast('❤️ Boutique ajoutée aux favoris');
+                // Actualizar el estado en el array
+                const store = stores.find(s => s.id === boutiqueId);
+                if (store) store.isFavori = true;
             } else {
                 icon.className = 'bi bi-heart';
                 button.style.color = 'var(--text-light)';
+                button.classList.remove('active');
                 showToast('Boutique retirée des favoris');
+                // Actualizar el estado en el array
+                const store = stores.find(s => s.id === boutiqueId);
+                if (store) store.isFavori = false;
             }
         } else {
             // Revertir si hay error
             if (isFavori) {
                 icon.className = 'bi bi-heart-fill';
                 button.style.color = '#c0392b';
+                button.classList.add('active');
             } else {
                 icon.className = 'bi bi-heart';
                 button.style.color = 'var(--text-light)';
+                button.classList.remove('active');
             }
             showToast('❌ ' + data.message, true);
         }
@@ -978,9 +1012,11 @@ function toggleFavoriBoutique(boutiqueId, button) {
         if (isFavori) {
             icon.className = 'bi bi-heart-fill';
             button.style.color = '#c0392b';
+            button.classList.add('active');
         } else {
             icon.className = 'bi bi-heart';
             button.style.color = 'var(--text-light)';
+            button.classList.remove('active');
         }
         showToast('❌ Erreur de connexion', true);
     });
@@ -1116,11 +1152,13 @@ function renderStores() {
             `;
         }
         
+        // 🔥 Botón de favoritos con estado inicial desde PHP
         let favoriBtn = '';
         if (isClient) {
+            const isFavori = s.isFavori || false;
             favoriBtn = `
-                <button class="favori-btn" onclick="event.stopPropagation(); toggleFavoriBoutique(${s.id}, this)" title="Ajouter aux favoris">
-                    <i class="bi bi-heart"></i>
+                <button class="favori-btn ${isFavori ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavoriBoutique(${s.id}, this)" title="${isFavori ? 'Retirer des favoris' : 'Ajouter aux favoris'}">
+                    <i class="bi ${isFavori ? 'bi-heart-fill' : 'bi-heart'}"></i>
                 </button>
             `;
         }

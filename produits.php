@@ -17,7 +17,7 @@ try {
                c.nom_categorie, c.id_categorie
         FROM produit p
         JOIN boutique b ON p.id_boutique = b.id_boutique
-        JOIN categorie c ON p.id_categorie = c.id_categorie
+        LEFT JOIN categorie c ON p.id_categorie = c.id_categorie
         WHERE p.est_valide_par_admin = 1 
         AND p.statut_publie = 'Publié'
         ORDER BY p.date_creation DESC
@@ -62,6 +62,60 @@ try {
     $favoris_ids = [];
 }
 
+// ====== DEBUG: Verificar producto 75 ======
+error_log("=== DEBUG PRODUCTO 75 ===");
+
+// 1. Verificar si el producto existe en la base de datos
+try {
+    $stmtDebug = $pdo->prepare("SELECT * FROM produit WHERE id_produit = 75");
+    $stmtDebug->execute();
+    $producto75 = $stmtDebug->fetch(PDO::FETCH_ASSOC);
+    
+    if ($producto75) {
+        error_log("✅ Producto 75 encontrado en BD:");
+        error_log("  - est_valide_par_admin: " . $producto75['est_valide_par_admin']);
+        error_log("  - statut_publie: " . $producto75['statut_publie']);
+        error_log("  - id_boutique: " . $producto75['id_boutique']);
+        error_log("  - id_categorie: " . $producto75['id_categorie']);
+        
+        // Verificar boutique
+        $stmtB = $pdo->prepare("SELECT * FROM boutique WHERE id_boutique = ?");
+        $stmtB->execute([$producto75['id_boutique']]);
+        $boutique = $stmtB->fetch(PDO::FETCH_ASSOC);
+        if ($boutique) {
+            error_log("  ✅ Boutique encontrada: " . $boutique['nom_boutique']);
+            error_log("  - est_valide_par_admin: " . $boutique['est_valide_par_admin']);
+        } else {
+            error_log("  ❌ Boutique NO encontrada para id_boutique: " . $producto75['id_boutique']);
+        }
+        
+        // Verificar categoría
+        $stmtC = $pdo->prepare("SELECT * FROM categorie WHERE id_categorie = ?");
+        $stmtC->execute([$producto75['id_categorie']]);
+        $categoria = $stmtC->fetch(PDO::FETCH_ASSOC);
+        if ($categoria) {
+            error_log("  ✅ Categoría encontrada: " . $categoria['nom_categorie']);
+        } else {
+            error_log("  ❌ Categoría NO encontrada para id_categorie: " . $producto75['id_categorie']);
+        }
+    } else {
+        error_log("❌ Producto 75 NO existe en la BD");
+    }
+} catch(Exception $e) {
+    error_log("Error debug: " . $e->getMessage());
+}
+
+// 2. Verificar qué productos se cargaron
+$ids_cargados = array_column($produits_db, 'id_produit');
+error_log("IDs de productos cargados: " . implode(', ', $ids_cargados));
+error_log("Total: " . count($produits_db));
+
+if (in_array(75, $ids_cargados)) {
+    error_log("✅ Producto 75 ESTÁ en la lista de productos cargados");
+} else {
+    error_log("❌ Producto 75 NO ESTÁ en la lista de productos cargados");
+}
+
 // Formater les produits pour le JavaScript
 $produits_json = [];
 foreach ($produits_db as $p) {
@@ -76,11 +130,24 @@ foreach ($produits_db as $p) {
         'description' => $p['description'] ?? 'Produit artisanal marocain de qualité',
         'shopId' => $p['id_boutique'],
         'shopName' => $p['nom_boutique'],
-        'category' => $p['nom_categorie'],
+        'category' => $p['nom_categorie'] ?? 'Sans catégorie',
         'categoryId' => $p['id_categorie'],
         'isFavori' => in_array($p['id_produit'], $favoris_ids)
     ];
 }
+
+// ====== GUARDAR VARIABLES ANTES DEL HEADER ======
+$header_guard = [
+    'produits_json' => $produits_json,
+    'isAdmin' => $isAdmin,
+    'isClient' => $isClient,
+    'total_produits' => $total_produits,
+    'total_boutiques' => $total_boutiques,
+    'panier_count' => $panier_count,
+    'favoris_ids' => $favoris_ids,
+    'categories_db' => $categories_db,
+    'theme' => $theme
+];
 ?>
 <!DOCTYPE html>
 <html lang="fr" data-theme="<?php echo $theme; ?>">
@@ -868,7 +935,23 @@ foreach ($produits_db as $p) {
 </head>
 <body data-active-page="produits">
 
-<?php include 'header.php'; ?>
+<?php 
+// ====== RESTAURAR VARIABLES DESPUÉS DEL HEADER ======
+// El header se incluye aquí, pero como ya tenemos las variables guardadas,
+// las restauramos después de incluirlo
+include 'header.php';
+
+// Restaurar variables (por si el header las modificó)
+$produits_json = $header_guard['produits_json'];
+$isAdmin = $header_guard['isAdmin'];
+$isClient = $header_guard['isClient'];
+$total_produits = $header_guard['total_produits'];
+$total_boutiques = $header_guard['total_boutiques'];
+$panier_count = $header_guard['panier_count'];
+$favoris_ids = $header_guard['favoris_ids'];
+$categories_db = $header_guard['categories_db'];
+$theme = $header_guard['theme'];
+?>
 
 <!-- PAGE HEADER -->
 <div class="page-header">
@@ -963,6 +1046,7 @@ const categoriesFromDB = <?php echo json_encode($categories_db); ?>;
 const isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
 const isClient = <?php echo $isClient ? 'true' : 'false'; ?>;
 
+console.log('=== 🔍 INICIO DE DEPURACIÓN ===');
 console.log('isClient:', isClient);
 console.log('Produits chargés:', produitsFromDB.length);
 
@@ -970,6 +1054,52 @@ let allProducts = produitsFromDB;
 let filteredProducts = [];
 let activeCategory = null;
 let deleteProductId = null;
+
+// ====== SISTEMA DE DEPURACIÓN COMPLETO ======
+console.log('📦 Total productos en allProducts:', allProducts.length);
+console.log('🔑 IDs de productos cargados:', allProducts.map(p => p.id));
+
+// Buscar producto ID 75
+const productoBuscado = 75;
+const productoEncontrado = allProducts.find(p => p.id === productoBuscado);
+
+if (productoEncontrado) {
+    console.log('✅ PRODUCTO 75 ENCONTRADO:', productoEncontrado);
+    console.log('   Nombre:', productoEncontrado.name);
+    console.log('   Stock:', productoEncontrado.stock);
+    console.log('   Precio:', productoEncontrado.price);
+} else {
+    console.error('❌ PRODUCTO 75 NO ENCONTRADO en allProducts');
+    console.log('📋 IDs disponibles:', allProducts.map(p => p.id));
+    console.log('💡 Posibles causas:');
+    console.log('   1. El producto no está publicado (statut_publie != "Publié")');
+    console.log('   2. El producto no está validado por admin (est_valide_par_admin != 1)');
+    console.log('   3. La boutique o categoría no existen o no están validadas');
+    console.log('   4. El ID 75 no existe en la base de datos');
+    console.log('💡 Revisa el error_log de PHP para más información');
+}
+
+// Mostrar primeros 5 productos para ejemplo
+console.log('📝 Primeros 5 productos cargados:');
+allProducts.slice(0, 5).forEach((p, i) => {
+    console.log(`   ${i+1}. ID:${p.id} - ${p.name} (${p.category})`);
+});
+
+// ====== FUNCIÓN DE DEBUG PARA PROBAR ======
+window.debugProducto = function(id) {
+    console.log(`🔍 Buscando producto ID ${id}...`);
+    const p = allProducts.find(item => item.id === id);
+    if (p) {
+        console.log('✅ Encontrado:', p);
+        return p;
+    } else {
+        console.error('❌ No encontrado. IDs disponibles:', allProducts.map(item => item.id));
+        return null;
+    }
+};
+
+console.log('💡 Para buscar un producto específico, usa: debugProducto(75)');
+console.log('=== 🔍 FIN DE DEPURACIÓN ===');
 
 // ====== PAGINATION VARIABLES ======
 let currentPage = 1;
@@ -1035,35 +1165,86 @@ function updateCartCount() {
     if (badge) badge.textContent = panierCount;
 }
 
-function addToCart(product) {
-    const userRole = '<?php echo $_SESSION['user_role'] ?? ''; ?>';
-    if (userRole !== 'client') {
-        showToast('Veuillez vous connecter en tant que client', true);
+// ========== ADD TO CART (VERSIÓN CORREGIDA) ==========
+function addToCart(productId, productName) {
+    console.log('🛒 === addToCart llamado ===');
+    console.log('📌 ID recibido:', productId, '(tipo:', typeof productId, ')');
+    console.log('📌 Nombre recibido:', productName);
+    console.log('📦 allProducts contiene', allProducts.length, 'productos');
+    
+    // Verificar sesión
+    <?php if (!isset($_SESSION['user_id'])): ?>
+        showToast('⚠️ Veuillez vous connecter pour ajouter au panier', true);
+        setTimeout(() => { window.location.href = 'signin.php'; }, 1500);
+        return;
+    <?php endif; ?>
+    
+    <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'client'): ?>
+        showToast('⚠️ Seuls les clients peuvent acheter', true);
+        return;
+    <?php endif; ?>
+    
+    // 🔥 Buscar el producto - CONVERSIÓN A NÚMERO PARA COMPARACIÓN
+    const product = allProducts.find(p => parseInt(p.id) === parseInt(productId));
+    
+    if (!product) {
+        console.error('❌ Producto no encontrado. ID buscado:', productId);
+        console.log('🔑 IDs disponibles:', allProducts.map(p => p.id));
+        console.log('🔍 Comparación:', parseInt(productId), 'vs', allProducts.map(p => parseInt(p.id)));
+        showToast('❌ Produit non disponible (ID: ' + productId + ')', true);
         return;
     }
-
+    
+    console.log('✅ Producto encontrado:', product);
+    
     if (product.stock <= 0) {
         showToast('❌ Produit en rupture de stock', true);
         return;
     }
-
+    
+    // Deshabilitar botones
+    const buttons = document.querySelectorAll('.add-cart-btn');
+    buttons.forEach(btn => {
+        if (btn.textContent.includes('Ajouter') || btn.textContent.includes('🛒')) {
+            btn.textContent = '⏳...';
+            btn.disabled = true;
+        }
+    });
+    
+    const formData = new FormData();
+    formData.append('id_produit', productId);
+    formData.append('quantite', 1);
+    
     fetch('ajouter_panier.php', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'id_produit=' + encodeURIComponent(product.id) + '&quantite=1'
+        body: formData
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
+        // Reactivar botones
+        buttons.forEach(btn => {
+            btn.textContent = '🛒 Ajouter';
+            btn.disabled = false;
+        });
+        
         if (data.success) {
-            panierCount = data.total_panier;
-            const badge = document.getElementById('cart-count');
-            if (badge) badge.textContent = data.total_panier;
             showToast(`✓ ${product.name} ajouté au panier !`);
+            const badge = document.getElementById('cart-count');
+            if (badge && data.total_panier !== undefined) {
+                badge.textContent = data.total_panier;
+                panierCount = data.total_panier;
+            }
         } else {
-            showToast(data.message || '❌ Erreur lors de l\'ajout au panier', true);
+            showToast(data.message || '❌ Erreur lors de l\'ajout', true);
         }
     })
-    .catch(() => showToast('❌ Erreur de connexion au serveur', true));
+    .catch(error => {
+        buttons.forEach(btn => {
+            btn.textContent = '🛒 Ajouter';
+            btn.disabled = false;
+        });
+        showToast('❌ Erreur de connexion au serveur', true);
+    });
 }
 
 function getStockClass(stock) {
@@ -1080,7 +1261,6 @@ function getStockText(stock) {
 
 // ========== TOGGLE FAVORI PRODUIT ==========
 function toggleFavoriProduit(productId, button) {
-    // Verificar si el usuario es cliente
     <?php if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'client'): ?>
         showToast('⚠️ Veuillez vous connecter en tant que client', true);
         setTimeout(() => { window.location.href = 'signin.php'; }, 1500);
@@ -1090,7 +1270,6 @@ function toggleFavoriProduit(productId, button) {
     const icon = button.querySelector('i');
     const isFavori = icon.classList.contains('bi-heart-fill');
     
-    // Cambio optimista
     if (isFavori) {
         icon.className = 'bi bi-heart';
         button.style.color = 'var(--text-light)';
@@ -1120,13 +1299,11 @@ function toggleFavoriProduit(productId, button) {
                 button.classList.remove('active');
                 showToast('Produit retiré des favoris');
             }
-            // Actualizar el estado en el array de productos
             const product = allProducts.find(p => p.id === productId);
             if (product) {
                 product.isFavori = data.action === 'added';
             }
         } else {
-            // Revertir si hay error
             if (isFavori) {
                 icon.className = 'bi bi-heart-fill';
                 button.style.color = '#c0392b';
@@ -1140,7 +1317,6 @@ function toggleFavoriProduit(productId, button) {
         }
     })
     .catch(() => {
-        // Revertir si hay error de conexión
         if (isFavori) {
             icon.className = 'bi bi-heart-fill';
             button.style.color = '#c0392b';
@@ -1214,7 +1390,6 @@ function filterProducts() {
         return matchSearch && matchCategory;
     });
     
-    // Tri
     if (sortValue === 'price_asc') {
         filteredProducts.sort((a, b) => a.prix_numerique - b.prix_numerique);
     } else if (sortValue === 'price_desc') {
@@ -1223,7 +1398,6 @@ function filterProducts() {
         filteredProducts.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
     }
     
-    // Mettre à jour les statistiques
     document.getElementById('statProducts').textContent = filteredProducts.length;
 }
 
@@ -1264,7 +1438,6 @@ function renderProducts() {
         const stockText = getStockText(p.stock);
         const isOutOfStock = p.stock <= 0;
         
-        // 🔥 Botón de favoritos (solo para clientes)
         let favoriBtn = '';
         if (isClient) {
             const isFavori = p.isFavori || false;
@@ -1284,7 +1457,7 @@ function renderProducts() {
             `;
         } else {
             buttons = `
-                <button class="add-cart-btn" onclick='addToCart(${JSON.stringify(p)})' ${isOutOfStock ? 'disabled' : ''}>
+                <button class="add-cart-btn" onclick="addToCart(${p.id}, '${escapeHtml(p.name)}')" ${isOutOfStock ? 'disabled' : ''}>
                     🛒 ${isOutOfStock ? 'Rupture' : 'Ajouter'}
                 </button>
             `;
@@ -1473,7 +1646,6 @@ document.getElementById('sortFilter')?.addEventListener('change', () => {
     renderProducts();
 });
 
-// Filtre par catégorie
 const catFilter = document.getElementById('catFilter');
 if (catFilter) {
     catFilter.addEventListener('change', (e) => {
@@ -1484,7 +1656,6 @@ if (catFilter) {
     });
 }
 
-// Filtre par nombre d'éléments par page
 const perPageFilter = document.getElementById('perPageFilter');
 if (perPageFilter) {
     perPage = parseInt(perPageFilter.value) || 12;
@@ -1495,7 +1666,6 @@ if (perPageFilter) {
     });
 }
 
-// Admin: toggle add category form
 document.getElementById('toggleAddCat')?.addEventListener('click', () => {
     document.getElementById('addCatForm').classList.toggle('open');
 });
@@ -1516,8 +1686,20 @@ function init() {
     initReveal();
 }
 
-// Démarrer
 document.addEventListener('DOMContentLoaded', init);
 </script>
+
+<!-- ===== BOTÓN DE DEBUG (opcional) ===== -->
+<div style="position: fixed; bottom: 80px; right: 20px; z-index: 9999; display: flex; gap: 10px;">
+    <button onclick="console.log('allProducts:', allProducts); debugProducto(75);" 
+            style="background: #333; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px;">
+        🐛 Debug ID 75
+    </button>
+    <button onclick="console.log('IDs:', allProducts.map(p => p.id));" 
+            style="background: #555; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px;">
+        📋 Mostrar IDs
+    </button>
+</div>
+
 </body>
 </html>

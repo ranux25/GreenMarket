@@ -1,6 +1,6 @@
 <?php
 session_start();
-include("connexion.php");
+include('connexion.php');
 
 header('Content-Type: application/json');
 
@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'client') {
 }
 
 $id_client = $_SESSION['user_id'];
-$id_produit = $_POST['id_produit'] ?? 0;
+$id_produit = intval($_POST['id_produit'] ?? 0);
 $quantite = max(1, intval($_POST['quantite'] ?? 1));
 
 if (!$id_produit) {
@@ -21,25 +21,44 @@ if (!$id_produit) {
 
 try {
     // Vérifier que le produit existe et est disponible
-    $reqProd = $pdo->prepare("SELECT stock_quantite FROM produit WHERE id_produit = ? AND est_valide_par_admin = 1");
+    $reqProd = $pdo->prepare("
+        SELECT id_produit, nom_produit, stock_quantite, est_valide_par_admin, statut_publie 
+        FROM produit 
+        WHERE id_produit = ?
+    ");
     $reqProd->execute([$id_produit]);
-    $produit = $reqProd->fetch();
+    $produit = $reqProd->fetch(PDO::FETCH_ASSOC);
 
     if (!$produit) {
+        echo json_encode(['success' => false, 'message' => 'Produit non trouvé']);
+        exit();
+    }
+
+    if ($produit['est_valide_par_admin'] != 1) {
+        echo json_encode(['success' => false, 'message' => 'Produit non disponible (en attente de validation)']);
+        exit();
+    }
+
+    if ($produit['statut_publie'] !== 'Publié') {
         echo json_encode(['success' => false, 'message' => 'Produit non disponible']);
         exit();
     }
 
-    // Vérifier si le produit est déjà dans le panier
+    if ($produit['stock_quantite'] <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Produit en rupture de stock']);
+        exit();
+    }
+
+    // Verificar si el producto ya está en el carrito
     $reqCheck = $pdo->prepare("SELECT quantite FROM panier WHERE id_client = ? AND id_produit = ?");
     $reqCheck->execute([$id_client, $id_produit]);
-    $existant = $reqCheck->fetch();
+    $existant = $reqCheck->fetch(PDO::FETCH_ASSOC);
 
     if ($existant) {
         // Mettre à jour la quantité
         $nouvelle_quantite = $existant['quantite'] + $quantite;
         if ($nouvelle_quantite > $produit['stock_quantite']) {
-            echo json_encode(['success' => false, 'message' => 'Stock insuffisant']);
+            echo json_encode(['success' => false, 'message' => 'Stock insuffisant (disponible: ' . $produit['stock_quantite'] . ')']);
             exit();
         }
         $reqUpdate = $pdo->prepare("UPDATE panier SET quantite = ? WHERE id_client = ? AND id_produit = ?");
@@ -47,7 +66,7 @@ try {
     } else {
         // Ajouter au panier
         if ($quantite > $produit['stock_quantite']) {
-            echo json_encode(['success' => false, 'message' => 'Stock insuffisant']);
+            echo json_encode(['success' => false, 'message' => 'Stock insuffisant (disponible: ' . $produit['stock_quantite'] . ')']);
             exit();
         }
         $reqInsert = $pdo->prepare("INSERT INTO panier (id_client, id_produit, quantite) VALUES (?, ?, ?)");
@@ -57,7 +76,7 @@ try {
     // Récupérer le total du panier
     $reqTotal = $pdo->prepare("SELECT SUM(quantite) as total FROM panier WHERE id_client = ?");
     $reqTotal->execute([$id_client]);
-    $total = $reqTotal->fetch()['total'] ?? 0;
+    $total = $reqTotal->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
 
     echo json_encode([
         'success' => true,

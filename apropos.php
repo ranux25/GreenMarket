@@ -77,12 +77,11 @@ try {
             --footer-text: #d4b8a0;
             --footer-link: #c4a890;
             --footer-link-hover: #ffffff;
-            --page-header-bg: #f5ede0;
-            --page-header-text: #5D0D18;
-            --page-header-sub: #6B6B6B;
-            --page-header-border: rgba(93, 13, 24, 0.08);
-            --page-header-eyebrow: #5D0D18;
-            --page-header-eyebrow-bg: rgba(93, 13, 24, 0.06);
+            --page-header-bg: var(--primary);
+            --page-header-text: #fff;
+            --page-header-sub: rgba(255,249,235,.7);
+            --page-header-border: rgba(255,249,235,.05);
+            --page-header-border-top: rgba(255,249,235,.15);
             --cream: #fff9eb;
             --modal-bg: #fffdf7;
             --modal-shadow: rgba(0,0,0,0.2);
@@ -129,12 +128,11 @@ try {
             --footer-text: #b8a896;
             --footer-link: #b8a896;
             --footer-link-hover: #f0e6d8;
-            --page-header-bg: #3d3229;
+            --page-header-bg: #1a1410;
             --page-header-text: #f0e6d8;
-            --page-header-sub: #b8a896;
-            --page-header-border: rgba(240, 230, 216, 0.08);
-            --page-header-eyebrow: #d4a85c;
-            --page-header-eyebrow-bg: rgba(240, 230, 216, 0.06);
+            --page-header-sub: rgba(240,230,216,0.6);
+            --page-header-border: rgba(240,230,216,0.05);
+            --page-header-border-top: rgba(240,230,216,0.15);
             --cream: #f0e6d8;
             --modal-bg: #3d3229;
             --modal-shadow: rgba(0,0,0,0.4);
@@ -195,16 +193,13 @@ try {
             font-weight: 600;
             letter-spacing: .2em;
             text-transform: uppercase;
-            color: var(--page-header-eyebrow);
-            background: var(--page-header-eyebrow-bg);
-            padding: 0.3rem 1rem;
-            border-radius: 999px;
+            color: var(--page-header-sub);
             margin-bottom: .9rem;
-            transition: color 0.3s ease, background-color 0.3s ease;
+            transition: color 0.3s ease;
         }
         .page-header h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 3.6rem;
+            font-size: clamp(32px, 5vw, 52px);
             font-weight: 700;
             line-height: 1.05;
             color: var(--page-header-text);
@@ -485,7 +480,7 @@ try {
         }
         .btn-cta {
             background: var(--primary);
-            color: white;
+            color: #fff;
             border: none;
             padding: 0.8rem 2rem;
             border-radius: 999px;
@@ -498,6 +493,9 @@ try {
         .btn-cta:hover {
             background: var(--primary-light);
             transform: translateY(-2px);
+        }
+        [data-theme="dark"] .btn-cta {
+            color: var(--bg);
         }
 
         /* ===== FOOTER ===== */
@@ -679,11 +677,9 @@ try {
     }
 
     // ===== FORZAR INPUT DE BÚSQUEDA VACÍO =====
-    // Esto asegura que el campo de búsqueda esté vacío en esta página
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('headerSearch');
         if (searchInput) {
-            // Si el input tiene el email del usuario, lo limpiamos
             searchInput.value = '';
         }
         initReveal();
