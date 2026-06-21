@@ -7,6 +7,7 @@ $theme = $_COOKIE['theme'] ?? 'light';
 
 // Verificar si el usuario es admin
 $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
+$isClient = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'client';
 
 // Función para normalizar URLs de imágenes
 function normalizeImageUrl($url) {
@@ -16,7 +17,7 @@ function normalizeImageUrl($url) {
     $url = str_replace('\\', '/', $url);
     $url = str_replace(' ', '%20', $url);
     if (strpos($url, 'http') !== 0 && strpos($url, '/') !== 0) {
-        $url = './' . $url;
+        return $url;
     }
     return $url;
 }
@@ -36,7 +37,7 @@ try {
     $stmt->execute();
     $boutiques_db = $stmt->fetchAll();
     
-    // Récupérer toutes las categorías disponibles
+    // Récupérer todas las categorías disponibles
     $stmt = $pdo->query("SELECT * FROM categorie ORDER BY nom_categorie");
     $categories_db = $stmt->fetchAll();
     
@@ -91,7 +92,6 @@ foreach ($boutiques_db as $b) {
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
-  /* ========== VARIABLES DE TEMA GLOBAL ========== */
   :root {
     --primary: #5D0D18;
     --primary-light: #7a1020;
@@ -151,7 +151,6 @@ foreach ($boutiques_db as $b) {
     --danger-hover: #b71c1c;
   }
 
-  /* ========== TEMA OSCURO BEIGE ========== */
   [data-theme="dark"] {
     --primary: #8a6048;
     --primary-light: #a0785a;
@@ -210,7 +209,6 @@ foreach ($boutiques_db as $b) {
     --danger-hover: #c62828;
   }
 
-  /* ========== STYLES UNIFIÉS ========== */
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -223,13 +221,6 @@ foreach ($boutiques_db as $b) {
 
   h1, h2, h3, .playfair { font-family: 'Playfair Display', serif; }
 
-  /* Animations */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(40px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* Scroll-reveal */
   .reveal {
     opacity: 0;
     transform: translateY(35px);
@@ -258,60 +249,6 @@ foreach ($boutiques_db as $b) {
     transform: translateX(0);
   }
 
-  /* Section title */
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(22px, 3vw, 34px);
-    font-weight: 700;
-    position: relative;
-    display: inline-block;
-    color: var(--text-dark);
-    transition: color 0.3s ease;
-  }
-  .section-title::after {
-    content: '';
-    display: block;
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary), var(--secondary), transparent);
-    width: 70%;
-    margin-top: 8px;
-    transition: background 0.3s ease;
-  }
-
-  /* Buttons */
-  .btn-primary {
-    background: var(--primary);
-    color: #fff;
-    border: none;
-    border-radius: 999px;
-    padding: 11px 24px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
-  }
-  .btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); }
-  
-  /* 🔥 Botón de eliminar para admin */
-  .btn-danger-admin {
-    background: var(--danger);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 0.25rem 0.6rem;
-    font-size: 0.7rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-  }
-  .btn-danger-admin:hover {
-    background: var(--danger-hover);
-    transform: scale(1.05);
-  }
-
-  /* Page header */
   .page-header {
     background: var(--page-header-bg);
     padding: 4rem 2.5rem 3rem;
@@ -385,7 +322,6 @@ foreach ($boutiques_db as $b) {
     transition: color 0.3s ease;
   }
 
-  /* Search bar */
   .search-bar-wrap {
     background: var(--search-bg);
     padding: 1.2rem 2.5rem;
@@ -445,7 +381,6 @@ foreach ($boutiques_db as $b) {
     color: var(--text-dark);
   }
 
-  /* Layout */
   .main-layout {
     display: grid;
     grid-template-columns: 280px 1fr;
@@ -455,7 +390,6 @@ foreach ($boutiques_db as $b) {
     gap: 2rem;
   }
 
-  /* Sidebar */
   .sidebar { position: sticky; top: 88px; align-self: start; }
   .sidebar-section {
     background: var(--sidebar-bg);
@@ -526,7 +460,6 @@ foreach ($boutiques_db as $b) {
     transition: background 0.3s ease, color 0.3s ease;
   }
 
-  /* Add category form */
   .add-cat-form {
     padding: 1.2rem;
     border-top: 1px solid var(--sidebar-border);
@@ -581,7 +514,6 @@ foreach ($boutiques_db as $b) {
     transition: background 0.3s ease, color 0.3s ease;
   }
 
-  /* Store cards */
   .stores-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -678,11 +610,44 @@ foreach ($boutiques_db as $b) {
   }
   .stars { color: #e0a82e; font-size: 0.7rem; }
 
-  /* 🔥 Admin delete button en la tarjeta */
-  .admin-delete-btn {
+  /* 🔥 Botón de favoritos */
+  .favori-btn {
     position: absolute;
     top: 0.5rem;
     left: 0.5rem;
+    z-index: 5;
+    background: rgba(255,255,255,0.95);
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    transition: all 0.2s;
+    color: var(--text-light);
+  }
+  .favori-btn:hover {
+    transform: scale(1.1);
+    background: #fff;
+  }
+  .favori-btn.active {
+    color: #c0392b;
+  }
+  [data-theme="dark"] .favori-btn {
+    background: rgba(60,50,40,0.95);
+  }
+  [data-theme="dark"] .favori-btn:hover {
+    background: #4d3d32;
+  }
+
+  .admin-delete-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
     background: var(--danger);
     color: white;
     border: none;
@@ -702,11 +667,7 @@ foreach ($boutiques_db as $b) {
     background: var(--danger-hover);
     transform: scale(1.05);
   }
-  [data-theme="dark"] .admin-delete-btn {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-  }
 
-  /* ====== PAGINATION STYLES ====== */
   .pagination-wrapper {
     display: flex;
     justify-content: center;
@@ -745,13 +706,6 @@ foreach ($boutiques_db as $b) {
     opacity: 0.4;
     cursor: not-allowed;
   }
-  .pagination-wrapper .page-btn {
-    min-width: 44px;
-  }
-  .pagination-wrapper .nav-btn {
-    padding: 0 1.2rem;
-    gap: 0.3rem;
-  }
   .pagination-info {
     font-size: 0.85rem;
     color: var(--text-light);
@@ -760,7 +714,6 @@ foreach ($boutiques_db as $b) {
     transition: color 0.3s ease;
   }
 
-  /* Empty state */
   .empty-state {
     text-align: center;
     padding: 3rem;
@@ -769,7 +722,6 @@ foreach ($boutiques_db as $b) {
   }
   .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
 
-  /* Toast */
   .toast {
     position: fixed;
     bottom: 28px;
@@ -786,7 +738,6 @@ foreach ($boutiques_db as $b) {
   }
   .toast.show { transform: translateY(0); opacity: 1; }
 
-  /* Responsive */
   @media (max-width: 900px) {
     .main-layout { grid-template-columns: 1fr; }
     .sidebar { position: static; }
@@ -830,9 +781,7 @@ foreach ($boutiques_db as $b) {
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!-- SEARCH BAR                                                   -->
-<!-- ============================================================ -->
+<!-- SEARCH BAR -->
 <div class="search-bar-wrap">
   <div class="search-input-wrapper">
     <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
@@ -841,7 +790,6 @@ foreach ($boutiques_db as $b) {
     <input class="search-input" id="searchInput" type="text" placeholder="Rechercher une boutique...">
   </div>
   
-  <!-- Selector: Catégorie -->
   <select class="filter-select" id="catFilter">
     <option value="">Toutes les catégories</option>
     <?php foreach ($categories_db as $cat): ?>
@@ -851,7 +799,6 @@ foreach ($boutiques_db as $b) {
     <?php endforeach; ?>
   </select>
   
-  <!-- Selector de tri -->
   <select class="filter-select" id="sortFilter">
     <option value="">Trier par</option>
     <option value="name">Nom A–Z</option>
@@ -859,7 +806,6 @@ foreach ($boutiques_db as $b) {
     <option value="sales">Plus vendues</option>
   </select>
   
-  <!-- Selector: Nombre par page -->
   <select class="filter-select" id="perPageFilter">
     <option value="6">6 par page</option>
     <option value="9">9 par page</option>
@@ -898,7 +844,6 @@ foreach ($boutiques_db as $b) {
   <section class="stores-area">
     <div class="stores-grid reveal" id="storesGrid"></div>
     
-    <!-- ====== PAGINATION ====== -->
     <div class="pagination-info" id="paginationInfo"></div>
     <div class="pagination-wrapper" id="paginationWrapper"></div>
   </section>
@@ -911,6 +856,7 @@ foreach ($boutiques_db as $b) {
 const boutiquesFromDB = <?php echo json_encode($boutiques_json); ?>;
 const categoriesFromDB = <?php echo json_encode($categories_db); ?>;
 const isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
+const isClient = <?php echo $isClient ? 'true' : 'false'; ?>;
 
 console.log('Boutiques chargées:', boutiquesFromDB.length);
 console.log('Catégories chargées:', categoriesFromDB.length);
@@ -978,6 +924,68 @@ function renderStars(rating) {
     return '★'.repeat(full) + '☆'.repeat(empty);
 }
 
+// ====== TOGGLE FAVORI BOUTIQUE ======
+function toggleFavoriBoutique(boutiqueId, button) {
+    <?php if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'client'): ?>
+        showToast('⚠️ Veuillez vous connecter en tant que client', true);
+        setTimeout(() => { window.location.href = 'signin.php'; }, 1500);
+        return;
+    <?php endif; ?>
+    
+    const icon = button.querySelector('i');
+    const isFavori = icon.classList.contains('bi-heart-fill');
+    
+    // Cambio optimista
+    if (isFavori) {
+        icon.className = 'bi bi-heart';
+        button.style.color = 'var(--text-light)';
+    } else {
+        icon.className = 'bi bi-heart-fill';
+        button.style.color = '#c0392b';
+    }
+    
+    fetch('toggle_favori_boutique.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'id_boutique=' + boutiqueId
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.action === 'added') {
+                icon.className = 'bi bi-heart-fill';
+                button.style.color = '#c0392b';
+                showToast('❤️ Boutique ajoutée aux favoris');
+            } else {
+                icon.className = 'bi bi-heart';
+                button.style.color = 'var(--text-light)';
+                showToast('Boutique retirée des favoris');
+            }
+        } else {
+            // Revertir si hay error
+            if (isFavori) {
+                icon.className = 'bi bi-heart-fill';
+                button.style.color = '#c0392b';
+            } else {
+                icon.className = 'bi bi-heart';
+                button.style.color = 'var(--text-light)';
+            }
+            showToast('❌ ' + data.message, true);
+        }
+    })
+    .catch(() => {
+        // Revertir si hay error de conexión
+        if (isFavori) {
+            icon.className = 'bi bi-heart-fill';
+            button.style.color = '#c0392b';
+        } else {
+            icon.className = 'bi bi-heart';
+            button.style.color = 'var(--text-light)';
+        }
+        showToast('❌ Erreur de connexion', true);
+    });
+}
+
 // ====== RENDER CATEGORIES ======
 function renderCategories() {
     const list = document.getElementById('categoryList');
@@ -1030,7 +1038,6 @@ function filterStores() {
         return matchSearch && matchCategory;
     });
     
-    // Tri
     if (sortValue === 'name') {
         filteredStores.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
     } else if (sortValue === 'products') {
@@ -1042,7 +1049,7 @@ function filterStores() {
     document.getElementById('statStores').textContent = filteredStores.length;
 }
 
-// 🔥 FUNCIÓN PARA ELIMINAR TIENDA (SOLO ADMIN)
+// ====== ADMIN: SUPPRIMER BOUTIQUE ======
 function deleteStoreAdmin(storeId, storeName) {
     if (!isAdmin) {
         showToast('❌ Non autorisé', true);
@@ -1060,7 +1067,6 @@ function deleteStoreAdmin(storeId, storeName) {
             .then(data => {
                 if (data.success) {
                     showToast('✅ Boutique supprimée avec succès !');
-                    // Eliminar la tienda de la lista
                     stores = stores.filter(s => s.id !== storeId);
                     renderCategories();
                     renderStores();
@@ -1101,7 +1107,6 @@ function renderStores() {
     const fallbackImg = 'IMAGES/default-boutique.jpg';
     
     grid.innerHTML = pageItems.map(s => {
-        // 🔥 Botón de eliminar solo para admin
         let deleteBtn = '';
         if (isAdmin) {
             deleteBtn = `
@@ -1111,9 +1116,19 @@ function renderStores() {
             `;
         }
         
+        let favoriBtn = '';
+        if (isClient) {
+            favoriBtn = `
+                <button class="favori-btn" onclick="event.stopPropagation(); toggleFavoriBoutique(${s.id}, this)" title="Ajouter aux favoris">
+                    <i class="bi bi-heart"></i>
+                </button>
+            `;
+        }
+        
         return `
             <div class="store-card">
                 ${deleteBtn}
+                ${favoriBtn}
                 <div class="store-banner" onclick="window.location.href='info-store.php?id=${s.id}'">
                     <img src="${escapeHtml(s.banner || fallbackImg)}" alt="${escapeHtml(s.name)}" onerror="this.src='${fallbackImg}'">
                     ${s.badge ? `<span class="store-badge">${escapeHtml(s.badge)}</span>` : ''}
@@ -1287,7 +1302,6 @@ document.getElementById('cancelCat')?.addEventListener('click', () => {
 
 document.getElementById('saveCat')?.addEventListener('click', addCategory);
 
-// Filtre par catégorie
 const catFilter = document.getElementById('catFilter');
 if (catFilter) {
     categories.forEach(c => {
@@ -1304,7 +1318,6 @@ if (catFilter) {
     });
 }
 
-// Filtre par nombre d'éléments par page
 const perPageFilter = document.getElementById('perPageFilter');
 if (perPageFilter) {
     perPage = parseInt(perPageFilter.value) || 12;
@@ -1321,7 +1334,6 @@ renderCategories();
 renderStores();
 initReveal();
 
-// Mettre à jour les statistiques
 document.getElementById('statProducts').textContent = stores.reduce((sum, s) => sum + (s.products || 0), 0);
 </script>
 </body>

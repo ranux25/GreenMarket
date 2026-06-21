@@ -378,77 +378,26 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
         }
 
         .notif-icon {
-            width: 36px;
-            height: 36px;
-            min-width: 36px;
+            width: 36px; height: 36px; min-width: 36px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             font-size: .95rem;
             flex-shrink: 0;
             margin-top: 2px;
         }
-        .notif-icon.order { 
-            background: rgba(93,13,24,.1); 
-            color: var(--primary); 
-        }
-        .notif-icon.promo { 
-            background: rgba(192,122,26,.12); 
-            color: var(--gold); 
-        }
-        .notif-icon.system { 
-            background: rgba(159,178,172,.2); 
-            color: var(--secondary); 
-        }
-        .notif-icon.message { 
-            background: rgba(59,130,246,.1); 
-            color: #3b82f6; 
-        }
-        .notif-icon.success { 
-            background: rgba(46,125,50,.1); 
-            color: #2e7d32; 
-        }
-        [data-theme="dark"] .notif-icon.order { 
-            background: rgba(212,168,92,.15); 
-            color: var(--gold); 
-        }
-        [data-theme="dark"] .notif-icon.success { 
-            background: rgba(102,187,106,.15); 
-            color: #66bb6a; 
-        }
+        .notif-icon.order { background: rgba(93,13,24,.1); color: var(--primary); }
+        .notif-icon.promo { background: rgba(192,122,26,.12); color: var(--gold); }
+        .notif-icon.system { background: rgba(159,178,172,.2); color: var(--secondary); }
+        .notif-icon.message { background: rgba(59,130,246,.1); color: #3b82f6; }
+        .notif-icon.success { background: rgba(46,125,50,.1); color: #2e7d32; }
+        [data-theme="dark"] .notif-icon.order { background: rgba(212,168,92,.15); color: var(--gold); }
+        [data-theme="dark"] .notif-icon.success { background: rgba(102,187,106,.15); color: #66bb6a; }
 
         .notif-body { flex: 1; min-width: 0; }
-        .notif-title { 
-            font-size: .82rem; 
-            font-weight: 600; 
-            color: var(--dropdown-text); 
-            line-height: 1.3;
-            margin-bottom: 2px;
-        }
-        .notif-text { 
-            font-size: .78rem; 
-            color: var(--text-light); 
-            line-height: 1.5;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        .notif-time { 
-            font-size: .65rem; 
-            color: var(--suggestions-muted); 
-            margin-top: 4px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .notif-unread-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--primary);
-            flex-shrink: 0;
-            margin-top: 8px;
-        }
+        .notif-title { font-size: .82rem; font-weight: 600; color: var(--dropdown-text); line-height: 1.3; margin-bottom: 2px; }
+        .notif-text { font-size: .78rem; color: var(--text-light); line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+        .notif-time { font-size: .65rem; color: var(--suggestions-muted); margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+        .notif-unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); flex-shrink: 0; margin-top: 8px; }
         [data-theme="dark"] .notif-unread-dot { background: var(--gold); }
 
         .notif-empty {
@@ -457,12 +406,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
             color: var(--suggestions-muted);
             font-size: .88rem;
         }
-        .notif-empty i { 
-            font-size: 2.2rem; 
-            display: block; 
-            margin-bottom: .6rem; 
-            opacity: .4; 
-        }
+        .notif-empty i { font-size: 2.2rem; display: block; margin-bottom: .6rem; opacity: .4; }
 
         .notif-footer {
             padding: .55rem .85rem;
@@ -651,8 +595,11 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
                         <div class="acc-menu-body">
                             <a href="<?= $dashboardLink ?>"><i class="bi bi-grid-1x2"></i> Tableau de bord</a>
                             <a href="profile.php"><i class="bi bi-sliders"></i> Paramètres</a>
+                            
                             <?php if ($_SESSION['user_role'] === 'client'): ?>
                             <a href="mes-commandes.php"><i class="bi bi-box-seam"></i> Mes commandes</a>
+                            <!-- ===== 🔥 NOUVEAU: FAVORIS POUR CLIENT ===== -->
+                            <a href="favoris.php"><i class="bi bi-heart"></i> Mes favoris</a>
                             <?php endif; ?>
                             
                             <!-- ===== Mes boutiques pour producteur ===== -->
@@ -799,6 +746,13 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
             <div class="mob-div"></div>
             <?php endif; ?>
             
+            <!-- 🔥 NOUVEAU: Favoris dans le menu mobile pour client -->
+            <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'client'): ?>
+            <a href="favoris.php" class="mob-link">
+                <i class="bi bi-heart" style="color:var(--gold);"></i> Mes favoris
+            </a>
+            <?php endif; ?>
+            
             <div style="padding:.4rem 1rem">
                 <p class="mob-lang-label">Langue / Language</p>
                 <div class="mob-lang-opts">
@@ -901,7 +855,6 @@ function markRead(el, link) {
     if(link && link !== '#') setTimeout(() => location.href = link, 150);
 }
 
-// Marcar notificación al hacer clic en ella
 document.querySelectorAll('.notif-item').forEach(item => {
     item.addEventListener('click', function() {
         const link = this.dataset.link || '#';

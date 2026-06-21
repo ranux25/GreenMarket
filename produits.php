@@ -5,6 +5,10 @@ include('connexion.php');
 // Detectar tema guardado (por defecto claro)
 $theme = $_COOKIE['theme'] ?? 'light';
 
+// Verificar si el usuario es admin o cliente
+$isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
+$isClient = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'client';
+
 // Récupérer les produits depuis la base de données
 try {
     $stmt = $pdo->prepare("
@@ -40,6 +44,14 @@ try {
         $panier_count = $stmtP->fetch()['total'] ?? 0;
     }
     
+    // Si le client est connecté, récupérer ses favoris
+    $favoris_ids = [];
+    if ($isClient) {
+        $stmtF = $pdo->prepare("SELECT id_produit FROM favoris WHERE id_client = ?");
+        $stmtF->execute([$_SESSION['user_id']]);
+        $favoris_ids = $stmtF->fetchAll(PDO::FETCH_COLUMN);
+    }
+    
 } catch(PDOException $e) {
     error_log("Error produits: " . $e->getMessage());
     $produits_db = [];
@@ -47,10 +59,8 @@ try {
     $total_produits = 0;
     $total_boutiques = 0;
     $panier_count = 0;
+    $favoris_ids = [];
 }
-
-// Vérifier si l'utilisateur est admin
-$isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
 
 // Formater les produits pour le JavaScript
 $produits_json = [];
@@ -67,7 +77,8 @@ foreach ($produits_db as $p) {
         'shopId' => $p['id_boutique'],
         'shopName' => $p['nom_boutique'],
         'category' => $p['nom_categorie'],
-        'categoryId' => $p['id_categorie']
+        'categoryId' => $p['id_categorie'],
+        'isFavori' => in_array($p['id_produit'], $favoris_ids)
     ];
 }
 ?>
@@ -142,6 +153,8 @@ foreach ($produits_db as $p) {
     --pagination-text: var(--text-dark);
     --pagination-active-bg: var(--primary);
     --pagination-active-text: #fff;
+    --danger: #c62828;
+    --danger-hover: #b71c1c;
   }
 
   [data-theme="dark"] {
@@ -204,6 +217,8 @@ foreach ($produits_db as $p) {
     --pagination-text: #f0e6d8;
     --pagination-active-bg: #6d4c3a;
     --pagination-active-text: #f0e6d8;
+    --danger: #ef5350;
+    --danger-hover: #c62828;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -573,6 +588,7 @@ foreach ($produits_db as $p) {
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
     box-shadow: 0 4px 16px var(--product-shadow);
+    position: relative;
   }
   .product-card:hover {
     transform: translateY(-6px);
@@ -660,6 +676,40 @@ foreach ($produits_db as $p) {
   }
   .stock-low { color: var(--product-stock-low); }
   .stock-out { color: var(--product-stock-out); }
+
+  /* 🔥 Botón de favoritos */
+  .favori-btn {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 5;
+    background: rgba(255,255,255,0.95);
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    transition: all 0.2s;
+    color: var(--text-light);
+  }
+  .favori-btn:hover {
+    transform: scale(1.1);
+    background: #fff;
+  }
+  .favori-btn.active {
+    color: #c0392b;
+  }
+  [data-theme="dark"] .favori-btn {
+    background: rgba(60,50,40,0.95);
+  }
+  [data-theme="dark"] .favori-btn:hover {
+    background: #4d3d32;
+  }
 
   /* Buttons */
   .add-cart-btn {
@@ -849,6 +899,12 @@ foreach ($produits_db as $p) {
       </option>
     <?php endforeach; ?>
   </select>
+  <select class="filter-select" id="sortFilter">
+    <option value="">Trier par</option>
+    <option value="price_asc">Prix : croissant</option>
+    <option value="price_desc">Prix : décroissant</option>
+    <option value="name">Nom A–Z</option>
+  </select>
   <select class="filter-select" id="perPageFilter">
     <option value="6">6 par page</option>
     <option value="9">9 par page</option>
@@ -905,6 +961,10 @@ foreach ($produits_db as $p) {
 const produitsFromDB = <?php echo json_encode($produits_json); ?>;
 const categoriesFromDB = <?php echo json_encode($categories_db); ?>;
 const isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
+const isClient = <?php echo $isClient ? 'true' : 'false'; ?>;
+
+console.log('isClient:', isClient);
+console.log('Produits chargés:', produitsFromDB.length);
 
 let allProducts = produitsFromDB;
 let filteredProducts = [];
@@ -1018,6 +1078,82 @@ function getStockText(stock) {
     return stock + ' en stock';
 }
 
+// ========== TOGGLE FAVORI PRODUIT ==========
+function toggleFavoriProduit(productId, button) {
+    // Verificar si el usuario es cliente
+    <?php if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'client'): ?>
+        showToast('⚠️ Veuillez vous connecter en tant que client', true);
+        setTimeout(() => { window.location.href = 'signin.php'; }, 1500);
+        return;
+    <?php endif; ?>
+    
+    const icon = button.querySelector('i');
+    const isFavori = icon.classList.contains('bi-heart-fill');
+    
+    // Cambio optimista
+    if (isFavori) {
+        icon.className = 'bi bi-heart';
+        button.style.color = 'var(--text-light)';
+        button.classList.remove('active');
+    } else {
+        icon.className = 'bi bi-heart-fill';
+        button.style.color = '#c0392b';
+        button.classList.add('active');
+    }
+    
+    fetch('toggle_favori.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'id_produit=' + productId
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.action === 'added') {
+                icon.className = 'bi bi-heart-fill';
+                button.style.color = '#c0392b';
+                button.classList.add('active');
+                showToast('❤️ Produit ajouté aux favoris');
+            } else {
+                icon.className = 'bi bi-heart';
+                button.style.color = 'var(--text-light)';
+                button.classList.remove('active');
+                showToast('Produit retiré des favoris');
+            }
+            // Actualizar el estado en el array de productos
+            const product = allProducts.find(p => p.id === productId);
+            if (product) {
+                product.isFavori = data.action === 'added';
+            }
+        } else {
+            // Revertir si hay error
+            if (isFavori) {
+                icon.className = 'bi bi-heart-fill';
+                button.style.color = '#c0392b';
+                button.classList.add('active');
+            } else {
+                icon.className = 'bi bi-heart';
+                button.style.color = 'var(--text-light)';
+                button.classList.remove('active');
+            }
+            showToast('❌ ' + data.message, true);
+        }
+    })
+    .catch(() => {
+        // Revertir si hay error de conexión
+        if (isFavori) {
+            icon.className = 'bi bi-heart-fill';
+            button.style.color = '#c0392b';
+            button.classList.add('active');
+        } else {
+            icon.className = 'bi bi-heart';
+            button.style.color = 'var(--text-light)';
+            button.classList.remove('active');
+        }
+        showToast('❌ Erreur de connexion', true);
+    });
+}
+
 // ========== RENDU CATÉGORIES ==========
 function renderCategories() {
     const list = document.getElementById('categoryList');
@@ -1128,6 +1264,17 @@ function renderProducts() {
         const stockText = getStockText(p.stock);
         const isOutOfStock = p.stock <= 0;
         
+        // 🔥 Botón de favoritos (solo para clientes)
+        let favoriBtn = '';
+        if (isClient) {
+            const isFavori = p.isFavori || false;
+            favoriBtn = `
+                <button class="favori-btn ${isFavori ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavoriProduit(${p.id}, this)" title="Ajouter aux favoris">
+                    <i class="bi ${isFavori ? 'bi-heart-fill' : 'bi-heart'}"></i>
+                </button>
+            `;
+        }
+        
         let buttons = '';
         if (isAdmin) {
             buttons = `
@@ -1145,6 +1292,7 @@ function renderProducts() {
         
         return `
             <div class="product-card">
+                ${favoriBtn}
                 <div class="product-banner" onclick="window.location.href='info-produit.php?id=${p.id}'">
                     <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy" 
                          onerror="this.src='${fallbackImg}'">
