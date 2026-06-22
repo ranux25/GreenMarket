@@ -2,8 +2,8 @@
 session_start();
 header('Content-Type: application/json');
 
-// SOLO ADMIN
-if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+// Vérifier que c'est un producteur
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'producteur') {
     echo json_encode(['success' => false, 'message' => 'Non autorisé']);
     exit;
 }
@@ -17,16 +17,19 @@ if (!$id_boutique) {
     exit;
 }
 
+$id_producteur = $_SESSION['user_id'];
+
 try {
-    // Récupérer les infos de la boutique ET du producteur
+    // Vérifier que la boutique appartient au producteur
     $stmt = $pdo->prepare("
         SELECT b.id_boutique, b.nom_boutique, b.id_producteur, 
-               p.nom_entreprise, p.email, p.id_producteur
-        FROM boutique b 
-        LEFT JOIN producteur p ON b.id_producteur = p.id_producteur 
-        WHERE b.id_boutique = ?
+               COUNT(p.id_produit) as nb_produits
+        FROM boutique b
+        LEFT JOIN produit p ON b.id_boutique = p.id_boutique
+        WHERE b.id_boutique = ? AND b.id_producteur = ?
+        GROUP BY b.id_boutique
     ");
-    $stmt->execute([$id_boutique]);
+    $stmt->execute([$id_boutique, $id_producteur]);
     $boutique = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$boutique) {
@@ -37,48 +40,49 @@ try {
     // Démarrer la transaction
     $pdo->beginTransaction();
     
-    // 1. Supprimer les dépendances (tables sans CASCADE)
+    // Supprimer les dépendances
     $tables = ['categorie_boutique', 'evaluer_boutique', 'favoris_boutique'];
     foreach ($tables as $table) {
         $stmt = $pdo->prepare("DELETE FROM $table WHERE id_boutique = ?");
         $stmt->execute([$id_boutique]);
     }
     
-    // 2. Supprimer la boutique
+    // Supprimer les produits de la boutique
+    $stmt = $pdo->prepare("DELETE FROM produit WHERE id_boutique = ?");
+    $stmt->execute([$id_boutique]);
+    
+    // Supprimer la boutique
     $stmt = $pdo->prepare("DELETE FROM boutique WHERE id_boutique = ?");
     $stmt->execute([$id_boutique]);
     
-    // 3. Créer une notification pour le producteur
-    $message = "❌ Votre boutique '{$boutique['nom_boutique']}' a été supprimée par l'administrateur.\n";
-    $message .= "📅 Date de suppression : " . date('d/m/Y à H:i') . "\n";
-    $message .= "📧 Contactez le support si vous avez des questions.";
+    // --- NOTIFICATION POUR LE PRODUCTEUR ---
+    $message = "🗑️ Vous avez supprimé votre boutique '{$boutique['nom_boutique']}' avec {$boutique['nb_produits']} produit(s).\n";
+    $message .= "📅 Suppression effectuée le " . date('d/m/Y à H:i');
     
     $stmt = $pdo->prepare("
         INSERT INTO notification (id_producteur, message, date_notification, est_lu, type_notification) 
         VALUES (?, ?, NOW(), 0, 'system')
     ");
-    $stmt->execute([$boutique['id_producteur'], $message]);
+    $stmt->execute([$id_producteur, $message]);
     
-    // Valider la transaction
     $pdo->commit();
     
     echo json_encode([
         'success' => true, 
-        'message' => 'Boutique "' . $boutique['nom_boutique'] . '" supprimée avec succès',
-        'notification_envoyee' => true
+        'message' => "La boutique '{$boutique['nom_boutique']}' a été supprimée avec succès"
     ]);
 
 } catch(PDOException $e) {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    error_log("Erreur supprimer_boutique_admin: " . $e->getMessage());
+    error_log("Erreur supprimer_boutique: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Erreur SQL: ' . $e->getMessage()]);
 } catch(Exception $e) {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    error_log("Erreur supprimer_boutique_admin: " . $e->getMessage());
+    error_log("Erreur supprimer_boutique: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
 ?>

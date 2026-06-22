@@ -10,7 +10,7 @@ if (isset($_SESSION['user_role'])) {
 
 // Charger le nombre d'articles dans le panier depuis la BD
 $cartCount = 0;
-if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'client') {
+if (isset($_SESSION['user_id']) && isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'client') {
     if (!isset($pdo)) { include_once __DIR__ . '/connexion.php'; }
     try {
         $reqCart = $pdo->prepare("SELECT COALESCE(SUM(quantite), 0) as total FROM panier WHERE id_client = ?");
@@ -19,13 +19,17 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'client') {
     } catch(PDOException $e) { $cartCount = 0; }
 }
 
-// Charger les notifications non lues depuis la BD
+// Charger les notifications non lues depuis la BD (solo si está conectado)
 $notifications = [];
 $unreadCount   = 0;
-if (isset($_SESSION['user_id'])) {
+$mesBoutiques = [];
+
+if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
     if (!isset($pdo)) { include_once __DIR__ . '/connexion.php'; }
     $role = $_SESSION['user_role'] ?? '';
     $col  = ($role === 'client') ? 'id_client' : 'id_producteur';
+    
+    // Notifications (solo para clientes y productores)
     if ($role === 'client' || $role === 'producteur') {
         try {
             $reqN = $pdo->prepare("
@@ -47,17 +51,15 @@ if (isset($_SESSION['user_id'])) {
             $unreadCount   = count(array_filter($notifications, fn($n) => !$n['is_read']));
         } catch(PDOException $e) { $notifications = []; $unreadCount = 0; }
     }
-}
-
-// Récupérer les boutiques du producteur
-$mesBoutiques = [];
-if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'producteur') {
-    if (!isset($pdo)) { include_once __DIR__ . '/connexion.php'; }
-    try {
-        $reqBoutiques = $pdo->prepare("SELECT id_boutique, nom_boutique FROM boutique WHERE id_producteur = ?");
-        $reqBoutiques->execute([$_SESSION['user_id']]);
-        $mesBoutiques = $reqBoutiques->fetchAll(PDO::FETCH_ASSOC);
-    } catch(PDOException $e) { $mesBoutiques = []; }
+    
+    // Récupérer les boutiques du producteur (solo si es producteur)
+    if ($role === 'producteur') {
+        try {
+            $reqBoutiques = $pdo->prepare("SELECT id_boutique, nom_boutique FROM boutique WHERE id_producteur = ?");
+            $reqBoutiques->execute([$_SESSION['user_id']]);
+            $mesBoutiques = $reqBoutiques->fetchAll(PDO::FETCH_ASSOC);
+        } catch(PDOException $e) { $mesBoutiques = []; }
+    }
 }
 
 // Fonction pour obtenir l'icône selon le type de notification
@@ -96,6 +98,9 @@ function getNotifTitle($type) {
         default      => '📢 Notification'
     };
 }
+
+// Verificar si el usuario está conectado
+$isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
 ?>
 <!DOCTYPE html>
 <html lang="fr" data-theme="<?php echo $theme; ?>">
@@ -625,14 +630,18 @@ function getNotifTitle($type) {
                 </div>
             </div>
 
-            <!-- Cuenta / Notificaciones -->
-            <?php if (isset($_SESSION['user_role'])): ?>
+            <!-- Cuenta / Notificaciones (SOLO SI ESTÁ CONECTADO) -->
+            <?php if ($isLoggedIn): ?>
             <div class="acc-wrap" id="accWrap">
                 <button class="acc-btn" id="accBtn" title="Mon compte">
                     <i class="bi bi-person-circle"></i>
-                    <span class="notif-dot <?= $unreadCount > 0 ? 'show' : '' ?>" id="notifDot">
-                        <?= $unreadCount > 0 ? ($unreadCount > 9 ? '9+' : $unreadCount) : '' ?>
+                    <?php if ($unreadCount > 0): ?>
+                    <span class="notif-dot show" id="notifDot">
+                        <?= $unreadCount > 9 ? '9+' : $unreadCount ?>
                     </span>
+                    <?php else: ?>
+                    <span class="notif-dot" id="notifDot"></span>
+                    <?php endif; ?>
                 </button>
 
                 <div class="acc-drop" id="accDrop">
@@ -652,8 +661,8 @@ function getNotifTitle($type) {
                     <!-- Panel: Compte -->
                     <div class="acc-panel active" id="panel-compte">
                         <div class="acc-head">
-                            <p class="acc-name"><?= htmlspecialchars($_SESSION['user_nom']) ?></p>
-                            <span class="acc-role"><?= ucfirst($_SESSION['user_role']) ?></span>
+                            <p class="acc-name"><?= htmlspecialchars($_SESSION['user_nom'] ?? 'Utilisateur') ?></p>
+                            <span class="acc-role"><?= ucfirst($_SESSION['user_role'] ?? '') ?></span>
                         </div>
                         <hr class="acc-divider">
                         <div class="acc-menu-body">
@@ -665,7 +674,7 @@ function getNotifTitle($type) {
                             <a href="favoris.php"><i class="bi bi-heart"></i> Mes favoris</a>
                             <?php endif; ?>
                             
-                            <!-- Mes boutiques pour producteur -->
+                            <!-- Mes boutiques para producteur -->
                             <?php if ($_SESSION['user_role'] === 'producteur'): ?>
                             <div class="boutique-submenu">
                                 <div class="sub-label"><i class="bi bi-shop"></i> Mes boutiques</div>
@@ -723,7 +732,6 @@ function getNotifTitle($type) {
                                     <div class="notif-text">
                                         <?php 
                                         $message = $n['text'];
-                                        // Si es evaluación, resaltar estrellas
                                         if ($isEvaluation) {
                                             $message = preg_replace('/(⭐{1,5}☆{0,5})/', '<span class="stars">$1</span>', $message);
                                         }
@@ -757,6 +765,7 @@ function getNotifTitle($type) {
                 </div><!-- /acc-drop -->
             </div>
             <?php else: ?>
+            <!-- Botón de conexión para usuarios no logueados -->
             <a href="signin.php" class="login-link">
                 <i class="bi bi-box-arrow-in-right"></i> Connexion
             </a>
@@ -786,8 +795,8 @@ function getNotifTitle($type) {
             <a href="apropos.php"  class="mob-link <?= $currentPage==='apropos.php'  ? 'active':'' ?>"><i class="bi bi-info-circle"></i> À propos</a>
             <div class="mob-div"></div>
             
-            <!-- Mes boutiques mobile pour producteur -->
-            <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'producteur'): ?>
+            <!-- Mes boutiques mobile para productor -->
+            <?php if ($isLoggedIn && $_SESSION['user_role'] === 'producteur'): ?>
             <div style="padding:.2rem 1rem">
                 <p class="mob-sub-label"><i class="bi bi-shop"></i> Mes boutiques</p>
                 <?php if (!empty($mesBoutiques)): ?>
@@ -808,8 +817,8 @@ function getNotifTitle($type) {
             <div class="mob-div"></div>
             <?php endif; ?>
             
-            <!-- Favoris pour client -->
-            <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'client'): ?>
+            <!-- Favoris para client -->
+            <?php if ($isLoggedIn && $_SESSION['user_role'] === 'client'): ?>
             <a href="favoris.php" class="mob-link">
                 <i class="bi bi-heart" style="color:var(--gold);"></i> Mes favoris
             </a>
@@ -826,10 +835,10 @@ function getNotifTitle($type) {
             </div>
             <div class="mob-div"></div>
             
-            <?php if (isset($_SESSION['user_role'])): ?>
+            <?php if ($isLoggedIn): ?>
             <div style="padding:.35rem 1rem">
                 <p style="font-size:.7rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em">Mon compte (<?= ucfirst($_SESSION['user_role']) ?>)</p>
-                <p style="font-weight:600;color:#fff;margin-top:2px"><?= htmlspecialchars($_SESSION['user_nom']) ?></p>
+                <p style="font-weight:600;color:#fff;margin-top:2px"><?= htmlspecialchars($_SESSION['user_nom'] ?? 'Utilisateur') ?></p>
             </div>
             <a href="<?= $dashboardLink ?>" class="mob-link"><i class="bi bi-grid-1x2"></i> Tableau de bord</a>
             <a href="notifications.php" class="mob-link">

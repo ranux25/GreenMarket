@@ -1,52 +1,58 @@
 <?php
 session_start();
-include('connexion.php');
 
-// Vérifier que l'utilisateur est connecté et est admin
+// SOLO ADMIN
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-    header('Location: signin.php');
+    header("Location: dashboard_admin.php?msgerr=" . urlencode('Non autorisé'));
     exit;
 }
 
-$id = $_GET['id'] ?? 0;
+include('connexion.php');
 
-if (!$id) {
-    $_SESSION['error'] = 'ID du producteur invalide';
-    header('Location: dashboard_admin.php');
+$id_producteur = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+if (!$id_producteur) {
+    header("Location: dashboard_admin.php?msgerr=" . urlencode('ID producteur manquant'));
     exit;
 }
 
 try {
-    // Vérifier si le producteur existe
-    $stmt = $pdo->prepare("SELECT * FROM producteur WHERE id_producteur = ?");
-    $stmt->execute([$id]);
+    // Obtener estado actual
+    $stmt = $pdo->prepare("SELECT id_producteur, nom_entreprise, est_valide_par_admin FROM producteur WHERE id_producteur = ?");
+    $stmt->execute([$id_producteur]);
     $producteur = $stmt->fetch();
     
     if (!$producteur) {
-        $_SESSION['error'] = 'Producteur non trouvé';
-        header('Location: dashboard_admin.php');
-        exit;
+        throw new Exception('Producteur non trouvé');
     }
     
-    // Suspendre le producteur (mettre est_valide_par_admin = 0)
-    $stmt = $pdo->prepare("UPDATE producteur SET est_valide_par_admin = 0 WHERE id_producteur = ?");
-    $stmt->execute([$id]);
+    $nouveau_statut = $producteur['est_valide_par_admin'] == 1 ? 0 : 1;
     
-    // Optionnel: Désactiver aussi les produits de ce producteur
+    $stmt = $pdo->prepare("UPDATE producteur SET est_valide_par_admin = ? WHERE id_producteur = ?");
+    $stmt->execute([$nouveau_statut, $id_producteur]);
+    
+    if ($nouveau_statut == 1) {
+        $message = '✅ Producteur "' . $producteur['nom_entreprise'] . '" réactivé avec succès';
+        $notification_message = '✅ Votre compte producteur "' . $producteur['nom_entreprise'] . '" a été réactivé par l\'administrateur.';
+        $type = 'reactivation_producteur';
+    } else {
+        $message = '⛔ Producteur "' . $producteur['nom_entreprise'] . '" suspendu avec succès';
+        $notification_message = '⛔ Votre compte producteur "' . $producteur['nom_entreprise'] . '" a été suspendu par l\'administrateur. Veuillez contacter le support.';
+        $type = 'suspension_producteur';
+    }
+    
+    // Notificar al productor
     $stmt = $pdo->prepare("
-        UPDATE produit p 
-        JOIN boutique b ON p.id_boutique = b.id_boutique 
-        SET p.est_valide_par_admin = 0, p.statut_publie = 'Suspendu'
-        WHERE b.id_producteur = ?
+        INSERT INTO notification (id_producteur, message, type_notification, date_notification, est_lu) 
+        VALUES (?, ?, ?, NOW(), 0)
     ");
-    $stmt->execute([$id]);
-    
-    $_SESSION['success'] = '⛔ Producteur suspendu avec succès. Tous ses produits ont été désactivés.';
-    
-} catch(PDOException $e) {
-    $_SESSION['error'] = 'Erreur lors de la suspension: ' . $e->getMessage();
-}
+    $stmt->execute([$id_producteur, $notification_message, $type]);
 
-header('Location: dashboard_admin.php');
-exit;
+    header("Location: dashboard_admin.php?msgs=" . urlencode($message) . "&tab=producteurs");
+    exit;
+
+} catch(Exception $e) {
+    header("Location: dashboard_admin.php?msgerr=" . urlencode($e->getMessage()));
+    exit;
+}
 ?>

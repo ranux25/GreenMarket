@@ -1,45 +1,55 @@
 <?php
 session_start();
-include('connexion.php');
-
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'client') {
-    echo json_encode(['success' => false, 'message' => 'Non autorisé']);
-    exit();
+// SOLO CLIENTES
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'client') {
+    echo json_encode(['success' => false, 'message' => 'Veuillez vous connecter en tant que client']);
+    exit;
 }
 
-$id_client = $_SESSION['user_id'];
-$id_boutique = intval($_POST['id_boutique'] ?? 0);
+include('connexion.php');
 
-if ($id_boutique <= 0) {
-    echo json_encode(['success' => false, 'message' => 'ID boutique invalide']);
-    exit();
+$id_boutique = isset($_POST['id_boutique']) ? (int)$_POST['id_boutique'] : 0;
+
+if (!$id_boutique) {
+    echo json_encode(['success' => false, 'message' => 'ID de boutique manquant']);
+    exit;
 }
 
 try {
+    // Verificar si la boutique existe
     $stmt = $pdo->prepare("SELECT id_boutique FROM boutique WHERE id_boutique = ?");
     $stmt->execute([$id_boutique]);
     if (!$stmt->fetch()) {
         echo json_encode(['success' => false, 'message' => 'Boutique non trouvée']);
-        exit();
+        exit;
     }
-
-    $stmt = $pdo->prepare("SELECT id_boutique FROM favoris_boutique WHERE id_client = ? AND id_boutique = ?");
+    
+    $id_client = $_SESSION['user_id'];
+    
+    // Verificar si ya está en favoritos
+    $stmt = $pdo->prepare("SELECT * FROM favoris_boutique WHERE id_client = ? AND id_boutique = ?");
     $stmt->execute([$id_client, $id_boutique]);
     $existe = $stmt->fetch();
-
+    
     if ($existe) {
+        // Eliminar de favoritos
         $stmt = $pdo->prepare("DELETE FROM favoris_boutique WHERE id_client = ? AND id_boutique = ?");
         $stmt->execute([$id_client, $id_boutique]);
-        echo json_encode(['success' => true, 'message' => 'Boutique retirée des favoris', 'action' => 'removed']);
+        echo json_encode(['success' => true, 'action' => 'removed']);
     } else {
+        // Agregar a favoritos
         $stmt = $pdo->prepare("INSERT INTO favoris_boutique (id_client, id_boutique) VALUES (?, ?)");
         $stmt->execute([$id_client, $id_boutique]);
-        echo json_encode(['success' => true, 'message' => 'Boutique ajoutée aux favoris', 'action' => 'added']);
+        echo json_encode(['success' => true, 'action' => 'added']);
     }
 
 } catch(PDOException $e) {
-    echo json_encode(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);
+    error_log("Erreur toggle_favori_boutique: " . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => 'Erreur SQL: ' . $e->getMessage()]);
+} catch(Exception $e) {
+    error_log("Erreur toggle_favori_boutique: " . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
 ?>

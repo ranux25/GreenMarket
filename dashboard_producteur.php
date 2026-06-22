@@ -10,6 +10,9 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'producteur') {
 #connexion a la base de donnees
 include('connexion.php');
 
+# ===== THEME (COOKIES) =====
+$theme = $_COOKIE['theme'] ?? 'light';
+
 # 🔥 DEBUG - Verificar sesión
 $debug_info = [];
 $debug_info['session_user_id'] = $_SESSION['user_id'] ?? 'NO SET';
@@ -87,7 +90,6 @@ try {
             $produitIds = array_column($produits, 'id_produit');
             $placeholders = implode(',', array_fill(0, count($produitIds), '?'));
             
-            // 🔥 CORRIGÉ: Supprimé cl.telephone qui n'existe pas dans la table client
             $stmt = $pdo->prepare("
                 SELECT DISTINCT c.id_commande, c.date_commande, c.statut_commande, c.montant_total,
                        cl.nom_client, cl.email,
@@ -151,7 +153,7 @@ try {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="<?php echo $theme; ?>">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -159,9 +161,53 @@ try {
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
-  /* Styles spécifiques au dashboard producteur */
+  /* ===== VARIABLES THEME ===== */
+  :root {
+    --primary: #5D0D18;
+    --primary-light: #7a1020;
+    --secondary: #9FB2AC;
+    --bg: #FFF9EB;
+    --bg-light: #f5f0e8;
+    --bg-card: #ffffff;
+    --bg-input: #ffffff;
+    --text-dark: #2C2C2C;
+    --text-light: #6B6B6B;
+    --border-color: #e8ddd0;
+    --shadow-color: rgba(93,13,24,0.1);
+    --gold: #c07a1a;
+    --success: #27ae60;
+    --danger: #c0392b;
+    --warning: #f39c12;
+    --info: #2980b9;
+  }
+  
+  [data-theme="dark"] {
+    --primary: #8a6048;
+    --primary-light: #a0785a;
+    --secondary: #6d4c3a;
+    --bg: #2c241e;
+    --bg-light: #3d3229;
+    --bg-card: #3d3229;
+    --bg-input: #4d3d32;
+    --text-dark: #f0e6d8;
+    --text-light: #b8a896;
+    --border-color: #5a4a3a;
+    --shadow-color: rgba(0,0,0,0.4);
+    --gold: #d4a85c;
+    --success: #2e7d32;
+    --danger: #c0392b;
+    --warning: #f39c12;
+    --info: #2980b9;
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Lato', sans-serif; background: #fff9eb; }
+  body { 
+    font-family: 'Lato', sans-serif; 
+    background: var(--bg); 
+    color: var(--text-dark);
+    transition: background 0.3s, color 0.3s;
+    min-height: 100vh;
+  }
 
   .dashboard-grid {
     display: grid;
@@ -172,25 +218,25 @@ try {
     margin: 0 auto;
   }
   .stat-card {
-    background: white;
-    border: 1px solid #e8ddd0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 1.5rem;
     text-align: center;
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
   }
-  .stat-card:hover { transform: translateY(-5px); }
+  .stat-card:hover { transform: translateY(-5px); box-shadow: 0 4px 20px var(--shadow-color); }
   .stat-icon { font-size: 2rem; }
   .stat-val {
     font-family: 'Playfair Display', serif;
     font-size: 2rem;
     font-weight: 700;
-    color: #5d0d18;
+    color: var(--primary);
     margin: 0.5rem 0;
   }
   .stat-label {
     font-size: 0.8rem;
-    color: #6b5055;
+    color: var(--text-light);
     text-transform: uppercase;
   }
 
@@ -202,7 +248,7 @@ try {
   .tabs {
     display: flex;
     gap: 0.5rem;
-    border-bottom: 2px solid #e8ddd0;
+    border-bottom: 2px solid var(--border-color);
     flex-wrap: wrap;
   }
   .tab-btn {
@@ -211,14 +257,25 @@ try {
     background: none;
     cursor: pointer;
     font-size: 0.9rem;
-    color: #6b5055;
+    color: var(--text-light);
     transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
   }
-  .tab-btn:hover { color: #5d0d18; }
+  .tab-btn:hover { color: var(--primary); }
   .tab-btn.active {
-    color: #5d0d18;
-    border-bottom: 2px solid #5d0d18;
+    color: var(--primary);
+    border-bottom-color: var(--primary);
     font-weight: 600;
+  }
+  [data-theme="dark"] .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .tab-btn .badge-tab {
+    background: var(--danger);
+    color: white;
+    border-radius: 50%;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.7rem;
+    margin-left: 0.3rem;
   }
 
   .main-content {
@@ -230,14 +287,15 @@ try {
   .tab-panel.active { display: block; }
 
   .section-card {
-    background: white;
-    border: 1px solid #e8ddd0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     overflow: hidden;
     margin-bottom: 2rem;
+    transition: background 0.3s, border-color 0.3s;
   }
   .section-header {
-    background: #5d0d18;
+    background: var(--primary);
     color: #fff9eb;
     padding: 1rem 1.5rem;
     font-family: 'Playfair Display', serif;
@@ -247,6 +305,8 @@ try {
     justify-content: space-between;
     align-items: center;
   }
+  [data-theme="dark"] .section-header { background: var(--primary-light); }
+  
   .badge-count {
     background: rgba(255,255,255,0.2);
     border-radius: 20px;
@@ -263,6 +323,11 @@ try {
     margin: 2rem;
     text-align: center;
   }
+  [data-theme="dark"] .alert-warning {
+    background: #4a3a1a;
+    border-color: #f0d080;
+    color: #f0d080;
+  }
 
   .alert-success {
     background: #d4edda;
@@ -271,20 +336,10 @@ try {
     border-radius: 12px;
     margin: 1.5rem;
   }
-
-  /* 🔥 DEBUG INFO */
-  .debug-info {
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 1rem 2.5rem;
-    font-family: monospace;
-    font-size: 12px;
-    color: #333;
-    display: block;
+  [data-theme="dark"] .alert-success {
+    background: #1e4620;
+    color: #8fdf9f;
   }
-  .debug-info strong { color: #5d0d18; }
 
   .table-wrapper { overflow-x: auto; }
   table {
@@ -294,16 +349,20 @@ try {
   th, td {
     padding: 1rem;
     text-align: left;
-    border-bottom: 1px solid #e8ddd0;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-dark);
   }
   th {
-    background: #fff9eb;
+    background: var(--bg-light);
     font-weight: 600;
+    color: var(--text-dark);
   }
+  [data-theme="dark"] th { background: var(--bg); }
+  
   .empty-state {
     text-align: center;
     padding: 3rem;
-    color: #6b5055;
+    color: var(--text-light);
   }
   .empty-state .empty-icon {
     font-size: 3rem;
@@ -315,13 +374,13 @@ try {
     display: inline-block;
     margin-top: 1rem;
     padding: 0.6rem 1.5rem;
-    background: #5d0d18;
+    background: var(--primary);
     color: white;
     border-radius: 8px;
     text-decoration: none;
     font-weight: 600;
   }
-  .empty-state .btn-primary:hover { background: #3e0910; }
+  .empty-state .btn-primary:hover { background: var(--primary-light); }
 
   .badge {
     padding: 0.25rem 0.65rem;
@@ -329,10 +388,15 @@ try {
     font-size: 0.75rem;
     font-weight: 600;
   }
-  .badge-success { background: #d4edda; color: #27ae60; }
-  .badge-info { background: #d1ecf1; color: #2980b9; }
-  .badge-warning { background: #fff3cd; color: #856404; }
-  .badge-danger { background: #f8d7da; color: #c0392b; }
+  .badge-success { background: #d4edda; color: var(--success); }
+  .badge-info { background: #d1ecf1; color: var(--info); }
+  .badge-warning { background: #fff3cd; color: var(--warning); }
+  .badge-danger { background: #f8d7da; color: var(--danger); }
+  
+  [data-theme="dark"] .badge-success { background: #1e4620; color: #8fdf9f; }
+  [data-theme="dark"] .badge-warning { background: #4a3a1a; color: #f0d080; }
+  [data-theme="dark"] .badge-info { background: #1a3a4a; color: #80d0f0; }
+  [data-theme="dark"] .badge-danger { background: #4a1a1a; color: #f08080; }
 
   .btn {
     padding: 0.4rem 0.8rem;
@@ -341,23 +405,151 @@ try {
     border: none;
     cursor: pointer;
     transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
   }
-  .btn-wine { background: #5d0d18; color: white; }
-  .btn-wine:hover { background: #3e0910; }
-  .btn-success { background: #27ae60; color: white; }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-wine { background: var(--primary); color: white; }
+  .btn-wine:hover { background: var(--primary-light); }
+  .btn-success { background: var(--success); color: white; }
   .btn-success:hover { background: #219653; }
-  .btn-danger { background: #c0392b; color: white; }
+  .btn-danger { background: var(--danger); color: white; }
   .btn-danger:hover { background: #a93226; }
-  .btn-info { background: #2980b9; color: white; }
-  .btn-info:hover { background: #1f6fa5; }
+  .btn-info { background: var(--info); color: white; }
+  .btn-info:hover { background: #2471a3; }
+  .btn-outline-wine { 
+    background: transparent; 
+    color: var(--primary); 
+    border: 1.5px solid var(--primary);
+  }
+  .btn-outline-wine:hover { background: var(--primary); color: white; }
 
   .action-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+  /* ===== SETTINGS PANEL ===== */
+  .settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 1.5rem;
+  }
+  .settings-group {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 1.2rem;
+    border: 1px solid var(--border-color);
+  }
+  .settings-group h4 {
+    font-family: 'Playfair Display', serif;
+    color: var(--primary);
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+  }
+  .settings-group p {
+    color: var(--text-light);
+  }
+
+  /* ===== TOGGLE THEME AVEC ANIMATION ===== */
+  .theme-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+  }
+  .theme-toggle-label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: 500;
+  }
+
+  .theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .theme-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #ccc;
+    transition: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border-radius: 34px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .theme-slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background: white;
+    transition: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  .theme-slider .slider-icons {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    padding: 0 8px;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    font-size: 14px;
+    color: #fff;
+    z-index: 1;
+  }
+  .theme-slider .slider-icons .icon-sun { opacity: 1; }
+  .theme-slider .slider-icons .icon-moon { opacity: 0.3; }
+
+  .theme-switch input:checked + .theme-slider {
+    background: #2c241e;
+  }
+
+  .theme-switch input:checked + .theme-slider:before {
+    transform: translateX(26px);
+    background: #f0e6d8;
+  }
+
+  .theme-switch input:checked + .theme-slider .slider-icons .icon-sun {
+    opacity: 0.3;
+  }
+  .theme-switch input:checked + .theme-slider .slider-icons .icon-moon {
+    opacity: 1;
+  }
+
+  .theme-switch input:active + .theme-slider:before {
+    width: 32px;
+  }
+
+  .theme-switch:hover .theme-slider {
+    box-shadow: 0 0 0 4px rgba(93,13,24,0.15);
+  }
+  [data-theme="dark"] .theme-switch:hover .theme-slider {
+    box-shadow: 0 0 0 4px rgba(212,168,92,0.2);
+  }
 
   .toast {
     position: fixed;
     bottom: 2rem;
     right: 2rem;
-    background: #5d0d18;
+    background: var(--primary);
     color: white;
     padding: 0.8rem 1.5rem;
     border-radius: 8px;
@@ -370,10 +562,48 @@ try {
     transform: translateY(0);
     opacity: 1;
   }
+  .toast.error { background: var(--danger); }
+  .toast.success { background: var(--success); }
 
   @media (max-width: 768px) {
     .dashboard-grid, .tabs-container, .main-content {
       padding: 1rem;
+    }
+    .settings-grid {
+      grid-template-columns: 1fr;
+    }
+    .tab-btn {
+      padding: 0.5rem 0.8rem;
+      font-size: 0.8rem;
+    }
+    .section-header {
+      font-size: 1rem;
+      padding: 0.8rem 1rem;
+    }
+    .theme-switch {
+      width: 50px;
+      height: 28px;
+    }
+    .theme-slider:before {
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+    }
+    .theme-switch input:checked + .theme-slider:before {
+      transform: translateX(22px);
+    }
+    .theme-slider .slider-icons {
+      font-size: 11px;
+      padding: 0 5px;
+    }
+    th, td {
+      padding: 0.5rem;
+      font-size: 0.8rem;
+    }
+    .btn {
+      font-size: 0.7rem;
+      padding: 0.3rem 0.6rem;
     }
   }
 </style>
@@ -381,8 +611,6 @@ try {
 <body>
 
 <?php include 'header.php'; ?>
-
-<!-- 🔥 DEBUG INFO -->
 
 <!-- Mensaje de éxito al crear boutique -->
 <?php if (isset($_GET['boutique_creation']) && $_GET['boutique_creation'] == 'success'): ?>
@@ -436,6 +664,7 @@ try {
     <button class="tab-btn" data-tab="boutiques">🏪 Mes Boutiques</button>
     <button class="tab-btn" data-tab="produits">📦 Mes Produits</button>
     <button class="tab-btn" data-tab="commandes">🛒 Commandes</button>
+    <button class="tab-btn" data-tab="parametres">⚙️ Paramètres</button>
   </div>
 </div>
 
@@ -568,7 +797,7 @@ try {
   </div>
 
   <!-- ============================== -->
-  <!-- ONGLET COMMANDES CON GESTION   -->
+  <!-- ONGLET COMMANDES               -->
   <!-- ============================== -->
   <div class="tab-panel" id="tab-commandes">
     <div class="section-card">
@@ -654,6 +883,56 @@ try {
     </div>
   </div>
 
+  <!-- ============================== -->
+  <!-- ONGLET PARAMÈTRES              -->
+  <!-- ============================== -->
+  <div class="tab-panel" id="tab-parametres">
+    <div class="section-card">
+      <div class="section-header">⚙️ Paramètres</div>
+      <div class="settings-grid">
+        
+        <!-- ===== THEME TOGGLE AVEC ANIMATION ===== -->
+        <div class="settings-group">
+          <h4>🎨 Thème Clair / Sombre</h4>
+          <div class="theme-toggle-wrapper">
+            <span class="theme-toggle-label">☀️ Clair</span>
+            <label class="theme-switch">
+              <input type="checkbox" id="themeToggle" <?php echo $theme === 'dark' ? 'checked' : ''; ?> onchange="toggleTheme()">
+              <span class="theme-slider">
+                <span class="slider-icons">
+                  <span class="icon-sun">☀️</span>
+                  <span class="icon-moon">🌙</span>
+                </span>
+              </span>
+            </label>
+            <span class="theme-toggle-label">🌙 Sombre</span>
+          </div>
+          <p style="font-size:0.75rem;color:var(--text-light);margin-top:0.5rem;">
+            <?php echo $theme === 'dark' ? '🌙 Mode sombre activé' : '☀️ Mode clair activé'; ?>
+          </p>
+        </div>
+        
+        <!-- ===== INFORMATIONS DU COMPTE ===== -->
+        <div class="settings-group">
+          <h4>👤 Informations du compte</h4>
+          <p style="font-size:0.9rem;color:var(--text-dark);">
+            <strong>Entreprise :</strong> <?php echo htmlspecialchars($producteur['nom_entreprise']); ?><br>
+            <strong>Email :</strong> <?php echo htmlspecialchars($producteur['email']); ?><br>
+            <strong>Statut :</strong> 
+            <?php if ($producteur['est_valide_par_admin'] == 1): ?>
+              <span class="badge badge-success">✅ Validé</span>
+            <?php else: ?>
+              <span class="badge badge-warning">⏳ En attente de validation</span>
+            <?php endif; ?>
+            <br>
+            <strong>Date d'inscription :</strong> <?php echo date('d/m/Y', strtotime($producteur['date_inscription'])); ?>
+          </p>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <?php endif; ?>
@@ -661,7 +940,9 @@ try {
 <div class="toast" id="toast"></div>
 
 <script>
-// Gestion des onglets
+// ============================================
+// ONGLETS
+// ============================================
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', function() {
     const tabName = this.getAttribute('data-tab');
@@ -672,21 +953,20 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
+// ============================================
+// TOAST
+// ============================================
 function showToast(msg, isError = false) {
   const toast = document.getElementById('toast');
   toast.innerHTML = msg;
-  if (isError) {
-    toast.style.background = '#c0392b';
-  } else {
-    toast.style.background = '#5d0d18';
-  }
+  toast.className = 'toast' + (isError ? ' error' : '');
   toast.classList.add('show');
-  setTimeout(() => {
-    toast.classList.remove('show');
-    toast.style.background = '#5d0d18';
-  }, 3000);
+  setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
+// ============================================
+// UPDATE STATUT COMMANDE
+// ============================================
 function updateStatut(id, statut) {
   if (confirm('Voulez-vous vraiment changer le statut de cette commande en "' + statut + '" ?')) {
     fetch('update_commande.php', {
@@ -707,9 +987,47 @@ function updateStatut(id, statut) {
   }
 }
 
+// ============================================
+// VOIR DÉTAILS COMMANDE
+// ============================================
 function voirDetails(id) {
   window.location.href = 'details_commande.php?id=' + id;
 }
+
+// ============================================
+// TOGGLE THEME AVEC ANIMATION
+// ============================================
+function toggleTheme() {
+  const checkbox = document.getElementById('themeToggle');
+  const theme = checkbox.checked ? 'dark' : 'light';
+  
+  // Sauvegarder dans un cookie
+  document.cookie = 'theme=' + theme + '; path=/; max-age=31536000';
+  
+  // Appliquer le thème immédiatement
+  document.documentElement.setAttribute('data-theme', theme);
+  
+  // Mettre à jour le texte de statut
+  const statusText = document.querySelector('.settings-group p');
+  if (statusText) {
+    statusText.textContent = theme === 'dark' ? '🌙 Mode sombre activé' : '☀️ Mode clair activé';
+  }
+  
+  // Afficher le message
+  const themeName = theme === 'light' ? 'clair' : 'sombre';
+  showToast('✅ Thème changé en ' + themeName);
+  
+  // Recharger la page pour appliquer les changements dans le header également
+  setTimeout(() => location.reload(), 600);
+}
+
+// ============================================
+// INIT - Appliquer le thème au chargement
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+  const theme = '<?php echo $theme; ?>';
+  document.documentElement.setAttribute('data-theme', theme);
+});
 </script>
 </body>
 </html>
