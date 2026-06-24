@@ -3,16 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3307
--- Généré le : mar. 09 juin 2026 à 22:52
+-- Généré le : mar. 23 juin 2026 à 01:07
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.0.30
---
--- IMPORTANT : Après avoir importé cette base de données, exécutez le script
--- migrate_passwords.php UNE SEULE FOIS via votre navigateur (ex: http://localhost/Projet-Web/migrate_passwords.php)
--- pour hasher les mots de passe en clair. Les comptes par défaut sont :
---   Admin    : admin@greenmarket.com / admin123
---   Producteurs : caftan@gmail.com / 123456  (et tous les autres producteurs)
---
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -46,7 +39,22 @@ CREATE TABLE `administrateur` (
 --
 
 INSERT INTO `administrateur` (`id_admin`, `nom_admin`, `email`, `mot_de_passe`) VALUES
-(1, 'Administrador Principal', 'admin@greenmarket.com', 'admin123');
+(1, 'Administrateur', 'admin@greenmarket.com', '$2y$12$Vl5LeR0.PeHeEvoHFV.gtec8FtgGwKBle3ZAqzC5PAAW87Vx64HwS');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `alertes_stock`
+--
+
+CREATE TABLE `alertes_stock` (
+  `id_alerte` int(11) NOT NULL,
+  `id_produit` int(11) NOT NULL,
+  `id_client` int(11) NOT NULL,
+  `date_creation` datetime DEFAULT current_timestamp(),
+  `date_desactivation` datetime DEFAULT NULL,
+  `est_active` tinyint(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -58,26 +66,29 @@ CREATE TABLE `boutique` (
   `id_boutique` int(11) NOT NULL,
   `id_producteur` int(11) NOT NULL,
   `nom_boutique` varchar(100) NOT NULL,
+  `id_categorie` int(11) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
   `image` varchar(255) DEFAULT NULL,
-  `date_creation` datetime NOT NULL DEFAULT current_timestamp()
+  `date_creation` datetime NOT NULL DEFAULT current_timestamp(),
+  `est_valide_par_admin` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `boutique`
 --
 
-INSERT INTO `boutique` (`id_boutique`, `id_producteur`, `nom_boutique`, `description`, `date_creation`) VALUES
-(11, 1, 'Maison de Caftan', 'Création artisanale de caftans marocains traditionnels', '2026-06-09 21:34:20'),
-(12, 2, 'Tapis Berbère d\'Atlas', 'Tapis berbères tissés à la main dans les montagnes de l’Atlas', '2026-06-09 21:34:20'),
-(13, 3, 'Poterie de Safi', 'Poteries artisanales de la ville de Safi', '2026-06-09 21:34:20'),
-(14, 4, 'Marqueterie de Tetouan', 'Objets décoratifs en bois marqueté', '2026-06-09 21:34:20'),
-(15, 5, 'Bijoux Amazigh', 'Bijoux traditionnels amazighs faits à la main', '2026-06-09 21:34:20'),
-(16, 6, 'Lumières de Marrakech', 'Lanternes et luminaires artisanaux marocains', '2026-06-09 21:34:20'),
-(17, 7, 'Argamane Naturel', 'Produits naturels à base d’huile d’argan', '2026-06-09 21:34:20'),
-(18, 8, 'Saveurs du Terroir', 'Produits gastronomiques du terroir marocain', '2026-06-09 21:34:20'),
-(19, 9, 'Tissage d\'Azilal', 'Textiles et couvertures artisanales d’Azilal', '2026-06-09 21:34:20'),
-(20, 10, 'Caftans Impériaux', 'Caftans de luxe inspirés des traditions impériales', '2026-06-09 21:34:20');
+INSERT INTO `boutique` (`id_boutique`, `id_producteur`, `nom_boutique`, `id_categorie`, `description`, `image`, `date_creation`, `est_valide_par_admin`) VALUES
+(11, 1, 'Maison de Caftan', 1, 'Création artisanale de caftans marocains traditionnels', 'IMAGES/maisoncaftan.png', '2026-06-09 21:34:20', 1),
+(12, 2, 'Tapis Berbère d\'Atlas', 2, 'Tapis berbères tissés à la main dans les montagnes de l’Atlas', 'IMAGES/tapisberbere.png', '2026-06-09 21:34:20', 1),
+(13, 3, 'Poterie de Safi', 3, 'Poteries artisanales de la ville de Safi', 'IMAGES/poteriedesafi.png', '2026-06-09 21:34:20', 1),
+(14, 4, 'Marqueterie de Tetouan', 4, 'Objets décoratifs en bois marqueté', 'IMAGES/marqueterietetouan.png', '2026-06-09 21:34:20', 1),
+(15, 5, 'Bijoux Amazigh', 5, 'Bijoux traditionnels amazighs faits à la main', 'IMAGES/bijouxamazigh.png', '2026-06-09 21:34:20', 1),
+(16, 6, 'Lumières de Marrakech', 6, 'Lanternes et luminaires artisanaux marocains', 'IMAGES/lumieremarrakech.png', '2026-06-09 21:34:20', 1),
+(17, 7, 'Argamane Naturel', 7, 'Produits naturels à base d’huile d’argan', 'IMAGES/argamanenaturel.png', '2026-06-09 21:34:20', 1),
+(18, 8, 'Saveurs du Terroir', 8, 'Produits gastronomiques du terroir marocain', 'IMAGES/saveursterroir.png', '2026-06-09 21:34:20', 1),
+(19, 9, 'Tissage d\'Azilal', 2, 'Textiles et couvertures artisanales d’Azilal', 'IMAGES/tapisamazigh.png', '2026-06-09 21:34:20', 1),
+(20, 10, 'Caftans Impériaux', 5, 'Description...', 'IMAGES/caftansimperiaux.png', '2026-06-09 21:34:20', 1),
+(29, 10, 'Caftans Impériauxxx', 5, '3333', 'IMAGES/boutique_1782160546_6a399ca280d35.webp', '2026-06-22 21:35:46', 0);
 
 -- --------------------------------------------------------
 
@@ -108,20 +119,65 @@ INSERT INTO `categorie` (`id_categorie`, `nom_categorie`, `description`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `categorie_boutique`
+--
+
+CREATE TABLE `categorie_boutique` (
+  `id_categorie_boutique` int(11) NOT NULL,
+  `id_boutique` int(11) NOT NULL,
+  `id_categorie` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `categorie_boutique`
+--
+
+INSERT INTO `categorie_boutique` (`id_categorie_boutique`, `id_boutique`, `id_categorie`) VALUES
+(1, 11, 1),
+(2, 12, 2),
+(3, 13, 3),
+(4, 14, 4),
+(5, 15, 5),
+(6, 16, 6),
+(7, 17, 7),
+(8, 18, 8),
+(9, 19, 2),
+(10, 20, 1);
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `client`
 --
 
 CREATE TABLE `client` (
   `id_client` int(11) NOT NULL,
   `nom_client` varchar(50) NOT NULL,
-  `prenom_client` varchar(50) DEFAULT NULL,
   `email` varchar(100) NOT NULL,
+  `telephone` varchar(20) DEFAULT NULL,
+  `adresse` varchar(255) DEFAULT NULL,
   `mot_de_passe` varchar(255) NOT NULL,
-  `telephone_client` varchar(20) DEFAULT NULL,
-  `adresse_client` varchar(255) DEFAULT NULL,
   `date_inscription` datetime NOT NULL DEFAULT current_timestamp(),
   `est_actif` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `client`
+--
+
+INSERT INTO `client` (`id_client`, `nom_client`, `email`, `telephone`, `adresse`, `mot_de_passe`, `date_inscription`, `est_actif`) VALUES
+(1, 'Youssef El Amrani', 'youssef.elamrani@gmail.com', NULL, NULL, '$2y$12$V//CQt8/q0ZZNu5nZlduseQQrMu6IRpSBqDo4z2.rK6AcTc0852L.', '2026-05-10 10:00:00', 1),
+(2, 'Fatima Zahra Benali', 'fatima.benali@gmail.com', NULL, NULL, '$2y$12$V//CQt8/q0ZZNu5nZlduseQQrMu6IRpSBqDo4z2.rK6AcTc0852L.', '2026-05-12 11:00:00', 1),
+(3, 'Omar Tazi', 'omar.tazi@gmail.com', NULL, NULL, '$2y$12$V//CQt8/q0ZZNu5nZlduseQQrMu6IRpSBqDo4z2.rK6AcTc0852L.', '2026-05-14 09:30:00', 1),
+(4, 'Khadija Moussaoui', 'khadija.moussaoui@gmail.com', NULL, NULL, '$2y$12$V//CQt8/q0ZZNu5nZlduseQQrMu6IRpSBqDo4z2.rK6AcTc0852L.', '2026-05-15 14:00:00', 1),
+(5, 'Mehdi Berrada', 'mehdi.berrada@gmail.com', NULL, NULL, '$2y$12$V//CQt8/q0ZZNu5nZlduseQQrMu6IRpSBqDo4z2.rK6AcTc0852L.', '2026-05-18 16:00:00', 1),
+(6, 'Nadia Cherkaoui', 'nadia.cherkaoui@gmail.com', NULL, NULL, '$2y$12$V//CQt8/q0ZZNu5nZlduseQQrMu6IRpSBqDo4z2.rK6AcTc0852L.', '2026-05-20 08:00:00', 1),
+(7, 'Amine Hajji', 'amine.hajji@gmail.com', NULL, NULL, '$2y$12$V//CQt8/q0ZZNu5nZlduseQQrMu6IRpSBqDo4z2.rK6AcTc0852L.', '2026-05-22 10:30:00', 1),
+(8, 'Samira Idrissi', 'samira.idrissi@gmail.com', NULL, NULL, '$2y$12$V//CQt8/q0ZZNu5nZlduseQQrMu6IRpSBqDo4z2.rK6AcTc0852L.', '2026-05-25 12:00:00', 1),
+(9, 'Rachid Ouali', 'rachid.ouali@gmail.com', NULL, NULL, '$2y$12$V//CQt8/q0ZZNu5nZlduseQQrMu6IRpSBqDo4z2.rK6AcTc0852L.', '2026-05-28 15:00:00', 1),
+(10, 'Laila Benkirane', 'laila.benkirane@gmail.com', NULL, NULL, '$2y$12$V//CQt8/q0ZZNu5nZlduseQQrMu6IRpSBqDo4z2.rK6AcTc0852L.', '2026-06-01 09:00:00', 1),
+(21, 'Rania', 'Rania@gmail.com', NULL, NULL, '$2y$10$ym90alDGsH.rFr/uH1IJm.JEwB8/KcPLEedF0SsvDTjJLmf6T.OtG', '2026-06-09 22:43:37', 1),
+(22, 'zineb', 'zineb@gmail.com', NULL, NULL, 'zineb123$2y$10$uysKe/jYwuXg2JmEDYFF7eyGr6A97HC2uO0qT6xJxg2L5enZJMZXy', '2026-06-10 17:24:42', 1);
 
 -- --------------------------------------------------------
 
@@ -136,9 +192,22 @@ CREATE TABLE `commande` (
   `date_commande` datetime NOT NULL DEFAULT current_timestamp(),
   `statut_commande` enum('En attente','Confirmée','Expédiée','Livrée','Annulée') NOT NULL DEFAULT 'En attente',
   `montant_total` decimal(10,2) NOT NULL,
-  `adresse_livraison` varchar(500) DEFAULT NULL,
-  `facture` varchar(255) DEFAULT NULL
+  `adresse_livraison` varchar(255) DEFAULT NULL,
+  `facture` varchar(255) DEFAULT NULL,
+  `statut_validation` enum('en_attente','en_cours','tous_acceptes','partiellement_refuse') DEFAULT 'en_attente'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `commande`
+--
+
+INSERT INTO `commande` (`id_commande`, `id_client`, `id_paiement`, `date_commande`, `statut_commande`, `montant_total`, `adresse_livraison`, `facture`, `statut_validation`) VALUES
+(1, 10, NULL, '2026-06-20 19:39:26', 'Livrée', 6400.00, 'ain melloul, 93000 Tetouan', NULL, 'en_attente'),
+(2, 10, NULL, '2026-06-20 21:53:29', 'En attente', 11080.00, 'ain melloul, 93000 Tetouan', NULL, 'en_attente'),
+(3, 10, NULL, '2026-06-21 01:15:12', 'En attente', 4250.00, 'ain melloul, 93000 Tetouan', NULL, 'en_attente'),
+(4, 10, NULL, '2026-06-21 15:17:49', 'En attente', 4730.00, 'ain melloul, 93000 Tetouan', NULL, 'en_attente'),
+(5, 10, NULL, '2026-06-21 18:16:24', 'En attente', 4000.00, 'ain melloul, 93000 Tetouan', NULL, 'en_attente'),
+(6, 21, NULL, '2026-06-21 20:47:56', 'En attente', 7430.00, 'ain melloul, 93000 Tetouan', NULL, 'en_attente');
 
 -- --------------------------------------------------------
 
@@ -153,6 +222,47 @@ CREATE TABLE `contenir` (
   `prix_unitaire` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Déchargement des données de la table `contenir`
+--
+
+INSERT INTO `contenir` (`id_commande`, `id_produit`, `quantite`, `prix_unitaire`) VALUES
+(1, 62, 5, 750.00),
+(1, 65, 1, 380.00),
+(1, 66, 1, 220.00),
+(1, 80, 1, 1800.00),
+(2, 67, 1, 450.00),
+(2, 68, 1, 280.00),
+(2, 69, 1, 520.00),
+(2, 70, 1, 320.00),
+(2, 71, 1, 680.00),
+(2, 72, 1, 420.00),
+(2, 76, 2, 80.00),
+(2, 79, 2, 2200.00),
+(2, 80, 2, 1800.00),
+(3, 79, 1, 2200.00),
+(3, 80, 1, 1800.00),
+(4, 78, 1, 480.00),
+(4, 79, 1, 2200.00),
+(4, 80, 1, 1800.00),
+(5, 75, 1, 150.00),
+(5, 80, 2, 1800.00),
+(6, 61, 1, 1200.00),
+(6, 62, 1, 750.00),
+(6, 63, 1, 950.00),
+(6, 64, 1, 600.00),
+(6, 65, 1, 380.00),
+(6, 66, 1, 220.00),
+(6, 67, 1, 450.00),
+(6, 68, 1, 280.00),
+(6, 69, 1, 520.00),
+(6, 70, 1, 320.00),
+(6, 71, 1, 680.00),
+(6, 72, 1, 420.00),
+(6, 74, 2, 90.00),
+(6, 75, 1, 150.00),
+(6, 76, 1, 80.00);
+
 -- --------------------------------------------------------
 
 --
@@ -162,9 +272,40 @@ CREATE TABLE `contenir` (
 CREATE TABLE `evaluer` (
   `id_client` int(11) NOT NULL,
   `id_produit` int(11) NOT NULL,
-  `note` tinyint(4) NOT NULL,
-  `commentaire` varchar(255) DEFAULT NULL
+  `note` tinyint(4) NOT NULL CHECK (`note` between 1 and 5),
+  `commentaire` varchar(255) DEFAULT NULL,
+  `date_evaluation` datetime NOT NULL DEFAULT current_timestamp(),
+  `est_publie` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `evaluer`
+--
+
+INSERT INTO `evaluer` (`id_client`, `id_produit`, `note`, `commentaire`, `date_evaluation`, `est_publie`) VALUES
+(10, 62, 5, 'J\'aime ce produit!!!', '2026-06-21 19:08:07', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `evaluer_boutique`
+--
+
+CREATE TABLE `evaluer_boutique` (
+  `id_client` int(11) NOT NULL,
+  `id_boutique` int(11) NOT NULL,
+  `note` tinyint(4) NOT NULL CHECK (`note` between 1 and 5),
+  `commentaire` varchar(255) DEFAULT NULL,
+  `date_evaluation` datetime NOT NULL DEFAULT current_timestamp(),
+  `est_publie` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `evaluer_boutique`
+--
+
+INSERT INTO `evaluer_boutique` (`id_client`, `id_boutique`, `note`, `commentaire`, `date_evaluation`, `est_publie`) VALUES
+(10, 11, 5, 'J\'aime trop cette boutique!!', '2026-06-21 19:31:18', 1);
 
 -- --------------------------------------------------------
 
@@ -175,6 +316,65 @@ CREATE TABLE `evaluer` (
 CREATE TABLE `favoris` (
   `id_client` int(11) NOT NULL,
   `id_produit` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `favoris`
+--
+
+INSERT INTO `favoris` (`id_client`, `id_produit`) VALUES
+(10, 78),
+(10, 79),
+(10, 80),
+(21, 79);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `favoris_boutique`
+--
+
+CREATE TABLE `favoris_boutique` (
+  `id_client` int(11) NOT NULL,
+  `id_boutique` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `favoris_boutique`
+--
+
+INSERT INTO `favoris_boutique` (`id_client`, `id_boutique`) VALUES
+(10, 11),
+(10, 12);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `languages`
+--
+
+CREATE TABLE `languages` (
+  `id` int(11) NOT NULL,
+  `code` varchar(5) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `flag` varchar(10) NOT NULL,
+  `is_default` tinyint(1) DEFAULT 0,
+  `is_active` tinyint(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `ligne_commande`
+--
+
+CREATE TABLE `ligne_commande` (
+  `id_ligne` int(11) NOT NULL,
+  `id_commande` int(11) NOT NULL,
+  `id_produit` int(11) NOT NULL,
+  `quantite` int(11) NOT NULL DEFAULT 1,
+  `prix_unitaire` decimal(10,2) NOT NULL,
+  `sous_total` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -190,8 +390,45 @@ CREATE TABLE `notification` (
   `message` varchar(255) NOT NULL,
   `date_notification` datetime NOT NULL DEFAULT current_timestamp(),
   `est_lu` tinyint(1) NOT NULL DEFAULT 0,
-  `type_notification` varchar(30) NOT NULL
+  `type_notification` varchar(30) NOT NULL,
+  `id_produit` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `notification`
+--
+
+INSERT INTO `notification` (`id_notification`, `id_client`, `id_producteur`, `message`, `date_notification`, `est_lu`, `type_notification`, `id_produit`) VALUES
+(1, NULL, 10, '❌ Votre boutique \'Caftans Impériauxxx\' a été refusée par l\'administrateur. Veuillez contacter le support pour plus d\'informations.', '2026-06-20 21:44:33', 1, 'system', NULL),
+(2, NULL, 4, '🛒 Nouvelle commande de Laila Benkirane !\nCommande #000002\nTotal : 2 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-20 21:53:29', 0, 'order', NULL),
+(3, NULL, 5, '🛒 Nouvelle commande de Laila Benkirane !\nCommande #000002\nTotal : 2 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-20 21:53:29', 1, 'order', NULL),
+(4, NULL, 6, '🛒 Nouvelle commande de Laila Benkirane !\nCommande #000002\nTotal : 2 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-20 21:53:29', 0, 'order', NULL),
+(5, NULL, 8, '🛒 Nouvelle commande de Laila Benkirane !\nCommande #000002\nTotal : 2 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-20 21:53:29', 0, 'order', NULL),
+(6, NULL, 10, '🛒 Nouvelle commande de Laila Benkirane !\nCommande #000002\nTotal : 4 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-20 21:53:29', 1, 'order', NULL),
+(7, 10, NULL, '✅ Votre commande #000002 a été confirmée !\nTotal : 11,080.00 DH\nMerci pour votre achat sur GreenMarket 🌿', '2026-06-20 21:53:29', 1, 'order', NULL),
+(8, NULL, 10, '✅ Votre boutique \'Caftans Impériauxxx\' a été validée par l\'administrateur. Vous pouvez maintenant gérer vos produits et recevoir des commandes !', '2026-06-20 22:38:50', 1, 'system', NULL),
+(9, 10, NULL, '📦 Votre commande #000001 est maintenant : Confirmée.\n', '2026-06-20 22:53:57', 1, 'order', NULL),
+(10, 10, NULL, '📦 Votre commande #000001 est maintenant : Expédiée.\n', '2026-06-20 22:54:04', 1, 'order', NULL),
+(11, 10, NULL, '📦 Votre commande #000001 est maintenant : Livrée.\nMerci pour votre achat sur GreenMarket 🌿', '2026-06-20 22:54:08', 1, 'order', NULL),
+(12, NULL, 10, '🛒 Nouvelle commande de Laila Benkirane !\nCommande #000003\nTotal : 2 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-21 01:15:12', 1, 'order', NULL),
+(14, NULL, 9, '🛒 Nouvelle commande de Laila Benkirane !\nCommande #000004\nTotal : 1 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-21 15:17:49', 0, 'order', NULL),
+(15, NULL, 10, '🛒 Nouvelle commande de Laila Benkirane !\nCommande #000004\nTotal : 2 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-21 15:17:49', 1, 'order', NULL),
+(17, NULL, 8, '🛒 Nouvelle commande de Laila Benkirane !\nCommande #000005\nTotal : 1 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-21 18:16:24', 0, 'order', NULL),
+(18, NULL, 10, '🛒 Nouvelle commande de Laila Benkirane !\nCommande #000005\nTotal : 2 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-21 18:16:24', 1, 'order', NULL),
+(19, 10, NULL, '✅ Votre commande #000005 a été confirmée !\nTotal : 4,000.00 DH\nMerci pour votre achat sur GreenMarket 🌿', '2026-06-21 18:16:24', 1, 'order', NULL),
+(20, NULL, 1, '📝 Nouvelle évaluation pour \"Djellaba Femme Blanche\"\nClient : Laila Benkirane\nNote : ⭐⭐⭐⭐⭐ (5/5)\nCommentaire : \"J\'aime ce produit!!!\"\n📅 21/06/2026 à 20:08', '2026-06-21 19:08:07', 0, 'evaluation', 62),
+(21, NULL, 1, '📝 Nouvelle évaluation pour la boutique \"Maison de Caftan\"\nClient : Laila Benkirane\nNote : ⭐⭐⭐⭐⭐ (5/5)\nCommentaire : \"J\'aime trop cette boutique!!\"\n📅 21/06/2026 à 20:31', '2026-06-21 19:31:18', 0, 'evaluation_boutique', NULL),
+(22, NULL, 1, '🛒 Nouvelle commande de Rania !\nCommande #000006\nTotal : 2 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-21 20:47:56', 0, 'order', NULL),
+(23, NULL, 2, '🛒 Nouvelle commande de Rania !\nCommande #000006\nTotal : 2 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-21 20:47:56', 0, 'order', NULL),
+(24, NULL, 3, '🛒 Nouvelle commande de Rania !\nCommande #000006\nTotal : 2 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-21 20:47:56', 0, 'order', NULL),
+(25, NULL, 4, '🛒 Nouvelle commande de Rania !\nCommande #000006\nTotal : 2 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-21 20:47:56', 0, 'order', NULL),
+(26, NULL, 5, '🛒 Nouvelle commande de Rania !\nCommande #000006\nTotal : 2 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-21 20:47:56', 0, 'order', NULL),
+(27, NULL, 6, '🛒 Nouvelle commande de Rania !\nCommande #000006\nTotal : 2 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-21 20:47:56', 0, 'order', NULL),
+(28, NULL, 7, '🛒 Nouvelle commande de Rania !\nCommande #000006\nTotal : 2 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-21 20:47:56', 0, 'order', NULL),
+(29, NULL, 8, '🛒 Nouvelle commande de Rania !\nCommande #000006\nTotal : 2 article(s)\nMerci de traiter cette commande rapidement.', '2026-06-21 20:47:56', 0, 'order', NULL),
+(30, 21, NULL, '✅ Votre commande #000006 a été confirmée !\nTotal : 7,430.00 DH\nMerci pour votre achat sur GreenMarket 🌿', '2026-06-21 20:47:56', 0, 'order', NULL),
+(33, NULL, 10, '❌ Votre boutique \"Caftans Impériauxxx\" a été refusée par l\'administrateur. Veuillez contacter le support pour plus d\'informations.', '2026-06-22 21:39:21', 1, 'refus_boutique', NULL),
+(34, NULL, 10, '❌ Votre boutique \"Caftans Impériauxxx\" a été refusée par l\'administrateur. Veuillez contacter le support pour plus d\'informations.', '2026-06-22 21:39:27', 1, 'refus_boutique', NULL);
 
 -- --------------------------------------------------------
 
@@ -230,11 +467,8 @@ CREATE TABLE `producteur` (
   `id_producteur` int(11) NOT NULL,
   `id_admin` int(11) DEFAULT NULL,
   `nom_entreprise` varchar(100) NOT NULL,
-  `nom_contact` varchar(100) DEFAULT NULL,
   `email` varchar(100) NOT NULL,
   `mot_de_passe` varchar(255) NOT NULL,
-  `telephone_producteur` varchar(20) DEFAULT NULL,
-  `adresse_producteur` varchar(255) DEFAULT NULL,
   `est_valide_par_admin` tinyint(1) NOT NULL DEFAULT 0,
   `date_inscription` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -244,16 +478,16 @@ CREATE TABLE `producteur` (
 --
 
 INSERT INTO `producteur` (`id_producteur`, `id_admin`, `nom_entreprise`, `email`, `mot_de_passe`, `est_valide_par_admin`, `date_inscription`) VALUES
-(1, 1, 'Maison de Caftan SARL', 'caftan@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
-(2, 1, 'Atlas Tapis', 'atlas@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
-(3, 1, 'Poterie Safi', 'safi@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
-(4, 1, 'Tetouan Art', 'tetouan@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
-(5, 1, 'Amazigh Bijoux', 'amazigh@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
-(6, 1, 'Marrakech Lumières', 'lumiere@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
-(7, 1, 'Argamane', 'argamane@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
-(8, 1, 'Saveurs Maroc', 'saveurs@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
-(9, 1, 'Azilal Textile', 'azilal@gmail.com', '123456', 1, '2026-06-09 21:32:01'),
-(10, 1, 'Caftans Impériaux', 'imperial@gmail.com', '123456', 1, '2026-06-09 21:32:01');
+(1, 1, 'Maison de Caftan SARL', 'caftan@gmail.com', '$2y$12$2Duuc.uumFnpaD4P.CIx5eyPGoISHEOUkBv1MOG0k1cu9LUb5LHbu', 1, '2026-06-09 21:32:01'),
+(2, 1, 'Atlas Tapis', 'atlas@gmail.com', '$2y$12$2Duuc.uumFnpaD4P.CIx5eyPGoISHEOUkBv1MOG0k1cu9LUb5LHbu', 1, '2026-06-09 21:32:01'),
+(3, 1, 'Poterie Safi', 'safi@gmail.com', '$2y$12$2Duuc.uumFnpaD4P.CIx5eyPGoISHEOUkBv1MOG0k1cu9LUb5LHbu', 1, '2026-06-09 21:32:01'),
+(4, 1, 'Tetouan Art', 'tetouan@gmail.com', '$2y$12$2Duuc.uumFnpaD4P.CIx5eyPGoISHEOUkBv1MOG0k1cu9LUb5LHbu', 1, '2026-06-09 21:32:01'),
+(5, 1, 'Amazigh Bijoux', 'amazigh@gmail.com', '$2y$12$2Duuc.uumFnpaD4P.CIx5eyPGoISHEOUkBv1MOG0k1cu9LUb5LHbu', 1, '2026-06-09 21:32:01'),
+(6, 1, 'Marrakech Lumières', 'lumiere@gmail.com', '$2y$12$2Duuc.uumFnpaD4P.CIx5eyPGoISHEOUkBv1MOG0k1cu9LUb5LHbu', 1, '2026-06-09 21:32:01'),
+(7, 1, 'Argamane', 'argamane@gmail.com', '$2y$12$2Duuc.uumFnpaD4P.CIx5eyPGoISHEOUkBv1MOG0k1cu9LUb5LHbu', 1, '2026-06-09 21:32:01'),
+(8, 1, 'Saveurs Maroc', 'saveurs@gmail.com', '$2y$12$2Duuc.uumFnpaD4P.CIx5eyPGoISHEOUkBv1MOG0k1cu9LUb5LHbu', 1, '2026-06-09 21:32:01'),
+(9, 1, 'Azilal Textile', 'azilal@gmail.com', '$2y$12$2Duuc.uumFnpaD4P.CIx5eyPGoISHEOUkBv1MOG0k1cu9LUb5LHbu', 1, '2026-06-09 21:32:01'),
+(10, 1, 'Caftans Impériaux', 'imperial@gmail.com', '$2y$12$2Duuc.uumFnpaD4P.CIx5eyPGoISHEOUkBv1MOG0k1cu9LUb5LHbu', 1, '2026-06-09 21:32:01');
 
 -- --------------------------------------------------------
 
@@ -272,8 +506,35 @@ CREATE TABLE `produit` (
   `statut_publie` enum('Brouillon','Publié','Suspendu') DEFAULT 'Brouillon',
   `est_valide_par_admin` tinyint(1) NOT NULL DEFAULT 0,
   `date_creation` datetime NOT NULL DEFAULT current_timestamp(),
-  `photo_url` varchar(255) DEFAULT NULL
+  `photo_url` varchar(255) DEFAULT NULL,
+  `statut_validation` enum('en_attente','valide','refuse') DEFAULT 'en_attente'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `produit`
+--
+
+INSERT INTO `produit` (`id_produit`, `id_categorie`, `id_boutique`, `nom_produit`, `description`, `prix_unitaire`, `stock_quantite`, `statut_publie`, `est_valide_par_admin`, `date_creation`, `photo_url`, `statut_validation`) VALUES
+(61, 1, 11, 'Caftan Brode Bordeaux', 'Caftan en soie brode a la main, couleur bordeaux', 1200.00, 14, 'Publié', 1, '2026-06-01 10:00:00', 'IMAGES\\produits\\Caftan Brode Bordeaux.jpg', 'en_attente'),
+(62, 1, 11, 'Djellaba Femme Blanche', 'Djellaba elegante en tissu leger pour femme', 750.00, 14, 'Publié', 1, '2026-06-01 10:05:00', 'IMAGES\\produits\\Djellaba Femme Blanche.jpg', 'en_attente'),
+(63, 2, 12, 'Tapis Berbere Rouge', 'Tapis berbere tisse a la main, motifs geometriques rouges', 950.00, 7, 'Publié', 1, '2026-06-01 10:10:00', 'IMAGES\\produits\\Tapis Berbere Rouge.jpg', 'en_attente'),
+(64, 2, 12, 'Couverture Azilal Bleue', 'Couverture artisanale aux tons bleu et blanc', 600.00, 11, 'Publié', 1, '2026-06-01 10:15:00', 'IMAGES\\produits\\Couverture Azilal Bleue.jpg', 'en_attente'),
+(65, 3, 13, 'Tajine Decoratif Safi', 'Tajine en ceramique peint a la main, style Safi', 380.00, 23, 'Publié', 1, '2026-06-01 10:20:00', 'IMAGES\\produits\\Tajine Decoratif Safi.jpg', 'en_attente'),
+(66, 3, 13, 'Assiette Ceramique Fes', 'Assiette decorative en ceramique bleue de Fes', 220.00, 38, 'Publié', 1, '2026-06-01 10:25:00', 'IMAGES\\produits\\Assiette Ceramique Fes.jpg', 'en_attente'),
+(67, 4, 14, 'Boite a Bijoux Marquetee', 'Boite en bois marquete avec incrustations de nacre', 450.00, 16, 'Publié', 1, '2026-06-01 10:30:00', 'IMAGES\\produits\\Boite a Bijoux Marquetee.jpg', 'en_attente'),
+(68, 4, 14, 'Cadre Photo Arabesque', 'Cadre en bois sculpte aux motifs arabesques', 280.00, 20, 'Publié', 1, '2026-06-01 10:35:00', 'IMAGES\\produits\\Cadre Photo Arabesque.jpg', 'en_attente'),
+(69, 5, 15, 'Collier Amazigh Argent', 'Collier en argent avec pendeloques amazighes traditionnelles', 520.00, 8, 'Publié', 1, '2026-06-01 10:40:00', 'IMAGES\\produits\\Collier Amazigh Argent.jpg', 'en_attente'),
+(70, 5, 15, 'Bracelet Berbere Email', 'Bracelet en argent emaille, artisanat berbere', 320.00, 13, 'Publié', 1, '2026-06-01 10:45:00', 'IMAGES\\produits\\Bracelet Berbere Email.jpg', 'en_attente'),
+(71, 6, 16, 'Lanterne Marrakchi Doree', 'Lanterne en fer forge dore, finition artisanale', 680.00, 18, 'Publié', 1, '2026-06-01 10:50:00', 'IMAGES\\produits\\Lanterne Marrakchi Doree.jpg', 'en_attente'),
+(72, 6, 16, 'Applique Murale Cuivre', 'Applique en cuivre martele, style marocain traditionnel', 420.00, 12, 'Publié', 1, '2026-06-01 10:55:00', 'IMAGES\\produits\\Applique Murale Cuivre.jpg', 'en_attente'),
+(73, 7, 17, 'Huile d\'Argan Pure 100ml', 'Huile d\'argan vierge pressee a froid, 100% naturelle', 180.00, 50, 'Publié', 1, '2026-06-01 11:00:00', 'IMAGES\\produits\\Huile d\'Argan Pure 100ml.jpg', 'en_attente'),
+(74, 7, 17, 'Savon Beldi Noir 200g', 'Savon beldi traditionnel a base d\'huile d\'olive et argile', 90.00, 58, 'Publié', 1, '2026-06-01 11:05:00', 'IMAGES\\produits\\Savon Beldi Noir 200g.jpg', 'en_attente'),
+(75, 8, 18, 'Miel de Thym Atlasien', 'Miel artisanal recolte dans les montagnes de l\'Atlas', 150.00, 33, 'Publié', 1, '2026-06-01 11:10:00', 'IMAGES\\produits\\Miel de Thym Atlasien.jpg', 'en_attente'),
+(76, 8, 18, 'Epices Ras el-Hanout 250g', 'Melange traditionnel de 27 epices du terroir marocain', 80.00, 42, 'Publié', 1, '2026-06-01 11:15:00', 'IMAGES\\produits\\Epices Ras el-Hanout 250g.jpg', 'en_attente'),
+(77, 2, 19, 'Tapis Azilal Multicolore', 'Tapis en laine naturelle, motifs colores d\'Azilal', 1100.00, 6, 'Publié', 1, '2026-06-01 11:20:00', 'IMAGES/produits/Tapis Azilal Multicolore.jpg', 'en_attente'),
+(78, 2, 19, 'Plaid Laine Berbere Beige', 'Plaid artisanal en laine naturelle teinte vegetale', 480.00, 9, 'Publié', 1, '2026-06-01 11:25:00', 'IMAGES\\produits\\Plaid bouclette.jpg', 'en_attente'),
+(79, 1, 20, 'Caftan Imperial Or', 'Caftan de ceremonie en brocard dore, broderie de luxe', 2200.00, 1, 'Publié', 1, '2026-06-01 11:30:00', 'IMAGES\\produits\\Caftan Imperial Or.jpg', 'en_attente'),
+(80, 1, 20, 'Takchita Bicolore Ivoire', 'Takchita deux pieces en soie, couleurs ivoire et champagne', 1800.00, 10, 'Publié', 1, '2026-06-01 11:35:00', 'IMAGES\\produits\\Takchita Bicolore Ivoire.jpg', 'en_attente');
 
 -- --------------------------------------------------------
 
@@ -292,6 +553,256 @@ CREATE TABLE `reclamation` (
   `reponse_admin` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `translations`
+--
+
+CREATE TABLE `translations` (
+  `id` int(11) NOT NULL,
+  `lang_code` varchar(5) NOT NULL,
+  `translation_key` varchar(150) NOT NULL,
+  `translation_value` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `validation_commande`
+--
+
+CREATE TABLE `validation_commande` (
+  `id_validation_commande` int(11) NOT NULL,
+  `id_commande` int(11) NOT NULL,
+  `id_producteur` int(11) NOT NULL,
+  `id_produit` int(11) NOT NULL,
+  `statut` enum('en_attente','accepte','refuse') DEFAULT 'en_attente',
+  `date_reponse` datetime DEFAULT NULL,
+  `commentaire` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `validation_produit`
+--
+
+CREATE TABLE `validation_produit` (
+  `id_validation` int(11) NOT NULL,
+  `id_produit` int(11) NOT NULL,
+  `id_producteur` int(11) NOT NULL,
+  `statut` enum('en_attente','valide','refuse') DEFAULT 'en_attente',
+  `date_validation` datetime DEFAULT NULL,
+  `commentaire` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `validation_produit`
+--
+
+INSERT INTO `validation_produit` (`id_validation`, `id_produit`, `id_producteur`, `statut`, `date_validation`, `commentaire`) VALUES
+(1, 61, 1, 'en_attente', NULL, NULL),
+(2, 61, 2, 'en_attente', NULL, NULL),
+(3, 61, 3, 'en_attente', NULL, NULL),
+(4, 61, 4, 'en_attente', NULL, NULL),
+(5, 61, 5, 'en_attente', NULL, NULL),
+(6, 61, 6, 'en_attente', NULL, NULL),
+(7, 61, 7, 'en_attente', NULL, NULL),
+(8, 61, 8, 'en_attente', NULL, NULL),
+(9, 61, 9, 'en_attente', NULL, NULL),
+(10, 61, 10, 'en_attente', NULL, NULL),
+(11, 62, 1, 'en_attente', NULL, NULL),
+(12, 62, 2, 'en_attente', NULL, NULL),
+(13, 62, 3, 'en_attente', NULL, NULL),
+(14, 62, 4, 'en_attente', NULL, NULL),
+(15, 62, 5, 'en_attente', NULL, NULL),
+(16, 62, 6, 'en_attente', NULL, NULL),
+(17, 62, 7, 'en_attente', NULL, NULL),
+(18, 62, 8, 'en_attente', NULL, NULL),
+(19, 62, 9, 'en_attente', NULL, NULL),
+(20, 62, 10, 'en_attente', NULL, NULL),
+(21, 79, 1, 'en_attente', NULL, NULL),
+(22, 79, 2, 'en_attente', NULL, NULL),
+(23, 79, 3, 'en_attente', NULL, NULL),
+(24, 79, 4, 'en_attente', NULL, NULL),
+(25, 79, 5, 'en_attente', NULL, NULL),
+(26, 79, 6, 'en_attente', NULL, NULL),
+(27, 79, 7, 'en_attente', NULL, NULL),
+(28, 79, 8, 'en_attente', NULL, NULL),
+(29, 79, 9, 'en_attente', NULL, NULL),
+(30, 79, 10, 'en_attente', NULL, NULL),
+(31, 80, 1, 'en_attente', NULL, NULL),
+(32, 80, 2, 'en_attente', NULL, NULL),
+(33, 80, 3, 'en_attente', NULL, NULL),
+(34, 80, 4, 'en_attente', NULL, NULL),
+(35, 80, 5, 'en_attente', NULL, NULL),
+(36, 80, 6, 'en_attente', NULL, NULL),
+(37, 80, 7, 'en_attente', NULL, NULL),
+(38, 80, 8, 'en_attente', NULL, NULL),
+(39, 80, 9, 'en_attente', NULL, NULL),
+(40, 80, 10, 'en_attente', NULL, NULL),
+(41, 63, 1, 'en_attente', NULL, NULL),
+(42, 63, 2, 'en_attente', NULL, NULL),
+(43, 63, 3, 'en_attente', NULL, NULL),
+(44, 63, 4, 'en_attente', NULL, NULL),
+(45, 63, 5, 'en_attente', NULL, NULL),
+(46, 63, 6, 'en_attente', NULL, NULL),
+(47, 63, 7, 'en_attente', NULL, NULL),
+(48, 63, 8, 'en_attente', NULL, NULL),
+(49, 63, 9, 'en_attente', NULL, NULL),
+(50, 63, 10, 'en_attente', NULL, NULL),
+(51, 64, 1, 'en_attente', NULL, NULL),
+(52, 64, 2, 'en_attente', NULL, NULL),
+(53, 64, 3, 'en_attente', NULL, NULL),
+(54, 64, 4, 'en_attente', NULL, NULL),
+(55, 64, 5, 'en_attente', NULL, NULL),
+(56, 64, 6, 'en_attente', NULL, NULL),
+(57, 64, 7, 'en_attente', NULL, NULL),
+(58, 64, 8, 'en_attente', NULL, NULL),
+(59, 64, 9, 'en_attente', NULL, NULL),
+(60, 64, 10, 'en_attente', NULL, NULL),
+(61, 77, 1, 'en_attente', NULL, NULL),
+(62, 77, 2, 'en_attente', NULL, NULL),
+(63, 77, 3, 'en_attente', NULL, NULL),
+(64, 77, 4, 'en_attente', NULL, NULL),
+(65, 77, 5, 'en_attente', NULL, NULL),
+(66, 77, 6, 'en_attente', NULL, NULL),
+(67, 77, 7, 'en_attente', NULL, NULL),
+(68, 77, 8, 'en_attente', NULL, NULL),
+(69, 77, 9, 'en_attente', NULL, NULL),
+(70, 77, 10, 'en_attente', NULL, NULL),
+(71, 78, 1, 'en_attente', NULL, NULL),
+(72, 78, 2, 'en_attente', NULL, NULL),
+(73, 78, 3, 'en_attente', NULL, NULL),
+(74, 78, 4, 'en_attente', NULL, NULL),
+(75, 78, 5, 'en_attente', NULL, NULL),
+(76, 78, 6, 'en_attente', NULL, NULL),
+(77, 78, 7, 'en_attente', NULL, NULL),
+(78, 78, 8, 'en_attente', NULL, NULL),
+(79, 78, 9, 'en_attente', NULL, NULL),
+(80, 78, 10, 'en_attente', NULL, NULL),
+(81, 65, 1, 'en_attente', NULL, NULL),
+(82, 65, 2, 'en_attente', NULL, NULL),
+(83, 65, 3, 'en_attente', NULL, NULL),
+(84, 65, 4, 'en_attente', NULL, NULL),
+(85, 65, 5, 'en_attente', NULL, NULL),
+(86, 65, 6, 'en_attente', NULL, NULL),
+(87, 65, 7, 'en_attente', NULL, NULL),
+(88, 65, 8, 'en_attente', NULL, NULL),
+(89, 65, 9, 'en_attente', NULL, NULL),
+(90, 65, 10, 'en_attente', NULL, NULL),
+(91, 66, 1, 'en_attente', NULL, NULL),
+(92, 66, 2, 'en_attente', NULL, NULL),
+(93, 66, 3, 'en_attente', NULL, NULL),
+(94, 66, 4, 'en_attente', NULL, NULL),
+(95, 66, 5, 'en_attente', NULL, NULL),
+(96, 66, 6, 'en_attente', NULL, NULL),
+(97, 66, 7, 'en_attente', NULL, NULL),
+(98, 66, 8, 'en_attente', NULL, NULL),
+(99, 66, 9, 'en_attente', NULL, NULL),
+(100, 66, 10, 'en_attente', NULL, NULL),
+(101, 67, 1, 'en_attente', NULL, NULL),
+(102, 67, 2, 'en_attente', NULL, NULL),
+(103, 67, 3, 'en_attente', NULL, NULL),
+(104, 67, 4, 'en_attente', NULL, NULL),
+(105, 67, 5, 'en_attente', NULL, NULL),
+(106, 67, 6, 'en_attente', NULL, NULL),
+(107, 67, 7, 'en_attente', NULL, NULL),
+(108, 67, 8, 'en_attente', NULL, NULL),
+(109, 67, 9, 'en_attente', NULL, NULL),
+(110, 67, 10, 'en_attente', NULL, NULL),
+(111, 68, 1, 'en_attente', NULL, NULL),
+(112, 68, 2, 'en_attente', NULL, NULL),
+(113, 68, 3, 'en_attente', NULL, NULL),
+(114, 68, 4, 'en_attente', NULL, NULL),
+(115, 68, 5, 'en_attente', NULL, NULL),
+(116, 68, 6, 'en_attente', NULL, NULL),
+(117, 68, 7, 'en_attente', NULL, NULL),
+(118, 68, 8, 'en_attente', NULL, NULL),
+(119, 68, 9, 'en_attente', NULL, NULL),
+(120, 68, 10, 'en_attente', NULL, NULL),
+(121, 69, 1, 'en_attente', NULL, NULL),
+(122, 69, 2, 'en_attente', NULL, NULL),
+(123, 69, 3, 'en_attente', NULL, NULL),
+(124, 69, 4, 'en_attente', NULL, NULL),
+(125, 69, 5, 'en_attente', NULL, NULL),
+(126, 69, 6, 'en_attente', NULL, NULL),
+(127, 69, 7, 'en_attente', NULL, NULL),
+(128, 69, 8, 'en_attente', NULL, NULL),
+(129, 69, 9, 'en_attente', NULL, NULL),
+(130, 69, 10, 'en_attente', NULL, NULL),
+(131, 70, 1, 'en_attente', NULL, NULL),
+(132, 70, 2, 'en_attente', NULL, NULL),
+(133, 70, 3, 'en_attente', NULL, NULL),
+(134, 70, 4, 'en_attente', NULL, NULL),
+(135, 70, 5, 'en_attente', NULL, NULL),
+(136, 70, 6, 'en_attente', NULL, NULL),
+(137, 70, 7, 'en_attente', NULL, NULL),
+(138, 70, 8, 'en_attente', NULL, NULL),
+(139, 70, 9, 'en_attente', NULL, NULL),
+(140, 70, 10, 'en_attente', NULL, NULL),
+(141, 71, 1, 'en_attente', NULL, NULL),
+(142, 71, 2, 'en_attente', NULL, NULL),
+(143, 71, 3, 'en_attente', NULL, NULL),
+(144, 71, 4, 'en_attente', NULL, NULL),
+(145, 71, 5, 'en_attente', NULL, NULL),
+(146, 71, 6, 'en_attente', NULL, NULL),
+(147, 71, 7, 'en_attente', NULL, NULL),
+(148, 71, 8, 'en_attente', NULL, NULL),
+(149, 71, 9, 'en_attente', NULL, NULL),
+(150, 71, 10, 'en_attente', NULL, NULL),
+(151, 72, 1, 'en_attente', NULL, NULL),
+(152, 72, 2, 'en_attente', NULL, NULL),
+(153, 72, 3, 'en_attente', NULL, NULL),
+(154, 72, 4, 'en_attente', NULL, NULL),
+(155, 72, 5, 'en_attente', NULL, NULL),
+(156, 72, 6, 'en_attente', NULL, NULL),
+(157, 72, 7, 'en_attente', NULL, NULL),
+(158, 72, 8, 'en_attente', NULL, NULL),
+(159, 72, 9, 'en_attente', NULL, NULL),
+(160, 72, 10, 'en_attente', NULL, NULL),
+(161, 73, 1, 'en_attente', NULL, NULL),
+(162, 73, 2, 'en_attente', NULL, NULL),
+(163, 73, 3, 'en_attente', NULL, NULL),
+(164, 73, 4, 'en_attente', NULL, NULL),
+(165, 73, 5, 'en_attente', NULL, NULL),
+(166, 73, 6, 'en_attente', NULL, NULL),
+(167, 73, 7, 'en_attente', NULL, NULL),
+(168, 73, 8, 'en_attente', NULL, NULL),
+(169, 73, 9, 'en_attente', NULL, NULL),
+(170, 73, 10, 'en_attente', NULL, NULL),
+(171, 74, 1, 'en_attente', NULL, NULL),
+(172, 74, 2, 'en_attente', NULL, NULL),
+(173, 74, 3, 'en_attente', NULL, NULL),
+(174, 74, 4, 'en_attente', NULL, NULL),
+(175, 74, 5, 'en_attente', NULL, NULL),
+(176, 74, 6, 'en_attente', NULL, NULL),
+(177, 74, 7, 'en_attente', NULL, NULL),
+(178, 74, 8, 'en_attente', NULL, NULL),
+(179, 74, 9, 'en_attente', NULL, NULL),
+(180, 74, 10, 'en_attente', NULL, NULL),
+(181, 75, 1, 'en_attente', NULL, NULL),
+(182, 75, 2, 'en_attente', NULL, NULL),
+(183, 75, 3, 'en_attente', NULL, NULL),
+(184, 75, 4, 'en_attente', NULL, NULL),
+(185, 75, 5, 'en_attente', NULL, NULL),
+(186, 75, 6, 'en_attente', NULL, NULL),
+(187, 75, 7, 'en_attente', NULL, NULL),
+(188, 75, 8, 'en_attente', NULL, NULL),
+(189, 75, 9, 'en_attente', NULL, NULL),
+(190, 75, 10, 'en_attente', NULL, NULL),
+(191, 76, 1, 'en_attente', NULL, NULL),
+(192, 76, 2, 'en_attente', NULL, NULL),
+(193, 76, 3, 'en_attente', NULL, NULL),
+(194, 76, 4, 'en_attente', NULL, NULL),
+(195, 76, 5, 'en_attente', NULL, NULL),
+(196, 76, 6, 'en_attente', NULL, NULL),
+(197, 76, 7, 'en_attente', NULL, NULL),
+(198, 76, 8, 'en_attente', NULL, NULL),
+(199, 76, 9, 'en_attente', NULL, NULL),
+(200, 76, 10, 'en_attente', NULL, NULL);
+
 --
 -- Index pour les tables déchargées
 --
@@ -304,17 +815,34 @@ ALTER TABLE `administrateur`
   ADD UNIQUE KEY `email` (`email`);
 
 --
+-- Index pour la table `alertes_stock`
+--
+ALTER TABLE `alertes_stock`
+  ADD PRIMARY KEY (`id_alerte`),
+  ADD UNIQUE KEY `unique_alerte` (`id_produit`,`id_client`),
+  ADD KEY `id_client` (`id_client`);
+
+--
 -- Index pour la table `boutique`
 --
 ALTER TABLE `boutique`
   ADD PRIMARY KEY (`id_boutique`),
-  ADD KEY `fk_boutique_producteur` (`id_producteur`);
+  ADD KEY `fk_boutique_producteur` (`id_producteur`),
+  ADD KEY `fk_boutique_categorie` (`id_categorie`);
 
 --
 -- Index pour la table `categorie`
 --
 ALTER TABLE `categorie`
   ADD PRIMARY KEY (`id_categorie`);
+
+--
+-- Index pour la table `categorie_boutique`
+--
+ALTER TABLE `categorie_boutique`
+  ADD PRIMARY KEY (`id_categorie_boutique`),
+  ADD KEY `fk_cb_boutique` (`id_boutique`),
+  ADD KEY `fk_cb_categorie` (`id_categorie`);
 
 --
 -- Index pour la table `client`
@@ -346,6 +874,13 @@ ALTER TABLE `evaluer`
   ADD KEY `fk_evaluer_produit` (`id_produit`);
 
 --
+-- Index pour la table `evaluer_boutique`
+--
+ALTER TABLE `evaluer_boutique`
+  ADD PRIMARY KEY (`id_client`,`id_boutique`),
+  ADD KEY `fk_evaluer_boutique_boutique` (`id_boutique`);
+
+--
 -- Index pour la table `favoris`
 --
 ALTER TABLE `favoris`
@@ -353,12 +888,35 @@ ALTER TABLE `favoris`
   ADD KEY `fk_favoris_produit` (`id_produit`);
 
 --
+-- Index pour la table `favoris_boutique`
+--
+ALTER TABLE `favoris_boutique`
+  ADD PRIMARY KEY (`id_client`,`id_boutique`),
+  ADD KEY `fk_favoris_boutique_boutique` (`id_boutique`);
+
+--
+-- Index pour la table `languages`
+--
+ALTER TABLE `languages`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `code` (`code`);
+
+--
+-- Index pour la table `ligne_commande`
+--
+ALTER TABLE `ligne_commande`
+  ADD PRIMARY KEY (`id_ligne`),
+  ADD KEY `id_commande` (`id_commande`),
+  ADD KEY `id_produit` (`id_produit`);
+
+--
 -- Index pour la table `notification`
 --
 ALTER TABLE `notification`
   ADD PRIMARY KEY (`id_notification`),
   ADD KEY `fk_notification_client` (`id_client`),
-  ADD KEY `fk_notification_producteur` (`id_producteur`);
+  ADD KEY `fk_notification_producteur` (`id_producteur`),
+  ADD KEY `fk_notification_produit` (`id_produit`);
 
 --
 -- Index pour la table `paiement`
@@ -398,6 +956,30 @@ ALTER TABLE `reclamation`
   ADD KEY `fk_reclamation_client` (`id_client`);
 
 --
+-- Index pour la table `translations`
+--
+ALTER TABLE `translations`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_translation` (`lang_code`,`translation_key`);
+
+--
+-- Index pour la table `validation_commande`
+--
+ALTER TABLE `validation_commande`
+  ADD PRIMARY KEY (`id_validation_commande`),
+  ADD KEY `id_commande` (`id_commande`),
+  ADD KEY `id_producteur` (`id_producteur`),
+  ADD KEY `id_produit` (`id_produit`);
+
+--
+-- Index pour la table `validation_produit`
+--
+ALTER TABLE `validation_produit`
+  ADD PRIMARY KEY (`id_validation`),
+  ADD UNIQUE KEY `unique_validation` (`id_produit`,`id_producteur`),
+  ADD KEY `id_producteur` (`id_producteur`);
+
+--
 -- AUTO_INCREMENT pour les tables déchargées
 --
 
@@ -408,34 +990,58 @@ ALTER TABLE `administrateur`
   MODIFY `id_admin` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT pour la table `alertes_stock`
+--
+ALTER TABLE `alertes_stock`
+  MODIFY `id_alerte` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT pour la table `boutique`
 --
 ALTER TABLE `boutique`
-  MODIFY `id_boutique` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id_boutique` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT pour la table `categorie`
 --
 ALTER TABLE `categorie`
-  MODIFY `id_categorie` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_categorie` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT pour la table `categorie_boutique`
+--
+ALTER TABLE `categorie_boutique`
+  MODIFY `id_categorie_boutique` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT pour la table `client`
 --
 ALTER TABLE `client`
-  MODIFY `id_client` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_client` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT pour la table `commande`
 --
 ALTER TABLE `commande`
-  MODIFY `id_commande` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_commande` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT pour la table `languages`
+--
+ALTER TABLE `languages`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT pour la table `ligne_commande`
+--
+ALTER TABLE `ligne_commande`
+  MODIFY `id_ligne` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `id_notification` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_notification` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT pour la table `paiement`
@@ -447,13 +1053,13 @@ ALTER TABLE `paiement`
 -- AUTO_INCREMENT pour la table `producteur`
 --
 ALTER TABLE `producteur`
-  MODIFY `id_producteur` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_producteur` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT pour la table `produit`
 --
 ALTER TABLE `produit`
-  MODIFY `id_produit` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+  MODIFY `id_produit` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
 
 --
 -- AUTO_INCREMENT pour la table `reclamation`
@@ -462,14 +1068,47 @@ ALTER TABLE `reclamation`
   MODIFY `id_reclamation` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT pour la table `translations`
+--
+ALTER TABLE `translations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=981;
+
+--
+-- AUTO_INCREMENT pour la table `validation_commande`
+--
+ALTER TABLE `validation_commande`
+  MODIFY `id_validation_commande` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT pour la table `validation_produit`
+--
+ALTER TABLE `validation_produit`
+  MODIFY `id_validation` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=256;
+
+--
 -- Contraintes pour les tables déchargées
 --
+
+--
+-- Contraintes pour la table `alertes_stock`
+--
+ALTER TABLE `alertes_stock`
+  ADD CONSTRAINT `alertes_stock_ibfk_1` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`),
+  ADD CONSTRAINT `alertes_stock_ibfk_2` FOREIGN KEY (`id_client`) REFERENCES `client` (`id_client`);
 
 --
 -- Contraintes pour la table `boutique`
 --
 ALTER TABLE `boutique`
+  ADD CONSTRAINT `fk_boutique_categorie` FOREIGN KEY (`id_categorie`) REFERENCES `categorie` (`id_categorie`) ON DELETE SET NULL,
   ADD CONSTRAINT `fk_boutique_producteur` FOREIGN KEY (`id_producteur`) REFERENCES `producteur` (`id_producteur`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `categorie_boutique`
+--
+ALTER TABLE `categorie_boutique`
+  ADD CONSTRAINT `fk_cb_boutique` FOREIGN KEY (`id_boutique`) REFERENCES `boutique` (`id_boutique`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_cb_categorie` FOREIGN KEY (`id_categorie`) REFERENCES `categorie` (`id_categorie`) ON DELETE CASCADE;
 
 --
 -- Contraintes pour la table `commande`
@@ -493,6 +1132,13 @@ ALTER TABLE `evaluer`
   ADD CONSTRAINT `fk_evaluer_produit` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Contraintes pour la table `evaluer_boutique`
+--
+ALTER TABLE `evaluer_boutique`
+  ADD CONSTRAINT `fk_evaluer_boutique_boutique` FOREIGN KEY (`id_boutique`) REFERENCES `boutique` (`id_boutique`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_evaluer_boutique_client` FOREIGN KEY (`id_client`) REFERENCES `client` (`id_client`) ON DELETE CASCADE;
+
+--
 -- Contraintes pour la table `favoris`
 --
 ALTER TABLE `favoris`
@@ -500,11 +1146,26 @@ ALTER TABLE `favoris`
   ADD CONSTRAINT `fk_favoris_produit` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Contraintes pour la table `favoris_boutique`
+--
+ALTER TABLE `favoris_boutique`
+  ADD CONSTRAINT `fk_favoris_boutique_boutique` FOREIGN KEY (`id_boutique`) REFERENCES `boutique` (`id_boutique`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_favoris_boutique_client` FOREIGN KEY (`id_client`) REFERENCES `client` (`id_client`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `ligne_commande`
+--
+ALTER TABLE `ligne_commande`
+  ADD CONSTRAINT `ligne_commande_ibfk_1` FOREIGN KEY (`id_commande`) REFERENCES `commande` (`id_commande`) ON DELETE CASCADE,
+  ADD CONSTRAINT `ligne_commande_ibfk_2` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`);
+
+--
 -- Contraintes pour la table `notification`
 --
 ALTER TABLE `notification`
   ADD CONSTRAINT `fk_notification_client` FOREIGN KEY (`id_client`) REFERENCES `client` (`id_client`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_notification_producteur` FOREIGN KEY (`id_producteur`) REFERENCES `producteur` (`id_producteur`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_notification_producteur` FOREIGN KEY (`id_producteur`) REFERENCES `producteur` (`id_producteur`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_notification_produit` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`) ON DELETE CASCADE;
 
 --
 -- Contraintes pour la table `panier`
@@ -532,6 +1193,27 @@ ALTER TABLE `produit`
 ALTER TABLE `reclamation`
   ADD CONSTRAINT `fk_reclamation_admin` FOREIGN KEY (`id_admin`) REFERENCES `administrateur` (`id_admin`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_reclamation_client` FOREIGN KEY (`id_client`) REFERENCES `client` (`id_client`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `translations`
+--
+ALTER TABLE `translations`
+  ADD CONSTRAINT `translations_ibfk_1` FOREIGN KEY (`lang_code`) REFERENCES `languages` (`code`) ON DELETE CASCADE;
+
+--
+-- Contraintes pour la table `validation_commande`
+--
+ALTER TABLE `validation_commande`
+  ADD CONSTRAINT `validation_commande_ibfk_1` FOREIGN KEY (`id_commande`) REFERENCES `commande` (`id_commande`),
+  ADD CONSTRAINT `validation_commande_ibfk_2` FOREIGN KEY (`id_producteur`) REFERENCES `producteur` (`id_producteur`),
+  ADD CONSTRAINT `validation_commande_ibfk_3` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`);
+
+--
+-- Contraintes pour la table `validation_produit`
+--
+ALTER TABLE `validation_produit`
+  ADD CONSTRAINT `validation_produit_ibfk_1` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`),
+  ADD CONSTRAINT `validation_produit_ibfk_2` FOREIGN KEY (`id_producteur`) REFERENCES `producteur` (`id_producteur`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

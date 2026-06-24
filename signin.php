@@ -11,6 +11,9 @@ if (isset($_SESSION['user_role'])) {
     exit;
 }
 
+// Detectar tema guardado (por defecto claro)
+$theme = $_COOKIE['theme'] ?? 'light';
+
 if (isset($_GET['msgs'])) $_SESSION['success'] = $_GET['msgs'];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -186,7 +189,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    #========== FORGOT PASSWORD (depuis le formulaire signin) ==========
+    #========== FORGOT PASSWORD ==========
     elseif ($action == 'forgot') {
         $err = [];
         $email = trim($email ?? '');
@@ -231,7 +234,7 @@ $active_form = $_SESSION['active_form'] ?? 'login';
 unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION['form_data'], $_SESSION['active_form']);
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="<?php echo $theme; ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -239,44 +242,131 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
+    /* ========== VARIABLES ========== */
     :root {
-      --bg-cream: #FFF9EB;
-      --accent-sage: #9FB2AC;
-      --primary-burgundy: #5D0D18;
+      --bg-body: #FFF9EB;
+      --bg-card: #ffffff;
+      --bg-input: #fcfaf5;
+      --text-primary: #2D251E;
+      --text-secondary: #70665f;
+      --text-muted: #90857d;
+      --border-color: rgba(159,178,172,0.4);
+      --shadow-color: rgba(93,13,24,0.1);
+      --primary: #5D0D18;
       --primary-hover: #44070F;
-      --text-dark: #2D251E;
+      --secondary: #9FB2AC;
+      --success: #166534;
+      --success-bg: #f0fdf4;
+      --success-border: #bbf7d0;
+      --error: #c0392b;
+      --error-bg: #fdf0f0;
+      --error-border: #f5c6cb;
+      --warning: #92400e;
+      --warning-bg: #fffbeb;
+      --warning-border: #fde68a;
+      --overlay-bg: linear-gradient(135deg, #8FA39D 0%, var(--secondary) 100%);
+      --overlay-text: #FFF9EB;
+      --icon-color: #90857d;
+      --link-color: #5D0D18;
+      --input-focus: rgba(93,13,24,0.08);
     }
+
+    [data-theme="dark"] {
+      --bg-body: #1a1410;
+      --bg-card: #2c241e;
+      --bg-input: #3d3229;
+      --text-primary: #f0e6d8;
+      --text-secondary: #b8a896;
+      --text-muted: #8a7a6a;
+      --border-color: #5a4a3a;
+      --shadow-color: rgba(0,0,0,0.4);
+      --primary: #8a6048;
+      --primary-hover: #a0785a;
+      --secondary: #6d4c3a;
+      --success: #4ade80;
+      --success-bg: #1a3a2a;
+      --success-border: #2a5a3a;
+      --error: #ef5350;
+      --error-bg: #3a1a1a;
+      --error-border: #5a2a2a;
+      --warning: #fbbf24;
+      --warning-bg: #3a2a1a;
+      --warning-border: #5a4a2a;
+      --overlay-bg: linear-gradient(135deg, #3d3229 0%, #2c241e 100%);
+      --overlay-text: #f0e6d8;
+      --icon-color: #8a7a6a;
+      --link-color: #d4a85c;
+      --input-focus: rgba(138,96,72,0.2);
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Jost', sans-serif; }
     body {
-      background-color: var(--bg-cream);
-      color: var(--text-dark);
+      background-color: var(--bg-body);
+      color: var(--text-primary);
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 40px 20px;
       position: relative;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
+
+    /* ========== Toggle Tema ========== */
+    .theme-toggle {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      z-index: 100;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px var(--shadow-color);
+    }
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      border-color: var(--primary);
+    }
+    [data-theme="dark"] .theme-toggle .bi-sun { display: none; }
+    [data-theme="dark"] .theme-toggle .bi-moon { display: block; }
+    [data-theme="light"] .theme-toggle .bi-sun { display: block; }
+    [data-theme="light"] .theme-toggle .bi-moon { display: none; }
+
+    /* ========== Back Home ========== */
     .back-home-btn {
       position: fixed; top: 30px; left: 30px; z-index: 100;
-      background: var(--primary-burgundy); color: white; border: none;
+      background: var(--primary); color: white; border: none;
       border-radius: 50px; padding: 10px 20px;
       display: flex; align-items: center; gap: 8px;
       text-decoration: none; font-weight: 600; font-size: 0.85rem;
       transition: all 0.3s ease;
     }
     .back-home-btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
+    /* ========== Container ========== */
     .auth-container {
-      background: #ffffff; width: 1100px; max-width: 100%; min-height: 720px;
-      border-radius: 30px; box-shadow: 0 20px 60px rgba(93,13,24,0.1);
+      background: var(--bg-card); width: 1100px; max-width: 100%; min-height: 720px;
+      border-radius: 30px; box-shadow: 0 20px 60px var(--shadow-color);
       position: relative; overflow: hidden; display: flex; margin: 0 auto;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
     }
+
+    /* ========== Overlay ========== */
     .overlay-panel {
       position: absolute; top: 0; left: 0; width: 50%; height: 100%;
-      background: linear-gradient(135deg, #8FA39D 0%, var(--accent-sage) 100%);
+      background: var(--overlay-bg);
       z-index: 10; transition: transform 0.7s cubic-bezier(0.66,0,0.34,1);
       display: flex; flex-direction: column; justify-content: center;
-      align-items: center; padding: 30px; color: var(--bg-cream); text-align: center;
+      align-items: center; padding: 30px; color: var(--overlay-text); text-align: center;
     }
     .plant-illustration {
       width: 120px; height: 120px; background: rgba(255,249,235,0.15);
@@ -291,11 +381,14 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     }
     .panel-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 12px; font-weight: 700; }
     .panel-desc { font-size: 0.85rem; max-width: 280px; opacity: 0.9; }
+
+    /* ========== Form Box ========== */
     .form-box {
       width: 50%; height: 100%; padding: 40px 50px;
       display: flex; flex-direction: column; justify-content: center;
       transition: opacity 0.5s ease-in-out;
       overflow-y: auto; position: relative;
+      background: var(--bg-card);
     }
     .login-box  { position: absolute; left: 50%; opacity: 1; z-index: 5; pointer-events: all; }
     .signup-box { position: absolute; left: 0;   opacity: 0; z-index: 1; pointer-events: none; }
@@ -309,18 +402,24 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     .auth-container.forgot-panel-active .login-box { opacity: 0; z-index: 1; pointer-events: none; }
     .auth-container.forgot-panel-active .forgot-box { opacity: 1; z-index: 5; pointer-events: all; left: 0; }
 
-    .brand { display: flex; align-items: center; gap: 8px; color: var(--primary-burgundy); margin-bottom: 15px; }
-    .brand span { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; }
+    /* ========== Brand ========== */
+    .brand { display: flex; align-items: center; gap: 8px; color: var(--primary); margin-bottom: 15px; }
+    .brand span { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: var(--text-primary); }
     .brand-logo { height: 35px; width: auto; object-fit: contain; }
-    h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--primary-burgundy); margin-bottom: 6px; }
-    .subtitle { color: #70665f; font-size: 0.9rem; margin-bottom: 22px; }
+
+    h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--primary); margin-bottom: 6px; }
+    .subtitle { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 22px; }
+
+    /* ========== Inputs ========== */
     .input-group { position: relative; margin-bottom: 14px; }
-    .input-group i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #90857d; font-size: 1rem; z-index: 1; }
+    .input-group i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--icon-color); font-size: 1rem; z-index: 1; }
     .input-group input, .input-group textarea, .input-group input[type="file"] {
       width: 100%; padding: 12px 15px 12px 42px;
-      background-color: #fcfaf5; border: 1px solid rgba(159,178,172,0.4);
+      background-color: var(--bg-input); border: 1px solid var(--border-color);
       border-radius: 10px; outline: none; font-size: 0.9rem;
       font-family: 'Jost', sans-serif;
+      color: var(--text-primary);
+      transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
     }
     .input-group input[type="file"] {
       padding: 10px 15px 10px 42px;
@@ -331,69 +430,95 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
       min-height: 80px;
     }
     .input-group input:focus, .input-group textarea:focus {
-      border-color: var(--primary-burgundy);
-      box-shadow: 0 0 0 2px rgba(93,13,24,0.08);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--input-focus);
     }
+    .input-group input::placeholder, .input-group textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* ========== Role ========== */
     .role-container { display: flex; gap: 12px; margin-bottom: 14px; }
-    .role-label-title { font-size: 0.85rem; font-weight: 500; color: #70665f; margin-bottom: 5px; display: block; }
+    .role-label-title { font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 5px; display: block; }
     .role-option { flex: 1; }
     .role-option input[type="radio"] { display: none; }
     .role-card {
       display: flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 10px; background: #fcfaf5; border: 1px solid rgba(159,178,172,0.4);
+      padding: 10px; background: var(--bg-input); border: 1px solid var(--border-color);
       border-radius: 10px; cursor: pointer; font-size: 0.85rem;
+      color: var(--text-secondary);
+      transition: all 0.3s ease;
     }
     .role-option input[type="radio"]:checked + .role-card {
-      border-color: var(--primary-burgundy);
-      background-color: rgba(93,13,24,0.03);
-      color: var(--primary-burgundy);
+      border-color: var(--primary);
+      background-color: var(--input-focus);
+      color: var(--primary);
       font-weight: 500;
     }
-    .producer-fields { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; opacity: 0; }
-    .producer-fields.active { max-height: 400px; opacity: 1; margin-bottom: 4px; }
-    .form-options { display: flex; justify-content: space-between; margin-bottom: 18px; font-size: 0.85rem; }
+
+    /* ========== Producer Fields ========== */
+    .producer-fields { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, opacity 0.4s ease, margin 0.4s ease; opacity: 0; margin-bottom: 0; }
+    .producer-fields.active { max-height: 500px; opacity: 1; margin-bottom: 4px; }
+
+    .help-text {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: -8px;
+      margin-bottom: 10px;
+      margin-left: 2px;
+    }
+    .file-info {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: -8px;
+      margin-bottom: 10px;
+      margin-left: 2px;
+    }
+
+    /* ========== Form Options ========== */
+    .form-options { display: flex; justify-content: space-between; margin-bottom: 18px; font-size: 0.85rem; color: var(--text-secondary); }
+    .form-options label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    .form-options a { color: var(--link-color); text-decoration: none; }
+    .form-options a:hover { text-decoration: underline; }
+
+    /* ========== Button ========== */
     .btn-submit {
-      width: 100%; padding: 12px; background-color: var(--primary-burgundy);
+      width: 100%; padding: 12px; background-color: var(--primary);
       color: white; border: none; border-radius: 10px; font-size: 0.9rem;
       font-weight: 500; cursor: pointer; transition: all 0.3s ease;
     }
     .btn-submit:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
-    .terms-text { font-size: 0.75rem; color: #90857d; text-align: center; margin-top: 10px; }
-    .switch-text { text-align: center; margin-top: 15px; font-size: 0.9rem; color: #70665f; }
-    .switch-link { color: var(--primary-burgundy); text-decoration: none; font-weight: 600; }
+
+    /* ========== Links ========== */
+    .terms-text { font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 10px; }
+    .terms-text a { color: var(--link-color); text-decoration: none; }
+    .terms-text a:hover { text-decoration: underline; }
+
+    .switch-text { text-align: center; margin-top: 15px; font-size: 0.9rem; color: var(--text-secondary); }
+    .switch-link { color: var(--link-color); text-decoration: none; font-weight: 600; cursor: pointer; }
     .switch-link:hover { text-decoration: underline; }
-    
+
+    /* ========== Alerts ========== */
     .alert { padding: 10px 14px; border-radius: 10px; font-size: 0.85rem; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-    .alert-error { background: #fdf0f0; border: 1px solid #f5c6cb; color: #c0392b; }
-    .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
-    .alert-warning { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .alert-error { background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error); }
+    .alert-success { background: var(--success-bg); border: 1px solid var(--success-border); color: var(--success); }
+    .alert-warning { background: var(--warning-bg); border: 1px solid var(--warning-border); color: var(--warning); }
 
-    .help-text {
-      font-size: 0.7rem;
-      color: #90857d;
-      margin-top: 4px;
-      margin-left: 42px;
-    }
-    
-    .file-info {
-      font-size: 0.7rem;
-      color: #6b5055;
-      margin-top: 4px;
-      margin-left: 42px;
-    }
-
+    /* ========== Responsive ========== */
     @media (max-width: 800px) {
-      .auth-container { flex-direction: column; height: auto; background: transparent; }
+      .auth-container { flex-direction: column; height: auto; background: transparent; box-shadow: none; }
       .overlay-panel { position: relative; width: 100%; height: 160px; border-radius: 24px; margin-bottom: 15px; transform: none !important; padding: 20px; }
       .plant-illustration { width: 60px; height: 60px; font-size: 1.8rem; margin-bottom: 8px; }
       .panel-title { font-size: 1.4rem; }
-      .form-box { position: relative; width: 100%; left: 0 !important; background: white; border-radius: 24px; padding: 30px 25px; }
+      .form-box { position: relative; width: 100%; left: 0 !important; background: var(--bg-card); border-radius: 24px; padding: 30px 25px; box-shadow: 0 20px 60px var(--shadow-color); }
       .auth-container .signup-box, .auth-container .forgot-box { display: none; }
       .auth-container .login-box { display: block; }
       .auth-container.right-panel-active .signup-box { display: block; }
       .auth-container.right-panel-active .login-box { display: none; }
       .auth-container.forgot-panel-active .forgot-box { display: block; }
       .auth-container.forgot-panel-active .login-box { display: none; }
+      .back-home-btn { top: 15px; left: 15px; padding: 8px 14px; font-size: 0.75rem; }
+      .theme-toggle { top: 15px; right: 15px; width: 38px; height: 38px; font-size: 1rem; }
     }
   </style>
 </head>
@@ -402,6 +527,12 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
 <a href="accueil.php" class="back-home-btn">
   <i class="bi bi-house-door"></i> Accueil
 </a>
+
+<!-- Toggle Tema -->
+<button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">
+  <i class="bi bi-sun"></i>
+  <i class="bi bi-moon"></i>
+</button>
 
 <div class="auth-container" id="authContainer">
   <div class="overlay-panel">
@@ -488,19 +619,17 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
           <input type="text" name="nom_entreprise" placeholder="Nom de l'entreprise" value="<?php echo htmlspecialchars($form_data['nom_entreprise'] ?? ''); ?>">
         </div>
         
-        <!-- Description de la boutique -->
         <div class="input-group">
           <i class="bi bi-file-text"></i>
           <textarea name="boutique_description" placeholder="Description de votre boutique (présentation, savoir-faire...)" rows="3"><?php echo htmlspecialchars($form_data['boutique_description'] ?? ''); ?></textarea>
         </div>
         <div class="help-text">Décrivez votre activité, vos produits, votre histoire...</div>
         
-        <!-- Upload d'image de la boutique -->
         <div class="input-group">
           <i class="bi bi-image"></i>
           <input type="file" name="boutique_image" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp">
         </div>
-        <div class="file-info">Format acceptés : JPG, PNG, GIF, WEBP (max 5MB)</div>
+        <div class="file-info">Formats acceptés : JPG, PNG, GIF, WEBP (max 5MB)</div>
       </div>
 
       <div class="input-group">
@@ -551,6 +680,7 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
   const panelTitle = document.getElementById('panelTitle');
   const panelDesc = document.getElementById('panelDesc');
 
+  // ========== Navigation ==========
   document.getElementById('toSignup').addEventListener('click', (e) => {
     e.preventDefault();
     container.classList.remove('forgot-panel-active');
@@ -580,7 +710,7 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     panelDesc.textContent = "Rejoignez notre réseau de coopératives et consommez de manière juste, authentique et locale.";
   });
 
-  // Role toggle pour afficher/masquer les champs producteur
+  // ========== Role toggle ==========
   document.querySelectorAll('input[name="role"]').forEach(radio => {
     radio.addEventListener('change', function() {
       const pf = document.getElementById('producerFields');
@@ -593,5 +723,38 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
       }
     });
   });
+
+  // ========== Theme Toggle ==========
+  const themeToggle = document.getElementById('themeToggle');
+  const htmlElement = document.documentElement;
+
+  function setTheme(theme) {
+    htmlElement.setAttribute('data-theme', theme);
+    document.cookie = 'theme=' + theme + '; path=/; max-age=31536000';
+  }
+
+  themeToggle.addEventListener('click', function() {
+    const currentTheme = htmlElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+  });
+
+  // ========== Initialiser le thème ==========
+  const savedTheme = '<?php echo $theme; ?>';
+  if (savedTheme) {
+    htmlElement.setAttribute('data-theme', savedTheme);
+  }
+
+  // ========== Afficher le bon formulaire si erreur ==========
+  <?php if ($active_form === 'signup'): ?>
+    container.classList.add('right-panel-active');
+    panelTitle.textContent = "Cultivons l'avenir !";
+    panelDesc.textContent = "Découvrez des produits authentiques en direct de nos petits producteurs régionaux.";
+  <?php elseif ($active_form === 'forgot'): ?>
+    container.classList.add('forgot-panel-active');
+    panelTitle.textContent = "Sécurité d'abord";
+    panelDesc.textContent = "Nous protégeons vos accès afin de garantir la sérénité de nos échanges locaux.";
+  <?php endif; ?>
 </script>
 </body>
+</html>

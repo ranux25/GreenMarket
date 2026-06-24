@@ -609,7 +609,7 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
             <!-- Carrito (solo para clientes) -->
             <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] === 'client'): ?>
             <a href="panier.php" class="icon-btn" title="Mon panier">
-                <i class="bi bi-bag"></i>
+                <i class="bi bi-cart3"></i>
                 <span class="cart-badge <?= $cartCount > 0 ? 'show' : '' ?>"
                       id="cart-count"><?= $cartCount ?></span>
             </a>
@@ -776,7 +776,7 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
         <div class="mob-actions">
             <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] === 'client'): ?>
             <a href="panier.php" class="icon-btn">
-                <i class="bi bi-bag"></i>
+                <i class="bi bi-cart3"></i>
                 <span class="cart-badge <?= $cartCount > 0 ? 'show' : '' ?>"><?= $cartCount ?></span>
             </a>
             <?php endif; ?>

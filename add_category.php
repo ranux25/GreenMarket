@@ -3,7 +3,6 @@ session_start();
 header('Content-Type: application/json');
 include('connexion.php');
 
-// Vérifier que l'utilisateur est admin
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
     echo json_encode(['success' => false, 'message' => 'Accès non autorisé']);
     exit;
@@ -18,7 +17,6 @@ if (empty($nom_categorie)) {
 }
 
 try {
-    // Vérifier si la catégorie existe déjà
     $stmt = $pdo->prepare("SELECT id_categorie FROM categorie WHERE nom_categorie = ?");
     $stmt->execute([$nom_categorie]);
     if ($stmt->fetch()) {
@@ -26,13 +24,10 @@ try {
         exit;
     }
     
-    // Insérer la nouvelle catégorie
     $stmt = $pdo->prepare("INSERT INTO categorie (nom_categorie, description) VALUES (?, ?)");
     $stmt->execute([$nom_categorie, $description]);
     
-    $id = $pdo->lastInsertId();
-    echo json_encode(['success' => true, 'id' => $id, 'message' => 'Catégorie ajoutée']);
-    
+    echo json_encode(['success' => true, 'id' => $pdo->lastInsertId(), 'message' => 'Catégorie ajoutée']);
 } catch(PDOException $e) {
     echo json_encode(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);
 }
