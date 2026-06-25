@@ -5,21 +5,45 @@ include('connexion.php');
 // Detectar tema guardado (por defecto claro)
 $theme = $_COOKIE['theme'] ?? 'light';
 
-#recuperer les boutiques validees depuis la BD
 try {
+    // ===== ESTADÍSTICAS REALES =====
+    // Total de boutiques validadas (cooperativas activas)
+    $reqStats = $pdo->prepare("
+        SELECT COUNT(*) as total_boutiques 
+        FROM boutique b
+        JOIN producteur p ON b.id_producteur = p.id_producteur
+        WHERE p.est_valide_par_admin = 1
+        AND b.est_valide_par_admin = 1
+    ");
+    $reqStats->execute();
+    $stats = $reqStats->fetch(PDO::FETCH_ASSOC);
+    $total_boutiques = $stats['total_boutiques'] ?? 0;
+
+    // Total de producteurs validés (artesanos)
+    $reqProducteurs = $pdo->prepare("
+        SELECT COUNT(*) as total_producteurs 
+        FROM producteur 
+        WHERE est_valide_par_admin = 1
+    ");
+    $reqProducteurs->execute();
+    $statsProducteurs = $reqProducteurs->fetch(PDO::FETCH_ASSOC);
+    $total_producteurs = $statsProducteurs['total_producteurs'] ?? 0;
+
+    // Recuperar las boutiques validadas
     $req = $pdo->prepare("
         SELECT b.*, p.nom_entreprise as producteur_nom, 
                p.est_valide_par_admin as producteur_valide
         FROM boutique b
         JOIN producteur p ON b.id_producteur = p.id_producteur
         WHERE p.est_valide_par_admin = 1
+        AND b.est_valide_par_admin = 1
         ORDER BY b.date_creation DESC
         LIMIT 6
     ");
     $req->execute();
     $boutiques_db = $req->fetchAll(PDO::FETCH_ASSOC);
 
-    #recuperer les produits valides et publies
+    // Recuperar los productos validos y publicados
     $req2 = $pdo->prepare("
         SELECT p.*, c.nom_categorie, b.nom_boutique
         FROM produit p
@@ -698,9 +722,16 @@ try {
       <button class="btn-outline" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">Voir les produits ↓</button>
     </div>
   </div>
+  <!-- ===== ESTADÍSTICAS REALES ===== -->
   <div class="hero-decorative">
-    <div class="hero-stat-card"><div class="num">120+</div><div style="font-size:11px;">Coopératives</div></div>
-    <div class="hero-stat-card"><div class="num">4 500</div><div style="font-size:11px;">Artisans</div></div>
+    <div class="hero-stat-card">
+      <div class="num"><?php echo $total_boutiques > 0 ? $total_boutiques : '0'; ?></div>
+      <div style="font-size:11px;">Coopératives</div>
+    </div>
+    <div class="hero-stat-card">
+      <div class="num"><?php echo $total_producteurs > 0 ? $total_producteurs : '0'; ?></div>
+      <div style="font-size:11px;">Artisans</div>
+    </div>
   </div>
 </section>
 
@@ -791,10 +822,10 @@ try {
 <?php include 'footer.php'; ?>
 
 <script>
-// Produits pour la grille (données statiques ou depuis PHP)
+// Produits pour la grille (datos desde PHP)
 const productsData = <?php echo json_encode($produits_db); ?>;
 
-// Si pas de produits en BD, utiliser les données par défaut
+// Si no hay productos en BD, usar datos por defecto
 const defaultProducts = [
   { id: 101, name: "Caftan en Soie", price: "500 DH", image: "IMAGES/CaftanSoie.jpg", coop: "Maison du Caftan", rating: 4.8, reviews: 212, badge: "Artisanal", badgeClass: "secondary" },
   { id: 201, name: "Tapis Berbère", price: "1 200 DH", image: "IMAGES/img/tapis.jpeg", coop: "Tapis Berbère d'Atlas", rating: 5, reviews: 189, badge: "Fait main", badgeClass: "fait" },
