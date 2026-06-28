@@ -3,7 +3,6 @@ session_start();
 header('Content-Type: application/json');
 require_once 'connexion.php';
 
-// Verificar que el usuario está autenticado y es cliente
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'client') {
     echo json_encode(['success' => false, 'message' => 'Vous devez être connecté en tant que client.']);
     exit;
@@ -22,7 +21,6 @@ try {
     $pdo->beginTransaction();
     
     if ($action === 'activer') {
-        // Verificar si el producto existe y está agotado
         $stmtCheck = $pdo->prepare("
             SELECT id_produit, stock_quantite, nom_produit 
             FROM produit 
@@ -39,7 +37,6 @@ try {
             throw new Exception('Ce produit est déjà en stock.');
         }
         
-        // Verificar si ya tiene una alerta activa
         $stmtCheckAlert = $pdo->prepare("
             SELECT id_alerte FROM alertes_stock 
             WHERE id_produit = ? AND id_client = ? AND est_active = 1
@@ -50,7 +47,6 @@ try {
             throw new Exception('Vous avez déjà une alerte active pour ce produit.');
         }
         
-        // Crear la alerta
         $stmtInsert = $pdo->prepare("
             INSERT INTO alertes_stock (id_produit, id_client, date_creation, est_active) 
             VALUES (?, ?, NOW(), 1)
@@ -64,7 +60,6 @@ try {
         ]);
         
     } else if ($action === 'desactiver') {
-        // Desactivar la alerta
         $stmtUpdate = $pdo->prepare("
             UPDATE alertes_stock 
             SET est_active = 0, date_desactivation = NOW() 

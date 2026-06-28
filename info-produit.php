@@ -2,7 +2,6 @@
 session_start();
 include('connexion.php');
 
-// Vérifier si un ID produit est fourni
 $id_produit = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if ($id_produit <= 0) {
@@ -13,7 +12,6 @@ if ($id_produit <= 0) {
 $isClient = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'client';
 $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
-// Récupérer les détails du produit
 try {
     $stmt = $pdo->prepare("
         SELECT p.*, 
@@ -34,7 +32,6 @@ try {
         exit;
     }
     
-    // ===== RÉCUPÉRER LES ÉVALUATIONS =====
     $stmtEvals = $pdo->prepare("
         SELECT e.*, c.nom_client
         FROM evaluer e
@@ -45,7 +42,6 @@ try {
     $stmtEvals->execute([$id_produit]);
     $evaluaciones = $stmtEvals->fetchAll(PDO::FETCH_ASSOC);
     
-    // Calcular promedio de notas
     $promedio = 0;
     $total_eval = count($evaluaciones);
     if ($total_eval > 0) {
@@ -53,7 +49,6 @@ try {
         $promedio = round($suma / $total_eval, 1);
     }
     
-    // Verificar si el cliente ya evaluó este producto
     $ya_evaluado = false;
     $evaluacion_cliente = null;
     if ($isClient && $userId) {
@@ -65,7 +60,6 @@ try {
         $ya_evaluado = $evaluacion_cliente ? true : false;
     }
     
-    // Verificar si el cliente compró este producto
     $a_achete = false;
     if ($isClient && $userId) {
         $stmtCheck = $pdo->prepare("
@@ -77,7 +71,6 @@ try {
         $a_achete = $stmtCheck->fetchColumn() > 0;
     }
     
-    // Récupérer d'autres produits de la même boutique
     $stmt = $pdo->prepare("
         SELECT p.id_produit, p.nom_produit, p.prix_unitaire, p.photo_url
         FROM produit p
@@ -90,7 +83,6 @@ try {
     $stmt->execute([$produit['id_boutique'], $id_produit]);
     $autres_produits = $stmt->fetchAll();
     
-    // Récupérer des produits similaires (même catégorie)
     $stmt = $pdo->prepare("
         SELECT p.id_produit, p.nom_produit, p.prix_unitaire, p.photo_url,
                b.nom_boutique
@@ -111,7 +103,6 @@ try {
     exit;
 }
 
-// Fonction pour générer les étoiles de notation
 function renderStars($rating = 4.5) {
     $full = floor($rating);
     $half = ($rating - $full) >= 0.5 ? 1 : 0;
@@ -119,7 +110,6 @@ function renderStars($rating = 4.5) {
     return str_repeat('★', $full) . str_repeat('½', $half) . str_repeat('☆', $empty);
 }
 
-// Fonction pour renderStars avec taille personnalisée
 function renderStarsSize($rating, $size = '1rem') {
     $full = floor($rating);
     $half = ($rating - $full) >= 0.5 ? 1 : 0;
@@ -164,7 +154,6 @@ function renderStarsSize($rating, $size = '1rem') {
 
   h1, h2, h3, .playfair { font-family: 'Playfair Display', serif; }
 
-  /* Animations */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(40px); }
     to { opacity: 1; transform: translateY(0); }
@@ -184,7 +173,6 @@ function renderStarsSize($rating, $size = '1rem') {
     transform: translateY(0);
   }
 
-  /* Boutons */
   .btn-primary {
     background: var(--primary);
     color: #fff;
@@ -221,7 +209,6 @@ function renderStarsSize($rating, $size = '1rem') {
   }
   .btn-sage:hover { background: #8aa09a; transform: translateY(-2px); }
 
-  /* Product Detail */
   .product-detail-container {
     max-width: 1280px;
     margin: 2rem auto;
@@ -307,7 +294,6 @@ function renderStarsSize($rating, $size = '1rem') {
   .shop-name { font-weight: 700; color: var(--primary); }
   .stars { color: #e0a82e; font-size: 0.8rem; }
 
-  /* Quantity Selector */
   .quantity-selector {
     display: flex;
     align-items: center;
@@ -335,7 +321,6 @@ function renderStarsSize($rating, $size = '1rem') {
     border-radius: 12px;
   }
 
-  /* Product Cards Mini */
   .product-mini-card {
     background: #fff;
     border-radius: 16px;
@@ -361,7 +346,6 @@ function renderStarsSize($rating, $size = '1rem') {
   }
   .product-mini-price { color: var(--primary); font-weight: 700; }
 
-  /* Toast */
   .toast {
     position: fixed;
     bottom: 28px;
@@ -379,7 +363,6 @@ function renderStarsSize($rating, $size = '1rem') {
   .toast.show { transform: translateY(0); opacity: 1; }
   .toast.error { background: #d9534f; }
 
-  /* ⭐ STYLES POUR L'ÉVALUATION */
   .star-rating {
     display: inline-flex;
     flex-direction: row-reverse;
@@ -435,7 +418,6 @@ function renderStarsSize($rating, $size = '1rem') {
 
 <div class="product-detail-container">
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-    <!-- Galerie d'images -->
     <div class="reveal">
       <div class="product-gallery">
         <?php 
@@ -448,7 +430,6 @@ function renderStarsSize($rating, $size = '1rem') {
       </div>
     </div>
 
-    <!-- Informations produit -->
     <div class="reveal">
       <div class="product-info">
         <span class="product-category">
@@ -488,14 +469,12 @@ function renderStarsSize($rating, $size = '1rem') {
           <p><?php echo nl2br(htmlspecialchars($produit['description'] ?? 'Aucune description disponible pour ce produit.')); ?></p>
         </div>
 
-        <!-- Sélecteur quantité -->
         <div class="quantity-selector">
           <button class="qty-btn" id="qtyMinus">−</button>
           <input type="number" id="qtyInput" class="qty-input" value="1" min="1" max="<?php echo $stock; ?>">
           <button class="qty-btn" id="qtyPlus">+</button>
         </div>
 
-        <!-- Boutons d'action -->
         <div class="flex gap-3 flex-wrap">
           <button class="btn-primary" id="addToCartBtn" <?php echo $stock <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''; ?>>
             🛒 Ajouter au panier
@@ -505,7 +484,6 @@ function renderStarsSize($rating, $size = '1rem') {
           </button>
         </div>
 
-        <!-- Informations boutique -->
         <div class="shop-info" onclick="window.location.href='store.php?id=<?php echo $produit['id_boutique']; ?>'">
           <?php 
           $shop_img = !empty($produit['boutique_image']) ? $produit['boutique_image'] : 'https://placehold.co/50x50/5D0D18/white?text=🏪';
@@ -521,15 +499,11 @@ function renderStarsSize($rating, $size = '1rem') {
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- 📝 SECTION D'ÉVALUATION                    -->
-  <!-- ========================================== -->
   <div class="evaluation-section reveal">
     <h2 class="text-2xl font-bold mb-6" style="color: var(--primary);">
       <i class="bi bi-star"></i> Avis et évaluations
     </h2>
     
-    <!-- Statistiques des évaluations -->
     <div class="flex items-center gap-6 mb-6 flex-wrap">
       <div class="flex items-center gap-2">
         <span class="text-3xl font-bold text-[var(--gold)]"><?php echo $promedio > 0 ? $promedio : '4.5'; ?></span>
@@ -544,7 +518,6 @@ function renderStarsSize($rating, $size = '1rem') {
       </div>
     </div>
     
-    <!-- FORMULAIRE D'ÉVALUATION -->
     <?php if ($isClient && $a_achete): ?>
       <div class="bg-[var(--bg)] rounded-2xl p-6 border border-[#e8ddd0] mb-8">
         <h3 class="font-bold text-lg mb-3" style="color: var(--primary);">
@@ -598,7 +571,6 @@ function renderStarsSize($rating, $size = '1rem') {
       </div>
     <?php endif; ?>
     
-    <!-- 📋 LISTE DES ÉVALUATIONS -->
     <div id="evaluationsList">
       <?php if (empty($evaluaciones)): ?>
         <div class="text-center py-8 bg-white rounded-2xl border border-[#e8ddd0]">
@@ -624,7 +596,6 @@ function renderStarsSize($rating, $size = '1rem') {
     </div>
   </div>
 
-  <!-- Autres produits de la même boutique -->
   <?php if (!empty($autres_produits)): ?>
   <div class="mt-16 reveal">
     <h2 class="text-2xl font-bold mb-6" style="color: var(--primary);">
@@ -647,7 +618,6 @@ function renderStarsSize($rating, $size = '1rem') {
   </div>
   <?php endif; ?>
 
-  <!-- Produits similaires -->
   <?php if (!empty($produits_similaires)): ?>
   <div class="mt-16 reveal">
     <h2 class="text-2xl font-bold mb-6" style="color: var(--primary);">
@@ -677,7 +647,6 @@ function renderStarsSize($rating, $size = '1rem') {
 <?php include 'footer.php'; ?>
 
 <script>
-// ========== QUANTITY SELECTOR ==========
 const qtyInput = document.getElementById('qtyInput');
 const qtyMinus = document.getElementById('qtyMinus');
 const qtyPlus = document.getElementById('qtyPlus');
@@ -703,7 +672,6 @@ if (qtyInput) {
     });
 }
 
-// ========== TOAST ==========
 function showToast(msg, isError = false) {
     const toast = document.getElementById('toast');
     toast.textContent = msg;
@@ -714,15 +682,22 @@ function showToast(msg, isError = false) {
 
 function updateCartCount(total) {
     const badge = document.getElementById('cart-count');
-    if (badge && total !== undefined) badge.textContent = total;
+    if (badge && total !== undefined) {
+        badge.textContent = total;
+        if (total > 0) badge.classList.add('show');
+        else badge.classList.remove('show');
+    }
 }
 
-// ========== PANIER ==========
 function addToCart() {
     <?php if ($stock <= 0): ?>
     showToast('❌ Ce produit n\'est plus disponible', true);
     return;
     <?php endif; ?>
+
+    const btn = document.getElementById('addToCartBtn');
+    if (btn && btn.disabled) return;
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ ...'; btn.style.opacity = '0.7'; }
 
     const quantity = parseInt(qtyInput?.value) || 1;
     const formData = new FormData();
@@ -735,19 +710,24 @@ function addToCart() {
             if (data.success) {
                 updateCartCount(data.total_panier);
                 showToast(`✓ <?php echo addslashes($produit['nom_produit']); ?> (x${quantity}) ajouté au panier !`);
+                if (btn) { btn.textContent = '✓ Ajouté !'; btn.style.opacity = '1'; }
+                setTimeout(() => { if (btn) { btn.innerHTML = '🛒 Ajouter au panier'; btn.disabled = false; } }, 2000);
             } else if (data.message && data.message.includes('connecter')) {
                 showToast('⚠️ Connectez-vous pour ajouter au panier', true);
                 setTimeout(() => { window.location.href = 'signin.php'; }, 1500);
             } else {
                 showToast('❌ ' + (data.message || 'Erreur'), true);
+                if (btn) { btn.innerHTML = '🛒 Ajouter au panier'; btn.disabled = false; btn.style.opacity = '1'; }
             }
         })
-        .catch(() => showToast('❌ Erreur de connexion au serveur', true));
+        .catch(() => {
+            showToast('❌ Erreur de connexion au serveur', true);
+            if (btn) { btn.innerHTML = '🛒 Ajouter au panier'; btn.disabled = false; btn.style.opacity = '1'; }
+        });
 }
 
 document.getElementById('addToCartBtn')?.addEventListener('click', addToCart);
 
-// ========== SOUMETTRE UNE ÉVALUATION ==========
 function submitEvaluation(event) {
     event.preventDefault();
     
@@ -756,7 +736,6 @@ function submitEvaluation(event) {
     const note = formData.get('note');
     const id_produit = formData.get('id_produit');
     
-    // Validation
     if (!note) {
         document.getElementById('starError').classList.remove('hidden');
         showToast('⚠️ Veuillez sélectionner une note', true);
@@ -799,7 +778,6 @@ function submitEvaluation(event) {
     return false;
 }
 
-// ========== SCROLL REVEAL ==========
 function initReveal() {
     const elements = document.querySelectorAll('.reveal');
     const observer = new IntersectionObserver((entries) => {
@@ -810,11 +788,9 @@ function initReveal() {
     elements.forEach(el => observer.observe(el));
 }
 
-// ========== INITIALISATION ==========
 updateCartCount();
 initReveal();
 
-// Log pour savoir si le formulaire existe
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('evaluationForm');
     if (form) {

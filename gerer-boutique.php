@@ -2,7 +2,6 @@
 session_start();
 include('connexion.php');
 
-// Verificar que el usuario esté logueado y sea producteur
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'producteur') {
     header("Location: signin.php");
     exit();
@@ -12,13 +11,11 @@ $theme = $_COOKIE['theme'] ?? 'light';
 $id_producteur = $_SESSION['user_id'];
 $id_boutique = intval($_GET['id'] ?? 0);
 
-// Si no hay ID de boutique, mostrar error
 if ($id_boutique <= 0) {
     header("Location: dashboard_producteur.php?error=id_invalide");
     exit();
 }
 
-// Vérifier que la boutique appartient au producteur
 try {
     $stmt = $pdo->prepare("
         SELECT b.*, p.nom_entreprise, c.nom_categorie, c.id_categorie as cat_id
@@ -39,7 +36,6 @@ try {
     exit();
 }
 
-// Récupérer les produits de la boutique
 try {
     $stmt = $pdo->prepare("
         SELECT p.*, c.nom_categorie 
@@ -54,7 +50,6 @@ try {
     $produits = [];
 }
 
-// Récupérer les catégories pour le formulaire
 try {
     $stmt = $pdo->query("SELECT id_categorie, nom_categorie FROM categorie ORDER BY nom_categorie");
     $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -62,10 +57,8 @@ try {
     $categories = [];
 }
 
-// Compter les produits
 $total_produits = count($produits);
 
-// Vérifier les messages de succès
 $success_message = '';
 if (isset($_GET['product_added'])) {
     $success_message = '✅ Produit ajouté avec succès !';
@@ -77,12 +70,10 @@ if (isset($_GET['product_added'])) {
     $success_message = '✅ Boutique modifiée avec succès !';
 }
 
-// Fonction pour vérifier si une image existe
 function hasImage($boutique) {
     return isset($boutique['image']) && !empty($boutique['image']) && file_exists($boutique['image']);
 }
 
-// Fonction pour obtenir l'URL de l'image
 function getImageUrl($boutique) {
     if (hasImage($boutique)) {
         return htmlspecialchars($boutique['image']);
@@ -90,10 +81,8 @@ function getImageUrl($boutique) {
     return null;
 }
 
-// Obtenir le nom de la catégorie
 $categorie_nom = $boutique['nom_categorie'] ?? 'Non catégorisé';
 if (empty($categorie_nom) || $categorie_nom == 'Non catégorisé') {
-    // Si la catégorie n'est pas trouvée, essayer de la récupérer directement
     if (!empty($boutique['id_categorie'])) {
         try {
             $stmt = $pdo->prepare("SELECT nom_categorie FROM categorie WHERE id_categorie = ?");
@@ -108,7 +97,6 @@ if (empty($categorie_nom) || $categorie_nom == 'Non catégorisé') {
     }
 }
 
-// Vérifier si l'image existe
 $has_image = hasImage($boutique);
 $image_url = getImageUrl($boutique);
 ?>
@@ -516,11 +504,103 @@ $image_url = getImageUrl($boutique);
             .product-img { height: 140px; }
             .store-image, .store-image-placeholder { width: 100px; height: 100px; }
         }
+
+        #toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: var(--primary);
+            color: #fff;
+            padding: 14px 22px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            z-index: 9999;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: 0.4s cubic-bezier(.22,1,.36,1);
+            max-width: 340px;
+        }
+        #toast.show { transform: translateY(0); opacity: 1; }
+
+        #confirm-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            align-items: center;
+            justify-content: center;
+        }
+        #confirm-modal.show { display: flex; }
+        #confirm-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(3px);
+        }
+        #confirm-box {
+            position: relative;
+            background: var(--bg-card, #fff);
+            border-radius: 20px;
+            padding: 2rem 1.8rem 1.5rem;
+            max-width: 360px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            text-align: center;
+            animation: modalIn 0.25s cubic-bezier(.22,1,.36,1);
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.88) translateY(20px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        #confirm-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+        #confirm-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-dark, #2C2C2C);
+            margin-bottom: 0.4rem;
+        }
+        #confirm-msg {
+            font-size: 0.88rem;
+            color: var(--text-light, #6B6B6B);
+            margin-bottom: 1.4rem;
+        }
+        .confirm-btns { display: flex; gap: 0.8rem; justify-content: center; }
+        .confirm-btns button {
+            flex: 1;
+            padding: 0.65rem 1rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        #confirm-cancel { background: #f5f0e8; color: var(--text-dark, #2C2C2C); }
+        #confirm-cancel:hover { opacity: 0.8; }
+        #confirm-ok { background: #c0392b; color: #fff; }
+        #confirm-ok:hover { background: #a93226; }
     </style>
 </head>
 <body>
 
 <?php include 'header.php'; ?>
+
+<div id="confirm-modal">
+  <div id="confirm-overlay"></div>
+  <div id="confirm-box">
+    <div id="confirm-icon">⚠️</div>
+    <div id="confirm-title"></div>
+    <div id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button id="confirm-cancel">Annuler</button>
+      <button id="confirm-ok">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
 
 <div class="page-header">
     <div style="max-width:1200px;margin:0 auto;">
@@ -539,7 +619,6 @@ $image_url = getImageUrl($boutique);
         <div class="alert alert-success"><?php echo $success_message; ?></div>
     <?php endif; ?>
 
-    <!-- Statistiques -->
     <div class="stats-grid">
         <div class="stat-card">
             <div class="number"><?php echo $total_produits; ?></div>
@@ -571,10 +650,8 @@ $image_url = getImageUrl($boutique);
         </div>
     </div>
 
-    <!-- Informations de la boutique -->
     <div class="store-card">
         <div class="store-header">
-            <!-- Affichage de l'image -->
             <?php if ($has_image && $image_url): ?>
                 <img src="<?php echo $image_url; ?>" 
                      alt="<?php echo htmlspecialchars($boutique['nom_boutique'] ?? 'Boutique'); ?>" 
@@ -605,7 +682,6 @@ $image_url = getImageUrl($boutique);
                     <p class="store-desc"><?php echo htmlspecialchars($boutique['description']); ?></p>
                 <?php endif; ?>
                 <div class="store-actions">
-                <!-- Badge de estado -->
                 <div style="display:flex;align-items:center;gap:0.5rem;width:100%;margin-bottom:0.5rem;">
                     <?php if (isset($boutique['est_valide_par_admin']) && $boutique['est_valide_par_admin'] == 1): ?>
                         <span class="badge badge-success" style="background:#d4edda;color:#155724;padding:0.3rem 0.8rem;border-radius:999px;font-weight:600;">
@@ -618,7 +694,6 @@ $image_url = getImageUrl($boutique);
                     <?php endif; ?>
                 </div>
                 
-                <!-- Botones de acción -->
                 <a href="modifier-boutique.php?id=<?php echo $id_boutique; ?>" class="btn-outline">
                     <i class="bi bi-pencil"></i> Modifier
                 </a>
@@ -633,7 +708,6 @@ $image_url = getImageUrl($boutique);
         </div>
     </div>
 
-    <!-- Liste des produits -->
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;">
         <h3 class="section-title" style="margin-bottom:0;">
             <i class="bi bi-box-seam"></i> Mes produits
@@ -701,61 +775,99 @@ $image_url = getImageUrl($boutique);
 <?php include 'footer.php'; ?>
 
 <script>
-// Supprimer un produit avec confirmation
+function showToast(msg, bg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.background = bg || 'var(--primary)';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+let _confirmCallback = null;
+
+function askConfirm(title, msg, callback, icon) {
+    document.getElementById('confirm-icon').textContent = icon || '⚠️';
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-msg').textContent = msg;
+    _confirmCallback = callback;
+    document.getElementById('confirm-modal').classList.add('show');
+}
+
+document.getElementById('confirm-ok').addEventListener('click', () => {
+    document.getElementById('confirm-modal').classList.remove('show');
+    if (_confirmCallback) _confirmCallback();
+});
+
+document.getElementById('confirm-cancel').addEventListener('click', () => {
+    document.getElementById('confirm-modal').classList.remove('show');
+    _confirmCallback = null;
+});
+
+document.getElementById('confirm-overlay').addEventListener('click', () => {
+    document.getElementById('confirm-modal').classList.remove('show');
+    _confirmCallback = null;
+});
+
 function supprimerProduit(id, nom, boutiqueId) {
     if (!id || id <= 0) {
-        alert('❌ ID produit invalide');
+        showToast('❌ ID produit invalide', '#c0392b');
         return;
     }
-    
-    if (confirm('Êtes-vous sûr de vouloir supprimer le produit "' + nom + '" ? Cette action est irréversible.')) {
-        // Trouver le bouton et le désactiver
-        const btns = document.querySelectorAll('.btn-sm-delete');
-        let btn = null;
-        btns.forEach(b => {
-            if (b.onclick && b.onclick.toString().includes('supprimerProduit(' + id + ',')) {
-                btn = b;
+
+    askConfirm(
+        'Supprimer ce produit ?',
+        '« ' + nom + ' » sera supprimé définitivement. Cette action est irréversible.',
+        () => {
+            const btns = document.querySelectorAll('.btn-sm-delete');
+            let btn = null;
+            btns.forEach(b => {
+                if (b.onclick && b.onclick.toString().includes('supprimerProduit(' + id + ',')) {
+                    btn = b;
+                }
+            });
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="loader"></span>';
             }
-        });
-        if (btn) {
-            btn.disabled = true;
-            btn.innerHTML = '<span class="loader"></span>';
-        }
-        
-        fetch('supprimer_produit.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'id_produit=' + id
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('✅ ' + data.message);
-                window.location.href = 'gerer-boutique.php?id=' + boutiqueId + '&product_deleted=1';
-            } else {
-                alert('❌ ' + data.message);
+
+            fetch('supprimer_produit.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'id_produit=' + id
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('✅ ' + data.message, '#27ae60');
+                    setTimeout(() => {
+                        window.location.href = 'gerer-boutique.php?id=' + boutiqueId + '&product_deleted=1';
+                    }, 1200);
+                } else {
+                    showToast('❌ ' + data.message, '#c0392b');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="bi bi-trash3"></i>';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                showToast('❌ Erreur de connexion au serveur', '#c0392b');
                 if (btn) {
                     btn.disabled = false;
                     btn.innerHTML = '<i class="bi bi-trash3"></i>';
                 }
-            }
-        })
-        .catch(error => {
-            console.error('Erreur:', error);
-            alert('❌ Erreur de connexion au serveur');
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-trash3"></i>';
-            }
-        });
-    }
+            });
+        },
+        '🗑️'
+    );
 }
 
-// Supprimer la boutique avec confirmation
 function supprimerBoutique(id, nom) {
-    if (confirm('⚠️ Êtes-vous sûr de vouloir supprimer la boutique "' + nom + '" ?\n\nCette action supprimera également tous ses produits et est irréversible.')) {
-        if (confirm('Confirmation finale : Voulez-vous vraiment supprimer cette boutique ?')) {
-            // Désactiver le bouton
+    askConfirm(
+        'Supprimer la boutique ?',
+        '« ' + nom + ' » et tous ses produits seront supprimés définitivement. Cette action est irréversible.',
+        () => {
             const btns = document.querySelectorAll('.btn-danger');
             let btn = null;
             btns.forEach(b => {
@@ -767,7 +879,7 @@ function supprimerBoutique(id, nom) {
                 btn.disabled = true;
                 btn.innerHTML = '<span class="loader"></span>';
             }
-            
+
             fetch('supprimer_boutique.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -776,10 +888,12 @@ function supprimerBoutique(id, nom) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('✅ Boutique supprimée avec succès !');
-                    window.location.href = 'dashboard_producteur.php';
+                    showToast('✅ Boutique supprimée avec succès !', '#27ae60');
+                    setTimeout(() => {
+                        window.location.href = 'dashboard_producteur.php';
+                    }, 1200);
                 } else {
-                    alert('❌ Erreur : ' + data.message);
+                    showToast('❌ Erreur : ' + data.message, '#c0392b');
                     if (btn) {
                         btn.disabled = false;
                         btn.innerHTML = '<i class="bi bi-trash3"></i> Supprimer';
@@ -788,14 +902,15 @@ function supprimerBoutique(id, nom) {
             })
             .catch(error => {
                 console.error('Erreur:', error);
-                alert('❌ Erreur de connexion au serveur');
+                showToast('❌ Erreur de connexion au serveur', '#c0392b');
                 if (btn) {
                     btn.disabled = false;
                     btn.innerHTML = '<i class="bi bi-trash3"></i> Supprimer';
                 }
             });
-        }
-    }
+        },
+        '🏪'
+    );
 }
 </script>
 </body>

@@ -2,7 +2,6 @@
 session_start();
 header('Content-Type: application/json');
 
-// SOLO ADMIN
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
     echo json_encode(['success' => false, 'message' => 'Non autorisé']);
     exit;
@@ -18,7 +17,6 @@ if (!$id_boutique) {
 }
 
 try {
-    // Récupérer les infos de la boutique ET du producteur
     $stmt = $pdo->prepare("
         SELECT b.id_boutique, b.nom_boutique, b.id_producteur, 
                p.nom_entreprise, p.email, p.id_producteur
@@ -34,21 +32,17 @@ try {
         exit;
     }
     
-    // Démarrer la transaction
     $pdo->beginTransaction();
     
-    // 1. Supprimer les dépendances (tables sans CASCADE)
     $tables = ['categorie_boutique', 'evaluer_boutique', 'favoris_boutique'];
     foreach ($tables as $table) {
         $stmt = $pdo->prepare("DELETE FROM $table WHERE id_boutique = ?");
         $stmt->execute([$id_boutique]);
     }
     
-    // 2. Supprimer la boutique
     $stmt = $pdo->prepare("DELETE FROM boutique WHERE id_boutique = ?");
     $stmt->execute([$id_boutique]);
     
-    // 3. Créer une notification pour le producteur
     $message = "❌ Votre boutique '{$boutique['nom_boutique']}' a été supprimée par l'administrateur.\n";
     $message .= "📅 Date de suppression : " . date('d/m/Y à H:i') . "\n";
     $message .= "📧 Contactez le support si vous avez des questions.";
@@ -59,7 +53,6 @@ try {
     ");
     $stmt->execute([$boutique['id_producteur'], $message]);
     
-    // Valider la transaction
     $pdo->commit();
     
     echo json_encode([

@@ -7,10 +7,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'client') {
 
 include("connexion.php");
 
-// Detectar tema guardado (por defecto claro)
 $theme = $_COOKIE['theme'] ?? 'light';
 
-// Recuperar el carrito del cliente desde la BD (incluyendo id_producteur)
 try {
     $req = $pdo->prepare("
         SELECT pa.quantite, p.id_produit, p.nom_produit, p.prix_unitaire,
@@ -33,7 +31,6 @@ if (empty($panier)) {
     exit;
 }
 
-// Calcular el total
 $sous_total = 0;
 foreach ($panier as $item) {
     $sous_total += $item['prix_unitaire'] * $item['quantite'];
@@ -44,7 +41,6 @@ $success = false;
 $numero_commande = '';
 $frais_livraison = 250;
 
-// Tratamiento de la commande
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $prenom = trim($_POST['prenom'] ?? '');
     $nom = trim($_POST['nom'] ?? '');
@@ -57,7 +53,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $ville = trim($_POST['ville'] ?? '');
     $code_postal = trim($_POST['code_postal'] ?? '');
 
-    // Validación
     if (empty($prenom)) $err['prenom'] = "Veuillez entrer votre prénom";
     if (empty($nom)) $err['nom'] = "Veuillez entrer votre nom";
     if (empty($email)) $err['email'] = "Veuillez entrer votre email";
@@ -75,7 +70,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (empty($err)) {
         try {
-            // Construir dirección
             if ($mode_livraison == 'livraison') {
                 $adresse_livraison = htmlspecialchars($adresse) . ', ' . 
                                     htmlspecialchars($code_postal) . ' ' . 
@@ -84,7 +78,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $adresse_livraison = 'Retrait en boutique';
             }
 
-            // Insertar la commande
             $ri = $pdo->prepare("
                 INSERT INTO commande 
                 (id_client, date_commande, montant_total, statut_commande, adresse_livraison) 
@@ -95,7 +88,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $id_commande = $pdo->lastInsertId();
             $numero_commande = 'CMD-' . str_pad($id_commande, 8, '0', STR_PAD_LEFT);
 
-            // Insertar productos
             foreach ($panier as $item) {
                 $ri2 = $pdo->prepare("
                     INSERT INTO contenir (id_commande, id_produit, quantite, prix_unitaire) 
@@ -103,7 +95,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 ");
                 $ri2->execute([$id_commande, $item['id_produit'], $item['quantite'], $item['prix_unitaire']]);
 
-                // Actualizar stock
                 $ri3 = $pdo->prepare("
                     UPDATE produit SET stock_quantite = stock_quantite - ? 
                     WHERE id_produit = ?
@@ -111,9 +102,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $ri3->execute([$item['quantite'], $item['id_produit']]);
             }
 
-            // ================================================================
-            // 🔥 ENVIAR NOTIFICACIONES A LOS PRODUCTORES
-            // ================================================================
             $stmtNotif = $pdo->prepare("
                 SELECT DISTINCT p.id_producteur, p.nom_entreprise, 
                        COALESCE(SUM(co.quantite), 0) as total_articles
@@ -143,9 +131,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmtNotifInsert->execute([$prod['id_producteur'], $message]);
             }
 
-            // ================================================================
-            // 🔥 NOTIFICACIÓN PARA EL CLIENTE
-            // ================================================================
             $message_client = "✅ Votre commande #{$numero_cmd} a été confirmée !\n";
             $message_client .= "Total : " . number_format($montant_total, 2) . " DH\n";
             $message_client .= "Merci pour votre achat sur GreenMarket 🌿";
@@ -156,7 +141,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ");
             $stmtNotifClient->execute([$_SESSION['user_id'], $message_client]);
 
-            // Vaciar carrito
             $pdo->prepare("DELETE FROM panier WHERE id_client = ?")->execute([$_SESSION['user_id']]);
 
             $success = true;
@@ -182,7 +166,6 @@ foreach ($panier as $item) {
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
-/* ===== VARIABLES DE TEMA GLOBAL ===== */
 :root {
   --primary: #5D0D18;
   --primary-light: #7a1020;
@@ -262,7 +245,6 @@ body{
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* ===== PAGE HEADER ===== */
 .page-header {
   background: var(--page-header-bg);
   padding: 4rem 2.5rem 3rem;
@@ -322,7 +304,6 @@ body{
   transition: color 0.3s ease;
 }
 
-/* ===== CONTAINER ===== */
 .container{ max-width:1100px; margin:2rem auto; padding:0 1.5rem; }
 
 .err{ color:var(--danger); font-size:.8rem; margin-bottom:8px; }
@@ -563,7 +544,6 @@ body{
 
 <?php include 'header.php'; ?>
 
-<!-- ===== PAGE HEADER ===== -->
 <div class="page-header">
   <div class="header-inner">
     <div class="header-eyebrow">🇲🇦 Artisanat &amp; Traditions marocaines</div>
@@ -701,7 +681,6 @@ body{
   </div>
 
 <script>
-// Mise à jour du total selon le mode de livraison
 var radios = document.querySelectorAll('input[name="mode_livraison"]');
 var sousTotal = <?= $sous_total; ?>;
 radios.forEach(function(radio) {

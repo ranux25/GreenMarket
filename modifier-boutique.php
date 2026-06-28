@@ -2,7 +2,6 @@
 session_start();
 include('connexion.php');
 
-// Verificar que el usuario esté logueado y sea producteur
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'producteur') {
     header("Location: signin.php");
     exit();
@@ -12,7 +11,6 @@ $theme = $_COOKIE['theme'] ?? 'light';
 $id_producteur = $_SESSION['user_id'];
 $id_boutique = intval($_GET['id'] ?? 0);
 
-// Verificar que la boutique pertenece al producteur
 try {
     $stmt = $pdo->prepare("
         SELECT b.*, c.nom_categorie 
@@ -32,7 +30,6 @@ try {
     exit();
 }
 
-// Récupérer toutes les catégories disponibles
 try {
     $stmt = $pdo->query("SELECT id_categorie, nom_categorie FROM categorie ORDER BY nom_categorie");
     $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -43,7 +40,6 @@ try {
 $error = '';
 $success = '';
 
-// Traitement du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nom_boutique = trim($_POST['nom_boutique'] ?? '');
     $description = trim($_POST['description'] ?? '');
@@ -51,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $supprimer_image = isset($_POST['supprimer_image']);
     $image = $_FILES['image'] ?? null;
     
-    // Validation
     if (empty($nom_boutique)) {
         $error = "Veuillez saisir un nom pour votre boutique";
     } elseif (strlen($nom_boutique) < 3) {
@@ -62,7 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $image_path = $boutique['image'] ?? null;
             
-            // Supprimer l'image si demandé
             if ($supprimer_image && !empty($image_path)) {
                 if (file_exists($image_path)) {
                     unlink($image_path);
@@ -70,7 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $image_path = null;
             }
             
-            // Gérer l'upload de la nouvelle image
             if ($image && $image['error'] === UPLOAD_ERR_OK) {
                 $upload_dir = 'IMAGES/';
                 if (!is_dir($upload_dir)) {
@@ -86,7 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $new_image_path = $upload_dir . $filename;
                     
                     if (move_uploaded_file($image['tmp_name'], $new_image_path)) {
-                        // Supprimer l'ancienne image si elle existe
                         if (!empty($image_path) && file_exists($image_path)) {
                             unlink($image_path);
                         }
@@ -98,7 +90,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             if (empty($error)) {
-                // Mettre à jour la boutique
                 $stmt = $pdo->prepare("
                     UPDATE boutique 
                     SET nom_boutique = ?, description = ?, id_categorie = ?, image = ?
@@ -115,16 +106,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fonction pour vérifier si une image existe
 function hasImage($boutique) {
     return isset($boutique['image']) && !empty($boutique['image']) && file_exists($boutique['image']);
 }
 
-// Vérifier si la boutique a une image
 $has_image = hasImage($boutique);
 $image_url = $has_image ? htmlspecialchars($boutique['image']) : null;
-
-// Obtenir le nom de la catégorie actuelle
 $categorie_actuelle = $boutique['nom_categorie'] ?? 'Non catégorisé';
 ?>
 <!DOCTYPE html>
@@ -335,7 +322,6 @@ $categorie_actuelle = $boutique['nom_categorie'] ?? 'Non catégorisé';
         </h2>
 
         <form method="POST" enctype="multipart/form-data">
-            <!-- Nom de la boutique -->
             <div class="form-group">
                 <label>Nom de la boutique <span class="required">*</span></label>
                 <input type="text" name="nom_boutique" 
@@ -343,7 +329,6 @@ $categorie_actuelle = $boutique['nom_categorie'] ?? 'Non catégorisé';
                        required minlength="3" maxlength="100">
             </div>
 
-            <!-- Catégorie -->
             <div class="form-group">
                 <label>Catégorie principale <span class="required">*</span></label>
                 <select name="id_categorie" required>
@@ -364,14 +349,12 @@ $categorie_actuelle = $boutique['nom_categorie'] ?? 'Non catégorisé';
                 <?php endif; ?>
             </div>
 
-            <!-- Description -->
             <div class="form-group">
                 <label>Description de la boutique</label>
                 <textarea name="description" rows="4" maxlength="500"><?php echo htmlspecialchars($boutique['description'] ?? ''); ?></textarea>
                 <div class="help-text">Une description attrayante donne envie aux clients de découvrir vos produits.</div>
             </div>
 
-            <!-- Image actuelle -->
             <?php if ($has_image && $image_url): ?>
             <div class="form-group">
                 <label>Image actuelle</label>
@@ -385,7 +368,6 @@ $categorie_actuelle = $boutique['nom_categorie'] ?? 'Non catégorisé';
             </div>
             <?php endif; ?>
 
-            <!-- Nouvelle image -->
             <div class="form-group">
                 <label><?php echo $has_image ? 'Changer l\'image' : 'Image de la boutique'; ?></label>
                 <input type="file" name="image" id="image" accept="image/*" onchange="previewImage(event)">
@@ -422,7 +404,6 @@ function previewImage(event) {
     }
 }
 
-// Si on coche "supprimer l'image", on désactive l'upload
 const supprimerImageCheckbox = document.getElementById('supprimer_image');
 if (supprimerImageCheckbox) {
     supprimerImageCheckbox.addEventListener('change', function() {

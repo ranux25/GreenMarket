@@ -2,14 +2,11 @@
 session_start();
 include('connexion.php');
 
-// Detectar tema guardado (por defecto claro)
 $theme = $_COOKIE['theme'] ?? 'light';
 
-// Verificar si el usuario es admin o cliente
 $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
 $isClient = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'client';
 
-// Récupérer les produits depuis la base de données
 try {
     $stmt = $pdo->prepare("
         SELECT p.*, 
@@ -25,18 +22,15 @@ try {
     $stmt->execute();
     $produits_db = $stmt->fetchAll();
     
-    // Récupérer toutes les catégories
     $stmt = $pdo->query("SELECT * FROM categorie ORDER BY nom_categorie");
     $categories_db = $stmt->fetchAll();
     
-    // Récupérer les statistiques
     $stmt = $pdo->query("SELECT COUNT(*) as total FROM produit WHERE est_valide_par_admin = 1 AND statut_publie = 'Publié'");
     $total_produits = $stmt->fetch()['total'];
     
     $stmt = $pdo->query("SELECT COUNT(DISTINCT id_boutique) as total FROM produit WHERE est_valide_par_admin = 1 AND statut_publie = 'Publié'");
     $total_boutiques = $stmt->fetch()['total'];
 
-    // Compter les articles dans le panier du client connecté
     $panier_count = 0;
     if (isset($_SESSION['user_id']) && $_SESSION['user_role'] == 'client') {
         $stmtP = $pdo->prepare("SELECT SUM(quantite) as total FROM panier WHERE id_client = ?");
@@ -44,7 +38,6 @@ try {
         $panier_count = $stmtP->fetch()['total'] ?? 0;
     }
     
-    // Si le client est connecté, récupérer ses favoris
     $favoris_ids = [];
     if ($isClient) {
         $stmtF = $pdo->prepare("SELECT id_produit FROM favoris WHERE id_client = ?");
@@ -62,7 +55,6 @@ try {
     $favoris_ids = [];
 }
 
-// Formater les produits pour le JavaScript
 $produits_json = [];
 foreach ($produits_db as $p) {
     $image_url = !empty($p['photo_url']) ? $p['photo_url'] : 'IMAGES/default-product.jpg';
@@ -82,7 +74,6 @@ foreach ($produits_db as $p) {
     ];
 }
 
-// ====== GUARDAR VARIABLES ANTES DEL HEADER ======
 $header_guard = [
     'produits_json' => $produits_json,
     'isAdmin' => $isAdmin,
@@ -105,7 +96,6 @@ $header_guard = [
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
-  /* ========== VARIABLES DE TEMA GLOBAL ========== */
   :root {
     --primary: #5D0D18;
     --primary-light: #7a1020;
@@ -279,7 +269,6 @@ $header_guard = [
     transform: translateX(0);
   }
 
-  /* Page Header */
   .page-header {
     background: var(--page-header-bg);
     padding: 4rem 2.5rem 3rem;
@@ -363,7 +352,6 @@ $header_guard = [
     transition: color 0.3s ease;
   }
 
-  /* Search Bar */
   .search-bar-wrap {
     background: var(--search-bg);
     padding: 1.2rem 2.5rem;
@@ -423,7 +411,6 @@ $header_guard = [
     color: var(--text-dark);
   }
 
-  /* Main Layout */
   .main-layout {
     display: grid;
     grid-template-columns: 280px 1fr;
@@ -433,7 +420,6 @@ $header_guard = [
     gap: 2rem;
   }
 
-  /* Sidebar */
   .sidebar { position: sticky; top: 88px; align-self: start; }
   .sidebar-section {
     background: var(--sidebar-bg);
@@ -511,7 +497,6 @@ $header_guard = [
     color: var(--bg);
   }
 
-  /* Botón eliminar categoría */
   .delete-cat-btn {
     background: none;
     border: none;
@@ -543,7 +528,6 @@ $header_guard = [
     gap: 0.5rem;
   }
 
-  /* Add category form */
   .add-cat-form {
     padding: 1.2rem;
     border-top: 1px solid var(--sidebar-border);
@@ -598,7 +582,6 @@ $header_guard = [
     transition: background 0.3s ease, color 0.3s ease;
   }
 
-  /* Products Grid */
   .stores-title-row {
     display: flex;
     align-items: baseline;
@@ -625,7 +608,6 @@ $header_guard = [
     gap: 1.5rem;
   }
 
-  /* Product Card */
   .product-card {
     background: var(--product-bg);
     border: 1.5px solid var(--product-border);
@@ -636,8 +618,10 @@ $header_guard = [
     position: relative;
   }
   .product-card:hover {
-    transform: translateY(-6px);
     box-shadow: 0 16px 36px var(--product-shadow-hover);
+  }
+  .product-card:not(:has(button:hover)):hover {
+    transform: translateY(-6px);
   }
   .product-banner {
     height: 220px;
@@ -722,7 +706,6 @@ $header_guard = [
   .stock-low { color: var(--product-stock-low); }
   .stock-out { color: var(--product-stock-out); }
 
-  /* Botón de favoritos */
   .favori-btn {
     position: absolute;
     top: 0.5rem;
@@ -756,7 +739,6 @@ $header_guard = [
     background: #4d3d32;
   }
 
-  /* Buttons */
   .add-cart-btn {
     background: var(--primary);
     color: #fff;
@@ -800,7 +782,6 @@ $header_guard = [
     transform: scale(1.05);
   }
 
-  /* Pagination */
   .pagination-wrapper {
     display: flex;
     justify-content: center;
@@ -854,7 +835,6 @@ $header_guard = [
     transition: color 0.3s ease;
   }
 
-  /* Toast */
   .toast {
     position: fixed;
     bottom: 28px;
@@ -872,7 +852,6 @@ $header_guard = [
   }
   .toast.show { transform: translateY(0); opacity: 1; }
 
-  /* Empty state */
   .empty-state {
     text-align: center;
     padding: 3rem;
@@ -882,7 +861,6 @@ $header_guard = [
   }
   .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
 
-  /* Responsive */
   @media (max-width: 900px) {
     .main-layout { grid-template-columns: 1fr; }
     .sidebar { position: static; }
@@ -909,6 +887,40 @@ $header_guard = [
       padding: 0 0.8rem;
     }
   }
+  #confirm-modal {
+    display: none; position: fixed; inset: 0; z-index: 9998;
+    align-items: center; justify-content: center;
+  }
+  #confirm-modal.show { display: flex; }
+  #confirm-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.45); backdrop-filter: blur(3px);
+  }
+  #confirm-box {
+    position: relative; background: #fff; border-radius: 20px;
+    padding: 2rem 1.8rem 1.5rem; max-width: 340px; width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2); text-align: center;
+    animation: modalIn 0.25s cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.88) translateY(20px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  #confirm-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+  #confirm-title {
+    font-family: 'Playfair Display', serif; font-size: 1.15rem;
+    font-weight: 700; color: #2C2C2C; margin-bottom: 0.4rem;
+  }
+  #confirm-msg { font-size: 0.88rem; color: #6B6B6B; margin-bottom: 1.4rem; }
+  .confirm-btns { display: flex; gap: 0.8rem; justify-content: center; }
+  .confirm-btns button {
+    flex: 1; padding: 0.65rem 1rem; border-radius: 999px;
+    font-weight: 700; font-size: 0.9rem; cursor: pointer; border: none; transition: all 0.2s;
+  }
+  #confirm-cancel { background: #f5f0e8; color: #2C2C2C; }
+  #confirm-cancel:hover { opacity: 0.8; }
+  #confirm-ok { background: #c0392b; color: #fff; }
+  #confirm-ok:hover { background: #a93226; }
 </style>
 </head>
 <body data-active-page="produits">
@@ -927,7 +939,6 @@ $categories_db = $header_guard['categories_db'];
 $theme = $header_guard['theme'];
 ?>
 
-<!-- PAGE HEADER -->
 <div class="page-header">
   <div class="header-inner">
     <div class="header-eyebrow">🇲🇦 Artisanat &amp; Traditions marocaines</div>
@@ -940,7 +951,6 @@ $theme = $header_guard['theme'];
   </div>
 </div>
 
-<!-- SEARCH BAR -->
 <div class="search-bar-wrap">
   <div class="search-input-wrapper">
     <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
@@ -971,7 +981,6 @@ $theme = $header_guard['theme'];
   </select>
 </div>
 
-<!-- MAIN CONTENT -->
 <div class="main-layout">
   <aside class="sidebar">
     <div class="sidebar-section reveal-left">
@@ -1004,17 +1013,27 @@ $theme = $header_guard['theme'];
     </div>
     <div class="stores-grid reveal" id="productsGrid"></div>
     
-    <!-- Pagination -->
     <div class="pagination-info" id="paginationInfo"></div>
     <div class="pagination-wrapper" id="paginationWrapper"></div>
   </section>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<div id="confirm-modal">
+  <div id="confirm-overlay"></div>
+  <div id="confirm-box">
+    <div id="confirm-icon">⚠️</div>
+    <div id="confirm-title"></div>
+    <div id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button id="confirm-cancel">Annuler</button>
+      <button id="confirm-ok">Confirmer</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ========== DATOS PHP ==========
 var produitsFromDB = <?php echo json_encode($produits_json); ?>;
 var categoriesFromDB = <?php echo json_encode($categories_db); ?>;
 var isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
@@ -1025,7 +1044,6 @@ console.log('📂 Catégories chargées:', categoriesFromDB.length);
 console.log('👑 Admin:', isAdmin);
 console.log('👤 Client:', isClient);
 
-// ========== VARIABLES GLOBALES ==========
 var allProducts = produitsFromDB;
 var filteredProducts = [];
 var activeCategory = null;
@@ -1033,7 +1051,6 @@ var currentPage = 1;
 var perPage = 12;
 var categories = [];
 
-// ========== FUNCIONES ==========
 function getCategoryIcon(categoryName) {
     var icons = {
         'Caftans & Vêtements traditionnels': '👘',
@@ -1071,7 +1088,6 @@ function showToast(msg, isError) {
     }, 3000);
 }
 
-// ========== CATEGORÍAS ==========
 function toggleCategoryForm() {
     var form = document.getElementById('addCatForm');
     if (form) {
@@ -1158,8 +1174,7 @@ function deleteCategory(categoryId, categoryName) {
         return;
     }
     
-    if (!confirm('Supprimer la catégorie "' + categoryName + '" ?')) return;
-    
+    askConfirm('Supprimer la catégorie ?', '"' + categoryName + '" sera supprimée définitivement.', function() {
     fetch('supprimer_categorie.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -1183,9 +1198,9 @@ function deleteCategory(categoryId, categoryName) {
     .catch(function() {
         showToast('❌ Erreur de connexion', true);
     });
+    });
 }
 
-// ========== RENDER CATEGORIAS ==========
 function renderCategories() {
     var list = document.getElementById('categoryList');
     if (!list) return;
@@ -1227,7 +1242,6 @@ function renderCategories() {
     });
 }
 
-// ========== FILTRAR ==========
 function filterProducts() {
     var searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
     var sortValue = document.getElementById('sortFilter')?.value || '';
@@ -1249,7 +1263,6 @@ function filterProducts() {
     document.getElementById('statProducts').textContent = filteredProducts.length;
 }
 
-// ========== RENDER PRODUCTOS ==========
 function renderProducts() {
     var grid = document.getElementById('productsGrid');
     if (!grid) {
@@ -1295,7 +1308,7 @@ function renderProducts() {
         if (isAdmin) {
             actionBtn = '<button class="admin-btn-delete" onclick="deleteProduct(' + p.id + ', \'' + escapeHtml(p.name) + '\')"><i class="bi bi-trash3"></i> Supprimer</button>';
         } else {
-            actionBtn = '<button class="add-cart-btn" onclick="addToCart(' + p.id + ', \'' + escapeHtml(p.name) + '\')" ' + (isOutOfStock ? 'disabled' : '') + '>🛒 ' + (isOutOfStock ? 'Rupture' : 'Ajouter') + '</button>';
+            actionBtn = '<button class="add-cart-btn" data-id="' + p.id + '" onclick="addToCart(' + p.id + ', \'' + escapeHtml(p.name) + '\')" ' + (isOutOfStock ? 'disabled' : '') + '>🛒 ' + (isOutOfStock ? 'Rupture' : 'Ajouter') + '</button>';
         }
         
         html += '<div class="product-card">' +
@@ -1324,7 +1337,6 @@ function renderProducts() {
     renderPagination(currentPage, totalPages);
 }
 
-// ========== PAGINACION ==========
 function renderPagination(activePage, totalPages) {
     var wrapper = document.getElementById('paginationWrapper');
     if (!wrapper) return;
@@ -1365,99 +1377,70 @@ function goToPage(page) {
     document.querySelector('.stores-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ========== ACCIONES ==========
-// ========== AJOUTER AU PANIER (VERSION CORRIGEE) ==========
 function addToCart(productId, productName) {
-    console.log('🔍 addToCart llamado con ID:', productId, 'Tipo:', typeof productId);
-    console.log('📦 allProducts:', allProducts);
-    console.log('🔑 IDs disponibles:', allProducts.map(function(p) { return p.id; }));
-    
-    // Verificar sesión
+    var btn = document.querySelector('.add-cart-btn[data-id="' + productId + '"]');
+    if (btn && btn.disabled) return;
+
     <?php if (!isset($_SESSION['user_id'])): ?>
         showToast('⚠️ Veuillez vous connecter pour ajouter au panier', true);
         setTimeout(function() { window.location.href = 'signin.php'; }, 1500);
         return;
     <?php endif; ?>
-    
+
     <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'client'): ?>
         showToast('⚠️ Seuls les clients peuvent acheter', true);
         return;
     <?php endif; ?>
-    
-    // Buscar el producto - convertir ambos a número para comparación
+
     var productIdNum = parseInt(productId);
     var product = null;
-    
     for (var i = 0; i < allProducts.length; i++) {
-        var pId = parseInt(allProducts[i].id);
-        if (pId === productIdNum) {
+        if (parseInt(allProducts[i].id) === productIdNum) {
             product = allProducts[i];
-            console.log('✅ Producto encontrado en índice:', i);
             break;
         }
     }
-    
+
     if (!product) {
-        showToast('❌ Produit non disponible (ID: ' + productId + ')', true);
-        console.error('❌ Producto no encontrado. Buscado:', productIdNum, 'IDs disponibles:', allProducts.map(function(p) { return parseInt(p.id); }));
+        showToast('❌ Produit non disponible', true);
         return;
     }
-    
-    console.log('📦 Producto encontrado:', product);
-    
+
     if (product.stock <= 0) {
         showToast('❌ Produit en rupture de stock', true);
         return;
     }
-    
-    // Deshabilitar botones
-    var btns = document.querySelectorAll('.add-cart-btn');
-    btns.forEach(function(b) {
-        if (b.textContent.includes('Ajouter') || b.textContent.includes('🛒')) {
-            b.textContent = '⏳...';
-            b.disabled = true;
-        }
-    });
-    
-    // Enviar con FormData
+
+    if (btn) { btn.disabled = true; btn.textContent = '⏳...'; }
+
     var formData = new FormData();
     formData.append('id_produit', productId);
     formData.append('quantite', 1);
-    
+
     fetch('ajouter_panier.php', {
         method: 'POST',
         body: formData,
         credentials: 'same-origin'
     })
-    .then(function(response) {
-        console.log('📡 Status:', response.status);
-        return response.json();
-    })
+    .then(function(response) { return response.json(); })
     .then(function(data) {
-        console.log('📦 Respuesta:', data);
-        // Restaurar botones
-        btns.forEach(function(b) {
-            b.textContent = '🛒 Ajouter';
-            b.disabled = false;
-        });
-        
         if (data.success) {
+            if (btn) { btn.textContent = '✓ Ajouté'; }
+            setTimeout(function() { if (btn) { btn.textContent = '🛒 Ajouter'; btn.disabled = false; } }, 2000);
             showToast('✓ ' + product.name + ' ajouté au panier');
-            var badge = document.getElementById('cart-count');
-            if (badge && data.total_panier !== undefined) {
+            var badges = document.querySelectorAll('.cart-badge');
+            badges.forEach(function(badge) {
                 badge.textContent = data.total_panier;
-                panierCount = data.total_panier;
-            }
+                badge.classList.add('show');
+            });
+            panierCount = data.total_panier;
         } else {
             showToast('❌ ' + data.message, true);
+            if (btn) { btn.textContent = '🛒 Ajouter'; btn.disabled = false; }
         }
     })
-    .catch(function(error) {
-        console.error('❌ Error:', error);
-        btns.forEach(function(b) {
-            b.textContent = '🛒 Ajouter';
-            b.disabled = false;
-        });
+    .catch(function() {
+        if (btn) { btn.textContent = '🛒 Ajouter'; btn.disabled = false; }
         showToast('❌ Erreur de connexion au serveur', true);
     });
 }
@@ -1501,8 +1484,7 @@ function toggleFavori(productId, button) {
 }
 
 function deleteProduct(productId, productName) {
-    if (!confirm('Supprimer "' + productName + '" ?')) return;
-    
+    askConfirm('Supprimer ce produit ?', '"' + productName + '" sera supprimé définitivement.', function() {
     fetch('supprimer_produit.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -1522,13 +1504,12 @@ function deleteProduct(productId, productName) {
     .catch(function() {
         showToast('❌ Erreur de connexion', true);
     });
+    });
 }
 
-// ========== INIT ==========
 function init() {
     console.log('🚀 Init...');
     
-    // Cargar categorías
     categories = categoriesFromDB.map(function(c) {
         return {
             id: c.id_categorie,
@@ -1541,7 +1522,6 @@ function init() {
     console.log('📦 productsGrid:', document.getElementById('productsGrid'));
     console.log('📂 categoryList:', document.getElementById('categoryList'));
     
-    // Eventos
     var btnToggle = document.getElementById('btnToggleCategory');
     var btnCancel = document.getElementById('btnCancelCategory');
     var btnSave = document.getElementById('btnSaveCategory');
@@ -1599,11 +1579,9 @@ function init() {
         });
     }
     
-    // Render
     renderCategories();
     renderProducts();
     
-    // Reveal
     document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(function(el) {
         var observer = new IntersectionObserver(function(entries) {
             entries.forEach(function(e) {
@@ -1616,12 +1594,35 @@ function init() {
     console.log('✅ Init terminé');
 }
 
-// Lanzar cuando el DOM esté listo
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
     init();
 }
+
+var _confirmCallback = null;
+
+function askConfirm(title, msg, callback) {
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-msg').textContent = msg;
+    _confirmCallback = callback;
+    document.getElementById('confirm-modal').classList.add('show');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('confirm-ok').addEventListener('click', function() {
+        document.getElementById('confirm-modal').classList.remove('show');
+        if (_confirmCallback) _confirmCallback();
+    });
+    document.getElementById('confirm-cancel').addEventListener('click', function() {
+        document.getElementById('confirm-modal').classList.remove('show');
+        _confirmCallback = null;
+    });
+    document.getElementById('confirm-overlay').addEventListener('click', function() {
+        document.getElementById('confirm-modal').classList.remove('show');
+        _confirmCallback = null;
+    });
+});
 </script>
 </body>
 </html>

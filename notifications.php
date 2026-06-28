@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Proteger la página: solo usuarios logueados
 if (!isset($_SESSION['user_role'])) {
     header('Location: signin.php');
     exit;
@@ -9,7 +8,6 @@ if (!isset($_SESSION['user_role'])) {
 
 include('connexion.php');
 
-// ── Marcar como leída via AJAX ──────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     header('Content-Type: application/json');
     $role = $_SESSION['user_role'];
@@ -31,12 +29,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     exit;
 }
 
-// ── Charger les notifications depuis la BD ──────────────────────────────────
 $role = $_SESSION['user_role'];
 $uid  = $_SESSION['user_id'];
 $col  = ($role === 'client') ? 'id_client' : 'id_producteur';
 
-// Si el usuario es admin, no tiene notificaciones
 if ($role === 'admin') {
     $notifications = [];
     $unreadCount = 0;
@@ -47,7 +43,6 @@ if ($role === 'admin') {
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         $notifications = array_map(function($n) {
-            // Calcular el tiempo relativo
             $time = strtotime($n['date_notification']);
             $diff = time() - $time;
             
@@ -63,7 +58,6 @@ if ($role === 'admin') {
                 $time_str = date('d M, H\hi', $time);
             }
             
-            // Determinar el título según el tipo
             $titles = [
                 'order' => 'Nouvelle commande',
                 'promo' => 'Promotion',
@@ -79,7 +73,7 @@ if ($role === 'admin') {
                 'title' => $title,
                 'text' => $n['message'],
                 'time' => $time_str,
-                'date_raw' => $n['date_notification'], // 🔥 Esto es lo importante
+                'date_raw' => $n['date_notification'],
                 'is_read' => (int)$n['is_read'],
                 'link' => '#',
             ];
@@ -95,13 +89,11 @@ if ($role === 'admin') {
 $theme       = $_COOKIE['theme'] ?? 'light';
 $currentPage = basename($_SERVER['PHP_SELF']);
 
-// Dashboard link
 $dashboardLink = '';
 if ($_SESSION['user_role'] === 'client')     $dashboardLink = 'dashboard_client.php';
-elseif ($_SESSION['user_role'] === 'producteur') $dashboardLink = 'dashboard-producteur.php';
+elseif ($_SESSION['user_role'] === 'producteur') $dashboardLink = 'dashboard_producteur.php';
 elseif ($_SESSION['user_role'] === 'admin')  $dashboardLink = 'dashboard_admin.php';
 
-// Función para agrupar por fecha
 function getDateGroup($date_raw) {
     if (empty($date_raw)) {
         return 'Date inconnue';
@@ -114,11 +106,9 @@ function getDateGroup($date_raw) {
     if ($date == date('Y-m-d', strtotime('-1 day'))) return 'Hier';
     if ($date == date('Y-m-d', strtotime('-2 days'))) return 'Avant-hier';
     
-    // Esta semana (lunes a domingo)
     $week_start = date('Y-m-d', strtotime('monday this week'));
     if ($date >= $week_start) return 'Cette semaine';
     
-    // Mes en curso
     if (date('m', strtotime($date)) == date('m')) {
         return 'Ce mois-ci';
     }
@@ -126,14 +116,12 @@ function getDateGroup($date_raw) {
     return date('F Y', strtotime($date));
 }
 
-// Agrupar las notificaciones
 $groups = [];
 foreach ($notifications as $n) {
     $group = getDateGroup($n['date_raw'] ?? date('Y-m-d H:i:s'));
     $groups[$group][] = $n;
 }
 
-// Definir los íconos y etiquetas para cada tipo
 $typeIcons = [
     'order'   => 'bi-bag-check',
     'promo'   => 'bi-tag',
@@ -193,14 +181,12 @@ $typeLabels = [
             min-height: 100vh;
         }
 
-        /* ── PAGE LAYOUT ── */
         .page-wrap {
             max-width: 780px;
             margin: 2.5rem auto;
             padding: 0 1.25rem 4rem;
         }
 
-        /* ── BREADCRUMB ── */
         .breadcrumb {
             display: flex; align-items: center; gap: .5rem;
             font-size: .82rem; color: var(--text-light);
@@ -210,7 +196,6 @@ $typeLabels = [
         .breadcrumb a:hover { color: var(--primary); }
         .breadcrumb i { font-size: .7rem; opacity: .5; }
 
-        /* ── HEADER ── */
         .page-header {
             display: flex; align-items: flex-start; justify-content: space-between;
             gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;
@@ -252,7 +237,6 @@ $typeLabels = [
         [data-theme="dark"] .btn-primary { background: var(--gold); color: #1a1410; }
         [data-theme="dark"] .btn-primary:hover { background: #b8962e; }
 
-        /* ── FILTER TABS ── */
         .filter-bar {
             display: flex; gap: .4rem; flex-wrap: wrap;
             margin-bottom: 1.25rem;
@@ -273,7 +257,6 @@ $typeLabels = [
         }
         [data-theme="dark"] .filter-btn.active { background: var(--gold); color: #1a1410; border-color: var(--gold); }
 
-        /* ── NOTIFICATION CARD ── */
         .notif-list { display: flex; flex-direction: column; gap: .65rem; }
 
         .notif-card {
@@ -292,7 +275,6 @@ $typeLabels = [
         [data-theme="dark"] .notif-card.unread { border-left-color: var(--gold); }
         .notif-card.removing { opacity: 0; transform: translateX(40px); transition: opacity .3s, transform .3s; }
 
-        /* Icon */
         .notif-icon {
             width: 44px; height: 44px; flex-shrink: 0;
             border-radius: 12px;
@@ -308,7 +290,6 @@ $typeLabels = [
         [data-theme="dark"] .notif-icon.message { background: rgba(59,130,246,.15); }
         [data-theme="dark"] .notif-icon.success { background: rgba(102,187,106,.15); color: #66bb6a; }
 
-        /* Body */
         .notif-body { flex: 1; min-width: 0; }
         .notif-top  { display: flex; align-items: flex-start; justify-content: space-between; gap: .5rem; }
         .notif-title {
@@ -340,14 +321,12 @@ $typeLabels = [
         [data-theme="dark"] .notif-link-btn { color: var(--gold); }
         .notif-link-btn:hover { opacity: .7; }
 
-        /* Unread dot */
         .unread-dot {
             width: 9px; height: 9px; border-radius: 50%;
             background: var(--primary); flex-shrink: 0; margin-top: 6px;
         }
         [data-theme="dark"] .unread-dot { background: var(--gold); }
 
-        /* Delete button */
         .notif-delete {
             position: absolute; top: .75rem; right: .85rem;
             width: 28px; height: 28px;
@@ -363,7 +342,6 @@ $typeLabels = [
         .notif-delete:hover { background: #fee2e2; color: #c0392b; }
         [data-theme="dark"] .notif-delete:hover { background: #4a2d30; color: #e8b8b8; }
 
-        /* ── EMPTY STATE ── */
         .empty-state {
             text-align: center; padding: 4rem 2rem;
             background: var(--bg-card);
@@ -380,7 +358,6 @@ $typeLabels = [
         .empty-state h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); }
         .empty-state p  { font-size: .88rem; color: var(--text-light); margin-top: .4rem; }
 
-        /* ── DATE SEPARATOR ── */
         .date-sep {
             display: flex; align-items: center; gap: .75rem;
             font-size: .75rem; font-weight: 700; color: var(--text-light);
@@ -391,7 +368,6 @@ $typeLabels = [
             content: ''; flex: 1; height: 1px; background: var(--border);
         }
 
-        /* ── TOAST ── */
         .toast {
             position: fixed; bottom: 1.5rem; right: 1.5rem;
             background: var(--text-dark); color: var(--bg);
@@ -406,7 +382,6 @@ $typeLabels = [
         }
         .toast.show { opacity: 1; transform: translateY(0); }
 
-        /* ── RESPONSIVE ── */
         @media (max-width: 600px) {
             .page-header { flex-direction: column; }
             .page-title { font-size: 1.4rem; }
@@ -421,14 +396,12 @@ $typeLabels = [
 
 <main class="page-wrap">
 
-    <!-- Breadcrumb -->
     <nav class="breadcrumb">
         <a href="accueil.php">Accueil</a>
         <i class="bi bi-chevron-right"></i>
         <span>Notifications</span>
     </nav>
 
-    <!-- Header de página -->
     <div class="page-header">
         <h1 class="page-title">
             <i class="bi bi-bell" style="font-size:1.5rem;color:var(--primary)"></i>
@@ -449,7 +422,6 @@ $typeLabels = [
         </div>
     </div>
 
-    <!-- Filtros -->
     <div class="filter-bar">
         <button class="filter-btn active" data-filter="all">Toutes</button>
         <button class="filter-btn" data-filter="unread">Non lues</button>
@@ -470,11 +442,9 @@ $typeLabels = [
         </button>
     </div>
 
-    <!-- Lista -->
     <div class="notif-list" id="notifList">
 
         <?php if (empty($groups)): ?>
-            <!-- Estado vacío -->
             <div class="empty-state" id="emptyState">
                 <div class="empty-icon"><i class="bi bi-bell-slash"></i></div>
                 <h3>Aucune notification</h3>
@@ -524,11 +494,10 @@ $typeLabels = [
             <?php endforeach; ?>
         <?php endif; ?>
 
-    </div><!-- /notif-list -->
+    </div>
 
 </main>
 
-<!-- Toast feedback -->
 <div class="toast" id="toast">
     <i class="bi bi-check-circle-fill" style="color:#4ade80"></i>
     <span id="toastMsg"></span>
@@ -537,7 +506,6 @@ $typeLabels = [
 <script>
 let activeFilter = 'all';
 
-/* ── Filtrar ────────────────────────────────────────────────── */
 document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', function() {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -564,7 +532,6 @@ function applyFilter() {
         if (show) visible++;
     });
 
-    // Mostrar/ocultar separadores de fecha
     document.querySelectorAll('.date-sep').forEach(sep => {
         let sibling = sep.nextElementSibling;
         let hasVisible = false;
@@ -581,7 +548,6 @@ function applyFilter() {
     }
 }
 
-/* ── Marcar una como leída ──────────────────────────────────── */
 function handleCardClick(card, link) {
     if (card.dataset.read === '0') markRead(card);
     if (link && link !== '#') setTimeout(() => location.href = link, 150);
@@ -600,7 +566,6 @@ function markRead(card) {
     });
 }
 
-/* ── Marcar todas ───────────────────────────────────────────── */
 document.getElementById('markAllBtn')?.addEventListener('click', () => {
     document.querySelectorAll('.notif-card.unread').forEach(card => {
         card.dataset.read = '1';
@@ -617,7 +582,6 @@ document.getElementById('markAllBtn')?.addEventListener('click', () => {
     });
 });
 
-/* ── Eliminar notificación ──────────────────────────────────── */
 function deleteNotif(card) {
     const wasUnread = card.dataset.read === '0';
     card.classList.add('removing');
@@ -634,7 +598,6 @@ function deleteNotif(card) {
     });
 }
 
-/* ── Eliminar leídas ────────────────────────────────────────── */
 document.getElementById('deleteReadBtn')?.addEventListener('click', () => {
     const read = document.querySelectorAll('.notif-card[data-read="1"]');
     let count = read.length;
@@ -649,7 +612,6 @@ document.getElementById('deleteReadBtn')?.addEventListener('click', () => {
     showToast(count + ' notification(s) supprimée(s)');
 });
 
-/* ── Contador de no leídas ──────────────────────────────────── */
 function updateUnreadCount(delta, reset) {
     const pill = document.getElementById('unreadPill');
     if (!pill) return;
@@ -657,7 +619,6 @@ function updateUnreadCount(delta, reset) {
     const next  = reset ? 0 : Math.max(0, current + delta);
     if (next <= 0) {
         pill.remove();
-        // También eliminar el botón de marcar todas si existe
         document.getElementById('markAllBtn')?.remove();
     } else {
         pill.textContent = next + ' non lue' + (next > 1 ? 's' : '');
@@ -670,7 +631,6 @@ function checkEmpty() {
     if (emptyState) {
         emptyState.style.display = remaining.length === 0 ? 'block' : 'none';
     }
-    // Ocultar separadores si no hay notificaciones
     document.querySelectorAll('.date-sep').forEach(sep => {
         const nextSibling = sep.nextElementSibling;
         if (nextSibling && nextSibling.classList.contains('notif-card')) {
@@ -681,7 +641,6 @@ function checkEmpty() {
     });
 }
 
-/* ── Toast ──────────────────────────────────────────────────── */
 let toastTimer;
 function showToast(msg) {
     const toast = document.getElementById('toast');
@@ -691,7 +650,6 @@ function showToast(msg) {
     toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
 }
 
-/* ── Inicializar ────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
     applyFilter();
 });

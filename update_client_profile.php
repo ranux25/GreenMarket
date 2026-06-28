@@ -20,7 +20,6 @@ if (empty($nom_client) || empty($email)) {
 }
 
 try {
-    // Vérifier que l'email n'est pas déjà utilisé par un autre client
     $stmt = $pdo->prepare("SELECT id_client FROM client WHERE email = ? AND id_client != ?");
     $stmt->execute([$email, $id_client]);
     if ($stmt->fetch()) {
@@ -35,7 +34,6 @@ try {
     ");
     $stmt->execute([$nom_client, $email, $telephone, $adresse, $id_client]);
     
-    // Actualizar sesión
     $_SESSION['user_nom'] = $nom_client;
     $_SESSION['user_email'] = $email;
     

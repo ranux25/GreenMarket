@@ -12,8 +12,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     elseif (isset($password) && $password !== $confpassword) $err['confpassword'] = "Les mots de passe ne correspondent pas";
 
     if (empty($err)) {
-        #NOTE : fonctionnalite reset par token necessite un systeme d'email
-        #Pour l'instant on redirige vers signin avec un message
         $err['token'] = "Fonctionnalité de réinitialisation par email non encore configurée. Contactez l'administrateur.";
     }
 }

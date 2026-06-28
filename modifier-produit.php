@@ -2,7 +2,6 @@
 session_start();
 include('connexion.php');
 
-// Verificar que el usuario esté logueado y sea producteur
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'producteur') {
     header("Location: signin.php");
     exit();
@@ -12,7 +11,6 @@ $theme = $_COOKIE['theme'] ?? 'light';
 $id_producteur = $_SESSION['user_id'];
 $id_produit = intval($_GET['id'] ?? 0);
 
-// Verificar que el producto pertenece al producteur (via boutique)
 try {
     $stmt = $pdo->prepare("
         SELECT p.*, b.id_boutique, b.nom_boutique 
@@ -32,7 +30,6 @@ try {
     exit();
 }
 
-// Récupérer les catégories disponibles
 try {
     $stmt = $pdo->query("SELECT id_categorie, nom_categorie FROM categorie ORDER BY nom_categorie");
     $categories = $stmt->fetchAll();
@@ -43,7 +40,6 @@ try {
 $error = '';
 $success = '';
 
-// Traitement du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nom_produit = trim($_POST['nom_produit'] ?? '');
     $description = trim($_POST['description'] ?? '');
@@ -54,7 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $supprimer_image = isset($_POST['supprimer_image']);
     $image = $_FILES['photo'] ?? null;
     
-    // Validation
     if (empty($nom_produit)) {
         $error = "Veuillez saisir un nom pour le produit";
     } elseif (strlen($nom_produit) < 3) {
@@ -69,7 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $image_path = $produit['photo_url'];
             
-            // Supprimer l'image si demandé
             if ($supprimer_image && $image_path) {
                 if (file_exists($image_path)) {
                     unlink($image_path);
@@ -77,7 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $image_path = null;
             }
             
-            // Gérer l'upload de la nouvelle image
             if ($image && $image['error'] === UPLOAD_ERR_OK) {
                 $upload_dir = 'IMAGES/produits/';
                 if (!is_dir($upload_dir)) {
@@ -104,7 +97,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             if (empty($error)) {
-                // Mettre à jour le produit
                 $stmt = $pdo->prepare("
                     UPDATE produit 
                     SET id_categorie = ?, nom_produit = ?, description = ?, 
@@ -355,7 +347,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </h2>
 
         <form method="POST" enctype="multipart/form-data">
-            <!-- Nom du produit -->
             <div class="form-group">
                 <label>Nom du produit <span class="required">*</span></label>
                 <input type="text" name="nom_produit" 
@@ -364,7 +355,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <div class="form-row">
-                <!-- Prix -->
                 <div class="form-group">
                     <label>Prix (DH) <span class="required">*</span></label>
                     <input type="number" name="prix_unitaire" 
@@ -373,7 +363,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                            required>
                 </div>
 
-                <!-- Stock -->
                 <div class="form-group">
                     <label>Quantité en stock <span class="required">*</span></label>
                     <input type="number" name="stock_quantite" 
@@ -383,7 +372,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
-            <!-- Catégorie -->
             <div class="form-group">
                 <label>Catégorie <span class="required">*</span></label>
                 <select name="id_categorie" required>
@@ -397,13 +385,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </select>
             </div>
 
-            <!-- Description -->
             <div class="form-group">
                 <label>Description du produit</label>
                 <textarea name="description" rows="4" maxlength="500"><?php echo htmlspecialchars($produit['description'] ?? ''); ?></textarea>
             </div>
 
-            <!-- Image actuelle -->
             <?php if ($produit['photo_url']): ?>
             <div class="form-group">
                 <label>Image actuelle</label>
@@ -417,7 +403,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <?php endif; ?>
 
-            <!-- Nouvelle image -->
             <div class="form-group">
                 <label><?php echo $produit['photo_url'] ? 'Changer l\'image' : 'Photo du produit'; ?></label>
                 <input type="file" name="photo" id="photo" accept="image/*" onchange="previewImage(event)">
@@ -427,7 +412,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
-            <!-- Statut de publication -->
             <div class="form-group">
                 <label>Statut de publication</label>
                 <select name="statut_publie">

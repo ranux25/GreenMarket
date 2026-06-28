@@ -2,7 +2,6 @@
 session_start();
 include('connexion.php');
 
-// Verificar que el usuario esté logueado y sea producteur
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'producteur') {
     header("Location: signin.php");
     exit();
@@ -13,7 +12,6 @@ $id_producteur = $_SESSION['user_id'];
 $error = '';
 $success = '';
 
-// Récupérer las categorías disponibles
 try {
     $stmt = $pdo->query("SELECT id_categorie, nom_categorie FROM categorie ORDER BY nom_categorie");
     $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -21,7 +19,6 @@ try {
     $categories = [];
 }
 
-// Récupérer el número de boutiques del producteur
 try {
     $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM boutique WHERE id_producteur = ?");
     $stmt->execute([$id_producteur]);
@@ -30,14 +27,12 @@ try {
     $nb_boutiques = 0;
 }
 
-// Traitement du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nom_boutique = trim($_POST['nom_boutique'] ?? '');
     $description = trim($_POST['description'] ?? '');
     $id_categorie = intval($_POST['id_categorie'] ?? 0);
     $image = $_FILES['image'] ?? null;
     
-    // Validation
     if (empty($nom_boutique)) {
         $error = "Veuillez saisir un nom pour votre boutique";
     } elseif (strlen($nom_boutique) < 3) {
@@ -46,7 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "Veuillez sélectionner une catégorie";
     } else {
         try {
-            // Gérer l'upload de l'image
             $image_path = null;
             if ($image && $image['error'] === UPLOAD_ERR_OK) {
                 $upload_dir = 'IMAGES/';
@@ -69,7 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             if (empty($error)) {
-                // 🔥 Insérer la boutique avec est_valide_par_admin = 0 (en attente de validation)
                 $stmt = $pdo->prepare("
                     INSERT INTO boutique (id_producteur, nom_boutique, description, id_categorie, image, est_valide_par_admin, date_creation) 
                     VALUES (?, ?, ?, ?, ?, 0, NOW())
@@ -78,7 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $id_boutique = $pdo->lastInsertId();
                 
-                // Rediriger avec un message indiquant que la boutique est en attente de validation
                 header("Location: dashboard_producteur.php?boutique_creation=success&id=" . $id_boutique);
                 exit();
             }
@@ -294,11 +286,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             .form-card { padding: 1.5rem; }
             .container { padding: 1rem; }
         }
+
+        #toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: var(--primary);
+            color: #fff;
+            padding: 14px 22px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            z-index: 9999;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: 0.4s cubic-bezier(.22,1,.36,1);
+            max-width: 340px;
+        }
+        #toast.show { transform: translateY(0); opacity: 1; }
     </style>
 </head>
 <body>
 
 <?php include 'header.php'; ?>
+
+<div id="toast"></div>
 
 <div class="page-header">
     <div style="max-width:800px;margin:0 auto;">
@@ -340,7 +352,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <form method="POST" enctype="multipart/form-data">
-            <!-- Nom de la boutique -->
             <div class="form-group">
                 <label>
                     Nom de la boutique <span class="required">*</span>
@@ -352,7 +363,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="help-text">Choisissez un nom qui reflète l'identité de votre artisanat.</div>
             </div>
 
-            <!-- Catégorie -->
             <div class="form-group">
                 <label>
                     Catégorie principale <span class="required">*</span>
@@ -369,7 +379,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="help-text">La catégorie principale de votre boutique.</div>
             </div>
 
-            <!-- Description -->
             <div class="form-group">
                 <label>Description de la boutique</label>
                 <textarea name="description" id="description" 
@@ -380,7 +389,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
-            <!-- Image -->
             <div class="form-group">
                 <label>Image de la boutique</label>
                 <input type="file" name="image" id="image" accept="image/*" onchange="previewImage(event)">
@@ -401,7 +409,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php include 'footer.php'; ?>
 
 <script>
-// Prévisualisation de l'image
 function previewImage(event) {
     const preview = document.getElementById('imagePreview');
     const img = document.getElementById('previewImg');
@@ -418,21 +425,28 @@ function previewImage(event) {
     }
 }
 
-// Validation du formulaire
+function showToast(msg, bg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.background = bg || 'var(--primary)';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
 document.querySelector('form').addEventListener('submit', function(e) {
     const nom = document.getElementById('nom_boutique').value.trim();
     const categorie = document.getElementById('id_categorie').value;
     
     if (nom.length < 3) {
         e.preventDefault();
-        alert('Le nom de la boutique doit contenir au moins 3 caractères.');
+        showToast('❌ Le nom de la boutique doit contenir au moins 3 caractères.', '#c0392b');
         document.getElementById('nom_boutique').focus();
         return false;
     }
     
     if (!categorie) {
         e.preventDefault();
-        alert('Veuillez sélectionner une catégorie.');
+        showToast('❌ Veuillez sélectionner une catégorie.', '#c0392b');
         document.getElementById('id_categorie').focus();
         return false;
     }

@@ -2,7 +2,6 @@
 session_start();
 require_once 'connexion.php';
 
-// Verificar si el usuario está logueado
 if (!isset($_SESSION['user_id'])) {
     header('Location: signin.php');
     exit();
@@ -13,7 +12,6 @@ $user_role = $_SESSION['user_role'];
 $success_message = '';
 $error_message = '';
 
-// Inicializar $user como array vacío
 $user = [
     'nom' => '',
     'prenom' => '',
@@ -23,7 +21,6 @@ $user = [
     'role' => $user_role
 ];
 
-// Obtener datos del usuario según su rol
 try {
     if ($user_role === 'client') {
         $stmt = $pdo->prepare("SELECT * FROM client WHERE id_client = ?");
@@ -58,14 +55,13 @@ try {
         }
         
     } elseif ($user_role === 'admin') {
-        // Usar el nombre correcto de la tabla: administrateur
         $stmt = $pdo->prepare("SELECT * FROM administrateur WHERE id_admin = ?");
         $stmt->execute([$user_id]);
         $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($user_data) {
             $user['nom'] = $user_data['nom_admin'] ?? '';
-            $user['prenom'] = ''; // La tabla administrateur no tiene campo prenom
+            $user['prenom'] = '';
             $user['email'] = $user_data['email'] ?? '';
             $user['telephone'] = '';
             $user['adresse'] = '';
@@ -82,7 +78,6 @@ try {
     error_log("Profile error: " . $e->getMessage());
 }
 
-// Procesar actualización del perfil
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'update_profile') {
         $nom = trim($_POST['nom'] ?? '');
@@ -113,7 +108,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $user['adresse'] = $adresse;
                 
             } elseif ($user_role === 'admin') {
-                // Actualizar administrateur
                 $stmt = $pdo->prepare("UPDATE administrateur SET nom_admin = ?, email = ? WHERE id_admin = ?");
                 $stmt->execute([$nom, $email, $user_id]);
                 
@@ -129,7 +123,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
     }
     
-    // Cambiar contraseña
     elseif ($_POST['action'] === 'change_password') {
         $current_password = $_POST['current_password'] ?? '';
         $new_password = $_POST['new_password'] ?? '';
@@ -182,7 +175,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-// Detectar tema guardado (por defecto claro)
 $theme = $_COOKIE['theme'] ?? 'light';
 ?>
 <!DOCTYPE html>
@@ -195,7 +187,6 @@ $theme = $_COOKIE['theme'] ?? 'light';
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        /* Variables de tema */
         :root {
             --bg-primary: #f5f0e8;
             --bg-secondary: #fff9eb;
@@ -215,7 +206,6 @@ $theme = $_COOKIE['theme'] ?? 'light';
             --alert-error-text: #721c24;
         }
 
-        /* Tema oscuro beige */
         [data-theme="dark"] {
             --bg-primary: #2c241e;
             --bg-secondary: #3d3229;
@@ -601,7 +591,6 @@ $theme = $_COOKIE['theme'] ?? 'light';
             color: var(--text-secondary);
         }
 
-        /* Estilos para selects en modo oscuro */
         [data-theme="dark"] select {
             background: var(--input-bg);
             color: var(--text-secondary);
@@ -613,7 +602,6 @@ $theme = $_COOKIE['theme'] ?? 'light';
             color: var(--text-secondary);
         }
 
-        /* Estilos para el toggle de tema */
         .theme-switch {
             position: relative;
             width: 60px;
@@ -662,7 +650,6 @@ $theme = $_COOKIE['theme'] ?? 'light';
             color: #2c241e;
         }
 
-        /* Estilos para la pestaña "À propos" en modo oscuro */
         [data-theme="dark"] .btn-secondary {
             background: #6d4c3a;
             color: #f0e6d8;
@@ -671,11 +658,31 @@ $theme = $_COOKIE['theme'] ?? 'light';
         [data-theme="dark"] .btn-secondary:hover {
             background: #8a6048;
         }
+
+        #toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: var(--primary);
+            color: #fff;
+            padding: 14px 22px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            z-index: 9999;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: 0.4s cubic-bezier(.22,1,.36,1);
+            max-width: 340px;
+        }
+        #toast.show { transform: translateY(0); opacity: 1; }
     </style>
 </head>
 <body>
 
 <?php include 'header.php'; ?>
+
+<div id="toast"></div>
 
 <div class="profile-container">
     <div class="profile-card">
@@ -713,7 +720,6 @@ $theme = $_COOKIE['theme'] ?? 'light';
             </button>
         </div>
         
-        <!-- Pestaña: Mon Profil -->
         <div class="tab-content active" id="tab-profile">
             <?php if ($success_message): ?>
                 <div class="alert-success"><?php echo htmlspecialchars($success_message); ?></div>
@@ -766,13 +772,11 @@ $theme = $_COOKIE['theme'] ?? 'light';
             </form>
         </div>
         
-        <!-- Pestaña: Paramètres -->
         <div class="tab-content" id="tab-settings">
             <h2 class="text-xl font-bold mb-4" style="color: var(--text-secondary);">
                 <i class="bi bi-sliders2"></i> Préférences
             </h2>
             
-            <!-- Control de tema -->
             <div class="info-card">
                 <h3 class="font-bold text-lg mb-3">
                     <i class="bi bi-palette"></i> Thème
@@ -832,7 +836,6 @@ $theme = $_COOKIE['theme'] ?? 'light';
             </div>
         </div>
         
-        <!-- Pestaña: Sécurité -->
         <div class="tab-content" id="tab-security">
             <h2 class="text-xl font-bold mb-4" style="color: var(--text-secondary);">
                 <i class="bi bi-shield-lock"></i> Sécurité du compte
@@ -880,7 +883,6 @@ $theme = $_COOKIE['theme'] ?? 'light';
             <?php endif; ?>
         </div>
         
-        <!-- Pestaña: À propos -->
         <div class="tab-content" id="tab-info">
             <h2 class="text-xl font-bold mb-4" style="color: var(--text-secondary);">
                 <i class="bi bi-info-circle"></i> Informations sur GreenMarket
@@ -916,7 +918,6 @@ $theme = $_COOKIE['theme'] ?? 'light';
 <?php include 'footer.php'; ?>
 
 <script>
-// Gestion des onglets
 document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', function() {
         const tabId = this.getAttribute('data-tab');
@@ -937,6 +938,14 @@ if (savedTab) {
     if (tabBtn) tabBtn.click();
 }
 
+function showToast(msg, bg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.background = bg || 'var(--primary)';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
 function savePreferences() {
     const preferences = {
         notifications_promo: document.getElementById('notif_promo')?.checked || false,
@@ -946,7 +955,7 @@ function savePreferences() {
     };
     
     localStorage.setItem('userPreferences', JSON.stringify(preferences));
-    alert('Préférences sauvegardées !');
+    showToast('✅ Préférences sauvegardées !', '#27ae60');
 }
 
 function loadPreferences() {
@@ -960,7 +969,6 @@ function loadPreferences() {
     }
 }
 
-// Función para cambiar el tema
 function toggleTheme() {
     const html = document.documentElement;
     const currentTheme = html.getAttribute('data-theme');
@@ -968,16 +976,13 @@ function toggleTheme() {
     
     html.setAttribute('data-theme', newTheme);
     
-    // Guardar en cookie
     document.cookie = `theme=${newTheme}; path=/; max-age=31536000`;
     
-    // Actualizar el ícono del slider
     const sliderIcon = document.querySelector('.theme-switch .slider i');
     if (sliderIcon) {
         sliderIcon.className = `bi ${newTheme === 'dark' ? 'bi-moon-fill' : 'bi-sun-fill'}`;
     }
     
-    // Actualizar clase active del switch
     const themeSwitch = document.getElementById('themeToggle');
     if (themeSwitch) {
         if (newTheme === 'dark') {
@@ -988,14 +993,12 @@ function toggleTheme() {
     }
 }
 
-// Cargar el tema guardado
 document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
     if (savedTheme) {
         const theme = savedTheme.split('=')[1];
         document.documentElement.setAttribute('data-theme', theme);
         
-        // Actualizar el ícono del slider
         const sliderIcon = document.querySelector('.theme-switch .slider i');
         if (sliderIcon) {
             sliderIcon.className = `bi ${theme === 'dark' ? 'bi-moon-fill' : 'bi-sun-fill'}`;
@@ -1012,7 +1015,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadPreferences();
 });
 
-// Función para toggle manual del tema (para el onclick del switch)
 function toggleThemeClick() {
     toggleTheme();
 }

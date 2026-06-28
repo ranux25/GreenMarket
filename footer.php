@@ -67,7 +67,6 @@
 </footer>
 
 <style>
-  /* ========== VARIABLES DE TEMA PARA FOOTER ========== */
   :root {
     --footer-bg-start: #5D0D18;
     --footer-bg-end: #3e0910;
@@ -92,7 +91,6 @@
     --footer-arrow-color: #ECE6A6;
   }
 
-  /* ========== TEMA OSCURO BEIGE ========== */
   [data-theme="dark"] {
     --footer-bg-start: #1a1410;
     --footer-bg-end: #0d0a08;
@@ -117,7 +115,6 @@
     --footer-arrow-color: #d4a85c;
   }
 
-  /* ========== FOOTER STYLES ========== */
   .main-footer {
     background: linear-gradient(135deg, var(--footer-bg-start) 0%, var(--footer-bg-end) 100%);
     color: var(--footer-text);
@@ -158,7 +155,6 @@
     transition: background 0.3s ease;
   }
 
-  /* Marca */
   .footer-logo {
     display: flex;
     align-items: center;
@@ -212,7 +208,6 @@
     transform: translateY(-3px);
   }
 
-  /* Listas de enlaces */
   .footer-col ul {
     list-style: none;
     padding: 0;
@@ -243,7 +238,6 @@
     transform: translateX(3px);
   }
 
-  /* Contacto */
   .footer-contact {
     margin-bottom: 1.5rem;
   }
@@ -262,7 +256,6 @@
     transition: color 0.3s ease;
   }
 
-  /* Newsletter */
   .newsletter-title {
     margin-top: 0.5rem;
   }
@@ -302,7 +295,6 @@
     transform: scale(1.05);
   }
 
-  /* Footer bottom */
   .footer-bottom {
     border-top: 1px solid var(--footer-border);
     padding: 1.2rem 2rem;
@@ -325,7 +317,6 @@
     transition: color 0.3s ease;
   }
 
-  /* ========== RESPONSIVE ========== */
   @media (max-width: 1024px) {
     .footer-container {
       grid-template-columns: 1fr 1fr;

@@ -2,10 +2,8 @@
 session_start();
 include("connexion.php");
 
-// Detectar tema guardado (por defecto claro)
 $theme = $_COOKIE['theme'] ?? 'light';
 
-// Recuperar estadísticas reales desde la BD
 try {
     $req = $pdo->query("SELECT COUNT(*) as total FROM client");
     $total_clients = $req->fetch(PDO::FETCH_ASSOC)['total'];
@@ -31,14 +29,10 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>GreenMarket – À propos de notre mission</title>
-
-    <!-- Librerías -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
     <style>
-        /* ===== VARIABLES DE TEMA GLOBAL ===== */
         :root {
             --primary: #5D0D18;
             --primary-light: #7a1020;
@@ -89,7 +83,6 @@ try {
             --modal-input-bg: #fff9eb;
         }
 
-        /* ===== TEMA OSCURO ===== */
         [data-theme="dark"] {
             --primary: #8a6048;
             --primary-light: #a0785a;
@@ -140,7 +133,6 @@ try {
             --modal-input-bg: #4d3d32;
         }
 
-        /* ===== STYLES BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
@@ -154,7 +146,6 @@ try {
 
         h1, h2, h3, .playfair { font-family: 'Playfair Display', serif; }
 
-        /* ===== PAGE HEADER ===== */
         .page-header {
             background: var(--page-header-bg);
             padding: 4rem 2.5rem 3rem;
@@ -219,7 +210,6 @@ try {
             transition: color 0.3s ease;
         }
 
-        /* ===== ANIMATIONS ===== */
         .reveal {
             opacity: 0;
             transform: translateY(35px);
@@ -248,14 +238,12 @@ try {
             transform: translateX(0);
         }
 
-        /* ===== CONTAINER ===== */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 3rem 2rem;
         }
 
-        /* ===== MISSION SECTION ===== */
         .mission-section {
             background: var(--bg-card);
             border-radius: 20px;
@@ -303,7 +291,6 @@ try {
             transition: color 0.3s ease, border-color 0.3s ease;
         }
 
-        /* ===== VALUES SECTION ===== */
         .values-section {
             background: var(--bg-card);
             border-radius: 20px;
@@ -356,7 +343,6 @@ try {
             transition: color 0.3s ease;
         }
 
-        /* ===== IMPACT SECTION ===== */
         .impact-section {
             background: linear-gradient(135deg, var(--wine) 0%, var(--wine-dark) 100%);
             border-radius: 20px;
@@ -391,7 +377,6 @@ try {
             opacity: 0.8;
         }
 
-        /* ===== TEAM SECTION ===== */
         .team-section {
             margin-bottom: 2.5rem;
         }
@@ -456,7 +441,6 @@ try {
             transition: color 0.3s ease;
         }
 
-        /* ===== CTA SECTION ===== */
         .cta-section {
             background: var(--bg-card);
             border-radius: 20px;
@@ -498,7 +482,6 @@ try {
             color: var(--bg);
         }
 
-        /* ===== FOOTER ===== */
         footer {
             background: var(--footer-bg);
             color: var(--footer-text);
@@ -506,7 +489,6 @@ try {
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .container {
                 padding: 2rem 1rem;
@@ -543,10 +525,8 @@ try {
 </head>
 <body>
 
-<!-- ===== HEADER ===== -->
 <?php include 'header.php'; ?>
 
-<!-- ===== PAGE HEADER ===== -->
 <div class="page-header">
     <div class="header-inner">
         <div class="header-eyebrow">🇲🇦 Notre histoire &amp; mission</div>
@@ -555,10 +535,8 @@ try {
     </div>
 </div>
 
-<!-- ===== CONTENU PRINCIPAL ===== -->
 <div class="container">
 
-    <!-- Mission -->
     <div class="mission-section reveal">
         <div class="mission-text">
             <h2>Notre mission</h2>
@@ -570,7 +548,6 @@ try {
         </div>
     </div>
 
-    <!-- Valeurs -->
     <div class="values-section reveal-left">
         <h2>Nos valeurs</h2>
         <div class="values-grid">
@@ -597,7 +574,6 @@ try {
         </div>
     </div>
 
-    <!-- Impact -->
     <div class="impact-section reveal">
         <h2>Notre impact en chiffres</h2>
         <div class="impact-grid">
@@ -620,7 +596,6 @@ try {
         </div>
     </div>
 
-    <!-- Équipe -->
     <div class="team-section reveal-right">
         <h2>L'équipe GreenMarket</h2>
         <div class="team-grid">
@@ -651,7 +626,6 @@ try {
         </div>
     </div>
 
-    <!-- CTA -->
     <div class="cta-section reveal">
         <h2>Rejoignez l'aventure GreenMarket</h2>
         <p>Que vous soyez artisan, producteur ou amateur d'artisanat, il y a une place pour vous chez GreenMarket.</p>
@@ -660,12 +634,9 @@ try {
 
 </div>
 
-<!-- ===== FOOTER ===== -->
 <?php include 'footer.php'; ?>
 
-<!-- ===== SCRIPTS ===== -->
 <script>
-    // ===== SCROLL REVEAL =====
     function initReveal() {
         const elements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
         const observer = new IntersectionObserver((entries) => {
@@ -676,7 +647,6 @@ try {
         elements.forEach(el => observer.observe(el));
     }
 
-    // ===== FORZAR INPUT DE BÚSQUEDA VACÍO =====
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('headerSearch');
         if (searchInput) {

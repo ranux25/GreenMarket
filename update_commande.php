@@ -2,7 +2,6 @@
 session_start();
 include('connexion.php');
 
-// Verificar que el usuario sea producteur o admin
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'], ['producteur', 'admin'])) {
     header('Location: signin.php');
     exit;
@@ -21,7 +20,6 @@ if (!$id_commande || !in_array($statut, $statuts_valides)) {
 }
 
 try {
-    // Vérifier que la commande appartient au producteur
     if ($_SESSION['user_role'] === 'producteur') {
         $stmt = $pdo->prepare("
             SELECT c.id_commande, c.statut_commande, c.id_client
@@ -40,7 +38,6 @@ try {
             exit;
         }
     } else {
-        // Admin puede modificar cualquier comanda
         $stmt = $pdo->prepare("SELECT id_client FROM commande WHERE id_commande = ?");
         $stmt->execute([$id_commande]);
         $commande = $stmt->fetch();
@@ -51,11 +48,9 @@ try {
         }
     }
     
-    // Mettre à jour le statut
     $stmt = $pdo->prepare("UPDATE commande SET statut_commande = ? WHERE id_commande = ?");
     $stmt->execute([$statut, $id_commande]);
     
-    // Envoyer une notification au client
     $message_client = "📦 Votre commande #" . str_pad($id_commande, 6, '0', STR_PAD_LEFT) . " est maintenant : {$statut}.\n";
     if ($statut === 'Livrée') {
         $message_client .= "Merci pour votre achat sur GreenMarket 🌿";

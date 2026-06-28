@@ -15,7 +15,6 @@ $suggestions = [];
 $searchTerm = '%' . $search . '%';
 
 try {
-    // Buscar productos
     $stmt = $pdo->prepare("
         SELECT 
             p.id_produit as id,
@@ -46,7 +45,6 @@ try {
         ];
     }
     
-    // Buscar tiendas
     $stmt = $pdo->prepare("
         SELECT 
             b.id_boutique as id,
@@ -76,7 +74,6 @@ try {
         ];
     }
     
-    // Ordenar: primero productos, luego tiendas
     usort($suggestions, function($a, $b) {
         $order = ['produit' => 0, 'boutique' => 1];
         return ($order[$a['type']] ?? 2) - ($order[$b['type']] ?? 2);
