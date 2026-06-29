@@ -1,34 +1,34 @@
 <?php
 session_start();
+header('Content-Type: application/json');
 
-// SOLO ADMIN
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-    header("Location: dashboard_admin.php?msgerr=" . urlencode('Non autorisé'));
+    echo json_encode(['success' => false, 'message' => 'Non autorisé']);
     exit;
 }
 
 include('connexion.php');
 
-$id_producteur = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-$action = isset($_GET['action']) ? $_GET['action'] : '';
+$id_producteur = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+$action = isset($_POST['action']) ? $_POST['action'] : '';
 
 if (!$id_producteur || !in_array($action, ['valider', 'refuser'])) {
-    header("Location: dashboard_admin.php?msgerr=" . urlencode('Données invalides'));
+    echo json_encode(['success' => false, 'message' => 'Données invalides']);
     exit;
 }
 
 try {
-    // Obtener información del producteur
     $stmt = $pdo->prepare("SELECT id_producteur, nom_entreprise, email FROM producteur WHERE id_producteur = ?");
     $stmt->execute([$id_producteur]);
     $producteur = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$producteur) {
-        throw new Exception('Producteur non trouvé');
+        echo json_encode(['success' => false, 'message' => 'Producteur non trouvé']);
+        exit;
     }
     
     if ($action === 'valider') {
-        $stmt = $pdo->prepare("UPDATE producteur SET est_valide_par_admin = 1 WHERE id_producteur = ?");
+        $stmt = $pdo->prepare("UPDATE producteur SET est_valide_par_admin = 1, statut = 'valide' WHERE id_producteur = ?");
         $stmt->execute([$id_producteur]);
         $message = '✅ Producteur "' . $producteur['nom_entreprise'] . '" validé avec succès';
         
@@ -36,7 +36,7 @@ try {
         $type = 'validation_producteur';
         
     } else {
-        $stmt = $pdo->prepare("UPDATE producteur SET est_valide_par_admin = 0 WHERE id_producteur = ?");
+        $stmt = $pdo->prepare("UPDATE producteur SET est_valide_par_admin = 0, statut = 'refuse' WHERE id_producteur = ?");
         $stmt->execute([$id_producteur]);
         $message = '❌ Producteur "' . $producteur['nom_entreprise'] . '" refusé';
         
@@ -44,7 +44,6 @@ try {
         $type = 'refus_producteur';
     }
 
-    // Insertar notificación
     $stmt = $pdo->prepare("
         INSERT INTO notification (id_producteur, message, type_notification, date_notification, est_lu) 
         VALUES (?, ?, ?, NOW(), 0)
@@ -55,16 +54,13 @@ try {
         $type
     ]);
 
-    header("Location: dashboard_admin.php?msgs=" . urlencode($message) . "&tab=producteurs");
-    exit;
+    echo json_encode(['success' => true, 'message' => $message]);
 
 } catch(PDOException $e) {
     error_log("Erreur valider_producteur: " . $e->getMessage());
-    header("Location: dashboard_admin.php?msgerr=" . urlencode('Erreur SQL: ' . $e->getMessage()));
-    exit;
+    echo json_encode(['success' => false, 'message' => 'Erreur SQL: ' . $e->getMessage()]);
 } catch(Exception $e) {
     error_log("Erreur valider_producteur: " . $e->getMessage());
-    header("Location: dashboard_admin.php?msgerr=" . urlencode($e->getMessage()));
-    exit;
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
 ?>

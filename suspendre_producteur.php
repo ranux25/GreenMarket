@@ -1,58 +1,80 @@
 <?php
-session_start();
+ini_set('display_errors', 0);
+ob_start();
 
-// SOLO ADMIN
+session_start();
+header('Content-Type: application/json');
+
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-    header("Location: dashboard_admin.php?msgerr=" . urlencode('Non autorisé'));
+    ob_clean();
+    echo json_encode(['success' => false, 'message' => 'Non autorisé']);
     exit;
 }
 
-include('connexion.php');
+include("connexion.php");
 
-$id_producteur = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-
-if (!$id_producteur) {
-    header("Location: dashboard_admin.php?msgerr=" . urlencode('ID producteur manquant'));
+$id = intval($_POST['id'] ?? 0);
+if (!$id) {
+    ob_clean();
+    echo json_encode(['success' => false, 'message' => 'ID invalide']);
     exit;
 }
 
 try {
-    // Obtener estado actual
-    $stmt = $pdo->prepare("SELECT id_producteur, nom_entreprise, est_valide_par_admin FROM producteur WHERE id_producteur = ?");
-    $stmt->execute([$id_producteur]);
-    $producteur = $stmt->fetch();
-    
-    if (!$producteur) {
-        throw new Exception('Producteur non trouvé');
+    $stmt = $pdo->prepare("SELECT statut FROM producteur WHERE id_producteur = ?");
+    $stmt->execute([$id]);
+    $prod = $stmt->fetch();
+
+    if (!$prod) {
+        ob_clean();
+        echo json_encode(['success' => false, 'message' => 'Producteur introuvable']);
+        exit;
     }
-    
-    $nouveau_statut = $producteur['est_valide_par_admin'] == 1 ? 0 : 1;
-    
-    $stmt = $pdo->prepare("UPDATE producteur SET est_valide_par_admin = ? WHERE id_producteur = ?");
-    $stmt->execute([$nouveau_statut, $id_producteur]);
-    
-    if ($nouveau_statut == 1) {
-        $message = '✅ Producteur "' . $producteur['nom_entreprise'] . '" réactivé avec succès';
-        $notification_message = '✅ Votre compte producteur "' . $producteur['nom_entreprise'] . '" a été réactivé par l\'administrateur.';
-        $type = 'reactivation_producteur';
+
+    $new_statut = ($prod['statut'] === 'valide') ? 'refuse' : 'valide';
+    $stmt = $pdo->prepare("UPDATE producteur SET statut = ? WHERE id_producteur = ?");
+    $stmt->execute([$new_statut, $id]);
+
+    $boutiques_ids = [];
+    if ($new_statut === 'refuse') {
+        $stmt = $pdo->prepare("SELECT id_boutique FROM boutique WHERE id_producteur = ? AND statut = 'valide'");
+        $stmt->execute([$id]);
+        $rows = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $boutiques_ids = $rows;
+
+        if (!empty($boutiques_ids)) {
+            $placeholders = implode(',', array_fill(0, count($boutiques_ids), '?'));
+            $stmt = $pdo->prepare("UPDATE boutique SET statut = 'refuse' WHERE id_boutique IN ($placeholders)");
+            $stmt->execute($boutiques_ids);
+        }
     } else {
-        $message = '⛔ Producteur "' . $producteur['nom_entreprise'] . '" suspendu avec succès';
-        $notification_message = '⛔ Votre compte producteur "' . $producteur['nom_entreprise'] . '" a été suspendu par l\'administrateur. Veuillez contacter le support.';
-        $type = 'suspension_producteur';
+        $stmt = $pdo->prepare("SELECT id_boutique FROM boutique WHERE id_producteur = ? AND statut = 'refuse'");
+        $stmt->execute([$id]);
+        $rows = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $boutiques_ids = $rows;
+
+        if (!empty($boutiques_ids)) {
+            $placeholders = implode(',', array_fill(0, count($boutiques_ids), '?'));
+            $stmt = $pdo->prepare("UPDATE boutique SET statut = 'valide' WHERE id_boutique IN ($placeholders)");
+            $stmt->execute($boutiques_ids);
+        }
     }
-    
-    // Notificar al productor
-    $stmt = $pdo->prepare("
-        INSERT INTO notification (id_producteur, message, type_notification, date_notification, est_lu) 
-        VALUES (?, ?, ?, NOW(), 0)
-    ");
-    $stmt->execute([$id_producteur, $notification_message, $type]);
 
-    header("Location: dashboard_admin.php?msgs=" . urlencode($message) . "&tab=producteurs");
-    exit;
+    $msg = ($new_statut === 'refuse')
+        ? 'Producteur suspendu. ' . count($boutiques_ids) . ' boutique(s) désactivée(s).'
+        : 'Producteur réactivé. ' . count($boutiques_ids) . ' boutique(s) réactivée(s).';
 
-} catch(Exception $e) {
-    header("Location: dashboard_admin.php?msgerr=" . urlencode($e->getMessage()));
-    exit;
+    ob_clean();
+    echo json_encode([
+        'success'       => true,
+        'message'       => $msg,
+        'new_statut'    => $new_statut,
+        'boutiques_ids' => array_map('intval', $boutiques_ids)
+    ]);
+
+} catch (Throwable $e) {
+    error_log("suspendre_producteur error: " . $e->getMessage());
+    ob_clean();
+    echo json_encode(['success' => false, 'message' => 'Erreur SQL: ' . $e->getMessage()]);
 }
 ?>

@@ -11,7 +11,6 @@ if (isset($_SESSION['user_role'])) {
     exit;
 }
 
-// Detectar tema guardado (por defecto claro)
 $theme = $_COOKIE['theme'] ?? 'light';
 
 if (isset($_GET['msgs'])) $_SESSION['success'] = $_GET['msgs'];
@@ -20,7 +19,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     extract($_POST);
     $action = $action ?? '';
 
-    #========== LOGIN ==========
     if ($action == 'login') {
         $err = [];
         if (!isset($email) || empty($email)) $err['email'] = "Veuillez entrer votre email";
@@ -30,21 +28,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $email = trim($email);
             include("connexion.php");
             try {
-                #chercher dans administrateur
                 $req = $pdo->prepare("SELECT id_admin as id, nom_admin as nom, email, mot_de_passe, 'admin' as role, 1 as valide FROM administrateur WHERE email = ?");
                 $req->execute([$email]);
                 $user = $req->fetch(PDO::FETCH_ASSOC);
 
-                #chercher dans client
                 if (empty($user)) {
-                    $req = $pdo->prepare("SELECT id_client as id, nom_client as nom, email, mot_de_passe, 'client' as role, 1 as valide FROM client WHERE email = ? AND est_actif = 1");
+                    $req = $pdo->prepare("SELECT id_client as id, nom_client as nom, email, mot_de_passe, 'client' as role, 1 as valide, est_actif FROM client WHERE email = ?");
                     $req->execute([$email]);
                     $user = $req->fetch(PDO::FETCH_ASSOC);
                 }
 
-                #chercher dans producteur
                 if (empty($user)) {
-                    $req = $pdo->prepare("SELECT id_producteur as id, nom_entreprise as nom, email, mot_de_passe, 'producteur' as role, est_valide_par_admin as valide FROM producteur WHERE email = ?");
+                    $req = $pdo->prepare("SELECT id_producteur as id, nom_entreprise as nom, email, mot_de_passe, 'producteur' as role, est_valide_par_admin as valide, statut FROM producteur WHERE email = ?");
                     $req->execute([$email]);
                     $user = $req->fetch(PDO::FETCH_ASSOC);
                 }
@@ -57,8 +52,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION['error'] = "Email ou mot de passe incorrect";
                     $_SESSION['active_form'] = 'login';
                     $_SESSION['form_data'] = ['email' => $email];
-                } elseif ($user['role'] == 'producteur' && $user['valide'] != 1) {
-                    $_SESSION['warning'] = "⚠️ Votre compte producteur est en attente de validation par un administrateur.";
+                } elseif ($user['role'] == 'client' && isset($user['est_actif']) && $user['est_actif'] == 0) {
+                    $_SESSION['error'] = "⛔ Votre compte a été suspendu. Veuillez contacter le support.";
+                    $_SESSION['active_form'] = 'login';
+                    $_SESSION['form_data'] = ['email' => $email];
+                } elseif ($user['role'] == 'producteur' && isset($user['statut']) && $user['statut'] === 'refuse') {
+                    $_SESSION['error'] = "⛔ Votre compte producteur a été suspendu. Veuillez contacter le support.";
                     $_SESSION['active_form'] = 'login';
                     $_SESSION['form_data'] = ['email' => $email];
                 } else {
@@ -66,6 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION['user_nom']   = $user['nom'];
                     $_SESSION['user_email'] = $user['email'];
                     $_SESSION['user_role']  = $user['role'];
+                    $_SESSION['est_valide'] = $user['valide'] ?? 0;
                     $redirects = ['admin' => 'dashboard_admin.php', 'producteur' => 'dashboard_producteur.php', 'client' => 'dashboard_client.php'];
                     header("Location: " . $redirects[$user['role']]);
                     exit;
@@ -80,7 +80,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    #========== SIGNUP ==========
     elseif ($action == 'signup') {
         $err = [];
         $nom            = trim($nom ?? '');
@@ -94,20 +93,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['form_data']   = ['nom' => $nom, 'email' => $email, 'role' => $role, 'nom_entreprise' => $nom_entreprise, 'boutique_description' => $boutique_description];
         $_SESSION['active_form'] = 'signup';
 
-        #verification email
         if (empty($email)) $err['email'] = "L'email est requis";
         elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $err['email'] = "Email invalide";
 
-        #verification mot de passe
         if (empty($password)) $err['password'] = "Le mot de passe est requis";
         elseif (strlen($password) < 6) $err['password'] = "Le mot de passe doit contenir au moins 6 caractères";
         elseif ($password !== $confirm) $err['password'] = "Les mots de passe ne correspondent pas";
 
-        #verification nom selon role
         if ($role == 'client' && empty($nom)) $err['nom'] = "Le nom est requis";
         if ($role == 'producteur' && empty($nom_entreprise)) $err['nom_entreprise'] = "Le nom de l'entreprise est requis";
 
-        #verification image boutique si producteur
         $boutique_image = null;
         if ($role == 'producteur' && isset($_FILES['boutique_image']) && $_FILES['boutique_image']['error'] === UPLOAD_ERR_OK) {
             $exts = ["image/jpeg", "image/png", "image/jpg", "image/gif", "image/webp"];
@@ -121,7 +116,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (empty($err)) {
             include("connexion.php");
             try {
-                #verifier si email existe deja
                 $req = $pdo->prepare("SELECT email FROM client WHERE email = ? UNION SELECT email FROM producteur WHERE email = ? UNION SELECT email FROM administrateur WHERE email = ?");
                 $req->execute([$email, $email, $email]);
                 if ($req->fetch()) {
@@ -130,7 +124,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     exit;
                 }
 
-                #hachage du mot de passe
                 $hash = password_hash($password, PASSWORD_DEFAULT);
 
                 if ($role == 'client') {
@@ -147,7 +140,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     exit;
 
                 } elseif ($role == 'producteur') {
-                    #deplacement de l'image si chargée
                     if (isset($_FILES['boutique_image']) && $_FILES['boutique_image']['error'] === UPLOAD_ERR_OK) {
                         $upload_dir = 'IMAGES/boutiques/';
                         if (!file_exists($upload_dir)) mkdir($upload_dir, 0777, true);
@@ -165,7 +157,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     $user_id = $pdo->lastInsertId();
 
-                    #creation automatique de la boutique
                     $desc = !empty($boutique_description) ? $boutique_description : 'Boutique artisanale marocaine';
                     $ri2 = $pdo->prepare("INSERT INTO boutique (id_producteur, nom_boutique, description, image, date_creation) VALUES (?, ?, ?, ?, NOW())");
                     $ri2->execute([$user_id, $nom_entreprise, $desc, $boutique_image]);
@@ -189,7 +180,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    #========== FORGOT PASSWORD ==========
     elseif ($action == 'forgot') {
         $err = [];
         $email = trim($email ?? '');
@@ -225,7 +215,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-#recuperer les messages de session
 $error       = $_SESSION['error']   ?? '';
 $success     = $_SESSION['success'] ?? '';
 $warning     = $_SESSION['warning'] ?? '';
@@ -242,7 +231,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    /* ========== VARIABLES ========== */
     :root {
       --bg-body: #FFF9EB;
       --bg-card: #ffffff;
@@ -312,7 +300,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    /* ========== Toggle Tema ========== */
     .theme-toggle {
       position: fixed;
       top: 30px;
@@ -341,7 +328,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     [data-theme="light"] .theme-toggle .bi-sun { display: block; }
     [data-theme="light"] .theme-toggle .bi-moon { display: none; }
 
-    /* ========== Back Home ========== */
     .back-home-btn {
       position: fixed; top: 30px; left: 30px; z-index: 100;
       background: var(--primary); color: white; border: none;
@@ -352,7 +338,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     }
     .back-home-btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
 
-    /* ========== Container ========== */
     .auth-container {
       background: var(--bg-card); width: 1100px; max-width: 100%; min-height: 720px;
       border-radius: 30px; box-shadow: 0 20px 60px var(--shadow-color);
@@ -360,7 +345,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
       transition: background 0.3s ease, box-shadow 0.3s ease;
     }
 
-    /* ========== Overlay ========== */
     .overlay-panel {
       position: absolute; top: 0; left: 0; width: 50%; height: 100%;
       background: var(--overlay-bg);
@@ -382,7 +366,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     .panel-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 12px; font-weight: 700; }
     .panel-desc { font-size: 0.85rem; max-width: 280px; opacity: 0.9; }
 
-    /* ========== Form Box ========== */
     .form-box {
       width: 50%; height: 100%; padding: 40px 50px;
       display: flex; flex-direction: column; justify-content: center;
@@ -402,7 +385,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     .auth-container.forgot-panel-active .login-box { opacity: 0; z-index: 1; pointer-events: none; }
     .auth-container.forgot-panel-active .forgot-box { opacity: 1; z-index: 5; pointer-events: all; left: 0; }
 
-    /* ========== Brand ========== */
     .brand { display: flex; align-items: center; gap: 8px; color: var(--primary); margin-bottom: 15px; }
     .brand span { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: var(--text-primary); }
     .brand-logo { height: 35px; width: auto; object-fit: contain; }
@@ -410,7 +392,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--primary); margin-bottom: 6px; }
     .subtitle { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 22px; }
 
-    /* ========== Inputs ========== */
     .input-group { position: relative; margin-bottom: 14px; }
     .input-group i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--icon-color); font-size: 1rem; z-index: 1; }
     .input-group input, .input-group textarea, .input-group input[type="file"] {
@@ -437,7 +418,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
       color: var(--text-muted);
     }
 
-    /* ========== Role ========== */
     .role-container { display: flex; gap: 12px; margin-bottom: 14px; }
     .role-label-title { font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 5px; display: block; }
     .role-option { flex: 1; }
@@ -456,7 +436,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
       font-weight: 500;
     }
 
-    /* ========== Producer Fields ========== */
     .producer-fields { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, opacity 0.4s ease, margin 0.4s ease; opacity: 0; margin-bottom: 0; }
     .producer-fields.active { max-height: 500px; opacity: 1; margin-bottom: 4px; }
 
@@ -475,13 +454,11 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
       margin-left: 2px;
     }
 
-    /* ========== Form Options ========== */
     .form-options { display: flex; justify-content: space-between; margin-bottom: 18px; font-size: 0.85rem; color: var(--text-secondary); }
     .form-options label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
     .form-options a { color: var(--link-color); text-decoration: none; }
     .form-options a:hover { text-decoration: underline; }
 
-    /* ========== Button ========== */
     .btn-submit {
       width: 100%; padding: 12px; background-color: var(--primary);
       color: white; border: none; border-radius: 10px; font-size: 0.9rem;
@@ -489,7 +466,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     }
     .btn-submit:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
 
-    /* ========== Links ========== */
     .terms-text { font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 10px; }
     .terms-text a { color: var(--link-color); text-decoration: none; }
     .terms-text a:hover { text-decoration: underline; }
@@ -498,13 +474,11 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     .switch-link { color: var(--link-color); text-decoration: none; font-weight: 600; cursor: pointer; }
     .switch-link:hover { text-decoration: underline; }
 
-    /* ========== Alerts ========== */
     .alert { padding: 10px 14px; border-radius: 10px; font-size: 0.85rem; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
     .alert-error { background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error); }
     .alert-success { background: var(--success-bg); border: 1px solid var(--success-border); color: var(--success); }
     .alert-warning { background: var(--warning-bg); border: 1px solid var(--warning-border); color: var(--warning); }
 
-    /* ========== Responsive ========== */
     @media (max-width: 800px) {
       .auth-container { flex-direction: column; height: auto; background: transparent; box-shadow: none; }
       .overlay-panel { position: relative; width: 100%; height: 160px; border-radius: 24px; margin-bottom: 15px; transform: none !important; padding: 20px; }
@@ -528,7 +502,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
   <i class="bi bi-house-door"></i> Accueil
 </a>
 
-<!-- Toggle Tema -->
 <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">
   <i class="bi bi-sun"></i>
   <i class="bi bi-moon"></i>
@@ -541,7 +514,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     <p class="panel-desc" id="panelDesc">Rejoignez notre réseau de coopératives et consommez de manière juste, authentique et locale.</p>
   </div>
 
-  <!-- LOGIN -->
   <div class="form-box login-box" id="loginBox">
     <div class="brand">
       <img src="IMAGES/logo.png" alt="Logo" class="brand-logo" onerror="this.src='https://placehold.co/35x35?text=GM'">
@@ -576,7 +548,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     <p class="switch-text">Pas encore membre ? <a href="#" class="switch-link" id="toSignup">Créer un compte</a></p>
   </div>
 
-  <!-- SIGNUP -->
   <div class="form-box signup-box" id="signupBox">
     <div class="brand">
       <img src="IMAGES/logo.png" alt="Logo" class="brand-logo" onerror="this.src='https://placehold.co/35x35?text=GM'">
@@ -612,7 +583,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
         </label>
       </div>
 
-      <!-- Champs spécifiques au producteur -->
       <div class="producer-fields" id="producerFields" style="<?php echo (isset($form_data['role']) && $form_data['role'] === 'producteur') ? 'max-height:400px; opacity:1; margin-bottom:4px;' : ''; ?>">
         <div class="input-group">
           <i class="bi bi-building"></i>
@@ -647,7 +617,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     <p class="switch-text">Déjà inscrit ? <a href="#" class="switch-link" id="toLoginFromSignup">Se connecter</a></p>
   </div>
 
-  <!-- FORGOT PASSWORD -->
   <div class="form-box forgot-box" id="forgotBox">
     <div class="brand">
       <img src="IMAGES/logo.png" alt="Logo" class="brand-logo" onerror="this.src='https://placehold.co/35x35?text=GM'">
@@ -680,7 +649,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
   const panelTitle = document.getElementById('panelTitle');
   const panelDesc = document.getElementById('panelDesc');
 
-  // ========== Navigation ==========
   document.getElementById('toSignup').addEventListener('click', (e) => {
     e.preventDefault();
     container.classList.remove('forgot-panel-active');
@@ -710,7 +678,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     panelDesc.textContent = "Rejoignez notre réseau de coopératives et consommez de manière juste, authentique et locale.";
   });
 
-  // ========== Role toggle ==========
   document.querySelectorAll('input[name="role"]').forEach(radio => {
     radio.addEventListener('change', function() {
       const pf = document.getElementById('producerFields');
@@ -724,7 +691,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     });
   });
 
-  // ========== Theme Toggle ==========
   const themeToggle = document.getElementById('themeToggle');
   const htmlElement = document.documentElement;
 
@@ -739,13 +705,11 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['warning'], $_SESSION[
     setTheme(newTheme);
   });
 
-  // ========== Initialiser le thème ==========
   const savedTheme = '<?php echo $theme; ?>';
   if (savedTheme) {
     htmlElement.setAttribute('data-theme', savedTheme);
   }
 
-  // ========== Afficher le bon formulaire si erreur ==========
   <?php if ($active_form === 'signup'): ?>
     container.classList.add('right-panel-active');
     panelTitle.textContent = "Cultivons l'avenir !";

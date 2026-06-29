@@ -1,13 +1,11 @@
 <?php
 session_start();
 
-#verifier que l'utilisateur est connecte et est producteur
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'producteur') {
     header('Location: signin.php');
     exit;
 }
 
-#connexion a la base de donnees
 include('connexion.php');
 
 $theme = $_COOKIE['theme'] ?? 'light';
@@ -19,7 +17,6 @@ if ($id_commande <= 0) {
 }
 
 try {
-    #recuperer les informations de la commande
     $stmt = $pdo->prepare("
         SELECT c.*, cl.nom_client, cl.email
         FROM commande c
@@ -34,7 +31,6 @@ try {
         exit;
     }
     
-    #recuperer les produits de la commande qui appartiennent au producteur
     $stmt = $pdo->prepare("
         SELECT co.*, p.nom_produit, p.photo_url, b.nom_boutique,
                p.id_boutique, b.id_producteur
@@ -46,19 +42,16 @@ try {
     $stmt->execute([$id_commande, $_SESSION['user_id']]);
     $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    #verifier si le producteur a des produits dans cette commande
     if (empty($produits)) {
         header('Location: dashboard_producteur.php?error=commande_non_autorisee');
         exit;
     }
     
-    #calculer le sous-total des produits du producteur
     $sous_total = 0;
     foreach ($produits as $p) {
         $sous_total += $p['prix_unitaire'] * $p['quantite'];
     }
     
-    #calculer le nombre total d'articles du producteur
     $nb_articles = array_sum(array_column($produits, 'quantite'));
     
 } catch(PDOException $e) {
@@ -67,7 +60,6 @@ try {
     exit;
 }
 
-// Fonction pour afficher le statut avec la bonne couleur
 function getStatutBadge($statut) {
     $classes = [
         'En attente' => 'badge-warning',
@@ -274,11 +266,83 @@ function getStatutBadge($statut) {
             .product-item .price { width: 100%; text-align: left; padding-left: 68px; }
             .status-section { flex-direction: column; align-items: flex-start; }
         }
+
+        #confirm-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            align-items: center;
+            justify-content: center;
+        }
+        #confirm-modal.show { display: flex; }
+        #confirm-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(3px);
+        }
+        #confirm-box {
+            position: relative;
+            background: var(--bg-card, #fff);
+            border-radius: 20px;
+            padding: 2rem 1.8rem 1.5rem;
+            max-width: 360px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            text-align: center;
+            animation: modalIn 0.25s cubic-bezier(.22,1,.36,1);
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.88) translateY(20px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        #confirm-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+        #confirm-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-dark, #2C2C2C);
+            margin-bottom: 0.4rem;
+        }
+        #confirm-msg {
+            font-size: 0.88rem;
+            color: var(--text-light, #6B6B6B);
+            margin-bottom: 1.4rem;
+        }
+        .confirm-btns { display: flex; gap: 0.8rem; justify-content: center; }
+        .confirm-btns button {
+            flex: 1;
+            padding: 0.65rem 1rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        #confirm-cancel { background: #f5f0e8; color: var(--text-dark, #2C2C2C); }
+        #confirm-cancel:hover { opacity: 0.8; }
+        #confirm-ok { background: #c0392b; color: #fff; }
+        #confirm-ok:hover { background: #a93226; }
     </style>
 </head>
 <body>
 
 <?php include 'header.php'; ?>
+
+<div id="confirm-modal">
+  <div id="confirm-overlay"></div>
+  <div id="confirm-box">
+    <div id="confirm-icon">⚠️</div>
+    <div id="confirm-title"></div>
+    <div id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button id="confirm-cancel">Annuler</button>
+      <button id="confirm-ok">Confirmer</button>
+    </div>
+  </div>
+</div>
 
 <div class="page-header">
     <div style="max-width:1000px;margin:0 auto;">
@@ -293,7 +357,6 @@ function getStatutBadge($statut) {
         <i class="bi bi-arrow-left"></i> Retour au tableau de bord
     </a>
 
-    <!-- Informations générales -->
     <div class="card">
         <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
             <div>
@@ -322,7 +385,6 @@ function getStatutBadge($statut) {
         </div>
     </div>
 
-    <!-- Produits commandés -->
     <div class="card">
         <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--primary);margin-bottom:1rem;">
             <i class="bi bi-box-seam"></i> Vos produits commandés
@@ -352,7 +414,6 @@ function getStatutBadge($statut) {
         </div>
         <?php endforeach; ?>
 
-        <!-- Total -->
         <div style="border-top:2px solid var(--border-color);padding-top:1rem;margin-top:0.5rem;">
             <div class="total-row">
                 <span class="label">Sous-total (vos produits)</span>
@@ -365,7 +426,6 @@ function getStatutBadge($statut) {
         </div>
     </div>
 
-    <!-- Actions -->
     <div class="card">
         <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--primary);margin-bottom:1rem;">
             <i class="bi bi-gear"></i> Gérer la commande
@@ -409,11 +469,7 @@ function getStatutBadge($statut) {
 function showToast(msg, isError = false) {
     const toast = document.getElementById('toast');
     toast.innerHTML = msg;
-    if (isError) {
-        toast.style.background = '#c0392b';
-    } else {
-        toast.style.background = '#5d0d18';
-    }
+    toast.style.background = isError ? '#c0392b' : '#5d0d18';
     toast.classList.add('show');
     setTimeout(() => {
         toast.classList.remove('show');
@@ -421,40 +477,69 @@ function showToast(msg, isError = false) {
     }, 3000);
 }
 
+let _confirmCallback = null;
+
+function askConfirm(title, msg, callback, icon) {
+    document.getElementById('confirm-icon').textContent = icon || '⚠️';
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-msg').textContent = msg;
+    _confirmCallback = callback;
+    document.getElementById('confirm-modal').classList.add('show');
+}
+
+document.getElementById('confirm-ok').addEventListener('click', () => {
+    document.getElementById('confirm-modal').classList.remove('show');
+    if (_confirmCallback) _confirmCallback();
+});
+
+document.getElementById('confirm-cancel').addEventListener('click', () => {
+    document.getElementById('confirm-modal').classList.remove('show');
+    _confirmCallback = null;
+});
+
+document.getElementById('confirm-overlay').addEventListener('click', () => {
+    document.getElementById('confirm-modal').classList.remove('show');
+    _confirmCallback = null;
+});
+
 function updateStatut(id, statut) {
-    if (confirm('Voulez-vous vraiment changer le statut de cette commande en "' + statut + '" ?')) {
-        // Désactiver tous les boutons pendant le traitement
-        document.querySelectorAll('.action-group .btn').forEach(btn => {
-            btn.disabled = true;
-            btn.style.opacity = '0.6';
-        });
-        
-        fetch('update_commande.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'id_commande=' + id + '&statut=' + encodeURIComponent(statut)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showToast('✅ ' + data.message);
-                setTimeout(() => location.reload(), 1000);
-            } else {
-                showToast('❌ ' + data.message, true);
+    const icons = { 'Confirmée': '✅', 'Expédiée': '📦', 'Livrée': '✅', 'Annulée': '❌' };
+    askConfirm(
+        'Changer le statut ?',
+        'Voulez-vous vraiment passer cette commande en "' + statut + '" ?',
+        () => {
+            document.querySelectorAll('.action-group .btn').forEach(btn => {
+                btn.disabled = true;
+                btn.style.opacity = '0.6';
+            });
+            fetch('update_commande.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'id_commande=' + id + '&statut=' + encodeURIComponent(statut)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('✅ ' + data.message);
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast('❌ ' + data.message, true);
+                    document.querySelectorAll('.action-group .btn').forEach(btn => {
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                    });
+                }
+            })
+            .catch(() => {
+                showToast('❌ Erreur de connexion au serveur', true);
                 document.querySelectorAll('.action-group .btn').forEach(btn => {
                     btn.disabled = false;
                     btn.style.opacity = '1';
                 });
-            }
-        })
-        .catch(() => {
-            showToast('❌ Erreur de connexion au serveur', true);
-            document.querySelectorAll('.action-group .btn').forEach(btn => {
-                btn.disabled = false;
-                btn.style.opacity = '1';
             });
-        });
-    }
+        },
+        icons[statut] || '⚠️'
+    );
 }
 </script>
 

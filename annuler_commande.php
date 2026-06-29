@@ -2,66 +2,64 @@
 session_start();
 include("connexion.php");
 
-header('Content-Type: application/json');
+$is_ajax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) || 
+           (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/x-www-form-urlencoded') !== false && $_SERVER['REQUEST_METHOD'] === 'POST');
 
-// Verificar autenticación
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'client') {
-    echo json_encode(['success' => false, 'message' => 'Non autorisé']);
+    if ($is_ajax) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Non autorisé']);
+    } else {
+        header('Location: signin.php');
+    }
     exit();
 }
 
 $id_client = $_SESSION['user_id'];
-$id_commande = $_POST['id_commande'] ?? 0;
+$id_commande = $_GET['id_commande'] ?? $_POST['id_commande'] ?? 0;
 
 if (!$id_commande) {
-    echo json_encode(['success' => false, 'message' => 'ID commande manquant']);
+    if ($is_ajax) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Commande invalide']);
+    } else {
+        header('Location: dashboard_client.php');
+    }
     exit();
 }
 
 try {
-    // Vérifier que la commande appartient au client et est en attente
-    $req = $pdo->prepare("
-        SELECT statut_commande FROM commande 
-        WHERE id_commande = ? AND id_client = ?
-    ");
+    $req = $pdo->prepare("SELECT statut_commande FROM commande WHERE id_commande = ? AND id_client = ?");
     $req->execute([$id_commande, $id_client]);
     $commande = $req->fetch();
 
     if (!$commande) {
-        echo json_encode(['success' => false, 'message' => 'Commande non trouvée']);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Commande introuvable']);
         exit();
     }
 
     if ($commande['statut_commande'] !== 'En attente') {
-        echo json_encode(['success' => false, 'message' => 'Cette commande ne peut pas être annulée']);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Cette commande ne peut plus être annulée']);
         exit();
     }
 
-    // Annuler la commande
-    $update = $pdo->prepare("
-        UPDATE commande SET statut_commande = 'Annulée' 
-        WHERE id_commande = ? AND id_client = ?
-    ");
-    $update->execute([$id_commande, $id_client]);
+    $pdo->prepare("UPDATE commande SET statut_commande = 'Annulée' WHERE id_commande = ? AND id_client = ?")
+        ->execute([$id_commande, $id_client]);
 
-    // Restaurer les stocks
-    $reqStock = $pdo->prepare("
-        SELECT id_produit, quantite FROM contenir WHERE id_commande = ?
-    ");
+    $reqStock = $pdo->prepare("SELECT id_produit, quantite FROM contenir WHERE id_commande = ?");
     $reqStock->execute([$id_commande]);
-    $produits = $reqStock->fetchAll();
-
-    foreach ($produits as $prod) {
-        $updateStock = $pdo->prepare("
-            UPDATE produit SET stock_quantite = stock_quantite + ? 
-            WHERE id_produit = ?
-        ");
-        $updateStock->execute([$prod['quantite'], $prod['id_produit']]);
+    foreach ($reqStock->fetchAll() as $prod) {
+        $pdo->prepare("UPDATE produit SET stock_quantite = stock_quantite + ? WHERE id_produit = ?")
+            ->execute([$prod['quantite'], $prod['id_produit']]);
     }
 
-    echo json_encode(['success' => true]);
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true, 'message' => 'Commande annulée avec succès']);
 
 } catch(PDOException $e) {
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'Erreur base de données']);
 }
 ?>

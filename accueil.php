@@ -2,7 +2,6 @@
 session_start();
 include('connexion.php');
 
-// Detectar tema guardado (por defecto claro)
 $theme = $_COOKIE['theme'] ?? 'light';
 
 try {
@@ -36,14 +35,21 @@ try {
         FROM boutique b
         JOIN producteur p ON b.id_producteur = p.id_producteur
         WHERE p.est_valide_par_admin = 1
+<<<<<<< HEAD
         AND b.est_valide_par_admin = 1
+=======
+        AND b.statut = 'valide'
+>>>>>>> dbde92a27019d242d65eceffd0969e06cc96c498
         ORDER BY b.date_creation DESC
         LIMIT 6
     ");
     $req->execute();
     $boutiques_db = $req->fetchAll(PDO::FETCH_ASSOC);
 
+<<<<<<< HEAD
     // Recuperar los productos validos y publicados
+=======
+>>>>>>> dbde92a27019d242d65eceffd0969e06cc96c498
     $req2 = $pdo->prepare("
         SELECT p.*, c.nom_categorie, b.nom_boutique
         FROM produit p
@@ -51,6 +57,7 @@ try {
         LEFT JOIN categorie c ON p.id_categorie = c.id_categorie
         WHERE p.est_valide_par_admin = 1
         AND p.statut_publie = 'Publié'
+        AND b.statut = 'valide'
         ORDER BY p.date_creation DESC
         LIMIT 8
     ");
@@ -71,16 +78,13 @@ try {
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <style>
-    /* ========== VARIABLES DE TEMA ========== */
     :root {
-      /* Colores principales */
       --primary: #5D0D18;
       --primary-light: #7a1020;
       --secondary: #9FB2AC;
       --secondary-dark: #8aa09a;
       --gold: #c07a1a;
       
-      /* Fondos */
       --bg: #FFF9EB;
       --bg-light: #f5f0e8;
       --bg-card: #ffffff;
@@ -89,47 +93,37 @@ try {
       --bg-section-alt: #fff9eb;
       --bg-why: linear-gradient(135deg, #fdf5e0, #f5ede0);
       
-      /* Textos */
       --text-dark: #2C2C2C;
       --text-light: #6B6B6B;
       --text-muted: #6B6B6B;
       
-      /* Bordes y sombras */
       --border-color: #f0e8d5;
       --shadow-color: rgba(93, 13, 24, 0.08);
       --shadow-hover: rgba(93, 13, 24, 0.16);
       
-      /* Hero */
       --hero-overlay: linear-gradient(105deg, rgba(255,249,235,0.96) 0%, rgba(255,249,235,0.88) 35%, rgba(93,13,24,0.12) 70%, rgba(93,13,24,0.25) 100%);
       --hero-stat-bg: rgba(255,255,255,0.92);
       --hero-stat-border: rgba(93,13,24,0.1);
       
-      /* Ticker */
       --ticker-bg: var(--primary);
       --ticker-text: rgba(255,255,255,0.9);
       
-      /* Category */
       --category-bg: #fff;
       --category-border: #f0e8d5;
       --category-hover: #fff8f0;
       
-      /* Product */
       --product-bg: #fff;
       --product-border: #f0e8d5;
       
-      /* Store */
       --store-bg: #fff;
       --store-border: #f0e8d5;
       
-      /* Why section */
       --why-border: rgba(93,13,24,0.08);
       --why-check-bg: var(--primary);
       
-      /* Toast */
       --toast-bg: var(--primary);
       --toast-text: #fff;
       
-      /* Badges */
       --badge-secondary-bg: var(--secondary);
       --badge-rare-bg: #c0392b;
       --badge-bio-bg: #6aaf6a;
@@ -137,16 +131,13 @@ try {
       --badge-text: #fff;
     }
 
-    /* ========== TEMA OSCURO BEIGE ========== */
     [data-theme="dark"] {
-      /* Colores principales */
       --primary: #8a6048;
       --primary-light: #a0785a;
       --secondary: #6d4c3a;
       --secondary-dark: #5a4a3a;
       --gold: #d4a85c;
       
-      /* Fondos */
       --bg: #2c241e;
       --bg-light: #3d3229;
       --bg-card: #3d3229;
@@ -155,54 +146,43 @@ try {
       --bg-section-alt: #2c241e;
       --bg-why: linear-gradient(135deg, #3d3229, #2c241e);
       
-      /* Textos */
       --text-dark: #f0e6d8;
       --text-light: #b8a896;
       --text-muted: #b8a896;
       
-      /* Bordes y sombras */
       --border-color: #5a4a3a;
       --shadow-color: rgba(0, 0, 0, 0.3);
       --shadow-hover: rgba(0, 0, 0, 0.4);
       
-      /* Hero */
       --hero-overlay: linear-gradient(105deg, rgba(44,36,30,0.96) 0%, rgba(44,36,30,0.88) 35%, rgba(44,36,30,0.12) 70%, rgba(44,36,30,0.25) 100%);
       --hero-stat-bg: rgba(61,50,41,0.92);
       --hero-stat-border: rgba(240,230,216,0.1);
       
-      /* Ticker */
       --ticker-bg: #1a1410;
       --ticker-text: #f0e6d8;
       
-      /* Category */
       --category-bg: #3d3229;
       --category-border: #5a4a3a;
       --category-hover: #4d3d32;
       
-      /* Product */
       --product-bg: #3d3229;
       --product-border: #5a4a3a;
       
-      /* Store */
       --store-bg: #3d3229;
       --store-border: #5a4a3a;
       
-      /* Why section */
       --why-border: #5a4a3a;
       --why-check-bg: var(--gold);
       
-      /* Toast */
       --toast-bg: var(--primary);
       --toast-text: #f0e6d8;
       
-      /* Badges */
       --badge-secondary-bg: #6d4c3a;
       --badge-rare-bg: #8a2a20;
       --badge-bio-bg: #4a7a4a;
       --badge-fait-bg: #b8943a;
     }
 
-    /* ========== STYLES BASE ========== */
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -215,7 +195,6 @@ try {
 
     h1, h2, h3, .playfair { font-family: 'Playfair Display', serif; }
 
-    /* ========== ANIMATIONS ========== */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(40px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -245,7 +224,6 @@ try {
       to   { transform: translateX(-50%); }
     }
 
-    /* Scroll-reveal base */
     .reveal {
       opacity: 0;
       transform: translateY(35px);
@@ -274,7 +252,6 @@ try {
       transform: translateX(0);
     }
 
-    /* ========== HERO ========== */
     .hero-section {
       position: relative;
       min-height: 85vh;
@@ -407,7 +384,6 @@ try {
       transition: color 0.3s ease;
     }
 
-    /* ========== TICKER ========== */
     .ticker-wrap {
       background: var(--ticker-bg);
       padding: 12px 0;
@@ -432,7 +408,6 @@ try {
     }
     .ticker-sep { color: rgba(255,255,255,0.35); font-size: 20px; }
 
-    /* ========== CATEGORIES ========== */
     .category-card {
       background: var(--category-bg);
       border-radius: 20px;
@@ -456,7 +431,6 @@ try {
       transition: color 0.3s ease;
     }
 
-    /* ========== PRODUCT CARDS ========== */
     .product-card {
       background: var(--product-bg);
       border-radius: 20px;
@@ -478,7 +452,6 @@ try {
     }
     .product-card:hover .product-img { transform: scale(1.07); }
     
-    /* ========== BADGES ========== */
     .badge {
       display: inline-block;
       border-radius: 999px;
@@ -493,7 +466,6 @@ try {
     .badge-fait { background: var(--badge-fait-bg); }
     .stars { color: #e0a82e; font-size: 14px; }
 
-    /* ========== BUTTONS ========== */
     .btn-primary {
       background: var(--primary);
       color: #fff;
@@ -537,7 +509,6 @@ try {
     }
     .btn-sage:hover { background: var(--secondary-dark); transform: translateY(-2px); }
 
-    /* ========== SECTION TITLE ========== */
     .section-title {
       font-family: 'Playfair Display', serif;
       font-size: clamp(22px, 3vw, 34px);
@@ -557,7 +528,6 @@ try {
       transition: background 0.3s ease;
     }
 
-    /* ========== STORE CARDS ========== */
     .store-card {
       background: var(--store-bg);
       border-radius: 18px;
@@ -599,7 +569,6 @@ try {
       transition: color 0.3s ease;
     }
 
-    /* ========== WHY SECTION ========== */
     .why-section {
       background: var(--bg-why);
       transition: background 0.3s ease;
@@ -634,7 +603,6 @@ try {
       transition: color 0.3s ease;
     }
 
-    /* ========== TOAST ========== */
     #toast {
       position: fixed;
       bottom: 28px;
@@ -651,7 +619,6 @@ try {
     }
     #toast.show { transform: translateY(0); opacity: 1; }
 
-    /* ========== SECTION BACKGROUNDS ========== */
     .section-categories {
       background: var(--bg);
       transition: background 0.3s ease;
@@ -665,7 +632,6 @@ try {
       transition: background 0.3s ease;
     }
 
-    /* ========== RESPONSIVE ========== */
     @media (max-width: 768px) {
       .hero-decorative {
         display: none;
@@ -680,10 +646,8 @@ try {
 
 <div id="toast">✓ Produit ajouté au panier !</div>
 
-<!-- HEADER -->
 <?php include 'header.php'; ?>
 
-<!-- TICKER -->
 <div class="ticker-wrap">
   <div class="ticker-inner" id="ticker">
     <span class="ticker-item">🌿 Livraison offerte dès 250 DH <span class="ticker-sep">|</span></span>
@@ -699,7 +663,6 @@ try {
   </div>
 </div>
 
-<!-- HERO SECTION -->
 <section class="hero-section">
   <div class="hero-bg">
     <img src="IMAGES/hero2.PNG" alt="Artisanat Marocain" id="heroImg"
@@ -735,10 +698,9 @@ try {
   </div>
 </section>
 
-<!-- CATEGORIES -->
 <section class="py-16 px-4 max-w-7xl mx-auto section-categories">
   <div class="mb-10 reveal">
-    <h2 class="section-title">Nos catégories de produits traditionnels</h2>
+    <h2 class="section-title">Nos categories de produits traditionnels</h2>
   </div>
   <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-4 reveal">
     <div class="category-card" onclick="window.location.href='produits.php?cat=Caftans'"><span class="category-icon">👘</span><span class="category-name">Caftans</span></div>
@@ -752,7 +714,6 @@ try {
   </div>
 </section>
 
-<!-- BOUTIQUES PARTENAIRES -->
 <section class="py-14 px-4 section-stores">
   <div class="max-w-7xl mx-auto">
     <div class="mb-10 reveal">
@@ -790,7 +751,6 @@ try {
   </div>
 </section>
 
-<!-- PRODUITS POPULAIRES -->
 <section id="products" class="py-16 px-4 section-products">
   <div class="max-w-7xl mx-auto">
     <div class="mb-10 reveal">
@@ -803,7 +763,6 @@ try {
   </div>
 </section>
 
-<!-- WHY SECTION -->
 <section class="py-16 px-4 why-section">
   <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-14 items-center">
     <div class="reveal-left">
@@ -822,10 +781,15 @@ try {
 <?php include 'footer.php'; ?>
 
 <script>
+<<<<<<< HEAD
 // Produits pour la grille (datos desde PHP)
 const productsData = <?php echo json_encode($produits_db); ?>;
 
 // Si no hay productos en BD, usar datos por defecto
+=======
+const productsData = <?php echo json_encode($produits_db); ?>;
+
+>>>>>>> dbde92a27019d242d65eceffd0969e06cc96c498
 const defaultProducts = [
   { id: 101, name: "Caftan en Soie", price: "500 DH", image: "IMAGES/CaftanSoie.jpg", coop: "Maison du Caftan", rating: 4.8, reviews: 212, badge: "Artisanal", badgeClass: "secondary" },
   { id: 201, name: "Tapis Berbère", price: "1 200 DH", image: "IMAGES/img/tapis.jpeg", coop: "Tapis Berbère d'Atlas", rating: 5, reviews: 189, badge: "Fait main", badgeClass: "fait" },
@@ -873,7 +837,7 @@ function renderProducts() {
         <p class="text-xs mt-1" style="color: var(--text-light);">👩‍🌾 ${p.coop}</p>
         <div class="stars my-2">${renderStars(p.rating)} <span style="font-size:12px;color:var(--text-light);">(${p.reviews})</span></div>
         <p class="font-bold text-xl" style="color:var(--primary);">${p.price}</p>
-        <button class="btn-primary w-full mt-3 py-2" onclick='addToCart(${JSON.stringify(p)})'>Ajouter au panier</button>
+        <button class="btn-primary w-full mt-3 py-2" onclick='addToCart(${JSON.stringify(p)}, this)'>Ajouter au panier</button>
       </div>
     </div>`;
   }).join('');
@@ -881,10 +845,23 @@ function renderProducts() {
 
 let cart = [];
 function updateCartCount(total) {
-  const badge = document.getElementById('cart-count');
-  if (badge && total !== undefined) badge.textContent = total;
+  const badges = document.querySelectorAll('.cart-badge');
+  badges.forEach(badge => {
+    if (total !== undefined) {
+      badge.textContent = total;
+      if (total > 0) badge.classList.add('show');
+    }
+  });
 }
-function addToCart(product) {
+
+function addToCart(product, btn) {
+  if (btn && btn.disabled) return;
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳ ...';
+    btn.style.opacity = '0.7';
+  }
+
   const formData = new FormData();
   formData.append('id_produit', product.id);
   formData.append('quantite', 1);
@@ -896,27 +873,34 @@ function addToCart(product) {
       if (data.success) {
         updateCartCount(data.total_panier);
         toast.textContent = `✓ ${product.name} ajouté au panier`;
+        toast.style.background = 'var(--toast-bg)';
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 2600);
+        if (btn) { btn.textContent = '✓ Ajouté'; btn.style.opacity = '1'; }
+        setTimeout(() => { if (btn) { btn.textContent = 'Ajouter au panier'; btn.disabled = false; } }, 2000);
       } else if (data.message.includes('connecter')) {
         toast.textContent = '⚠️ Connectez-vous pour ajouter au panier';
+        toast.style.background = '#e67e22';
         toast.classList.add('show');
         setTimeout(() => { window.location.href = 'signin.php'; }, 1500);
       } else {
         toast.textContent = '❌ ' + data.message;
+        toast.style.background = '#c0392b';
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 2600);
+        if (btn) { btn.textContent = 'Ajouter au panier'; btn.disabled = false; btn.style.opacity = '1'; }
       }
     })
     .catch(() => {
       const toast = document.getElementById('toast');
       toast.textContent = '❌ Erreur de connexion au serveur';
+      toast.style.background = '#c0392b';
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 2600);
+      if (btn) { btn.textContent = 'Ajouter au panier'; btn.disabled = false; btn.style.opacity = '1'; }
     });
 }
 
-// Scroll reveal
 function initReveal() {
   const elements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
   const observer = new IntersectionObserver((entries) => {
@@ -932,16 +916,24 @@ document.addEventListener('DOMContentLoaded', () => {
   initReveal();
   
   document.getElementById('becomePartnerBtn')?.addEventListener('click', () => {
+    const toast = document.getElementById('toast');
     <?php if (isset($_SESSION['user_role'])): ?>
       <?php if ($_SESSION['user_role'] === 'producteur'): ?>
-        alert("Vous êtes déjà producteur !");
+        toast.textContent = '✓ Vous êtes déjà producteur !';
+        toast.style.background = 'var(--toast-bg)';
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2600);
       <?php else: ?>
-        alert("Pour devenir partenaire, créez un compte producteur.");
-        window.location.href = 'signup.php';
+        toast.textContent = '⚠️ Pour devenir partenaire, créez un compte producteur.';
+        toast.style.background = '#e67e22';
+        toast.classList.add('show');
+        setTimeout(() => { window.location.href = 'signup.php'; }, 2000);
       <?php endif; ?>
     <?php else: ?>
-      alert("Veuillez vous connecter ou créer un compte producteur.");
-      window.location.href = 'signin.php';
+      toast.textContent = '⚠️ Veuillez vous connecter ou créer un compte producteur.';
+      toast.style.background = '#e67e22';
+      toast.classList.add('show');
+      setTimeout(() => { window.location.href = 'signin.php'; }, 2000);
     <?php endif; ?>
   });
 });

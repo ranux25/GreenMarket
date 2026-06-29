@@ -2,7 +2,6 @@
 session_start();
 include("connexion.php");
 
-// Verificar que el usuario esté logueado y sea cliente
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'client') {
     header("Location: signin.php");
     exit();
@@ -11,7 +10,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'client') {
 $id_client = $_SESSION['user_id'];
 $theme = $_COOKIE['theme'] ?? 'light';
 
-// Recuperar las commandes del cliente
 try {
     $req = $pdo->prepare("
         SELECT 
@@ -32,7 +30,6 @@ try {
     $req->execute([$id_client]);
     $commandes = $req->fetchAll(PDO::FETCH_ASSOC);
 
-    // Pour chaque commande, récupérer les produits
     foreach ($commandes as &$commande) {
         $reqProd = $pdo->prepare("
             SELECT 
@@ -110,7 +107,6 @@ try {
             padding: 2rem;
         }
 
-        /* Page header */
         .page-header {
             background: var(--bg-card);
             border-radius: 20px;
@@ -137,7 +133,6 @@ try {
             font-size: 0.95rem;
         }
 
-        /* Status badges */
         .badge {
             padding: 0.25rem 0.75rem;
             border-radius: 999px;
@@ -167,7 +162,6 @@ try {
         [data-theme="dark"] .badge-rembourse { background: #2a1a3d; color: #ab47bc; }
         [data-theme="dark"] .badge-en-attente-paiement { background: #4a2d1a; color: #ffa726; }
 
-        /* Order card */
         .order-card {
             background: var(--bg-card);
             border-radius: 16px;
@@ -323,7 +317,6 @@ try {
             background: #c4903a;
         }
 
-        /* Empty state */
         .empty-state {
             text-align: center;
             padding: 4rem 2rem;
@@ -347,7 +340,6 @@ try {
             margin-bottom: 1.5rem;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .container { padding: 1rem; }
             .page-header { padding: 1.5rem; }
@@ -362,17 +354,106 @@ try {
             .order-product-img { width: 50px; height: 50px; }
             .order-product-price { font-size: 0.85rem; }
         }
+
+        #toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: var(--primary);
+            color: #fff;
+            padding: 14px 22px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            z-index: 9999;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: 0.4s cubic-bezier(.22,1,.36,1);
+            max-width: 340px;
+        }
+        #toast.show { transform: translateY(0); opacity: 1; }
+
+        #confirm-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            align-items: center;
+            justify-content: center;
+        }
+        #confirm-modal.show { display: flex; }
+        #confirm-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(3px);
+        }
+        #confirm-box {
+            position: relative;
+            background: var(--bg-card, #fff);
+            border-radius: 20px;
+            padding: 2rem 1.8rem 1.5rem;
+            max-width: 340px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            text-align: center;
+            animation: modalIn 0.25s cubic-bezier(.22,1,.36,1);
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.88) translateY(20px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        #confirm-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+        #confirm-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-dark, #2C2C2C);
+            margin-bottom: 0.4rem;
+        }
+        #confirm-msg {
+            font-size: 0.88rem;
+            color: var(--text-light, #6B6B6B);
+            margin-bottom: 1.4rem;
+        }
+        .confirm-btns { display: flex; gap: 0.8rem; justify-content: center; }
+        .confirm-btns button {
+            flex: 1;
+            padding: 0.65rem 1rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        #confirm-cancel { background: var(--bg, #f5f0e8); color: var(--text-dark, #2C2C2C); }
+        #confirm-cancel:hover { opacity: 0.8; }
+        #confirm-ok { background: #c0392b; color: #fff; }
+        #confirm-ok:hover { background: #a93226; }
     </style>
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
     <?php include 'header.php'; ?>
 
-    <!-- ===== CONTENU PRINCIPAL ===== -->
+    <div id="toast"></div>
+
+    <div id="confirm-modal">
+        <div id="confirm-overlay"></div>
+        <div id="confirm-box">
+            <div id="confirm-icon">⚠️</div>
+            <div id="confirm-title"></div>
+            <div id="confirm-msg"></div>
+            <div class="confirm-btns">
+                <button id="confirm-cancel">Annuler</button>
+                <button id="confirm-ok">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         
-        <!-- En-tête -->
         <div class="page-header">
             <h1>
                 <i class="bi bi-box-seam"></i>
@@ -381,7 +462,6 @@ try {
             <p>Retrouvez l'historique complet de vos achats sur GreenMarket</p>
         </div>
 
-        <!-- Liste des commandes -->
         <?php if (empty($commandes)): ?>
             <div class="empty-state">
                 <i class="bi bi-inbox"></i>
@@ -394,7 +474,6 @@ try {
         <?php else: ?>
             <?php foreach ($commandes as $cmd): ?>
             <div class="order-card">
-                <!-- En-tête commande -->
                 <div class="order-header">
                     <div>
                         <div class="order-id">
@@ -420,7 +499,6 @@ try {
                     </div>
                 </div>
 
-                <!-- Produits -->
                 <div class="order-products">
                     <?php foreach ($cmd['produits'] as $prod): ?>
                     <div class="order-product">
@@ -441,7 +519,6 @@ try {
                     <?php endforeach; ?>
                 </div>
 
-                <!-- Footer -->
                 <div class="order-footer">
                     <div class="order-total">
                         Total : <span><?php echo number_format($cmd['montant_total'], 2, ',', ' '); ?> DH</span>
@@ -463,35 +540,67 @@ try {
 
     </div>
 
-    <!-- ===== FOOTER ===== -->
     <?php include 'footer.php'; ?>
 
     <script>
-        // Fonction pour annuler une commande
-        function annulerCommande(id) {
-            if (confirm('Êtes-vous sûr de vouloir annuler cette commande ?')) {
-                fetch('annuler_commande.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: 'id_commande=' + id
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Commande annulée avec succès !');
-                        location.reload();
-                    } else {
-                        alert('Erreur : ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    alert('Une erreur est survenue.');
-                    console.error(error);
-                });
-            }
+        function showToast(msg, bg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.background = bg || 'var(--primary)';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
+
+        function annulerCommande(id) {
+            askConfirm(
+                'Annuler la commande ?',
+                'Cette action est irréversible. La commande sera définitivement annulée.',
+                () => {
+                    fetch('annuler_commande.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'id_commande=' + id
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast('✅ Commande annulée avec succès !', '#27ae60');
+                            setTimeout(() => location.reload(), 1200);
+                        } else {
+                            showToast('❌ Erreur : ' + data.message, '#c0392b');
+                        }
+                    })
+                    .catch(error => {
+                        showToast('❌ Une erreur est survenue.', '#c0392b');
+                        console.error(error);
+                    });
+                }
+            );
+        }
+
+        let _confirmCallback = null;
+
+        function askConfirm(title, msg, callback) {
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-msg').textContent = msg;
+            _confirmCallback = callback;
+            document.getElementById('confirm-modal').classList.add('show');
+        }
+
+        document.getElementById('confirm-ok').addEventListener('click', () => {
+            document.getElementById('confirm-modal').classList.remove('show');
+            if (_confirmCallback) _confirmCallback();
+        });
+
+        document.getElementById('confirm-cancel').addEventListener('click', () => {
+            document.getElementById('confirm-modal').classList.remove('show');
+            _confirmCallback = null;
+        });
+
+        document.getElementById('confirm-overlay').addEventListener('click', () => {
+            document.getElementById('confirm-modal').classList.remove('show');
+            _confirmCallback = null;
+        });
     </script>
 
 </body>

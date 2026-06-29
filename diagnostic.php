@@ -1,12 +1,10 @@
 <?php
-// Diagnostic complet
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 echo "<h1>🔍 DIAGNOSTIC COMPLET</h1>";
 
-// 1. Test session
 echo "<h2>1. Session</h2>";
 session_start();
 echo "<pre>";
@@ -19,7 +17,6 @@ if (!isset($_SESSION['user_role'])) {
     echo "✅ user_role = " . $_SESSION['user_role'] . "<br>";
 }
 
-// 2. Test inclusion
 echo "<h2>2. Inclusion connexion.php</h2>";
 $chemin = __DIR__ . '/connexion.php';
 echo "Chemin recherché : " . $chemin . "<br>";
@@ -30,7 +27,6 @@ if (file_exists($chemin)) {
     echo "✅ Fichier inclus<br>";
 } else {
     echo "❌ Fichier non trouvé<br>";
-    // Chercher dans d'autres dossiers
     echo "Recherche dans d'autres dossiers...<br>";
     $fichiers = glob(__DIR__ . '/*/connexion.php');
     foreach ($fichiers as $f) {
@@ -38,7 +34,6 @@ if (file_exists($chemin)) {
     }
 }
 
-// 3. Test PDO
 echo "<h2>3. Test PDO</h2>";
 if (isset($pdo) && $pdo instanceof PDO) {
     echo "✅ PDO défini<br>";
@@ -53,7 +48,6 @@ if (isset($pdo) && $pdo instanceof PDO) {
     echo "❌ PDO non défini ou incorrect<br>";
 }
 
-// 4. Test GET
 echo "<h2>4. Paramètre GET</h2>";
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 echo "ID reçu : " . $id . "<br>";
@@ -61,7 +55,6 @@ echo "ID reçu : " . $id . "<br>";
 if ($id > 0) {
     echo "✅ ID valide<br>";
     
-    // 5. Vérifier le produit
     echo "<h2>5. Vérification du produit</h2>";
     try {
         $stmt = $pdo->prepare("SELECT * FROM produit WHERE id_produit = ?");
@@ -74,7 +67,6 @@ if ($id > 0) {
             print_r($product);
             echo "</pre>";
             
-            // 6. Vérifier les références
             echo "<h2>6. Vérification des références</h2>";
             $tables = [
                 'alertes_stock' => 'id_produit',
@@ -98,13 +90,10 @@ if ($id > 0) {
                 }
             }
             
-            // 7. Tester la suppression (sans l'exécuter)
             echo "<h2>7. Test de suppression (simulé)</h2>";
             try {
                 $stmt = $pdo->prepare("DELETE FROM produit WHERE id_produit = ?");
                 echo "✅ Requête DELETE préparée avec succès<br>";
-                // Ne pas exécuter pour éviter la suppression réelle
-                // $stmt->execute([$id]);
             } catch (Exception $e) {
                 echo "❌ Erreur préparation DELETE : " . $e->getMessage() . "<br>";
             }
@@ -119,7 +108,6 @@ if ($id > 0) {
     echo "❌ ID invalide ou manquant<br>";
 }
 
-// 8. Infos serveur
 echo "<h2>8. Infos serveur</h2>";
 echo "PHP Version : " . phpversion() . "<br>";
 echo "Document Root : " . $_SERVER['DOCUMENT_ROOT'] . "<br>";

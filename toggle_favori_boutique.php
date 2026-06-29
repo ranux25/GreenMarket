@@ -2,7 +2,6 @@
 session_start();
 header('Content-Type: application/json');
 
-// SOLO CLIENTES
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'client') {
     echo json_encode(['success' => false, 'message' => 'Veuillez vous connecter en tant que client']);
     exit;
@@ -18,7 +17,6 @@ if (!$id_boutique) {
 }
 
 try {
-    // Verificar si la boutique existe
     $stmt = $pdo->prepare("SELECT id_boutique FROM boutique WHERE id_boutique = ?");
     $stmt->execute([$id_boutique]);
     if (!$stmt->fetch()) {
@@ -28,18 +26,15 @@ try {
     
     $id_client = $_SESSION['user_id'];
     
-    // Verificar si ya está en favoritos
     $stmt = $pdo->prepare("SELECT * FROM favoris_boutique WHERE id_client = ? AND id_boutique = ?");
     $stmt->execute([$id_client, $id_boutique]);
     $existe = $stmt->fetch();
     
     if ($existe) {
-        // Eliminar de favoritos
         $stmt = $pdo->prepare("DELETE FROM favoris_boutique WHERE id_client = ? AND id_boutique = ?");
         $stmt->execute([$id_client, $id_boutique]);
         echo json_encode(['success' => true, 'action' => 'removed']);
     } else {
-        // Agregar a favoritos
         $stmt = $pdo->prepare("INSERT INTO favoris_boutique (id_client, id_boutique) VALUES (?, ?)");
         $stmt->execute([$id_client, $id_boutique]);
         echo json_encode(['success' => true, 'action' => 'added']);

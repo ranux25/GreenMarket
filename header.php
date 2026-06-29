@@ -8,7 +8,6 @@ if (isset($_SESSION['user_role'])) {
     elseif ($_SESSION['user_role'] === 'admin')  $dashboardLink = 'dashboard_admin.php';
 }
 
-// Charger le nombre d'articles dans le panier depuis la BD
 $cartCount = 0;
 if (isset($_SESSION['user_id']) && isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'client') {
     if (!isset($pdo)) { include_once __DIR__ . '/connexion.php'; }
@@ -19,7 +18,6 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_role']) && $_SESSION['u
     } catch(PDOException $e) { $cartCount = 0; }
 }
 
-// Charger les notifications non lues depuis la BD (solo si está conectado)
 $notifications = [];
 $unreadCount   = 0;
 $mesBoutiques = [];
@@ -29,7 +27,6 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
     $role = $_SESSION['user_role'] ?? '';
     $col  = ($role === 'client') ? 'id_client' : 'id_producteur';
     
-    // Notifications (solo para clientes y productores)
     if ($role === 'client' || $role === 'producteur') {
         try {
             $reqN = $pdo->prepare("
@@ -52,17 +49,21 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
         } catch(PDOException $e) { $notifications = []; $unreadCount = 0; }
     }
     
-    // Récupérer les boutiques du producteur (solo si es producteur)
     if ($role === 'producteur') {
         try {
+            // Get real id_producteur via email
+            $reqProd = $pdo->prepare("SELECT id_producteur FROM producteur WHERE email = ?");
+            $reqProd->execute([$_SESSION['user_email'] ?? '']);
+            $rowProd = $reqProd->fetch(PDO::FETCH_ASSOC);
+            $real_id_producteur = $rowProd ? $rowProd['id_producteur'] : $_SESSION['user_id'];
+            
             $reqBoutiques = $pdo->prepare("SELECT id_boutique, nom_boutique FROM boutique WHERE id_producteur = ?");
-            $reqBoutiques->execute([$_SESSION['user_id']]);
+            $reqBoutiques->execute([$real_id_producteur]);
             $mesBoutiques = $reqBoutiques->fetchAll(PDO::FETCH_ASSOC);
         } catch(PDOException $e) { $mesBoutiques = []; }
     }
 }
 
-// Fonction pour obtenir l'icône selon le type de notification
 function getNotifIcon($type) {
     return match($type) {
         'evaluation' => 'bi-star-fill',
@@ -99,7 +100,6 @@ function getNotifTitle($type) {
     };
 }
 
-// Verificar si el usuario está conectado
 $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
 ?>
 <!DOCTYPE html>
@@ -107,12 +107,12 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>GreenMarket</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        /* ===== VARIABLES ===== */
         :root {
             --primary:        #5D0D18;
             --primary-light:  #7a1020;
@@ -178,7 +178,6 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
             --suggestions-muted:  #b8a896;
         }
 
-        /* ===== HEADER ===== */
         .hdr {
             position: sticky; top: 0; z-index: 1000;
             background: var(--header-bg);
@@ -193,13 +192,11 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
             gap: 1.25rem; padding: .85rem 2rem;
         }
 
-        /* Logo */
         .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; flex-shrink: 0; text-decoration: none; }
         .logo img { height: 38px; border-radius: 6px; object-fit: contain; }
         .logo-text { font-family: 'Playfair Display', serif; font-size: 1.45rem; font-weight: 700; color: var(--header-text); }
         .logo-accent { color: var(--secondary); }
 
-        /* Search */
         .search-wrap { flex: 1; position: relative; }
         .search-wrap input {
             width: 100%; padding: .65rem 1rem .65rem 2.8rem;
@@ -216,7 +213,6 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
         }
         [data-theme="dark"] .search-ico { color: var(--gold); }
 
-        /* Suggestions */
         .suggestions {
             position: absolute; top: calc(100% + 8px); left: 0; right: 0;
             background: var(--suggestions-bg); border: 1px solid var(--suggestions-border);
@@ -236,23 +232,19 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
         .sug-divider { border-top: 1px solid var(--suggestions-border); margin: .3rem 1rem; }
         .sug-empty { padding: 1.5rem; text-align: center; color: var(--suggestions-muted); font-size: .9rem; }
 
-        /* Nav links */
         .nav-links { display: flex; gap: 2rem; align-items: center; flex-shrink: 0; }
         .nav-links a { position: relative; color: var(--header-text); text-decoration: none; font-size: .93rem; font-weight: 500; opacity: .75; padding: .4rem 0; transition: opacity .2s; }
         .nav-links a:hover, .nav-links a.active { opacity: 1; }
         .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); width: 0; height: 4px; background: var(--secondary); border-radius: 50%; transition: width .25s; }
         .nav-links a:hover::after, .nav-links a.active::after { width: 4px; }
 
-        /* Actions */
         .hdr-actions { display: flex; align-items: center; gap: .9rem; flex-shrink: 0; }
         .icon-btn { position: relative; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,.08); color: var(--header-text); border: none; cursor: pointer; font-size: 1.25rem; text-decoration: none; transition: background .2s; }
         .icon-btn:hover { background: var(--header-bg-hover); }
 
-        /* Cart badge */
-        .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--gold); color: #fff; font-size: .68rem; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--header-bg); opacity: 0; transform: scale(.5); transition: all .3s cubic-bezier(.34,1.56,.64,1); }
-        .cart-badge.show { opacity: 1; transform: scale(1); }
+        .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--gold); color: #fff; font-size: .68rem; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--header-bg); visibility: hidden; }
+        .cart-badge.show { visibility: visible; }
 
-        /* Language */
         .lang-wrap { position: relative; }
         .lang-btn { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.08); border: none; color: var(--header-text); padding: .55rem .85rem; border-radius: 10px; cursor: pointer; font-size: .82rem; font-weight: 500; transition: background .2s; }
         .lang-btn:hover { background: var(--header-bg-hover); }
@@ -265,7 +257,6 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
         .lang-opt.active { background: rgba(93,13,24,.07); color: var(--primary); font-weight: 700; }
         [data-theme="dark"] .lang-opt.active { background: rgba(240,230,216,.1); color: var(--gold); }
 
-        /* ===== ACCOUNT DROPDOWN ===== */
         .acc-wrap { position: relative; }
         .acc-btn { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,.08); color: var(--header-text); border: none; cursor: pointer; font-size: 1.25rem; transition: background .2s; }
         .acc-btn:hover, .acc-wrap.open .acc-btn { background: var(--header-bg-hover); }
@@ -298,7 +289,6 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
         }
         .acc-wrap.open .acc-drop { display: flex; }
 
-        /* Tabs */
         .acc-tabs {
             display: flex;
             border-bottom: 1px solid var(--dropdown-divider);
@@ -329,7 +319,6 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
         .acc-panel { display: none; flex-direction: column; max-height: 450px; overflow-y: auto; }
         .acc-panel.active { display: flex; }
 
-        /* Panel Compte */
         .acc-head { padding: .7rem .85rem .65rem; }
         .acc-name { font-weight: 700; color: var(--dropdown-text); font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .acc-role { display: inline-block; font-size: .62rem; font-weight: 700; text-transform: uppercase; background: rgba(93,13,24,.1); color: var(--primary); padding: 1px 6px; border-radius: 4px; margin-top: 3px; }
@@ -342,7 +331,6 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
         .acc-menu-body a.logout:hover { background: #fff5f5; color: #c0392b; }
         [data-theme="dark"] .acc-menu-body a.logout:hover { background: #4a2d30; color: #e8b8b8; }
 
-        /* ===== SUB-MENU BOUTIQUES ===== */
         .boutique-submenu {
             padding: .2rem .5rem .5rem;
             border-top: 1px solid var(--dropdown-divider);
@@ -390,7 +378,6 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
             color: var(--gold);
         }
 
-        /* ===== NOTIFICATIONS PANEL STYLES ===== */
         .notif-header {
             display: flex; align-items: center; justify-content: space-between;
             padding: .65rem .85rem .5rem;
@@ -495,12 +482,10 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
         [data-theme="dark"] .notif-footer a { color: var(--gold); }
         .notif-footer a:hover { opacity: .75; }
 
-        /* Login link */
         .login-link { display: flex; align-items: center; gap: 8px; background: var(--secondary); color: var(--primary); padding: .6rem 1.25rem; border-radius: 10px; text-decoration: none; font-size: .88rem; font-weight: 700; transition: background .2s, box-shadow .2s; }
         .login-link:hover { background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,.1); }
         [data-theme="dark"] .login-link { color: #f0e6d8; }
 
-        /* Mobile */
         .mob-actions { display: none; align-items: center; gap: .65rem; }
         .mob-btn { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(255,255,255,.08); border: none; border-radius: 10px; color: var(--header-text); font-size: 1.4rem; cursor: pointer; transition: background .2s; }
         .mob-btn:hover { background: var(--header-bg-hover); }
@@ -579,14 +564,12 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
 <header class="hdr">
     <div class="hdr-inner">
 
-        <!-- Logo -->
         <a class="logo" href="accueil.php">
             <img src="IMAGES/logo.png" alt="GreenMarket"
                  onerror="this.src='https://placehold.co/40x40/5D0D18/ffffff?text=GM'">
             <span class="logo-text">Green<span class="logo-accent">Market</span></span>
         </a>
 
-        <!-- Búsqueda -->
         <div class="search-wrap">
             <i class="bi bi-search search-ico"></i>
             <input type="text" id="headerSearch"
@@ -595,7 +578,6 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
             <div class="suggestions" id="suggestions"></div>
         </div>
 
-        <!-- Nav desktop -->
         <nav class="nav-links">
             <a href="accueil.php"  class="<?= $currentPage==='accueil.php'  ? 'active':'' ?>">Accueil</a>
             <a href="store.php"    class="<?= $currentPage==='store.php'    ? 'active':'' ?>">Boutiques</a>
@@ -603,10 +585,8 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
             <a href="apropos.php"  class="<?= $currentPage==='apropos.php'  ? 'active':'' ?>">À propos</a>
         </nav>
 
-        <!-- Actions desktop -->
         <div class="hdr-actions">
 
-            <!-- Carrito (solo para clientes) -->
             <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] === 'client'): ?>
             <a href="panier.php" class="icon-btn" title="Mon panier">
                 <i class="bi bi-cart3"></i>
@@ -615,7 +595,6 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
             </a>
             <?php endif; ?>
 
-            <!-- Idioma -->
             <div class="lang-wrap" id="langWrap">
                 <button class="lang-btn" id="langBtn">
                     <span id="curFlag">🇫🇷</span>
@@ -630,7 +609,6 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
                 </div>
             </div>
 
-            <!-- Cuenta / Notificaciones (SOLO SI ESTÁ CONECTADO) -->
             <?php if ($isLoggedIn): ?>
             <div class="acc-wrap" id="accWrap">
                 <button class="acc-btn" id="accBtn" title="Mon compte">
@@ -645,7 +623,6 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
                 </button>
 
                 <div class="acc-drop" id="accDrop">
-                    <!-- Pestañas -->
                     <div class="acc-tabs">
                         <button class="acc-tab active" data-tab="compte">
                             <i class="bi bi-person"></i> Compte
@@ -658,7 +635,6 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
                         </button>
                     </div>
 
-                    <!-- Panel: Compte -->
                     <div class="acc-panel active" id="panel-compte">
                         <div class="acc-head">
                             <p class="acc-name"><?= htmlspecialchars($_SESSION['user_nom'] ?? 'Utilisateur') ?></p>
@@ -674,7 +650,6 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
                             <a href="favoris.php"><i class="bi bi-heart"></i> Mes favoris</a>
                             <?php endif; ?>
                             
-                            <!-- Mes boutiques para producteur -->
                             <?php if ($_SESSION['user_role'] === 'producteur'): ?>
                             <div class="boutique-submenu">
                                 <div class="sub-label"><i class="bi bi-shop"></i> Mes boutiques</div>
@@ -701,7 +676,6 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
                         </div>
                     </div>
 
-                    <!-- ===== Panel: Notifications ===== -->
                     <div class="acc-panel" id="panel-notifs">
                         <div class="notif-header">
                             <span><i class="bi bi-bell"></i> Notifications</span>
@@ -762,17 +736,15 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
                             </a>
                         </div>
                     </div>
-                </div><!-- /acc-drop -->
+                </div>
             </div>
             <?php else: ?>
-            <!-- Botón de conexión para usuarios no logueados -->
             <a href="signin.php" class="login-link">
                 <i class="bi bi-box-arrow-in-right"></i> Connexion
             </a>
             <?php endif; ?>
         </div>
 
-        <!-- Mobile actions -->
         <div class="mob-actions">
             <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] === 'client'): ?>
             <a href="panier.php" class="icon-btn">
@@ -786,7 +758,6 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
         </div>
     </div>
 
-    <!-- Menú móvil -->
     <div class="mob-menu" id="mobMenu">
         <div class="mob-inner">
             <a href="accueil.php"  class="mob-link <?= $currentPage==='accueil.php'  ? 'active':'' ?>"><i class="bi bi-house-door"></i> Accueil</a>
@@ -795,29 +766,13 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
             <a href="apropos.php"  class="mob-link <?= $currentPage==='apropos.php'  ? 'active':'' ?>"><i class="bi bi-info-circle"></i> À propos</a>
             <div class="mob-div"></div>
             
-            <!-- Mes boutiques mobile para productor -->
             <?php if ($isLoggedIn && $_SESSION['user_role'] === 'producteur'): ?>
-            <div style="padding:.2rem 1rem">
-                <p class="mob-sub-label"><i class="bi bi-shop"></i> Mes boutiques</p>
-                <?php if (!empty($mesBoutiques)): ?>
-                    <?php foreach ($mesBoutiques as $boutique): ?>
-                    <a href="gerer-boutique.php?id=<?= $boutique['id_boutique'] ?>" class="mob-boutique-link">
-                        <i class="bi bi-shop"></i> <?= htmlspecialchars($boutique['nom_boutique']) ?>
-                    </a>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <a href="creer-boutique.php" class="mob-boutique-link" style="color:var(--secondary);font-weight:600;">
-                        <i class="bi bi-plus-circle"></i> Créer ma boutique
-                    </a>
-                <?php endif; ?>
-                <a href="creer-boutique.php" class="mob-boutique-link" style="color:var(--secondary);">
-                    <i class="bi bi-plus-circle"></i> + Nouvelle boutique
-                </a>
-            </div>
+            <a href="dashboard_producteur.php" class="mob-link <?= $currentPage==='dashboard_producteur.php' ? 'active':'' ?>">
+                <i class="bi bi-shop"></i> Mes Boutiques
+            </a>
             <div class="mob-div"></div>
             <?php endif; ?>
             
-            <!-- Favoris para client -->
             <?php if ($isLoggedIn && $_SESSION['user_role'] === 'client'): ?>
             <a href="favoris.php" class="mob-link">
                 <i class="bi bi-heart" style="color:var(--gold);"></i> Mes favoris
@@ -858,7 +813,6 @@ $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
 <div id="google_translate_element" style="display:none"></div>
 
 <script>
-/* ===== Google Translate ===== */
 (function(){
     const s = document.createElement('script');
     s.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
@@ -886,7 +840,6 @@ function syncLangUI(lang){
 }
 syncLangUI(localStorage.getItem('gm_lang') || 'fr');
 
-/* ===== Menú móvil ===== */
 const mobToggle = document.getElementById('mobToggle');
 const mobMenu   = document.getElementById('mobMenu');
 const mobIcon   = document.getElementById('mobIcon');
@@ -896,14 +849,12 @@ mobToggle?.addEventListener('click', e => {
     mobIcon.className = open ? 'bi bi-x-lg' : 'bi bi-list';
 });
 
-/* ===== Account dropdown ===== */
 const accWrap = document.getElementById('accWrap');
 document.getElementById('accBtn')?.addEventListener('click', e => {
     e.stopPropagation();
     accWrap.classList.toggle('open');
 });
 
-/* ===== Tabs cuenta/notificaciones ===== */
 document.querySelectorAll('.acc-tab').forEach(tab => {
     tab.addEventListener('click', () => {
         document.querySelectorAll('.acc-tab').forEach(t => t.classList.remove('active'));
@@ -913,7 +864,6 @@ document.querySelectorAll('.acc-tab').forEach(tab => {
     });
 });
 
-/* ===== Marcar notificación como leída ===== */
 function markRead(el, link) {
     if(el.classList.contains('unread')) {
         el.classList.remove('unread');
@@ -938,7 +888,6 @@ document.querySelectorAll('.notif-item').forEach(item => {
     });
 });
 
-/* ===== Marcar todas como leídas ===== */
 document.getElementById('markAllRead')?.addEventListener('click', function() {
     document.querySelectorAll('.notif-item.unread').forEach(el => {
         el.classList.remove('unread');
@@ -966,7 +915,6 @@ function updateNotifCount(delta, reset = false) {
     }
 }
 
-/* ===== Idioma ===== */
 const langWrap = document.getElementById('langWrap');
 document.getElementById('langBtn')?.addEventListener('click', e => {
     e.stopPropagation(); langWrap.classList.toggle('open');
@@ -982,7 +930,6 @@ document.querySelectorAll('.mob-lang-opt').forEach(btn => {
     btn.addEventListener('click', () => applyLang(btn.dataset.lang));
 });
 
-/* ===== Cerrar al clic exterior ===== */
 document.addEventListener('click', e => {
     if(accWrap  && !accWrap.contains(e.target))  accWrap.classList.remove('open');
     if(langWrap && !langWrap.contains(e.target)) langWrap.classList.remove('open');
@@ -992,7 +939,6 @@ document.addEventListener('click', e => {
     }
 });
 
-/* ===== Búsqueda ===== */
 const searchInput = document.getElementById('headerSearch');
 const suggestions = document.getElementById('suggestions');
 let searchTimer = null, activeIdx = -1;

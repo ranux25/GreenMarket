@@ -2,7 +2,6 @@
 session_start();
 include('connexion.php');
 
-// 🔥 OBTENER EL ID DE LA URL
 $id_boutique = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if ($id_boutique <= 0) {
@@ -14,7 +13,6 @@ $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
 $isClient = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'client';
 $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
-// Función para imágenes
 function getImageUrl($image) {
     if (empty($image)) {
         return 'IMAGES/default-boutique.jpg';
@@ -34,7 +32,6 @@ function getImageUrl($image) {
 }
 
 try {
-    // 🔥 CONSULTA DIRECTA - SOLO POR ID DE LA URL
     $stmt = $pdo->prepare("
         SELECT b.id_boutique, b.nom_boutique, b.image, b.description, b.date_creation,
                b.id_producteur, b.est_valide_par_admin,
@@ -52,7 +49,6 @@ try {
         exit;
     }
     
-    // Récupérer la categoría
     $nom_categorie = null;
     if (!empty($boutique['id_categorie'])) {
         $stmtC = $pdo->prepare("SELECT nom_categorie FROM categorie WHERE id_categorie = ?");
@@ -64,7 +60,6 @@ try {
     }
     $boutique['nom_categorie'] = $nom_categorie;
     
-    // Récupérer los productos de esta boutique
     $stmt = $pdo->prepare("
         SELECT p.*
         FROM produit p
@@ -76,8 +71,6 @@ try {
     $stmt->execute([$id_boutique]);
     $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // ===== EVALUACIONES DE LA BOUTIQUE =====
-    // Obtener evaluaciones de la boutique
     $stmtEvals = $pdo->prepare("
         SELECT eb.*, c.nom_client
         FROM evaluer_boutique eb
@@ -88,7 +81,6 @@ try {
     $stmtEvals->execute([$id_boutique]);
     $evaluaciones_boutique = $stmtEvals->fetchAll(PDO::FETCH_ASSOC);
     
-    // Calcular promedio de notas de la boutique
     $promedio_boutique = 0;
     $total_eval_boutique = count($evaluaciones_boutique);
     if ($total_eval_boutique > 0) {
@@ -96,7 +88,6 @@ try {
         $promedio_boutique = round($suma / $total_eval_boutique, 1);
     }
     
-    // Verificar si el cliente ya evaluó esta boutique
     $ya_evaluado_boutique = false;
     $evaluacion_cliente_boutique = null;
     if ($isClient && $userId) {
@@ -108,7 +99,6 @@ try {
         $ya_evaluado_boutique = $evaluacion_cliente_boutique ? true : false;
     }
     
-    // Verificar si el cliente compró algún producto de esta boutique
     $a_achete_boutique = false;
     if ($isClient && $userId) {
         $stmtCheck = $pdo->prepare("
@@ -121,7 +111,6 @@ try {
         $a_achete_boutique = $stmtCheck->fetchColumn() > 0;
     }
     
-    // Estadísticas
     $stmt = $pdo->prepare("
         SELECT 
             COUNT(*) as total_produits,
@@ -137,7 +126,6 @@ try {
     $stats = $stmt->fetch(PDO::FETCH_ASSOC);
     
 } catch(PDOException $e) {
-    error_log("Error info-store: " . $e->getMessage());
     header('Location: store.php?error=bd');
     exit;
 }
@@ -210,7 +198,6 @@ function renderStarsSize($rating, $size = '1rem') {
   .add-to-cart-btn:hover { background: var(--primary-light); }
   .add-to-cart-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   
-  /* ⭐ ESTILOS PARA EVALUACIÓN DE BOUTIQUE */
   .star-rating {
     display: inline-flex;
     flex-direction: row-reverse;
@@ -258,12 +245,70 @@ function renderStarsSize($rating, $size = '1rem') {
     .store-info-card { margin-top: -30px; }
     .evaluation-section { padding: 1rem; }
   }
+
+  #confirm-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    align-items: center;
+    justify-content: center;
+  }
+  #confirm-modal.show { display: flex; }
+  #confirm-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(3px);
+  }
+  #confirm-box {
+    position: relative;
+    background: #fff;
+    border-radius: 20px;
+    padding: 2rem 1.8rem 1.5rem;
+    max-width: 340px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    text-align: center;
+    animation: modalIn 0.25s cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.88) translateY(20px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  #confirm-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+  #confirm-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.4rem;
+  }
+  #confirm-msg {
+    font-size: 0.88rem;
+    color: var(--text-light);
+    margin-bottom: 1.4rem;
+  }
+  .confirm-btns { display: flex; gap: 0.8rem; justify-content: center; }
+  .confirm-btns button {
+    flex: 1;
+    padding: 0.65rem 1rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  #confirm-cancel { background: #f5f0e8; color: var(--text-dark); }
+  #confirm-cancel:hover { opacity: 0.8; }
+  #confirm-ok { background: #c0392b; color: #fff; }
+  #confirm-ok:hover { background: #a93226; }
 </style>
 </head>
 <body>
 
 <?php 
-// 🔥 IMPORTANTE: Guardar la variable $boutique antes de incluir header.php
 $boutique_temp = $boutique;
 $id_boutique_temp = $id_boutique;
 $stats_temp = $stats;
@@ -274,7 +319,6 @@ $userId_temp = $userId;
 
 include 'header.php'; 
 
-// 🔥 RESTAURAR la variable después de header.php
 $boutique = $boutique_temp;
 $id_boutique = $id_boutique_temp;
 $stats = $stats_temp;
@@ -284,7 +328,19 @@ $isClient = $isClient_temp;
 $userId = $userId_temp;
 ?>
 
-<!-- BANNER DE LA BOUTIQUE -->
+<div id="confirm-modal">
+  <div id="confirm-overlay"></div>
+  <div id="confirm-box">
+    <div id="confirm-icon">⚠️</div>
+    <div id="confirm-title"></div>
+    <div id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button id="confirm-cancel">Annuler</button>
+      <button id="confirm-ok">Confirmer</button>
+    </div>
+  </div>
+</div>
+
 <div class="store-banner-section">
     <?php 
     $banner_img = getImageUrl($boutique['image'] ?? '');
@@ -362,15 +418,11 @@ $userId = $userId_temp;
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- 📝 SECTION D'ÉVALUATION DE LA BOUTIQUE    -->
-    <!-- ========================================== -->
     <div class="evaluation-section reveal">
         <h2 class="text-xl font-bold mb-4" style="color: var(--primary);">
             <i class="bi bi-star"></i> Avis sur la boutique
         </h2>
         
-        <!-- Statistiques des évaluations -->
         <div class="flex items-center gap-4 mb-4 flex-wrap">
             <div class="flex items-center gap-2">
                 <span class="text-2xl font-bold text-[var(--gold)]"><?php echo $promedio_boutique > 0 ? $promedio_boutique : '4.5'; ?></span>
@@ -381,7 +433,6 @@ $userId = $userId_temp;
             </div>
         </div>
         
-        <!-- FORMULAIRE D'ÉVALUATION DE LA BOUTIQUE -->
         <?php if ($isClient && $a_achete_boutique): ?>
             <div class="bg-[var(--bg)] rounded-2xl p-4 border border-[#e8ddd0] mb-6">
                 <h3 class="font-bold text-md mb-2" style="color: var(--primary);">
@@ -435,7 +486,6 @@ $userId = $userId_temp;
             </div>
         <?php endif; ?>
         
-        <!-- 📋 LISTE DES ÉVALUATIONS DE LA BOUTIQUE -->
         <div id="evaluationsBoutiqueList">
             <?php if (empty($evaluaciones_boutique)): ?>
                 <div class="text-center py-6 bg-white rounded-2xl border border-[#e8ddd0]">
@@ -461,9 +511,6 @@ $userId = $userId_temp;
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- 📦 PRODUITS DE LA BOUTIQUE                 -->
-    <!-- ========================================== -->
     <div class="mt-12 reveal">
         <h2 class="text-2xl font-bold mb-6" style="color: var(--primary);">
             <i class="bi bi-box-seam"></i> Nos produits artisanaux
@@ -498,7 +545,8 @@ $userId = $userId_temp;
                         </div>
                         <div class="stars mt-2"><?php echo renderStars(4.5); ?></div>
                         
-                        <button class="add-to-cart-btn" 
+                        <button class="add-to-cart-btn"
+                                data-id="<?php echo $produit['id_produit']; ?>"
                                 onclick="event.stopPropagation(); addToCart(<?php echo $produit['id_produit']; ?>, '<?php echo addslashes($produit['nom_produit']); ?>')"
                                 <?php echo $produit['stock_quantite'] <= 0 ? 'disabled' : ''; ?>>
                             <?php echo $produit['stock_quantite'] <= 0 ? '❌ Indisponible' : '🛒 Ajouter au panier'; ?>
@@ -535,13 +583,16 @@ function showToast(msg, isError = false) {
 }
 
 function updateCartCount() {
-    const badge = document.getElementById('cart-count');
     <?php if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'client'): ?>
     fetch('get_cart_count.php')
         .then(res => res.json())
         .then(data => {
-            if (badge && data.total !== undefined) {
-                badge.textContent = data.total;
+            if (data.total !== undefined) {
+                const badges = document.querySelectorAll('.cart-badge');
+                badges.forEach(badge => {
+                    badge.textContent = data.total;
+                    if (data.total > 0) badge.classList.add('show');
+                });
             }
         })
         .catch(() => {});
@@ -554,19 +605,20 @@ function addToCart(productId, productName) {
         setTimeout(() => { window.location.href = 'signin.php'; }, 1500);
         return;
     <?php endif; ?>
-    
+
     <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'client'): ?>
         showToast('⚠️ Seuls les clients peuvent acheter', true);
         return;
     <?php endif; ?>
-    
-    const buttons = document.querySelectorAll('.add-to-cart-btn');
-    buttons.forEach(btn => {
-        if (btn.textContent.includes('Ajouter')) {
-            btn.textContent = '⏳ Ajout...';
-            btn.disabled = true;
-        }
-    });
+
+    const btn = document.querySelector(`.add-to-cart-btn[data-id="${productId}"]`);
+    if (btn && btn.disabled && btn.textContent === '⏳ Ajout...') return;
+
+    if (btn) {
+        btn.textContent = '⏳ Ajout...';
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+    }
 
     const formData = new FormData();
     formData.append('id_produit', productId);
@@ -578,33 +630,42 @@ function addToCart(productId, productName) {
     })
     .then(res => res.json())
     .then(data => {
-        buttons.forEach(btn => {
-            btn.textContent = '🛒 Ajouter au panier';
-            btn.disabled = false;
-        });
-
         if (data.success) {
             showToast(`✓ ${productName} ajouté au panier !`);
-            const badge = document.getElementById('cart-count');
-            if (badge && data.total_panier !== undefined) {
+            
+            const badges = document.querySelectorAll('.cart-badge');
+            badges.forEach(badge => {
                 badge.textContent = data.total_panier;
+                if (data.total_panier > 0) badge.classList.add('show');
+            });
+
+            if (btn) {
+                btn.textContent = '✓ Ajouté';
+                btn.style.opacity = '1';
+                setTimeout(() => {
+                    btn.textContent = '🛒 Ajouter au panier';
+                    btn.disabled = false;
+                }, 2000);
             }
         } else {
             showToast(data.message || '❌ Erreur lors de l\'ajout', true);
+            if (btn) {
+                btn.textContent = '🛒 Ajouter au panier';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
         }
     })
-    .catch(error => {
-        buttons.forEach(btn => {
+    .catch(() => {
+        showToast('❌ Erreur de connexion au serveur', true);
+        if (btn) {
             btn.textContent = '🛒 Ajouter au panier';
             btn.disabled = false;
-        });
-        showToast('❌ Erreur de connexion au serveur', true);
+            btn.style.opacity = '1';
+        }
     });
 }
 
-// ============================================
-// ⭐ ÉVALUATION DE LA BOUTIQUE
-// ============================================
 function submitEvaluationBoutique(event) {
     event.preventDefault();
     
@@ -659,9 +720,12 @@ function deleteStoreAdmin(id, name) {
         showToast('❌ Non autorisé', true);
         return;
     <?php endif; ?>
-    
-    if (confirm('⚠️ Êtes-vous sûr de vouloir supprimer la boutique "' + name + '" ?\n\nCette action supprimera également tous ses produits et est irréversible.')) {
-        if (confirm('Confirmation finale : Voulez-vous vraiment supprimer cette boutique ?')) {
+
+    document.getElementById('confirm-icon').textContent = '🗑️';
+    askConfirm(
+        'Supprimer "' + name + '" ?',
+        'Cette action supprimera également tous ses produits et est irréversible.',
+        () => {
             fetch('supprimer_boutique_admin.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -678,17 +742,36 @@ function deleteStoreAdmin(id, name) {
             })
             .catch(() => showToast('❌ Erreur de connexion au serveur', true));
         }
-    }
+    );
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     updateCartCount();
     initReveal();
-    
-    const form = document.getElementById('evaluationBoutiqueForm');
-    if (form) {
-        console.log('✅ Formulaire d\'évaluation boutique trouvé');
-    }
+});
+
+let _confirmCallback = null;
+
+function askConfirm(title, msg, callback) {
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-msg').textContent = msg;
+    _confirmCallback = callback;
+    document.getElementById('confirm-modal').classList.add('show');
+}
+
+document.getElementById('confirm-ok').addEventListener('click', () => {
+    document.getElementById('confirm-modal').classList.remove('show');
+    if (_confirmCallback) _confirmCallback();
+});
+
+document.getElementById('confirm-cancel').addEventListener('click', () => {
+    document.getElementById('confirm-modal').classList.remove('show');
+    _confirmCallback = null;
+});
+
+document.getElementById('confirm-overlay').addEventListener('click', () => {
+    document.getElementById('confirm-modal').classList.remove('show');
+    _confirmCallback = null;
 });
 </script>
 </body>

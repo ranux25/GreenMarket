@@ -16,18 +16,16 @@
   <link rel="stylesheet" href="legal.css">
 
   <style>
-    /* On garde uniquement les petits détails introuvables dans tes CSS globaux */
     body {
       font-family: 'Jost', sans-serif;
     }
     .brand-title, .legal-title {
       font-family: 'Playfair Display', serif;
-      color: #5D0D18; /* Ton bordeaux fétiche */
+      color: #5D0D18;
     }
     .legal-card {
       box-shadow: 0 15px 40px rgba(93, 13, 24, 0.05) !important;
     }
-    /* Barre de défilement fine et personnalisée pour le texte */
     .legal-scroll::-webkit-scrollbar {
       width: 6px;
     }
@@ -36,7 +34,7 @@
       border-radius: 10px;
     }
     .legal-scroll::-webkit-scrollbar-thumb {
-      background: #9FB2AC; /* Ton vert sauge */
+      background: #9FB2AC;
       border-radius: 10px;
     }
     .section-heading {

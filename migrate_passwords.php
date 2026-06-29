@@ -3,12 +3,10 @@ require_once 'connexion.php';
 
 echo "=== Migration des mots de passe vers password_hash ===\n\n";
 
-// 1. Migration des administrateurs
 $stmt = $pdo->query("SELECT id_admin, mot_de_passe FROM administrateur");
 while ($row = $stmt->fetch()) {
     $current_pwd = $row['mot_de_passe'];
-    
-    // Vérifier si ce n'est déjà un hash bcrypt
+
     if (password_get_info($current_pwd)['algo'] === 0) {
         $hashed = password_hash($current_pwd, PASSWORD_DEFAULT);
         $update = $pdo->prepare("UPDATE administrateur SET mot_de_passe = ? WHERE id_admin = ?");
@@ -19,11 +17,10 @@ while ($row = $stmt->fetch()) {
     }
 }
 
-// 2. Migration des clients
 $stmt = $pdo->query("SELECT id_client, mot_de_passe FROM client");
 while ($row = $stmt->fetch()) {
     $current_pwd = $row['mot_de_passe'];
-    
+
     if (password_get_info($current_pwd)['algo'] === 0) {
         $hashed = password_hash($current_pwd, PASSWORD_DEFAULT);
         $update = $pdo->prepare("UPDATE client SET mot_de_passe = ? WHERE id_client = ?");
@@ -34,11 +31,10 @@ while ($row = $stmt->fetch()) {
     }
 }
 
-// 3. Migration des producteurs
 $stmt = $pdo->query("SELECT id_producteur, mot_de_passe FROM producteur");
 while ($row = $stmt->fetch()) {
     $current_pwd = $row['mot_de_passe'];
-    
+
     if (password_get_info($current_pwd)['algo'] === 0) {
         $hashed = password_hash($current_pwd, PASSWORD_DEFAULT);
         $update = $pdo->prepare("UPDATE producteur SET mot_de_passe = ? WHERE id_producteur = ?");

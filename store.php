@@ -2,14 +2,11 @@
 session_start();
 include('connexion.php');
 
-// Detectar tema guardado (por defecto claro)
 $theme = $_COOKIE['theme'] ?? 'light';
 
-// Verificar si el usuario es admin
 $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
 $isClient = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'client';
 
-// Función para normalizar URLs de imágenes
 function normalizeImageUrl($url) {
     if (empty($url)) {
         return 'IMAGES/default-boutique.jpg';
@@ -22,7 +19,6 @@ function normalizeImageUrl($url) {
     return $url;
 }
 
-// Récupérer les boutiques desde la base de données con su catégorie
 try {
     $stmt = $pdo->prepare("
         SELECT b.*, p.nom_entreprise as producteur_nom, 
@@ -31,24 +27,22 @@ try {
         FROM boutique b
         JOIN producteur p ON b.id_producteur = p.id_producteur
         LEFT JOIN categorie c ON b.id_categorie = c.id_categorie
-        WHERE p.est_valide_par_admin = 1
+        WHERE p.est_valide_par_admin = 1 AND b.statut = 'valide'
+        AND b.statut = 'valide'
         ORDER BY b.date_creation DESC
     ");
     $stmt->execute();
     $boutiques_db = $stmt->fetchAll();
     
-    // Récupérer todas las categorías disponibles
     $stmt = $pdo->query("SELECT * FROM categorie ORDER BY nom_categorie");
     $categories_db = $stmt->fetchAll();
     
-    // Récupérer las estadísticas
     $stmt = $pdo->query("SELECT COUNT(*) as total FROM boutique b JOIN producteur p ON b.id_producteur = p.id_producteur WHERE p.est_valide_par_admin = 1");
     $total_boutiques = $stmt->fetch()['total'];
     
     $stmt = $pdo->query("SELECT COUNT(*) as total FROM produit WHERE est_valide_par_admin = 1");
     $total_produits = $stmt->fetch()['total'];
     
-    // 🔥 Si el cliente está conectado, obtener sus favoritos de boutiques
     $favoris_boutiques_ids = [];
     if ($isClient) {
         try {
@@ -70,7 +64,6 @@ try {
     $favoris_boutiques_ids = [];
 }
 
-// Convertir les données pour le JavaScript
 $boutiques_json = [];
 foreach ($boutiques_db as $b) {
     $banner_url = normalizeImageUrl($b['image']);
@@ -93,7 +86,7 @@ foreach ($boutiques_db as $b) {
         'producerName' => $b['producteur_nom'],
         'location' => 'Maroc',
         'since' => date('Y', strtotime($b['date_creation'])),
-        'isFavori' => in_array($b['id_boutique'], $favoris_boutiques_ids) // 🔥 Estado del favorito
+        'isFavori' => in_array($b['id_boutique'], $favoris_boutiques_ids)
     ];
 }
 ?>
@@ -625,7 +618,6 @@ foreach ($boutiques_db as $b) {
   }
   .stars { color: #e0a82e; font-size: 0.7rem; }
 
-  /* 🔥 Botón de favoritos */
   .favori-btn {
     position: absolute;
     top: 0.5rem;
@@ -776,13 +768,46 @@ foreach ($boutiques_db as $b) {
       flex-wrap: wrap;
     }
   }
+  #confirm-modal {
+    display: none; position: fixed; inset: 0; z-index: 9998;
+    align-items: center; justify-content: center;
+  }
+  #confirm-modal.show { display: flex; }
+  #confirm-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.45); backdrop-filter: blur(3px);
+  }
+  #confirm-box {
+    position: relative; background: #fff; border-radius: 20px;
+    padding: 2rem 1.8rem 1.5rem; max-width: 340px; width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2); text-align: center;
+    animation: modalIn 0.25s cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.88) translateY(20px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  #confirm-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+  #confirm-title {
+    font-family: 'Playfair Display', serif; font-size: 1.15rem;
+    font-weight: 700; color: #2C2C2C; margin-bottom: 0.4rem;
+  }
+  #confirm-msg { font-size: 0.88rem; color: #6B6B6B; margin-bottom: 1.4rem; }
+  .confirm-btns { display: flex; gap: 0.8rem; justify-content: center; }
+  .confirm-btns button {
+    flex: 1; padding: 0.65rem 1rem; border-radius: 999px;
+    font-weight: 700; font-size: 0.9rem; cursor: pointer; border: none; transition: all 0.2s;
+  }
+  #confirm-cancel { background: #f5f0e8; color: #2C2C2C; }
+  #confirm-cancel:hover { opacity: 0.8; }
+  #confirm-ok { background: #c0392b; color: #fff; }
+  #confirm-ok:hover { background: #a93226; }
 </style>
 </head>
 <body data-active-page="store">
 
 <?php include 'header.php'; ?>
 
-<!-- HEADER SECTION STORE -->
 <div class="page-header">
   <div class="header-inner">
     <div class="header-eyebrow">🇲🇦 Artisanat &amp; Traditions marocaines</div>
@@ -796,7 +821,6 @@ foreach ($boutiques_db as $b) {
   </div>
 </div>
 
-<!-- SEARCH BAR -->
 <div class="search-bar-wrap">
   <div class="search-input-wrapper">
     <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
@@ -830,7 +854,6 @@ foreach ($boutiques_db as $b) {
   </select>
 </div>
 
-<!-- MAIN CONTENT -->
 <div class="main-layout">
   <aside class="sidebar">
     <div class="sidebar-section reveal-left">
@@ -866,8 +889,20 @@ foreach ($boutiques_db as $b) {
 
 <div class="toast" id="toast"></div>
 
+<div id="confirm-modal">
+  <div id="confirm-overlay"></div>
+  <div id="confirm-box">
+    <div id="confirm-icon">🗑️</div>
+    <div id="confirm-title"></div>
+    <div id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button id="confirm-cancel">Annuler</button>
+      <button id="confirm-ok">Confirmer</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// Données PHP converties en JavaScript
 const boutiquesFromDB = <?php echo json_encode($boutiques_json); ?>;
 const categoriesFromDB = <?php echo json_encode($categories_db); ?>;
 const isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
@@ -877,7 +912,6 @@ console.log('Boutiques chargées:', boutiquesFromDB.length);
 console.log('Catégories chargées:', categoriesFromDB.length);
 console.log('isClient:', isClient);
 
-// 🔥 Mostrar estado de favoritos en consola
 if (isClient) {
     const favoris = boutiquesFromDB.filter(s => s.isFavori).map(s => s.id);
     console.log('Boutiques favoris ID:', favoris);
@@ -885,12 +919,10 @@ if (isClient) {
 
 let stores = boutiquesFromDB.length > 0 ? boutiquesFromDB : [];
 
-// ====== PAGINATION VARIABLES ======
 let currentPage = 1;
 let perPage = 12;
 let filteredStores = [];
 
-// Initialiser les catégories depuis la base de données
 let categories = [];
 if (categoriesFromDB.length > 0) {
     categories = categoriesFromDB.map(c => ({
@@ -946,7 +978,6 @@ function renderStars(rating) {
     return '★'.repeat(full) + '☆'.repeat(empty);
 }
 
-// ====== TOGGLE FAVORI BOUTIQUE ======
 function toggleFavoriBoutique(boutiqueId, button) {
     <?php if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'client'): ?>
         showToast('⚠️ Veuillez vous connecter en tant que client', true);
@@ -957,7 +988,6 @@ function toggleFavoriBoutique(boutiqueId, button) {
     const icon = button.querySelector('i');
     const isFavori = icon.classList.contains('bi-heart-fill');
     
-    // Cambio optimista
     if (isFavori) {
         icon.className = 'bi bi-heart';
         button.style.color = 'var(--text-light)';
@@ -981,7 +1011,6 @@ function toggleFavoriBoutique(boutiqueId, button) {
                 button.style.color = '#c0392b';
                 button.classList.add('active');
                 showToast('❤️ Boutique ajoutée aux favoris');
-                // Actualizar el estado en el array
                 const store = stores.find(s => s.id === boutiqueId);
                 if (store) store.isFavori = true;
             } else {
@@ -989,12 +1018,10 @@ function toggleFavoriBoutique(boutiqueId, button) {
                 button.style.color = 'var(--text-light)';
                 button.classList.remove('active');
                 showToast('Boutique retirée des favoris');
-                // Actualizar el estado en el array
                 const store = stores.find(s => s.id === boutiqueId);
                 if (store) store.isFavori = false;
             }
         } else {
-            // Revertir si hay error
             if (isFavori) {
                 icon.className = 'bi bi-heart-fill';
                 button.style.color = '#c0392b';
@@ -1008,7 +1035,6 @@ function toggleFavoriBoutique(boutiqueId, button) {
         }
     })
     .catch(() => {
-        // Revertir si hay error de conexión
         if (isFavori) {
             icon.className = 'bi bi-heart-fill';
             button.style.color = '#c0392b';
@@ -1022,7 +1048,6 @@ function toggleFavoriBoutique(boutiqueId, button) {
     });
 }
 
-// ====== RENDER CATEGORIES ======
 function renderCategories() {
     const list = document.getElementById('categoryList');
     if (!list) return;
@@ -1061,7 +1086,6 @@ function renderCategories() {
     });
 }
 
-// ====== FILTER STORES ======
 function filterStores() {
     const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
     const sortValue = document.getElementById('sortFilter')?.value || '';
@@ -1085,15 +1109,16 @@ function filterStores() {
     document.getElementById('statStores').textContent = filteredStores.length;
 }
 
-// ====== ADMIN: SUPPRIMER BOUTIQUE ======
 function deleteStoreAdmin(storeId, storeName) {
     if (!isAdmin) {
         showToast('❌ Non autorisé', true);
         return;
     }
-    
-    if (confirm('⚠️ Êtes-vous sûr de vouloir supprimer la boutique "' + storeName + '" ?\n\nCette action supprimera également tous ses produits et est irréversible.')) {
-        if (confirm('Confirmation finale : Voulez-vous vraiment supprimer cette boutique ?')) {
+
+    askConfirm(
+        'Supprimer "' + storeName + '" ?',
+        'Cette action supprimera également tous ses produits et est irréversible.',
+        () => {
             fetch('supprimer_boutique_admin.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -1112,10 +1137,9 @@ function deleteStoreAdmin(storeId, storeName) {
             })
             .catch(() => showToast('❌ Erreur de connexion au serveur', true));
         }
-    }
+    );
 }
 
-// ====== RENDER STORES ======
 function renderStores() {
     const grid = document.getElementById('storesGrid');
     if (!grid) return;
@@ -1152,7 +1176,6 @@ function renderStores() {
             `;
         }
         
-        // 🔥 Botón de favoritos con estado inicial desde PHP
         let favoriBtn = '';
         if (isClient) {
             const isFavori = s.isFavori || false;
@@ -1204,7 +1227,6 @@ function renderStores() {
     renderPagination(currentPage, totalPages);
 }
 
-// ====== RENDER PAGINATION ======
 function renderPagination(activePage, totalPages) {
     const wrapper = document.getElementById('paginationWrapper');
     if (!wrapper) return;
@@ -1261,7 +1283,6 @@ function goToPage(page) {
     document.querySelector('.stores-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ====== ADD CATEGORY ======
 function addCategory() {
     const name = document.getElementById('catNameInput').value.trim();
     const icon = document.getElementById('catIconInput').value.trim() || '📦';
@@ -1306,7 +1327,6 @@ function addCategory() {
     });
 }
 
-// ====== SCROLL REVEAL ======
 function initReveal() {
     const elements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
     const observer = new IntersectionObserver((entries) => {
@@ -1317,7 +1337,6 @@ function initReveal() {
     elements.forEach(el => observer.observe(el));
 }
 
-// ====== ÉVÉNEMENTS ======
 document.getElementById('searchInput')?.addEventListener('input', () => {
     currentPage = 1;
     renderStores();
@@ -1367,12 +1386,35 @@ if (perPageFilter) {
     });
 }
 
-// Initialisation
 renderCategories();
 renderStores();
 initReveal();
 
 document.getElementById('statProducts').textContent = stores.reduce((sum, s) => sum + (s.products || 0), 0);
+
+let _confirmCallback = null;
+
+function askConfirm(title, msg, callback) {
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-msg').textContent = msg;
+    _confirmCallback = callback;
+    document.getElementById('confirm-modal').classList.add('show');
+}
+
+document.getElementById('confirm-ok').addEventListener('click', () => {
+    document.getElementById('confirm-modal').classList.remove('show');
+    if (_confirmCallback) _confirmCallback();
+});
+
+document.getElementById('confirm-cancel').addEventListener('click', () => {
+    document.getElementById('confirm-modal').classList.remove('show');
+    _confirmCallback = null;
+});
+
+document.getElementById('confirm-overlay').addEventListener('click', () => {
+    document.getElementById('confirm-modal').classList.remove('show');
+    _confirmCallback = null;
+});
 </script>
 </body>
 </html>

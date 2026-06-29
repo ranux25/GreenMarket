@@ -2,7 +2,6 @@
 session_start();
 include('connexion.php');
 
-// Verificar que el usuario esté logueado y sea cliente
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'client') {
     header("Location: signin.php");
     exit();
@@ -11,7 +10,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'client') {
 $theme = $_COOKIE['theme'] ?? 'light';
 $id_client = $_SESSION['user_id'];
 
-// Récupérer los favoritos del cliente (productos)
 try {
     $stmt = $pdo->prepare("
         SELECT f.id_produit, f.id_client,
@@ -34,7 +32,6 @@ try {
     $total_favoris_produits = 0;
 }
 
-// Récupérer los favoritos de tiendas
 try {
     $stmt = $pdo->prepare("
         SELECT fb.id_boutique,
@@ -57,7 +54,6 @@ try {
     $total_favoris_boutiques = 0;
 }
 
-// Récupérer le nombre d'articles dans le panier
 $cartCount = 0;
 try {
     $reqCart = $pdo->prepare("SELECT COALESCE(SUM(quantite), 0) as total FROM panier WHERE id_client = ?");
@@ -65,7 +61,6 @@ try {
     $cartCount = (int)$reqCart->fetch(PDO::FETCH_ASSOC)['total'];
 } catch(PDOException $e) { $cartCount = 0; }
 
-// Funciones
 function formatPrice($price) {
     return number_format($price, 0, ',', ' ') . ' DH';
 }
@@ -322,7 +317,6 @@ function getImageUrl($image) {
             color: var(--bg);
         }
 
-        /* Store Cards */
         .stores-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -436,11 +430,83 @@ function getImageUrl($image) {
             }
             .container { padding: 1rem; }
         }
+
+        #confirm-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            align-items: center;
+            justify-content: center;
+        }
+        #confirm-modal.show { display: flex; }
+        #confirm-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(3px);
+        }
+        #confirm-box {
+            position: relative;
+            background: var(--bg-card, #fff);
+            border-radius: 20px;
+            padding: 2rem 1.8rem 1.5rem;
+            max-width: 360px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            text-align: center;
+            animation: modalIn 0.25s cubic-bezier(.22,1,.36,1);
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.88) translateY(20px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        #confirm-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+        #confirm-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-dark, #2C2C2C);
+            margin-bottom: 0.4rem;
+        }
+        #confirm-msg {
+            font-size: 0.88rem;
+            color: var(--text-light, #6B6B6B);
+            margin-bottom: 1.4rem;
+        }
+        .confirm-btns { display: flex; gap: 0.8rem; justify-content: center; }
+        .confirm-btns button {
+            flex: 1;
+            padding: 0.65rem 1rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        #confirm-cancel { background: #f5f0e8; color: var(--text-dark, #2C2C2C); }
+        #confirm-cancel:hover { opacity: 0.8; }
+        #confirm-ok { background: #c0392b; color: #fff; }
+        #confirm-ok:hover { background: #a93226; }
     </style>
 </head>
 <body>
 
 <?php include 'header.php'; ?>
+
+<div id="confirm-modal">
+  <div id="confirm-overlay"></div>
+  <div id="confirm-box">
+    <div id="confirm-icon">⚠️</div>
+    <div id="confirm-title"></div>
+    <div id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button id="confirm-cancel">Annuler</button>
+      <button id="confirm-ok">Confirmer</button>
+    </div>
+  </div>
+</div>
 
 <div class="page-header">
     <div style="max-width:1200px;margin:0 auto;">
@@ -455,9 +521,6 @@ function getImageUrl($image) {
         <i class="bi bi-arrow-left"></i> Retour à l'accueil
     </a>
 
-    <!-- ============================================================ -->
-    <!-- SECTION: BOUTIQUES FAVORITES                                  -->
-    <!-- ============================================================ -->
     <div class="section-title">
         <i class="bi bi-shop" style="color:var(--gold);"></i>
         Boutiques favorites
@@ -500,9 +563,6 @@ function getImageUrl($image) {
         </div>
     <?php endif; ?>
 
-    <!-- ============================================================ -->
-    <!-- SECTION: PRODUITS FAVORITES                                   -->
-    <!-- ============================================================ -->
     <div class="section-title" style="margin-top:2.5rem;">
         <i class="bi bi-box-seam" style="color:var(--gold);"></i>
         Produits favoris
@@ -564,7 +624,6 @@ function getImageUrl($image) {
 <?php include 'footer.php'; ?>
 
 <script>
-// ========== TOAST ==========
 function showToast(msg, isError = false) {
     const toast = document.getElementById('toast');
     toast.textContent = msg;
@@ -576,7 +635,31 @@ function showToast(msg, isError = false) {
     }, 2800);
 }
 
-// ========== AJOUTER AU PANIER ==========
+let _confirmCallback = null;
+
+function askConfirm(title, msg, callback, icon) {
+    document.getElementById('confirm-icon').textContent = icon || '⚠️';
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-msg').textContent = msg;
+    _confirmCallback = callback;
+    document.getElementById('confirm-modal').classList.add('show');
+}
+
+document.getElementById('confirm-ok').addEventListener('click', () => {
+    document.getElementById('confirm-modal').classList.remove('show');
+    if (_confirmCallback) _confirmCallback();
+});
+
+document.getElementById('confirm-cancel').addEventListener('click', () => {
+    document.getElementById('confirm-modal').classList.remove('show');
+    _confirmCallback = null;
+});
+
+document.getElementById('confirm-overlay').addEventListener('click', () => {
+    document.getElementById('confirm-modal').classList.remove('show');
+    _confirmCallback = null;
+});
+
 function addToCart(productId, productName) {
     <?php if (!isset($_SESSION['user_id'])): ?>
         showToast('⚠️ Veuillez vous connecter', true);
@@ -609,88 +692,94 @@ function addToCart(productId, productName) {
     .catch(() => showToast('❌ Erreur de connexion', true));
 }
 
-// ========== SUPPRIMER UN PRODUIT FAVORI ==========
 function supprimerProduitFavori(productId) {
-    if (!confirm('Voulez-vous retirer ce produit de vos favoris ?')) return;
-
-    fetch('toggle_favori.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'id_produit=' + productId
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const card = document.getElementById('favori-prod-' + productId);
-            if (card) {
-                card.style.opacity = '0';
-                card.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    card.remove();
-                    const remaining = document.querySelectorAll('.product-card');
-                    if (remaining.length === 0) {
-                        location.reload();
+    askConfirm(
+        'Retirer des favoris ?',
+        'Voulez-vous retirer ce produit de vos favoris ?',
+        () => {
+            fetch('toggle_favori.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'id_produit=' + productId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const card = document.getElementById('favori-prod-' + productId);
+                    if (card) {
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            card.remove();
+                            if (document.querySelectorAll('.product-card').length === 0) location.reload();
+                        }, 300);
                     }
-                }, 300);
-            }
-            showToast('✅ Retiré des favoris');
-        } else {
-            showToast('❌ ' + data.message, true);
-        }
-    })
-    .catch(() => showToast('❌ Erreur de connexion', true));
+                    showToast('✅ Retiré des favoris');
+                } else {
+                    showToast('❌ ' + data.message, true);
+                }
+            })
+            .catch(() => showToast('❌ Erreur de connexion', true));
+        },
+        '❤️'
+    );
 }
 
-// ========== SUPPRIMER UNE BOUTIQUE FAVORI ==========
 function supprimerBoutiqueFavori(boutiqueId) {
-    if (!confirm('Voulez-vous retirer cette boutique de vos favoris ?')) return;
-
-    fetch('toggle_favori_boutique.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'id_boutique=' + boutiqueId
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const card = document.getElementById('favori-store-' + boutiqueId);
-            if (card) {
-                card.style.opacity = '0';
-                card.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    card.remove();
-                    const remaining = document.querySelectorAll('.store-card');
-                    if (remaining.length === 0) {
-                        location.reload();
+    askConfirm(
+        'Retirer des favoris ?',
+        'Voulez-vous retirer cette boutique de vos favoris ?',
+        () => {
+            fetch('toggle_favori_boutique.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'id_boutique=' + boutiqueId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const card = document.getElementById('favori-store-' + boutiqueId);
+                    if (card) {
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            card.remove();
+                            if (document.querySelectorAll('.store-card').length === 0) location.reload();
+                        }, 300);
                     }
-                }, 300);
-            }
-            showToast('✅ Boutique retirée des favoris');
-        } else {
-            showToast('❌ ' + data.message, true);
-        }
-    })
-    .catch(() => showToast('❌ Erreur de connexion', true));
+                    showToast('✅ Boutique retirée des favoris');
+                } else {
+                    showToast('❌ ' + data.message, true);
+                }
+            })
+            .catch(() => showToast('❌ Erreur de connexion', true));
+        },
+        '🏪'
+    );
 }
 
-// ========== SUPPRIMER TOUS LES FAVORIS ==========
 function supprimerTousFavoris() {
-    if (!confirm('Voulez-vous vraiment supprimer tous vos favoris (produits et boutiques) ?')) return;
-
-    fetch('supprimer_tous_favoris.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showToast('✅ Tous les favoris supprimés');
-            setTimeout(() => location.reload(), 500);
-        } else {
-            showToast('❌ ' + data.message, true);
-        }
-    })
-    .catch(() => showToast('❌ Erreur de connexion', true));
+    askConfirm(
+        'Supprimer tous les favoris ?',
+        'Voulez-vous vraiment supprimer tous vos favoris (produits et boutiques) ? Cette action est irréversible.',
+        () => {
+            fetch('supprimer_tous_favoris.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('✅ Tous les favoris supprimés');
+                    setTimeout(() => location.reload(), 500);
+                } else {
+                    showToast('❌ ' + data.message, true);
+                }
+            })
+            .catch(() => showToast('❌ Erreur de connexion', true));
+        },
+        '🗑️'
+    );
 }
 </script>
 </body>

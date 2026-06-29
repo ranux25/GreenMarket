@@ -2,7 +2,6 @@
 session_start();
 header('Content-Type: application/json');
 
-// Vérifier que c'est un producteur
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'producteur') {
     echo json_encode(['success' => false, 'message' => 'Non autorisé']);
     exit;
@@ -20,7 +19,6 @@ if (!$id_boutique) {
 $id_producteur = $_SESSION['user_id'];
 
 try {
-    // Vérifier que la boutique appartient au producteur
     $stmt = $pdo->prepare("
         SELECT b.id_boutique, b.nom_boutique, b.id_producteur, 
                COUNT(p.id_produit) as nb_produits
@@ -37,25 +35,20 @@ try {
         exit;
     }
     
-    // Démarrer la transaction
     $pdo->beginTransaction();
     
-    // Supprimer les dépendances
     $tables = ['categorie_boutique', 'evaluer_boutique', 'favoris_boutique'];
     foreach ($tables as $table) {
         $stmt = $pdo->prepare("DELETE FROM $table WHERE id_boutique = ?");
         $stmt->execute([$id_boutique]);
     }
     
-    // Supprimer les produits de la boutique
     $stmt = $pdo->prepare("DELETE FROM produit WHERE id_boutique = ?");
     $stmt->execute([$id_boutique]);
     
-    // Supprimer la boutique
     $stmt = $pdo->prepare("DELETE FROM boutique WHERE id_boutique = ?");
     $stmt->execute([$id_boutique]);
     
-    // --- NOTIFICATION POUR LE PRODUCTEUR ---
     $message = "🗑️ Vous avez supprimé votre boutique '{$boutique['nom_boutique']}' avec {$boutique['nb_produits']} produit(s).\n";
     $message .= "📅 Suppression effectuée le " . date('d/m/Y à H:i');
     

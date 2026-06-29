@@ -1,76 +1,64 @@
 <?php
 session_start();
+header('Content-Type: application/json');
 
-// SOLO ADMIN
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-    header("Location: dashboard_admin.php?msgerr=" . urlencode('Non autorisé'));
+    echo json_encode(['success' => false, 'message' => 'Non autorisé']);
     exit;
 }
 
 include('connexion.php');
 
-$id_boutique = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-$action = isset($_GET['action']) ? $_GET['action'] : '';
+$id_boutique = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+$action      = $_POST['action'] ?? '';
 
 if (!$id_boutique || !in_array($action, ['valider', 'refuser'])) {
-    header("Location: dashboard_admin.php?msgerr=" . urlencode('Données invalides'));
+    echo json_encode(['success' => false, 'message' => 'Données invalides']);
     exit;
 }
 
 try {
-    // Obtener información de la boutique
     $stmt = $pdo->prepare("
-        SELECT b.id_boutique, b.nom_boutique, b.id_producteur,
-               pr.nom_entreprise, pr.email
+        SELECT b.id_boutique, b.nom_boutique, b.id_producteur
         FROM boutique b
-        JOIN producteur pr ON b.id_producteur = pr.id_producteur
         WHERE b.id_boutique = ?
     ");
     $stmt->execute([$id_boutique]);
     $boutique = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
     if (!$boutique) {
-        throw new Exception('Boutique non trouvée');
-    }
-    
-    if ($action === 'valider') {
-        $stmt = $pdo->prepare("UPDATE boutique SET est_valide_par_admin = 1 WHERE id_boutique = ?");
-        $stmt->execute([$id_boutique]);
-        $message = '✅ Boutique "' . $boutique['nom_boutique'] . '" validée avec succès';
-        
-        $notification_message = '✅ Votre boutique "' . $boutique['nom_boutique'] . '" a été validée par l\'administrateur. Vous pouvez maintenant gérer vos produits !';
-        $type = 'validation_boutique';
-        
-    } else {
-        $stmt = $pdo->prepare("UPDATE boutique SET est_valide_par_admin = 0 WHERE id_boutique = ?");
-        $stmt->execute([$id_boutique]);
-        $message = '❌ Boutique "' . $boutique['nom_boutique'] . '" refusée';
-        
-        $notification_message = '❌ Votre boutique "' . $boutique['nom_boutique'] . '" a été refusée par l\'administrateur. Veuillez contacter le support pour plus d\'informations.';
-        $type = 'refus_boutique';
+        echo json_encode(['success' => false, 'message' => 'Boutique non trouvée']);
+        exit;
     }
 
-    // Insertar notificación
-    $stmt = $pdo->prepare("
-        INSERT INTO notification (id_producteur, message, type_notification, date_notification, est_lu) 
+    if ($action === 'valider') {
+        $pdo->prepare("UPDATE boutique SET est_valide_par_admin = 1, statut = 'valide' WHERE id_boutique = ?")
+            ->execute([$id_boutique]);
+        $message   = 'Boutique "' . $boutique['nom_boutique'] . '" validée';
+        $notif_msg = '✅ Votre boutique "' . $boutique['nom_boutique'] . '" a été validée par l\'administrateur.';
+        $type      = 'validation_boutique';
+        $new_statut = 'valide';
+    } else {
+        $pdo->prepare("UPDATE boutique SET est_valide_par_admin = 0, statut = 'refuse' WHERE id_boutique = ?")
+            ->execute([$id_boutique]);
+        $message   = 'Boutique "' . $boutique['nom_boutique'] . '" refusée';
+        $notif_msg = '❌ Votre boutique "' . $boutique['nom_boutique'] . '" a été refusée par l\'administrateur.';
+        $type      = 'refus_boutique';
+        $new_statut = 'refuse';
+    }
+
+    $pdo->prepare("
+        INSERT INTO notification (id_producteur, message, type_notification, date_notification, est_lu)
         VALUES (?, ?, ?, NOW(), 0)
-    ");
-    $stmt->execute([
-        $boutique['id_producteur'],
-        $notification_message,
-        $type
+    ")->execute([$boutique['id_producteur'], $notif_msg, $type]);
+
+    echo json_encode([
+        'success'    => true,
+        'message'    => $message,
+        'new_statut' => $new_statut
     ]);
 
-    header("Location: dashboard_admin.php?msgs=" . urlencode($message) . "&tab=boutiques");
-    exit;
-
-} catch(PDOException $e) {
-    error_log("Erreur valider_boutique: " . $e->getMessage());
-    header("Location: dashboard_admin.php?msgerr=" . urlencode('Erreur SQL: ' . $e->getMessage()));
-    exit;
-} catch(Exception $e) {
-    error_log("Erreur valider_boutique: " . $e->getMessage());
-    header("Location: dashboard_admin.php?msgerr=" . urlencode($e->getMessage()));
-    exit;
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
 ?>

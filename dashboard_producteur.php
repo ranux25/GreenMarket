@@ -1,47 +1,54 @@
 <?php
 session_start();
 
-#verifier que l'utilisateur est connecte et est producteur
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'producteur') {
     header('Location: signin.php');
     exit;
 }
 
-#connexion a la base de donnees
 include('connexion.php');
 
-# ===== THEME (COOKIES) =====
 $theme = $_COOKIE['theme'] ?? 'light';
 
-# 🔥 DEBUG - Verificar sesión
 $debug_info = [];
 $debug_info['session_user_id'] = $_SESSION['user_id'] ?? 'NO SET';
 $debug_info['session_user_email'] = $_SESSION['user_email'] ?? 'NO SET';
 
-#verifier si le producteur est valide
 $est_valide = $_SESSION['est_valide'] ?? 0;
 
-#si non valide, verifier en BD
 if ($est_valide != 1) {
     try {
-        $stmt = $pdo->prepare("SELECT est_valide_par_admin FROM producteur WHERE id_producteur = ?");
-        $stmt->execute([$_SESSION['user_id']]);
+        if (isset($_SESSION['user_email'])) {
+            $stmt = $pdo->prepare("SELECT est_valide_par_admin FROM producteur WHERE email = ?");
+            $stmt->execute([$_SESSION['user_email']]);
+        } else {
+            $stmt = $pdo->prepare("SELECT est_valide_par_admin FROM producteur WHERE id_producteur = ?");
+            $stmt->execute([$_SESSION['user_id']]);
+        }
         $result = $stmt->fetch();
         if ($result && $result['est_valide_par_admin'] == 1) {
             $est_valide = 1;
             $_SESSION['est_valide'] = 1;
         }
     } catch(PDOException $e) {
-        // Ignorer
     }
 }
 
-#recuperer les donnees du producteur depuis la BD
 try {
-    #recuperer les informations du producteur
-    $stmt = $pdo->prepare("SELECT * FROM producteur WHERE id_producteur = ?");
-    $stmt->execute([$_SESSION['user_id']]);
-    $producteur = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Chercher par email d'abord (plus fiable), sinon par id
+    if (isset($_SESSION['user_email'])) {
+        $stmt = $pdo->prepare("SELECT * FROM producteur WHERE email = ?");
+        $stmt->execute([$_SESSION['user_email']]);
+        $producteur = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Corriger la session si l'id est différent
+        if ($producteur && $producteur['id_producteur'] != $_SESSION['user_id']) {
+            $_SESSION['user_id'] = $producteur['id_producteur'];
+        }
+    } else {
+        $stmt = $pdo->prepare("SELECT * FROM producteur WHERE id_producteur = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $producteur = $stmt->fetch(PDO::FETCH_ASSOC);
+    }
     
     if (!$producteur) {
         session_destroy();
@@ -52,28 +59,24 @@ try {
     $debug_info['producteur_trouve'] = $producteur['nom_entreprise'] ?? 'NO';
     $debug_info['est_valide_db'] = $producteur['est_valide_par_admin'] ?? 0;
     
-    #si l'etat de validation a change, mettre a jour la session
     if ($producteur['est_valide_par_admin'] != $est_valide) {
         $est_valide = $producteur['est_valide_par_admin'];
         $_SESSION['est_valide'] = $est_valide;
     }
     
-    #afficher les donnees seulement si valide
-    if ($est_valide == 1) {
-        #recuperer les boutiques du producteur
+    {
         $stmt = $pdo->prepare("SELECT * FROM boutique WHERE id_producteur = ?");
-        $stmt->execute([$_SESSION['user_id']]);
+        $stmt->execute([$producteur['id_producteur']]);
         $boutiques = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $nb_boutiques = count($boutiques);
         $debug_info['nb_boutiques'] = $nb_boutiques;
         
-        #recuperer les produits des boutiques
         if (!empty($boutiques)) {
             $boutiqueIds = array_column($boutiques, 'id_boutique');
             $placeholders = implode(',', array_fill(0, count($boutiqueIds), '?'));
             $stmt = $pdo->prepare("SELECT p.*, c.nom_categorie FROM produit p 
                                    LEFT JOIN categorie c ON p.id_categorie = c.id_categorie
-                                   WHERE p.id_boutique IN ($placeholders) AND p.est_valide_par_admin = 1");
+                                   WHERE p.id_boutique IN ($placeholders)");
             $stmt->execute($boutiqueIds);
             $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $nb_produits = count($produits);
@@ -84,7 +87,6 @@ try {
             $debug_info['nb_produits'] = 0;
         }
         
-        #recuperer les commandes des produits (groupées par commande)
         $commandes = [];
         if (!empty($produits)) {
             $produitIds = array_column($produits, 'id_produit');
@@ -106,7 +108,6 @@ try {
             $commandes = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $nb_commandes = count($commandes);
             
-            #calculer le CA total
             $ca_total = array_sum(array_column($commandes, 'montant_total'));
             $debug_info['nb_commandes'] = $nb_commandes;
             $debug_info['ca_total'] = $ca_total;
@@ -117,36 +118,53 @@ try {
             $debug_info['nb_commandes'] = 0;
             $debug_info['ca_total'] = 0;
         }
+
+        $avis = [];
+        $nb_avis = 0;
+        if (!empty($produits)) {
+            try {
+                $produitIds = array_column($produits, 'id_produit');
+                $placeholders = implode(',', array_fill(0, count($produitIds), '?'));
+                $stmt = $pdo->prepare("
+                    SELECT a.id_client, a.id_produit, a.note, a.commentaire,
+                           a.date_evaluation AS date_avis,
+                           p.nom_produit, cl.nom_client
+                    FROM evaluer a
+                    JOIN produit p ON a.id_produit = p.id_produit
+                    JOIN client cl ON a.id_client = cl.id_client
+                    WHERE a.id_produit IN ($placeholders)
+                    ORDER BY a.date_evaluation DESC
+                ");
+                $stmt->execute($produitIds);
+                $avis = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $nb_avis = count($avis);
+            } catch(PDOException $e) {
+                $avis = [];
+                $nb_avis = 0;
+            }
+        }
         
-    } else {
-        #si non valide, tableaux vides
-        $boutiques = [];
-        $produits = [];
-        $commandes = [];
-        $ca_total = 0;
-        $nb_commandes = 0;
-        $nb_boutiques = 0;
-        $nb_produits = 0;
-        $debug_info['est_valide'] = 0;
     }
     
 } catch(PDOException $e) {
     error_log("Error dashboard producteur: " . $e->getMessage());
-    $boutiques = [];
-    $produits = [];
-    $commandes = [];
-    $ca_total = 0;
-    $nb_commandes = 0;
-    $nb_boutiques = 0;
-    $nb_produits = 0;
-    $debug_info['error'] = $e->getMessage();
+    $debug_info['error'] = '🔴 SQL ERROR: ' . $e->getMessage();
+    // Ne pas remettre a zero — garder ce qu'on a deja charge
+    if (!isset($boutiques)) $boutiques = [];
+    if (!isset($produits)) $produits = [];
+    if (!isset($commandes)) $commandes = [];
+    if (!isset($avis)) $avis = [];
+    if (!isset($ca_total)) $ca_total = 0;
+    if (!isset($nb_commandes)) $nb_commandes = 0;
+    if (!isset($nb_boutiques)) $nb_boutiques = count($boutiques);
+    if (!isset($nb_produits)) $nb_produits = count($produits);
+    if (!isset($nb_avis)) $nb_avis = 0;
 }
 
-// Récupérer les notifications non lues pour le compteur
 $unreadCount = 0;
 try {
     $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM notification WHERE id_producteur = ? AND est_lu = 0");
-    $stmt->execute([$_SESSION['user_id']]);
+    $stmt->execute([$producteur['id_producteur']]);
     $unreadCount = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 } catch(PDOException $e) {
     $unreadCount = 0;
@@ -161,7 +179,6 @@ try {
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
-  /* ===== VARIABLES THEME ===== */
   :root {
     --primary: #5D0D18;
     --primary-light: #7a1020;
@@ -426,7 +443,6 @@ try {
 
   .action-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
-  /* ===== SETTINGS PANEL ===== */
   .settings-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -449,7 +465,6 @@ try {
     color: var(--text-light);
   }
 
-  /* ===== TOGGLE THEME AVEC ANIMATION ===== */
   .theme-toggle-wrapper {
     display: flex;
     align-items: center;
@@ -606,13 +621,85 @@ try {
       padding: 0.3rem 0.6rem;
     }
   }
+
+  #confirm-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    align-items: center;
+    justify-content: center;
+  }
+  #confirm-modal.show { display: flex; }
+  #confirm-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(3px);
+  }
+  #confirm-box {
+    position: relative;
+    background: var(--bg-card, #fff);
+    border-radius: 20px;
+    padding: 2rem 1.8rem 1.5rem;
+    max-width: 360px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    text-align: center;
+    animation: modalIn 0.25s cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.88) translateY(20px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  #confirm-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+  #confirm-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-dark, #2C2C2C);
+    margin-bottom: 0.4rem;
+  }
+  #confirm-msg {
+    font-size: 0.88rem;
+    color: var(--text-light, #6B6B6B);
+    margin-bottom: 1.4rem;
+  }
+  .confirm-btns { display: flex; gap: 0.8rem; justify-content: center; }
+  .confirm-btns button {
+    flex: 1;
+    padding: 0.65rem 1rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  #confirm-cancel { background: var(--bg-light, #f5f0e8); color: var(--text-dark, #2C2C2C); }
+  #confirm-cancel:hover { opacity: 0.8; }
+  #confirm-ok { background: #c0392b; color: #fff; }
+  #confirm-ok:hover { background: #a93226; }
 </style>
 </head>
 <body>
 
 <?php include 'header.php'; ?>
 
-<!-- Mensaje de éxito al crear boutique -->
+
+<div id="confirm-modal">
+  <div id="confirm-overlay"></div>
+  <div id="confirm-box">
+    <div id="confirm-icon">⚠️</div>
+    <div id="confirm-title"></div>
+    <div id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button id="confirm-cancel">Annuler</button>
+      <button id="confirm-ok">Confirmer</button>
+    </div>
+  </div>
+</div>
+
 <?php if (isset($_GET['boutique_creation']) && $_GET['boutique_creation'] == 'success'): ?>
     <div class="alert-success" style="margin:1.5rem;border:1px solid #c3e6cb;">
         <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:0.5rem;">
@@ -625,16 +712,14 @@ try {
     </div>
 <?php endif; ?>
 
-<!-- Mensaje de espera si no está validado -->
 <?php if ($est_valide != 1): ?>
 <div class="alert-warning">
   <i class="bi bi-hourglass-split" style="font-size: 1.2rem;"></i>
   <strong>⚠️ Compte en attente de validation</strong>
-  <p style="margin: 0;">Votre compte producteur est en attente de validation par un administrateur. Vous recevrez une notification une fois votre compte activé.</p>
+  <p style="margin: 0;">Votre compte producteur est en attente de validation par un administrateur. Vos boutiques et produits sont visibles ici mais ne seront publiés qu'après validation.</p>
 </div>
-<?php else: ?>
+<?php endif; ?>
 
-<!-- Dashboard Content -->
 <div class="dashboard-grid">
   <div class="stat-card">
     <div class="stat-icon">💰</div>
@@ -664,15 +749,13 @@ try {
     <button class="tab-btn" data-tab="boutiques">🏪 Mes Boutiques</button>
     <button class="tab-btn" data-tab="produits">📦 Mes Produits</button>
     <button class="tab-btn" data-tab="commandes">🛒 Commandes</button>
+    <button class="tab-btn" data-tab="avis">⭐ Avis <span class="badge-tab"><?php echo $nb_avis; ?></span></button>
     <button class="tab-btn" data-tab="parametres">⚙️ Paramètres</button>
   </div>
 </div>
 
 <div class="main-content">
   
-  <!-- ============================== -->
-  <!-- ONGLET APERÇU                  -->
-  <!-- ============================== -->
   <div class="tab-panel active" id="tab-apercu">
     <div class="section-card">
       <div class="section-header">📈 Mes Statistiques</div>
@@ -703,9 +786,6 @@ try {
     </div>
   </div>
 
-  <!-- ============================== -->
-  <!-- ONGLET BOUTIQUES               -->
-  <!-- ============================== -->
   <div class="tab-panel" id="tab-boutiques">
     <div class="section-card">
       <div class="section-header">
@@ -747,9 +827,6 @@ try {
     </div>
   </div>
 
-  <!-- ============================== -->
-  <!-- ONGLET PRODUITS                -->
-  <!-- ============================== -->
   <div class="tab-panel" id="tab-produits">
     <div class="section-card">
       <div class="section-header">
@@ -796,9 +873,6 @@ try {
     </div>
   </div>
 
-  <!-- ============================== -->
-  <!-- ONGLET COMMANDES               -->
-  <!-- ============================== -->
   <div class="tab-panel" id="tab-commandes">
     <div class="section-card">
       <div class="section-header">
@@ -883,15 +957,83 @@ try {
     </div>
   </div>
 
-  <!-- ============================== -->
-  <!-- ONGLET PARAMÈTRES              -->
-  <!-- ============================== -->
+  <div class="tab-panel" id="tab-avis">
+    <div class="section-card">
+      <div class="section-header">
+        ⭐ Avis sur mes produits
+        <span class="badge-count"><?php echo $nb_avis; ?> avis</span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>Client</th>
+              <th>Note</th>
+              <th>Commentaire</th>
+              <th>Date</th>
+              <th>Réponse</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php if (empty($avis)): ?>
+              <tr>
+                <td colspan="6" class="empty-state">
+                  <span class="empty-icon">⭐</span>
+                  Aucun avis reçu pour le moment.
+                </td>
+              </tr>
+            <?php else: ?>
+              <?php foreach ($avis as $av): ?>
+              <?php $reply_id = $av['id_client'] . '__' . $av['id_produit']; ?>
+              <tr>
+                <td><strong><?php echo htmlspecialchars($av['nom_produit']); ?></strong></td>
+                <td><?php echo htmlspecialchars($av['nom_client']); ?></td>
+                <td>
+                  <?php for ($i = 1; $i <= 5; $i++): ?>
+                    <span style="color:<?php echo $i <= $av['note'] ? '#f39c12' : '#ccc'; ?>">★</span>
+                  <?php endfor; ?>
+                  <small>(<?php echo $av['note']; ?>/5)</small>
+                </td>
+                <td><?php echo htmlspecialchars($av['commentaire'] ?? '—'); ?></td>
+                <td><?php echo date('d/m/Y', strtotime($av['date_avis'])); ?></td>
+                <td>
+                  <?php if (!empty($av['reponse_producteur'])): ?>
+                    <div style="background:var(--bg-light);border-left:3px solid var(--primary);padding:0.5rem 0.8rem;border-radius:4px;font-size:0.85rem;">
+                      <?php echo htmlspecialchars($av['reponse_producteur']); ?>
+                    </div>
+                    <button class="btn btn-outline-wine" style="margin-top:0.4rem;font-size:0.75rem;" onclick="toggleReplyForm('<?php echo $reply_id; ?>', true)">
+                      ✏️ Modifier
+                    </button>
+                  <?php else: ?>
+                    <button class="btn btn-wine" onclick="toggleReplyForm('<?php echo $reply_id; ?>', false)">
+                      💬 Répondre
+                    </button>
+                  <?php endif; ?>
+                  <div id="reply-form-<?php echo $reply_id; ?>" style="display:none;margin-top:0.5rem;">
+                    <textarea id="reply-text-<?php echo $reply_id; ?>" rows="3"
+                      style="width:100%;padding:0.5rem;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-dark);font-size:0.85rem;resize:vertical;"
+                      placeholder="Votre réponse..."><?php echo htmlspecialchars($av['reponse_producteur'] ?? ''); ?></textarea>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.4rem;">
+                      <button class="btn btn-success" onclick="submitReply('<?php echo $reply_id; ?>')">✅ Enregistrer</button>
+                      <button class="btn btn-danger" onclick="toggleReplyForm('<?php echo $reply_id; ?>', false, true)">✖ Annuler</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <?php endforeach; ?>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <div class="tab-panel" id="tab-parametres">
     <div class="section-card">
       <div class="section-header">⚙️ Paramètres</div>
       <div class="settings-grid">
         
-        <!-- ===== THEME TOGGLE AVEC ANIMATION ===== -->
         <div class="settings-group">
           <h4>🎨 Thème Clair / Sombre</h4>
           <div class="theme-toggle-wrapper">
@@ -912,7 +1054,6 @@ try {
           </p>
         </div>
         
-        <!-- ===== INFORMATIONS DU COMPTE ===== -->
         <div class="settings-group">
           <h4>👤 Informations du compte</h4>
           <p style="font-size:0.9rem;color:var(--text-dark);">
@@ -935,14 +1076,10 @@ try {
 
 </div>
 
-<?php endif; ?>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ============================================
-// ONGLETS
-// ============================================
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', function() {
     const tabName = this.getAttribute('data-tab');
@@ -953,9 +1090,6 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-// ============================================
-// TOAST
-// ============================================
 function showToast(msg, isError = false) {
   const toast = document.getElementById('toast');
   toast.innerHTML = msg;
@@ -964,66 +1098,117 @@ function showToast(msg, isError = false) {
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-// ============================================
-// UPDATE STATUT COMMANDE
-// ============================================
-function updateStatut(id, statut) {
-  if (confirm('Voulez-vous vraiment changer le statut de cette commande en "' + statut + '" ?')) {
-    fetch('update_commande.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'id_commande=' + id + '&statut=' + encodeURIComponent(statut)
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        showToast('✅ ' + data.message);
-        setTimeout(() => location.reload(), 1000);
-      } else {
-        showToast('❌ ' + data.message, true);
-      }
-    })
-    .catch(() => showToast('❌ Erreur de connexion au serveur', true));
-  }
+let _confirmCallback = null;
+
+function askConfirm(title, msg, callback, icon) {
+  document.getElementById('confirm-icon').textContent = icon || '⚠️';
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-msg').textContent = msg;
+  _confirmCallback = callback;
+  document.getElementById('confirm-modal').classList.add('show');
 }
 
-// ============================================
-// VOIR DÉTAILS COMMANDE
-// ============================================
+document.getElementById('confirm-ok').addEventListener('click', () => {
+  document.getElementById('confirm-modal').classList.remove('show');
+  if (_confirmCallback) _confirmCallback();
+});
+
+document.getElementById('confirm-cancel').addEventListener('click', () => {
+  document.getElementById('confirm-modal').classList.remove('show');
+  _confirmCallback = null;
+});
+
+document.getElementById('confirm-overlay').addEventListener('click', () => {
+  document.getElementById('confirm-modal').classList.remove('show');
+  _confirmCallback = null;
+});
+
+function updateStatut(id, statut) {
+  const icons = {
+    'Confirmée': '✅',
+    'Expédiée': '📦',
+    'Livrée': '✅',
+    'Annulée': '❌'
+  };
+  askConfirm(
+    'Changer le statut ?',
+    'Voulez-vous vraiment passer cette commande en "' + statut + '" ?',
+    () => {
+      fetch('update_commande.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'id_commande=' + id + '&statut=' + encodeURIComponent(statut)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('✅ ' + data.message);
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          showToast('❌ ' + data.message, true);
+        }
+      })
+      .catch(() => showToast('❌ Erreur de connexion au serveur', true));
+    },
+    icons[statut] || '⚠️'
+  );
+}
+
 function voirDetails(id) {
   window.location.href = 'details_commande.php?id=' + id;
 }
 
-// ============================================
-// TOGGLE THEME AVEC ANIMATION
-// ============================================
 function toggleTheme() {
   const checkbox = document.getElementById('themeToggle');
   const theme = checkbox.checked ? 'dark' : 'light';
   
-  // Sauvegarder dans un cookie
   document.cookie = 'theme=' + theme + '; path=/; max-age=31536000';
-  
-  // Appliquer le thème immédiatement
   document.documentElement.setAttribute('data-theme', theme);
   
-  // Mettre à jour le texte de statut
   const statusText = document.querySelector('.settings-group p');
   if (statusText) {
     statusText.textContent = theme === 'dark' ? '🌙 Mode sombre activé' : '☀️ Mode clair activé';
   }
   
-  // Afficher le message
   const themeName = theme === 'light' ? 'clair' : 'sombre';
   showToast('✅ Thème changé en ' + themeName);
   
-  // Recharger la page pour appliquer les changements dans le header également
   setTimeout(() => location.reload(), 600);
 }
 
-// ============================================
-// INIT - Appliquer le thème au chargement
-// ============================================
+function toggleReplyForm(id, show, cancel = false) {
+  const form = document.getElementById('reply-form-' + id);
+  if (cancel) {
+    form.style.display = 'none';
+  } else {
+    form.style.display = show ? 'none' : (form.style.display === 'none' ? 'block' : 'none');
+    if (!cancel) form.style.display = 'block';
+  }
+}
+
+function submitReply(id) {
+  const text = document.getElementById('reply-text-' + id).value.trim();
+  if (!text) {
+    showToast('❌ Veuillez écrire une réponse.', true);
+    return;
+  }
+  fetch('repondre_avis.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'id_avis=' + id + '&reponse=' + encodeURIComponent(text)
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      showToast('✅ Réponse enregistrée !');
+      setTimeout(() => location.reload(), 1000);
+    } else {
+      showToast('❌ ' + (data.message || 'Erreur'), true);
+    }
+  })
+  .catch(() => showToast('❌ Erreur de connexion', true));
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   const theme = '<?php echo $theme; ?>';
   document.documentElement.setAttribute('data-theme', theme);

@@ -2,7 +2,6 @@
 session_start();
 include('connexion.php');
 
-// Verificar que el usuario esté logueado y sea producteur
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'producteur') {
     header("Location: signin.php");
     exit();
@@ -12,7 +11,6 @@ $theme = $_COOKIE['theme'] ?? 'light';
 $id_producteur = $_SESSION['user_id'];
 $id_boutique = intval($_GET['boutique'] ?? 0);
 
-// Verificar que la boutique pertenece al producteur
 try {
     $stmt = $pdo->prepare("SELECT * FROM boutique WHERE id_boutique = ? AND id_producteur = ?");
     $stmt->execute([$id_boutique, $id_producteur]);
@@ -27,7 +25,6 @@ try {
     exit();
 }
 
-// Récupérer les catégories disponibles
 try {
     $stmt = $pdo->query("SELECT id_categorie, nom_categorie FROM categorie ORDER BY nom_categorie");
     $categories = $stmt->fetchAll();
@@ -38,7 +35,6 @@ try {
 $error = '';
 $success = '';
 
-// Traitement du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nom_produit = trim($_POST['nom_produit'] ?? '');
     $description = trim($_POST['description'] ?? '');
@@ -48,7 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $statut_publie = $_POST['statut_publie'] ?? 'Brouillon';
     $image = $_FILES['photo'] ?? null;
     
-    // Validation
     if (empty($nom_produit)) {
         $error = "Veuillez saisir un nom pour le produit";
     } elseif (strlen($nom_produit) < 3) {
@@ -61,7 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "Veuillez sélectionner une catégorie";
     } else {
         try {
-            // Gérer l'upload de l'image
             $image_path = null;
             if ($image && $image['error'] === UPLOAD_ERR_OK) {
                 $upload_dir = 'IMAGES/produits/';
@@ -84,7 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             if (empty($error)) {
-                // Insérer le produit
                 $stmt = $pdo->prepare("
                     INSERT INTO produit (
                         id_categorie, id_boutique, nom_produit, description, 
@@ -242,14 +235,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(93,13,24,0.3);
         }
-        .alert {
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1.5rem;
-            font-weight: 600;
-        }
-        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .image-preview {
             margin-top: 0.5rem;
             max-width: 200px;
@@ -260,6 +245,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         .image-preview img { width: 100%; height: auto; border-radius: 8px; }
         .image-preview.show { display: block; }
+
+        #toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: var(--primary);
+            color: #fff;
+            padding: 14px 22px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            z-index: 9999;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: 0.4s cubic-bezier(.22,1,.36,1);
+            max-width: 320px;
+        }
+        #toast.show { transform: translateY(0); opacity: 1; }
         .boutique-info {
             background: var(--bg);
             border-radius: 10px;
@@ -292,6 +295,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <?php include 'header.php'; ?>
 
+<div id="toast"></div>
+
 <div class="page-header">
     <div style="max-width:800px;margin:0 auto;">
         <h1><i class="bi bi-plus-circle"></i> Ajouter un produit</h1>
@@ -306,7 +311,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </a>
 
     <?php if ($error): ?>
-        <div class="alert alert-error">❌ <?php echo htmlspecialchars($error); ?></div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        showToast('❌ <?php echo addslashes(htmlspecialchars($error)); ?>', '#c0392b');
+    });
+    </script>
     <?php endif; ?>
 
     <div class="form-card">
@@ -316,7 +325,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <form method="POST" enctype="multipart/form-data">
-            <!-- Nom du produit -->
             <div class="form-group">
                 <label>Nom du produit <span class="required">*</span></label>
                 <input type="text" name="nom_produit" 
@@ -326,7 +334,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <div class="form-row">
-                <!-- Prix -->
                 <div class="form-group">
                     <label>Prix (DH) <span class="required">*</span></label>
                     <input type="number" name="prix_unitaire" 
@@ -335,7 +342,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                            required>
                 </div>
 
-                <!-- Stock -->
                 <div class="form-group">
                     <label>Quantité en stock <span class="required">*</span></label>
                     <input type="number" name="stock_quantite" 
@@ -345,7 +351,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
-            <!-- Catégorie -->
             <div class="form-group">
                 <label>Catégorie <span class="required">*</span></label>
                 <select name="id_categorie" required>
@@ -359,7 +364,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </select>
             </div>
 
-            <!-- Description -->
             <div class="form-group">
                 <label>Description du produit</label>
                 <textarea name="description" rows="4" 
@@ -367,7 +371,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                           maxlength="500"><?php echo htmlspecialchars($_POST['description'] ?? ''); ?></textarea>
             </div>
 
-            <!-- Image -->
             <div class="form-group">
                 <label>Photo du produit</label>
                 <input type="file" name="photo" id="photo" accept="image/*" onchange="previewImage(event)">
@@ -377,7 +380,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
-            <!-- Statut de publication -->
             <div class="form-group">
                 <label>Statut de publication</label>
                 <select name="statut_publie">
@@ -403,6 +405,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php include 'footer.php'; ?>
 
 <script>
+function showToast(msg, bg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.background = bg || 'var(--primary)';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
 function previewImage(event) {
     const preview = document.getElementById('imagePreview');
     const img = document.getElementById('previewImg');
